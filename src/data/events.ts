@@ -29,6 +29,48 @@ export interface GameEvent {
   choices: EventChoice[];
 }
 
+const TUTORIAL_EVENTS: GameEvent[] = [
+  {
+    id: 'tutorial-budget',
+    phase: 'development',
+    difficulty: 1,
+    tags: ['cash', 'team'],
+    title: '[튜토리얼] 첫 달 운영비',
+    description: '초기 자금은 넉넉하지 않다. 운영 전략을 고르자.',
+    choices: [
+      { id: 'safe-plan', label: '보수 운영', effect: { money: -1, morale: 1, risk: -1, progress: 2 } },
+      { id: 'balanced-plan', label: '균형 운영', effect: { money: -2, morale: 1, progress: 4, quality: 1 } },
+      { id: 'aggressive-plan', label: '공격 운영', effect: { money: -3, progress: 7, morale: -1, risk: 1 } }
+    ]
+  },
+  {
+    id: 'tutorial-scope',
+    phase: 'development',
+    difficulty: 1,
+    tags: ['quality', 'risk'],
+    title: '[튜토리얼] 핵심 기능 확정',
+    description: '무엇을 넣고 무엇을 빼는지가 향후 품질을 좌우한다.',
+    choices: [
+      { id: 'focus-core', label: '핵심만 만든다', effect: { progress: 6, quality: 2, stability: 2 } },
+      { id: 'one-more-feature', label: '기능 하나 더', effect: { progress: 8, quality: 1, risk: 1 } },
+      { id: 'prototype-fast', label: '프로토타입 우선', effect: { progress: 5, hype: 3, quality: -1 } }
+    ]
+  },
+  {
+    id: 'tutorial-team',
+    phase: 'development',
+    difficulty: 1,
+    tags: ['team', 'marketing'],
+    title: '[튜토리얼] 팀 분위기와 외부 기대감',
+    description: '팀 컨디션과 유저 기대를 함께 관리해야 한다.',
+    choices: [
+      { id: 'internal-day', label: '팀 케어 데이', effect: { morale: 3, progress: 2, hype: -1 } },
+      { id: 'dev-log', label: '개발자 노트 공개', effect: { morale: 1, hype: 4, reputation: 1 } },
+      { id: 'silent-sprint', label: '조용히 스퍼트', effect: { progress: 6, morale: -2, risk: 1 } }
+    ]
+  }
+];
+
 const DEVELOPMENT_EVENTS: GameEvent[] = [
   {
     id: 'feature-freeze',
@@ -225,7 +267,15 @@ function weightedPick(deck: GameEvent[], turn: number): GameEvent {
   return fallback[pickIndex];
 }
 
+export function isTutorialTurn(turn: number, phase: Phase): boolean {
+  return phase === 'development' && turn <= TUTORIAL_EVENTS.length;
+}
+
 export function getEventForTurn(turn: number, phase: Phase): GameEvent {
+  if (isTutorialTurn(turn, phase)) {
+    return TUTORIAL_EVENTS[turn - 1];
+  }
+
   const deck = phase === 'development' ? DEVELOPMENT_EVENTS : LIVE_EVENTS;
   return weightedPick(deck, turn);
 }

@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { initialGameState, type GameState, type Phase } from '../core/gameState';
-import { getEventForTurn } from '../data/events';
+import { getEventForTurn, isTutorialTurn } from '../data/events';
 import { clearSave, loadGame, saveGame } from '../systems/saveLoad';
 import { buildRunReport, resolveTurn } from '../systems/turnResolver';
 
@@ -97,6 +97,10 @@ export class MainScene extends Phaser.Scene {
     }
 
     const event = getEventForTurn(this.state.turn, this.state.phase);
+    if (isTutorialTurn(this.state.turn, this.state.phase)) {
+      this.addLine('튜토리얼 턴: 핵심 지표 변화를 익히세요', left, y, '#ffd6a5', 18);
+      y += 28;
+    }
     this.addLine(event.title, left, y, '#06d6a0', 28);
     y += 38;
     this.addLine(event.description, left, y, '#f1faee', 20);
