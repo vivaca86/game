@@ -59,12 +59,22 @@ export class MainScene extends Phaser.Scene {
     this.addLine(`진척 ${progress}%  품질 ${quality}  안정 ${stability}  하이프 ${hype}`, left, y, '#cce3de', 20);
     y += 30;
 
+    this.addLine(`팀 인원 ${this.state.team.headcount}명  숙련도 ${this.state.team.skill}`, left, y, '#e9edc9', 20);
+    y += 30;
+
+
     if (this.state.phase === 'live') {
       this.addLine(`동접 ${this.state.live.ccu}  턴매출 ${this.state.live.revenue}  누적매출 ${this.state.live.cumulativeRevenue}`, left, y, '#f1fa8c', 20);
       y += 34;
     } else {
       y += 16;
     }
+
+    const settlement = this.state.lastSettlement;
+    this.addLine(`정산: 수익 ${settlement.income} / 비용 ${settlement.cost} / 순이익 ${settlement.net}`, left, y, '#ffddd2', 18);
+    y += 24;
+    this.addLine(settlement.summary, left, y, '#ffc8dd', 16);
+    y += 24;
 
     this.addLine('[S] 저장  [L] 불러오기  [C] 저장삭제', left, y, '#adb5bd', 18);
     y += 32;

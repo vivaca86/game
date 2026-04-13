@@ -7,6 +7,11 @@ export interface Resources {
   risk: number;
 }
 
+export interface TeamStats {
+  headcount: number;
+  skill: number;
+}
+
 export interface ProductStats {
   progress: number;
   quality: number;
@@ -19,6 +24,13 @@ export interface LiveStats {
   revenue: number;
   cumulativeRevenue: number;
   peakCcu: number;
+}
+
+export interface TurnSettlement {
+  income: number;
+  cost: number;
+  net: number;
+  summary: string;
 }
 
 export interface RunReport {
@@ -38,8 +50,10 @@ export interface GameState {
   gameOver: boolean;
   ending: string | null;
   resources: Resources;
+  team: TeamStats;
   product: ProductStats;
   live: LiveStats;
+  lastSettlement: TurnSettlement;
 }
 
 export const MIN_RESOURCE = 0;
@@ -57,6 +71,10 @@ export const initialGameState: GameState = {
     reputation: 5,
     risk: 3
   },
+  team: {
+    headcount: 4,
+    skill: 50
+  },
   product: {
     progress: 15,
     quality: 45,
@@ -68,5 +86,11 @@ export const initialGameState: GameState = {
     revenue: 0,
     cumulativeRevenue: 0,
     peakCcu: 0
+  },
+  lastSettlement: {
+    income: 0,
+    cost: 0,
+    net: 0,
+    summary: '초기 상태'
   }
 };

@@ -11,6 +11,8 @@ export interface ChoiceEffect {
   quality?: number;
   stability?: number;
   hype?: number;
+  headcount?: number;
+  skill?: number;
 }
 
 export interface EventChoice {
@@ -64,9 +66,9 @@ const TUTORIAL_EVENTS: GameEvent[] = [
     title: '[튜토리얼] 팀 분위기와 외부 기대감',
     description: '팀 컨디션과 유저 기대를 함께 관리해야 한다.',
     choices: [
-      { id: 'internal-day', label: '팀 케어 데이', effect: { morale: 3, progress: 2, hype: -1 } },
+      { id: 'internal-day', label: '팀 케어 데이', effect: { morale: 3, progress: 2, hype: -1, skill: 1 } },
       { id: 'dev-log', label: '개발자 노트 공개', effect: { morale: 1, hype: 4, reputation: 1 } },
-      { id: 'silent-sprint', label: '조용히 스퍼트', effect: { progress: 6, morale: -2, risk: 1 } }
+      { id: 'silent-sprint', label: '조용히 스퍼트', effect: { progress: 6, morale: -2, risk: 1, skill: -1 } }
     ]
   }
 ];
@@ -93,8 +95,8 @@ const DEVELOPMENT_EVENTS: GameEvent[] = [
     title: '경력자 영입 기회',
     description: '비용은 크지만 개발 속도를 올릴 수 있다.',
     choices: [
-      { id: 'senior-hire', label: '시니어 채용', effect: { money: -4, progress: 10, quality: 4, morale: 1 } },
-      { id: 'contractor', label: '단기 외주', effect: { money: -2, progress: 6, risk: 1 } },
+      { id: 'senior-hire', label: '시니어 채용', effect: { money: -4, progress: 10, quality: 4, morale: 1, headcount: 1, skill: 6 } },
+      { id: 'contractor', label: '단기 외주', effect: { money: -2, progress: 6, risk: 1, skill: 2 } },
       { id: 'skip-hire', label: '현 인력 유지', effect: { money: 1, morale: -1, progress: 2 } }
     ]
   },

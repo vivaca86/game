@@ -14,8 +14,10 @@ function isGameState(candidate: unknown): candidate is GameState {
     typeof state.phase === 'string' &&
     typeof state.gameOver === 'boolean' &&
     typeof state.resources === 'object' &&
+    typeof state.team === 'object' &&
     typeof state.product === 'object' &&
-    typeof state.live === 'object'
+    typeof state.live === 'object' &&
+    typeof state.lastSettlement === 'object'
   );
 }
 

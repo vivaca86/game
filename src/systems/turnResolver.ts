@@ -4,12 +4,18 @@ import {
   type GameState,
   type ProductStats,
   type Resources,
-  type RunReport
+  type RunReport,
+  type TeamStats,
+  type TurnSettlement
 } from '../core/gameState';
 import type { ChoiceEffect, EventChoice } from '../data/events';
 
 function clampProductStat(value: number): number {
   return Math.max(0, Math.min(MAX_PRODUCT_STAT, value));
+}
+
+function clampSkill(value: number): number {
+  return Math.max(10, Math.min(100, value));
 }
 
 function applyResourceEffect(resources: Resources, effect: ChoiceEffect): Resources {
@@ -30,14 +36,59 @@ function applyProductEffect(product: ProductStats, effect: ChoiceEffect): Produc
   };
 }
 
-function applyDevelopmentUpkeep(state: GameState): GameState {
+function applyTeamEffect(team: TeamStats, effect: ChoiceEffect): TeamStats {
+  return {
+    headcount: Math.max(1, team.headcount + (effect.headcount ?? 0)),
+    skill: clampSkill(team.skill + (effect.skill ?? 0))
+  };
+}
+
+function moraleProductivityMultiplier(morale: number): number {
+  if (morale >= 12) {
+    return 1.12;
+  }
+  if (morale >= 8) {
+    return 1;
+  }
+  if (morale >= 5) {
+    return 0.9;
+  }
+  return 0.78;
+}
+
+function buildDevelopmentSettlement(state: GameState): TurnSettlement {
+  const baseIncome = Math.round(state.team.headcount * (state.team.skill / 50));
+  const officeCost = 3;
+  const payrollCost = state.team.headcount * 2;
+  const toolCost = Math.max(1, Math.round(state.team.headcount * 0.4));
+  const cost = officeCost + payrollCost + toolCost;
+  const income = baseIncome;
+
+  return {
+    income,
+    cost,
+    net: income - cost,
+    summary: `개발정산 수익 ${income} / 비용 ${cost}`
+  };
+}
+
+function applyDevelopmentSettlement(state: GameState): GameState {
+  const settlement = buildDevelopmentSettlement(state);
+  const productivity = moraleProductivityMultiplier(state.resources.morale);
+
   return {
     ...state,
     resources: {
       ...state.resources,
-      money: state.resources.money - 2,
+      money: state.resources.money + settlement.net,
       morale: state.resources.morale - 1
-    }
+    },
+    product: {
+      ...state.product,
+      progress: clampProductStat(state.product.progress + Math.round(state.team.headcount * 0.8 * productivity)),
+      quality: clampProductStat(state.product.quality + Math.round((state.team.skill - 50) / 20))
+    },
+    lastSettlement: settlement
   };
 }
 
@@ -50,13 +101,25 @@ function applyLiveSettlement(state: GameState): GameState {
 
   const ccu = Math.max(0, Math.round(qualityFactor + stabilityFactor + hypeFactor + reputationFactor - riskPenalty));
   const revenue = Math.max(0, Math.round(ccu * 0.45));
-  const liveCost = 3;
+
+  const officeCost = 3;
+  const payrollCost = state.team.headcount * 2;
+  const serverCost = Math.max(2, Math.round(ccu * 0.08));
+  const liveOpsCost = 2;
+  const totalCost = officeCost + payrollCost + serverCost + liveOpsCost;
+
+  const settlement: TurnSettlement = {
+    income: revenue,
+    cost: totalCost,
+    net: revenue - totalCost,
+    summary: `라이브정산 매출 ${revenue} / 비용 ${totalCost}`
+  };
 
   return {
     ...state,
     resources: {
       ...state.resources,
-      money: state.resources.money + revenue - liveCost,
+      money: state.resources.money + settlement.net,
       morale: state.resources.morale - 1
     },
     live: {
@@ -64,7 +127,8 @@ function applyLiveSettlement(state: GameState): GameState {
       revenue,
       cumulativeRevenue: state.live.cumulativeRevenue + revenue,
       peakCcu: Math.max(state.live.peakCcu, ccu)
-    }
+    },
+    lastSettlement: settlement
   };
 }
 
@@ -77,6 +141,12 @@ function tryLaunch(state: GameState): GameState {
         ...state.resources,
         reputation: state.resources.reputation + 2,
         risk: Math.max(0, state.resources.risk - 1)
+      },
+      lastSettlement: {
+        income: 0,
+        cost: 0,
+        net: 0,
+        summary: '출시 완료: 라이브 운영 시작'
       }
     };
   }
@@ -93,10 +163,11 @@ export function resolveTurn(state: GameState, choice: EventChoice): GameState {
     ...state,
     turn: state.turn + 1,
     resources: applyResourceEffect(state.resources, choice.effect),
+    team: applyTeamEffect(state.team, choice.effect),
     product: applyProductEffect(state.product, choice.effect)
   };
 
-  const settledState = updatedState.phase === 'development' ? applyDevelopmentUpkeep(updatedState) : applyLiveSettlement(updatedState);
+  const settledState = updatedState.phase === 'development' ? applyDevelopmentSettlement(updatedState) : applyLiveSettlement(updatedState);
   const launchedState = tryLaunch(settledState);
 
   return evaluateEnding(launchedState);
