@@ -18,6 +18,17 @@ export interface LiveStats {
   ccu: number;
   revenue: number;
   cumulativeRevenue: number;
+  peakCcu: number;
+}
+
+export interface RunReport {
+  ending: string;
+  turnsSurvived: number;
+  tier: string;
+  peakCcu: number;
+  cumulativeRevenue: number;
+  finalQuality: number;
+  failureCause: string;
 }
 
 export interface GameState {
@@ -55,6 +66,7 @@ export const initialGameState: GameState = {
   live: {
     ccu: 0,
     revenue: 0,
-    cumulativeRevenue: 0
+    cumulativeRevenue: 0,
+    peakCcu: 0
   }
 };

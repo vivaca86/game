@@ -3,7 +3,8 @@ import {
   MIN_RESOURCE,
   type GameState,
   type ProductStats,
-  type Resources
+  type Resources,
+  type RunReport
 } from '../core/gameState';
 import type { ChoiceEffect, EventChoice } from '../data/events';
 
@@ -61,7 +62,8 @@ function applyLiveSettlement(state: GameState): GameState {
     live: {
       ccu,
       revenue,
-      cumulativeRevenue: state.live.cumulativeRevenue + revenue
+      cumulativeRevenue: state.live.cumulativeRevenue + revenue,
+      peakCcu: Math.max(state.live.peakCcu, ccu)
     }
   };
 }
@@ -100,7 +102,7 @@ export function resolveTurn(state: GameState, choice: EventChoice): GameState {
   return evaluateEnding(launchedState);
 }
 
-function getCompanyTier(state: GameState): string {
+export function getCompanyTier(state: GameState): string {
   const score =
     state.resources.money * 2 +
     state.resources.reputation * 6 +
@@ -144,4 +146,27 @@ export function evaluateEnding(state: GameState): GameState {
   }
 
   return state;
+}
+
+export function buildRunReport(state: GameState): RunReport {
+  const ending = state.ending ?? '미확정 엔딩';
+  let failureCause = '시즌 완료';
+
+  if (ending.includes('파산')) {
+    failureCause = '현금 부족';
+  } else if (ending.includes('붕괴')) {
+    failureCause = '팀 멘탈 붕괴';
+  } else if (ending.includes('퇴출')) {
+    failureCause = '시장 신뢰 상실';
+  }
+
+  return {
+    ending,
+    turnsSurvived: Math.min(state.turn, state.maxTurns),
+    tier: getCompanyTier(state),
+    peakCcu: state.live.peakCcu,
+    cumulativeRevenue: state.live.cumulativeRevenue,
+    finalQuality: state.product.quality,
+    failureCause
+  };
 }

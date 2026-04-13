@@ -1,7 +1,8 @@
 import Phaser from 'phaser';
 import { initialGameState, type GameState, type Phase } from '../core/gameState';
 import { getEventForTurn } from '../data/events';
-import { resolveTurn } from '../systems/turnResolver';
+import { clearSave, loadGame, saveGame } from '../systems/saveLoad';
+import { buildRunReport, resolveTurn } from '../systems/turnResolver';
 
 function phaseLabel(phase: Phase): string {
   return phase === 'development' ? '개발 단계' : '라이브 운영 단계';
@@ -18,10 +19,28 @@ export class MainScene extends Phaser.Scene {
   public create(): void {
     this.cameras.main.setBackgroundColor('#1d1f27');
     this.uiGroup = this.add.group();
+    this.bindGlobalShortcuts();
     this.renderTurn();
   }
 
-  private renderTurn(): void {
+  private bindGlobalShortcuts(): void {
+    this.input.keyboard?.on('keydown-S', () => {
+      saveGame(this.state);
+      this.renderTurn('저장 완료');
+    });
+
+    this.input.keyboard?.on('keydown-L', () => {
+      this.state = loadGame();
+      this.renderTurn('불러오기 완료');
+    });
+
+    this.input.keyboard?.on('keydown-C', () => {
+      clearSave();
+      this.renderTurn('저장 데이터 삭제');
+    });
+  }
+
+  private renderTurn(notice = ''): void {
     this.uiGroup.clear(true, true);
 
     const left = 32;
@@ -47,9 +66,27 @@ export class MainScene extends Phaser.Scene {
       y += 16;
     }
 
+    this.addLine('[S] 저장  [L] 불러오기  [C] 저장삭제', left, y, '#adb5bd', 18);
+    y += 32;
+
+    if (notice) {
+      this.addLine(notice, left, y, '#80ed99', 18);
+      y += 28;
+    }
+
     if (this.state.gameOver) {
-      this.addLine(`엔딩: ${this.state.ending ?? '알 수 없음'}`, left, y, '#ef476f', 32);
-      y += 48;
+      const report = buildRunReport(this.state);
+
+      this.addLine(`엔딩: ${report.ending}`, left, y, '#ef476f', 30);
+      y += 40;
+      this.addLine(`티어: ${report.tier}`, left, y, '#f1fa8c', 22);
+      y += 28;
+      this.addLine(`생존 턴: ${report.turnsSurvived} / 원인: ${report.failureCause}`, left, y, '#ffffff', 20);
+      y += 28;
+      this.addLine(`최대 동접: ${report.peakCcu} / 누적매출: ${report.cumulativeRevenue}`, left, y, '#ffffff', 20);
+      y += 28;
+      this.addLine(`최종 품질: ${report.finalQuality}`, left, y, '#ffffff', 20);
+      y += 36;
       this.addLine('R 키로 재시작', left, y, '#ffffff', 22);
 
       this.input.keyboard?.once('keydown-R', () => {
