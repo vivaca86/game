@@ -1,8 +1,9 @@
 import Phaser from 'phaser';
 import { initialGameState, type GameState, type Phase } from '../core/gameState';
 import { getEventForTurn, isTutorialTurn } from '../data/events';
+import { awardMetaPoints, loadMetaProgress, saveMetaProgress, type MetaBonus, type MetaProgress } from '../systems/metaProgress';
 import { clearSave, loadGame, saveGame } from '../systems/saveLoad';
-import { buildRunReport, resolveTurn } from '../systems/turnResolver';
+import { applyMetaBonus, buildRunReport, resolveTurn } from '../systems/turnResolver';
 
 function phaseLabel(phase: Phase): string {
   return phase === 'development' ? '개발 단계' : '라이브 운영 단계';
@@ -11,6 +12,9 @@ function phaseLabel(phase: Phase): string {
 export class MainScene extends Phaser.Scene {
   private state: GameState = structuredClone(initialGameState);
   private uiGroup!: Phaser.GameObjects.Group;
+  private meta: MetaProgress = loadMetaProgress();
+  private rewardApplied = false;
+  private bonusApplied = false;
 
   public constructor() {
     super('MainScene');
@@ -38,6 +42,34 @@ export class MainScene extends Phaser.Scene {
       clearSave();
       this.renderTurn('저장 데이터 삭제');
     });
+
+    this.input.keyboard?.on('keydown-ONE', () => {
+      this.tryApplyMetaBonus('seed_funding');
+    });
+
+    this.input.keyboard?.on('keydown-TWO', () => {
+      this.tryApplyMetaBonus('team_training');
+    });
+
+    this.input.keyboard?.on('keydown-THREE', () => {
+      this.tryApplyMetaBonus('marketing_push');
+    });
+  }
+
+  private tryApplyMetaBonus(bonus: MetaBonus): void {
+    if (this.state.gameOver || this.bonusApplied || this.state.turn > 1 || this.meta.points <= 0) {
+      return;
+    }
+
+    this.meta = {
+      ...this.meta,
+      points: this.meta.points - 1
+    };
+    saveMetaProgress(this.meta);
+
+    this.state = applyMetaBonus(this.state, bonus);
+    this.bonusApplied = true;
+    this.renderTurn('메타 보너스 적용 완료');
   }
 
   private renderTurn(notice = ''): void {
@@ -49,7 +81,9 @@ export class MainScene extends Phaser.Scene {
     this.addLine(`Turn ${this.state.turn} / ${this.state.maxTurns}`, left, y, '#ffd166', 26);
     y += 36;
     this.addLine(`Phase: ${phaseLabel(this.state.phase)}`, left, y, '#90e0ef', 22);
-    y += 32;
+    y += 28;
+    this.addLine(`메타 포인트 ${this.meta.points} (런 ${this.meta.totalRuns})`, left, y, '#bde0fe', 20);
+    y += 28;
 
     const { money, morale, reputation, risk } = this.state.resources;
     this.addLine(`💰${money}  🙂${morale}  ⭐${reputation}  ⚠️${risk}`, left, y, '#ffffff', 22);
@@ -61,7 +95,6 @@ export class MainScene extends Phaser.Scene {
 
     this.addLine(`팀 인원 ${this.state.team.headcount}명  숙련도 ${this.state.team.skill}`, left, y, '#e9edc9', 20);
     y += 30;
-
 
     if (this.state.phase === 'live') {
       this.addLine(`동접 ${this.state.live.ccu}  턴매출 ${this.state.live.revenue}  누적매출 ${this.state.live.cumulativeRevenue}`, left, y, '#f1fa8c', 20);
@@ -77,7 +110,9 @@ export class MainScene extends Phaser.Scene {
     y += 24;
 
     this.addLine('[S] 저장  [L] 불러오기  [C] 저장삭제', left, y, '#adb5bd', 18);
-    y += 32;
+    y += 24;
+    this.addLine('[1] 시드투자  [2] 팀트레이닝  [3] 마케팅푸시 (1턴에만, 1회)', left, y, '#adb5bd', 16);
+    y += 30;
 
     if (notice) {
       this.addLine(notice, left, y, '#80ed99', 18);
@@ -86,6 +121,12 @@ export class MainScene extends Phaser.Scene {
 
     if (this.state.gameOver) {
       const report = buildRunReport(this.state);
+
+      if (!this.rewardApplied) {
+        this.meta = awardMetaPoints(this.meta, report);
+        saveMetaProgress(this.meta);
+        this.rewardApplied = true;
+      }
 
       this.addLine(`엔딩: ${report.ending}`, left, y, '#ef476f', 30);
       y += 40;
@@ -101,6 +142,8 @@ export class MainScene extends Phaser.Scene {
 
       this.input.keyboard?.once('keydown-R', () => {
         this.state = structuredClone(initialGameState);
+        this.rewardApplied = false;
+        this.bonusApplied = false;
         this.renderTurn();
       });
       return;

@@ -9,6 +9,7 @@ import {
   type TurnSettlement
 } from '../core/gameState';
 import type { ChoiceEffect, EventChoice } from '../data/events';
+import type { MetaBonus } from './metaProgress';
 
 function clampProductStat(value: number): number {
   return Math.max(0, Math.min(MAX_PRODUCT_STAT, value));
@@ -217,6 +218,37 @@ export function evaluateEnding(state: GameState): GameState {
   }
 
   return state;
+}
+
+
+export function applyMetaBonus(state: GameState, bonus: MetaBonus): GameState {
+  if (state.gameOver || state.turn > 1) {
+    return state;
+  }
+
+  if (bonus === 'seed_funding') {
+    return {
+      ...state,
+      resources: { ...state.resources, money: state.resources.money + 6 },
+      lastSettlement: { ...state.lastSettlement, summary: '메타 보너스 적용: 시드 투자 +6' }
+    };
+  }
+
+  if (bonus === 'team_training') {
+    return {
+      ...state,
+      team: { ...state.team, skill: Math.min(100, state.team.skill + 8) },
+      resources: { ...state.resources, morale: state.resources.morale + 2 },
+      lastSettlement: { ...state.lastSettlement, summary: '메타 보너스 적용: 팀 트레이닝' }
+    };
+  }
+
+  return {
+    ...state,
+    product: { ...state.product, hype: clampProductStat(state.product.hype + 10) },
+    resources: { ...state.resources, reputation: state.resources.reputation + 1 },
+    lastSettlement: { ...state.lastSettlement, summary: '메타 보너스 적용: 마케팅 푸시' }
+  };
 }
 
 export function buildRunReport(state: GameState): RunReport {
