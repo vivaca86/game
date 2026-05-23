@@ -1709,6 +1709,7 @@ function renderBuildPanel(state, index) {
         <h2>현재 빌드</h2>
         <span>유물 ${relics.length} · 기운 ${arcanas.length}</span>
       </div>
+      ${renderDeckOverview(state, index)}
       <div class="build-grid">
         <div class="build-column">
           <strong>유물</strong>
@@ -1726,6 +1727,66 @@ function renderBuildPanel(state, index) {
         </div>
       </div>
     </section>
+  `;
+}
+
+function renderDeckOverview(state, index) {
+  const cards = (state.deck || []).map((id) => index.cards.get(id)).filter(Boolean);
+  const total = cards.length;
+  const upgradedCount = cards.filter((card) => state.upgradedCards.includes(card.id)).length;
+  const equippedCardCount = new Set((state.inventory.gemBag || []).filter((gem) => gem.equippedCardId).map((gem) => gem.equippedCardId)).size;
+  const averageCost = total
+    ? (cards.reduce((sum, card) => sum + cardCost(card, state, index), 0) / total).toFixed(1)
+    : "0.0";
+  const pileStats = [
+    { key: "draw", label: "드로우", value: state.drawPile?.length || 0 },
+    { key: "discard", label: "버림", value: state.discardPile?.length || 0 },
+    { key: "hand", label: "손패", value: state.hand?.length || 0 },
+    { key: "exhaust", label: "소멸", value: state.exhaustPile?.length || 0 }
+  ];
+  const typeEntries = ["attack", "guard", "skill", "power", "curse", "temp"]
+    .map((type) => ({ type, count: cards.filter((card) => card.type === type).length }))
+    .filter((entry) => entry.count > 0);
+  const costEntries = [0, 1, 2, 3].map((cost) => ({
+    cost,
+    label: cost === 3 ? "3+" : `${cost}`,
+    count: cards.filter((card) => Math.min(3, cardCost(card, state, index)) === cost).length
+  }));
+  return `
+    <div class="deck-overview">
+      <div class="deck-overview-head">
+        <div>
+          <span class="choice-kicker">덱 현황</span>
+          <strong>카드 ${total}장</strong>
+          <p>강화 ${upgradedCount}장 · 보석 장착 ${equippedCardCount}장 · 평균 비용 ${averageCost}</p>
+        </div>
+        <div class="deck-pile-grid">
+          ${pileStats.map((pile) => `
+            <span class="deck-pile-chip pile-${pile.key}">
+              <b>${pile.label}</b>
+              <em>${pile.value}</em>
+            </span>
+          `).join("")}
+        </div>
+      </div>
+      <div class="deck-type-row" aria-label="덱 카드 타입 분포">
+        ${typeEntries.map((entry) => `
+          <span class="deck-type-chip deck-type-${entry.type}">
+            <b>${typeLabels[entry.type] || entry.type}</b>
+            <em>${entry.count}장</em>
+          </span>
+        `).join("")}
+      </div>
+      <div class="deck-cost-row" aria-label="덱 비용 곡선">
+        ${costEntries.map((entry) => `
+          <span class="deck-cost-chip cost-${entry.cost}">
+            <b>${entry.label} 비용</b>
+            <i class="deck-cost-track"><em style="width:${boundedPercent(entry.count, total)}%"></em></i>
+            <strong>${entry.count}장</strong>
+          </span>
+        `).join("")}
+      </div>
+    </div>
   `;
 }
 

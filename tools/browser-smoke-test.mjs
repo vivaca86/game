@@ -199,6 +199,21 @@ if (currentRoomOverflowItems.length > 0) {
   throw new Error(`현재 방 안내판 UI 넘침: ${currentRoomOverflowItems.slice(0, 4).join(" | ")}`);
 }
 await page.locator(".current-room-panel").screenshot({ path: "tmp/current-room-panel-desktop.png" });
+await page.waitForSelector(".deck-overview", { timeout: 10000 });
+await page.waitForSelector(".deck-pile-chip", { timeout: 10000 });
+await page.waitForSelector(".deck-type-chip", { timeout: 10000 });
+await page.waitForSelector(".deck-cost-chip", { timeout: 10000 });
+const deckOverviewText = await page.textContent(".deck-overview");
+if (!deckOverviewText?.includes("덱 현황") || !deckOverviewText.includes("평균 비용") || !deckOverviewText.includes("드로우")) {
+  throw new Error("덱 현황 요약판 핵심 정보 표시 실패");
+}
+const deckOverflowItems = await page.locator(".deck-overview, .deck-pile-chip, .deck-type-chip, .deck-cost-chip").evaluateAll((elements) => elements
+  .filter((element) => element.scrollWidth > element.clientWidth + 2 || element.scrollHeight > element.clientHeight + 2)
+  .map((element) => element.className));
+if (deckOverflowItems.length > 0) {
+  throw new Error(`덱 현황 요약판 UI 넘침: ${deckOverflowItems.slice(0, 4).join(" | ")}`);
+}
+await page.locator(".deck-overview").screenshot({ path: "tmp/deck-overview-desktop.png" });
 const combatForecastText = await page.textContent(".combat-forecast");
 if (!combatForecastText?.includes("이번 턴 예고") || (!combatForecastText.includes("예상 피해") && !combatForecastText.includes("피해 없음"))) {
   throw new Error("전투 예고판 표시 실패");
@@ -239,6 +254,15 @@ await page.setViewportSize({ width: 390, height: 820 });
 await page.waitForTimeout(120);
 const currentRoomMobileColumns = await page.locator(".current-room-panel").evaluate((element) => getComputedStyle(element).gridTemplateColumns.split(" ").length);
 if (currentRoomMobileColumns !== 1) throw new Error("모바일 현재 방 안내판 1열 반응형 확인 실패");
+const deckMobileCostColumns = await page.locator(".deck-cost-row").evaluate((element) => getComputedStyle(element).gridTemplateColumns.split(" ").length);
+if (deckMobileCostColumns !== 2) throw new Error("모바일 덱 비용 곡선 2열 반응형 확인 실패");
+const deckMobileOverflow = await page.locator(".deck-overview, .deck-pile-chip, .deck-type-chip, .deck-cost-chip").evaluateAll((elements) => elements
+  .filter((element) => element.scrollWidth > element.clientWidth + 2 || element.scrollHeight > element.clientHeight + 2)
+  .map((element) => element.className));
+if (deckMobileOverflow.length > 0) {
+  throw new Error(`모바일 덱 현황 요약판 넘침: ${deckMobileOverflow.slice(0, 4).join(" | ")}`);
+}
+await page.locator(".deck-overview").screenshot({ path: "tmp/deck-overview-mobile.png" });
 const combatStatusMobileColumns = await page.locator(".combat-status-board").evaluate((element) => getComputedStyle(element).gridTemplateColumns.split(" ").length);
 if (combatStatusMobileColumns !== 1) throw new Error("모바일 전투 상태판 1열 반응형 확인 실패");
 const combatStatusMobileOverflow = await page.locator(".current-room-panel, .current-room-core, .current-room-chip, .combat-status-card, .status-card-copy, .enemy-status-chip, .card-preview-chip").evaluateAll((elements) => elements
