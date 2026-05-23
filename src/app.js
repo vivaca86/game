@@ -4,6 +4,7 @@ import { advanceRoom, startRun } from "./core/progression.js";
 import { applyEventChoice, applyRewardOption, rerollReward } from "./core/rewards.js";
 import { cardCost } from "./core/card-effects.js";
 import { cardRoleSummary } from "./core/card-roles.js";
+import { gemFitHints, gemRoleSummary } from "./core/gem-roles.js";
 import {
   canEquipGemToCard,
   ensureGemState,
@@ -509,7 +510,9 @@ function renderCodexGem(gem, entryClass, stateBadge) {
       <div class="codex-copy">
         <span><b>${stateBadge}</b> · ${rarityLabels[gem.rarity] || gem.rarity} · ${gem.socketTypes?.map((type) => gemTypeLabels[type] || type).join(" · ") || "공용"}</span>
         <strong>${gem.name}</strong>
+        ${renderGemRoleChip(gem)}
         <p>${gemEffectSummary(gem)}</p>
+        ${renderGemFitHints(gem)}
       </div>
     </article>
   `;
@@ -1265,10 +1268,11 @@ function renderHandGemEffects(equippedGems, card, state, index, currentCost) {
 }
 
 function renderHandGemChip(item) {
+  const role = gemRoleSummary(item.gem);
   return `
-    <span class="hand-gem-chip hand-gem-${item.tone}" title="${item.gem.name} · ${gemEffectSummary(item.gem)}">
+    <span class="hand-gem-chip hand-gem-${item.tone}" title="${item.gem.name} · ${role.label} · ${gemEffectSummary(item.gem)}">
       <span class="gem-icon ${gemVisualClass(item.gem)}"></span>
-      <span class="hand-gem-copy"><b>${item.label}</b><em>${item.value}</em></span>
+      <span class="hand-gem-copy"><b>${item.label}</b><em>${item.value} · ${role.icon}</em></span>
     </span>
   `;
 }
@@ -2258,7 +2262,7 @@ function renderSocketCard(state, index, cardId) {
       <div class="equipped-effect-list">
         ${equippedGems.length === 0 ? "<span class='muted'>장착 효과 없음</span>" : equippedGems.map((instance) => {
           const gem = index.gems.get(instance.gemId);
-          return `<span class="effect-chip">${gem.name} · ${gemEffectSummary(gem)}</span>`;
+          return `<span class="effect-chip">${gem.name} · ${gemRoleSummary(gem).label} · ${gemEffectSummary(gem)}</span>`;
         }).join("")}
       </div>
       <div class="socket-actions">
@@ -2270,7 +2274,9 @@ function renderSocketCard(state, index, cardId) {
             <button class="gem-option" data-action="equip-gem" data-card-id="${card.id}" data-gem-instance-id="${instance.instanceId}">
               <span class="gem-icon ${gemVisualClass(gem)}"></span>
               <strong>${isFull ? "교체" : "장착"} · ${gem.name}</strong>
+              ${renderGemRoleChip(gem)}
               <small>${gemEffectSummary(gem)}</small>
+              ${renderGemFitHints(gem)}
               ${renderGemComparisonList(gem, card, state, index, currentCost)}
             </button>
           `;
@@ -2329,10 +2335,31 @@ function renderGemCard(index, instance) {
       <span class="gem-icon ${gemVisualClass(gem)}"></span>
       <div>
         <strong>${gem.name}</strong>
+        ${renderGemRoleChip(gem)}
         <small>${gem.socketTypes.map((type) => gemTypeLabels[type] || type).join(" · ")}</small>
+        ${renderGemFitHints(gem)}
         <em>${gemEffectSummary(gem)}</em>
       </div>
     </article>
+  `;
+}
+
+function renderGemRoleChip(gem) {
+  const role = gemRoleSummary(gem);
+  return `
+    <span class="gem-role-chip gem-role-${role.tone}" title="${role.label}">
+      <b>${role.icon}</b>
+      <em>${role.label}</em>
+    </span>
+  `;
+}
+
+function renderGemFitHints(gem) {
+  const hints = gemFitHints(gem).slice(0, 3);
+  return `
+    <span class="gem-fit-list" aria-label="${gem.name} 추천 장착">
+      ${hints.map((hint) => `<span>${hint}</span>`).join("")}
+    </span>
   `;
 }
 

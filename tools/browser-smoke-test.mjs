@@ -88,7 +88,7 @@ if (moruEnabled > 0) {
 }
 
 async function assertNoCodexOverflow(label) {
-  const overflowItems = await page.locator(".codex-entry, .codex-copy, .card-art-codex, .card-role-chip, .codex-entry > .gem-icon, .codex-entry > .item-icon, .codex-portrait-slot, .codex-stage .stage-key-art, .codex-enemy .monster-portrait").evaluateAll((elements) => elements
+  const overflowItems = await page.locator(".codex-entry, .codex-copy, .card-art-codex, .card-role-chip, .gem-role-chip, .gem-fit-list, .codex-entry > .gem-icon, .codex-entry > .item-icon, .codex-portrait-slot, .codex-stage .stage-key-art, .codex-enemy .monster-portrait").evaluateAll((elements) => elements
     .filter((element) => element.scrollWidth > element.clientWidth + 2 || element.scrollHeight > element.clientHeight + 2)
     .map((element) => element.className));
   if (overflowItems.length > 0) {
@@ -112,6 +112,9 @@ const codexCardRoleCount = await page.locator(".codex-kind-cards .card-role-chip
 if (codexCardRoleCount < 100) throw new Error("카드 도감 역할 칩 표시 실패");
 await page.screenshot({ path: "tmp/codex-panel-desktop.png", fullPage: true });
 await assertCodexVisual("gems", '.codex-kind-gems .gem-icon[class*="gem-rarity-"]', 50, "보석");
+const codexGemRoleCount = await page.locator(".codex-kind-gems .gem-role-chip").count();
+const codexGemFitCount = await page.locator(".codex-kind-gems .gem-fit-list").count();
+if (codexGemRoleCount < 50 || codexGemFitCount < 50) throw new Error("보석 도감 역할/추천 칩 표시 실패");
 await assertCodexVisual("relics", ".codex-kind-relics .item-icon-relic", 16, "유물");
 await assertCodexVisual("arcanas", ".codex-kind-arcanas .item-icon-arcana", 12, "기운");
 await assertCodexVisual("characters", ".codex-kind-characters .character-portrait", 20, "캐릭터");
@@ -388,7 +391,11 @@ await page.waitForSelector(".arcana-chip .item-icon-arcana", { timeout: 10000 })
 await page.click('[data-action="debug-gem"]');
 await page.waitForSelector(".gem-card", { timeout: 10000 });
 await page.waitForSelector('.gem-card .gem-icon[class*="gem-rarity-"]', { timeout: 10000 });
+await page.waitForSelector(".gem-card .gem-role-chip", { timeout: 10000 });
+await page.waitForSelector(".gem-card .gem-fit-list", { timeout: 10000 });
 await page.waitForSelector(".gem-option", { timeout: 10000 });
+await page.waitForSelector(".gem-option .gem-role-chip", { timeout: 10000 });
+await page.waitForSelector(".gem-option .gem-fit-list", { timeout: 10000 });
 await page.waitForSelector(".socket-growth-row", { timeout: 10000 });
 await page.waitForSelector(".socket-growth-chip", { timeout: 10000 });
 await page.waitForSelector(".gem-comparison-chip", { timeout: 10000 });
@@ -396,7 +403,7 @@ const socketGrowthText = await page.textContent(".socket-card");
 if (!socketGrowthText?.includes("강화") || !socketGrowthText.includes("소켓") || !socketGrowthText.includes("후보")) {
   throw new Error("보석 작업대 카드 성장 상태 표시 실패");
 }
-const socketComparisonOverflow = await page.locator(".socket-card, .socket-growth-chip, .gem-option, .gem-comparison-chip").evaluateAll((elements) => elements
+const socketComparisonOverflow = await page.locator(".socket-card, .socket-growth-chip, .gem-option, .gem-role-chip, .gem-fit-list, .gem-comparison-chip").evaluateAll((elements) => elements
   .filter((element) => element.scrollWidth > element.clientWidth + 2 || element.scrollHeight > element.clientHeight + 2)
   .map((element) => element.className));
 if (socketComparisonOverflow.length > 0) {
