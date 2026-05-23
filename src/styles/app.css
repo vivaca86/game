@@ -341,7 +341,11 @@ h1 {
 
 .profile-stat {
   display: grid;
+  grid-template-columns: 32px minmax(0, 1fr);
   gap: 4px;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
 }
 
 .profile-stat span,
@@ -349,6 +353,60 @@ h1 {
   color: #686c88;
   font-size: 13px;
   font-weight: 800;
+}
+
+.profile-stat-icon {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  place-items: center;
+  border-radius: 10px;
+  background: #e9f6ff;
+  color: #4f6880;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.profile-stat-card .profile-stat-icon {
+  background: #ffe8ee;
+  color: #a33c50;
+}
+
+.profile-stat-gem .profile-stat-icon {
+  background: #f2edff;
+  color: #6555a0;
+}
+
+.profile-stat-relic .profile-stat-icon {
+  background: #fff2c6;
+  color: #7c5d15;
+}
+
+.profile-stat-arcana .profile-stat-icon {
+  background: #e8f8f1;
+  color: #347159;
+}
+
+.profile-stat-achievement .profile-stat-icon {
+  background: #ffd45f;
+  color: #6f5a1f;
+}
+
+.profile-stat-meter {
+  grid-column: 1 / -1;
+  display: block;
+  height: 5px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(124, 204, 247, 0.2);
+}
+
+.profile-stat-meter b {
+  display: block;
+  width: var(--profile-progress, 0%);
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #7cccf7, #ff8ea2, #ffd45f);
 }
 
 .profile-next {
@@ -378,14 +436,22 @@ h1 {
 
 .goal-card {
   display: grid;
-  gap: 4px;
+  grid-template-columns: 34px minmax(0, 1fr);
+  gap: 8px;
+  align-items: center;
   padding: 9px;
   border: 2px solid rgba(76, 79, 112, 0.12);
   border-radius: 8px;
   background: #ffffff;
 }
 
-.goal-card span {
+.goal-copy {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.goal-copy span {
   overflow-wrap: anywhere;
   color: #383a56;
   font-weight: 900;
@@ -402,6 +468,82 @@ h1 {
 
 .goal-card em {
   color: #f06f75;
+}
+
+.achievement-badge,
+.unlock-icon {
+  display: grid;
+  width: 32px;
+  height: 32px;
+  place-items: center;
+  border: 2px solid rgba(255, 255, 255, 0.88);
+  border-radius: 11px;
+  background: #e9f6ff;
+  color: #4f6880;
+  font-size: 12px;
+  font-weight: 900;
+  box-shadow: 0 5px 12px rgba(76, 70, 116, 0.12);
+}
+
+.goal-stage .achievement-badge,
+.unlock-kind-stage .unlock-icon {
+  background: #dff4ff;
+  color: #4f6880;
+}
+
+.goal-battle .achievement-badge {
+  background: #ffe1e7;
+  color: #a33c50;
+}
+
+.goal-chain .achievement-badge {
+  background: #f2edff;
+  color: #6555a0;
+}
+
+.goal-collection .achievement-badge,
+.unlock-kind-card .unlock-icon {
+  background: #fff2c6;
+  color: #7c5d15;
+}
+
+.goal-character .achievement-badge,
+.unlock-kind-character .unlock-icon {
+  background: #ffe8ee;
+  color: #a33c50;
+}
+
+.goal-build .achievement-badge,
+.unlock-kind-gem .unlock-icon {
+  background: #e8f8f1;
+  color: #347159;
+}
+
+.unlock-kind-relic .unlock-icon {
+  background: #fff2c6;
+  color: #7c5d15;
+}
+
+.unlock-kind-arcana .unlock-icon {
+  background: #e8f8f1;
+  color: #347159;
+}
+
+.goal-progress-meter {
+  grid-column: 1 / -1;
+  display: block;
+  height: 7px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #edf8ff;
+}
+
+.goal-progress-meter b {
+  display: block;
+  width: var(--goal-progress, 0%);
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #7cccf7, #67d9a5, #ffd45f);
 }
 
 .unlock-goal em {

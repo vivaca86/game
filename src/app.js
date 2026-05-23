@@ -322,13 +322,13 @@ function renderProfilePanel(profile, index) {
   const nextAchievements = nextAchievementGoals(profile, index).slice(0, 3);
   const nextUnlocks = nextUnlockGoals(profile, index).slice(0, 4);
   const counts = [
-    ["스테이지", profile.clearedStages.length, index.data.stages.length],
-    ["캐릭터", profile.unlockedCharacters.length, index.data.characters.length],
-    ["카드", profile.unlockedCards.length, index.data.cards.length],
-    ["보석", profile.unlockedGems.length, index.data.gems.length],
-    ["유물", profile.unlockedRelics.length, index.data.relics.length],
-    ["기운", profile.unlockedArcanas.length, index.data.arcanas.length],
-    ["업적", profile.achievements.length, index.data.achievements.length]
+    { key: "stage", label: "스테이지", current: profile.clearedStages.length, total: index.data.stages.length },
+    { key: "character", label: "캐릭터", current: profile.unlockedCharacters.length, total: index.data.characters.length },
+    { key: "card", label: "카드", current: profile.unlockedCards.length, total: index.data.cards.length },
+    { key: "gem", label: "보석", current: profile.unlockedGems.length, total: index.data.gems.length },
+    { key: "relic", label: "유물", current: profile.unlockedRelics.length, total: index.data.relics.length },
+    { key: "arcana", label: "기운", current: profile.unlockedArcanas.length, total: index.data.arcanas.length },
+    { key: "achievement", label: "업적", current: profile.achievements.length, total: index.data.achievements.length }
   ];
   return `
     <section class="profile-panel">
@@ -337,12 +337,7 @@ function renderProfilePanel(profile, index) {
         <span>${profile.stats.wins}승 · ${profile.stats.totalRuns}회 탐험</span>
       </div>
       <div class="profile-grid">
-        ${counts.map(([label, current, total]) => `
-          <div class="profile-stat">
-            <span>${label}</span>
-            <strong>${current}/${total}</strong>
-          </div>
-        `).join("")}
+        ${counts.map(renderProfileStat).join("")}
       </div>
       <div class="profile-next">
         <strong>다음 목표</strong>
@@ -351,25 +346,55 @@ function renderProfilePanel(profile, index) {
       <div class="profile-detail-grid">
         <div class="goal-list">
           <strong>다가오는 업적</strong>
-          ${nextAchievements.map((item) => `
-            <article class="goal-card">
-              <span>${item.name}</span>
-              <small>${item.progressLabel}</small>
-              <em>${item.rewardLabel}</em>
-            </article>
-          `).join("") || "<span class='muted'>남은 업적 없음</span>"}
+          ${nextAchievements.map(renderAchievementGoalCard).join("") || "<span class='muted'>남은 업적 없음</span>"}
         </div>
         <div class="goal-list">
           <strong>다음 해금</strong>
-          ${nextUnlocks.map((item) => `
-            <article class="goal-card unlock-goal">
-              <span>${item.name}</span>
-              <small>${item.label}</small>
-            </article>
-          `).join("") || "<span class='muted'>남은 해금 없음</span>"}
+          ${nextUnlocks.map(renderUnlockGoalCard).join("") || "<span class='muted'>남은 해금 없음</span>"}
         </div>
       </div>
     </section>
+  `;
+}
+
+function renderProfileStat(stat) {
+  const ratio = stat.total > 0 ? Math.min(100, Math.round((stat.current / stat.total) * 100)) : 0;
+  return `
+    <div class="profile-stat profile-stat-${stat.key}" style="--profile-progress:${ratio}%">
+      <span class="profile-stat-icon">${profileStatIcon(stat.key)}</span>
+      <div>
+        <span>${stat.label}</span>
+        <strong>${stat.current}/${stat.total}</strong>
+      </div>
+      <i class="profile-stat-meter"><b></b></i>
+    </div>
+  `;
+}
+
+function renderAchievementGoalCard(item) {
+  const percent = Math.round(item.progress.ratio * 100);
+  return `
+    <article class="goal-card achievement-goal goal-${item.goalType}" style="--goal-progress:${percent}%">
+      <span class="achievement-badge">${achievementBadgeText(item.goalType)}</span>
+      <div class="goal-copy">
+        <span>${item.name}</span>
+        <small>${item.progress.current}/${item.progress.total} · ${item.description}</small>
+        <em>${item.rewardLabel}</em>
+      </div>
+      <i class="goal-progress-meter"><b></b></i>
+    </article>
+  `;
+}
+
+function renderUnlockGoalCard(item) {
+  return `
+    <article class="goal-card unlock-goal unlock-kind-${item.kind}">
+      <span class="unlock-icon">${unlockIconText(item.kind)}</span>
+      <div class="goal-copy">
+        <span>${item.name}</span>
+        <small>${item.label}</small>
+      </div>
+    </article>
   `;
 }
 
@@ -385,8 +410,10 @@ function nextAchievementGoals(profile, index) {
     .sort((a, b) => b.progress.ratio - a.progress.ratio || a.id.localeCompare(b.id))
     .map((achievement) => ({
       name: achievement.name,
-      progressLabel: `${achievement.progress.current}/${achievement.progress.total} · ${achievement.description}`,
-      rewardLabel: achievement.rewardLabel
+      description: achievement.description,
+      progress: achievement.progress,
+      rewardLabel: achievement.rewardLabel,
+      goalType: achievementGoalType(achievement.trigger || {}, achievement.reward || {})
     }));
 }
 
@@ -424,18 +451,46 @@ function nextUnlockGoals(profile, index) {
   const rows = [
     ...index.data.stages
       .filter((stage) => !profile.unlockedStages.includes(stage.id))
-      .map((stage) => ({ name: `${stage.order}. ${stage.name}`, label: unlockRequirementLabel(stage.unlock, index) })),
+      .map((stage) => ({ kind: "stage", name: `${stage.order}. ${stage.name}`, label: unlockRequirementLabel(stage.unlock, index) })),
     ...index.data.characters
       .filter((character) => !profile.unlockedCharacters.includes(character.id))
-      .map((character) => ({ name: character.name, label: unlockRequirementLabel(character.unlock, index) })),
+      .map((character) => ({ kind: "character", name: character.name, label: unlockRequirementLabel(character.unlock, index) })),
     ...index.data.cards
       .filter((card) => !profile.unlockedCards.includes(card.id))
-      .map((card) => ({ name: card.name, label: unlockRequirementLabel(card.unlock, index) })),
+      .map((card) => ({ kind: "card", name: card.name, label: unlockRequirementLabel(card.unlock, index) })),
     ...index.data.gems
       .filter((gem) => !profile.unlockedGems.includes(gem.id))
-      .map((gem) => ({ name: gem.name, label: unlockRequirementLabel(gem.unlock, index) }))
+      .map((gem) => ({ kind: "gem", name: gem.name, label: unlockRequirementLabel(gem.unlock, index) })),
+    ...index.data.relics
+      .filter((relic) => !profile.unlockedRelics.includes(relic.id))
+      .map((relic) => ({ kind: "relic", name: relic.name, label: unlockRequirementLabel(relic.unlock, index) })),
+    ...index.data.arcanas
+      .filter((arcana) => !profile.unlockedArcanas.includes(arcana.id))
+      .map((arcana) => ({ kind: "arcana", name: arcana.name, label: unlockRequirementLabel(arcana.unlock, index) }))
   ];
   return rows.filter((row) => row.label !== "기본 해금");
+}
+
+function achievementGoalType(trigger = {}, reward = {}) {
+  if (trigger.op === "clear_stage" || trigger.op === "clear_rooms_in_stage") return "stage";
+  if (trigger.op === "defeat_enemy" || trigger.op === "defeat_rank") return "battle";
+  if (trigger.op === "reach_chain") return "chain";
+  if (trigger.op?.startsWith("collect")) return "collection";
+  if (trigger.op === "unlock_character") return "character";
+  if (reward.unlockGemId || reward.unlockRelicId || reward.unlockArcanaId) return "build";
+  return "achievement";
+}
+
+function achievementBadgeText(type) {
+  return ({ stage: "길", battle: "전", chain: "연", collection: "수", character: "친", build: "빌", achievement: "★" })[type] || "★";
+}
+
+function unlockIconText(kind) {
+  return ({ stage: "길", character: "친", card: "카", gem: "보", relic: "유", arcana: "기" })[kind] || "열";
+}
+
+function profileStatIcon(key) {
+  return ({ stage: "길", character: "친", card: "카", gem: "보", relic: "유", arcana: "기", achievement: "★" })[key] || "·";
 }
 
 function unlockRequirementLabel(unlock = {}, index) {
