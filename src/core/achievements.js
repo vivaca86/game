@@ -20,6 +20,9 @@ function matchesTrigger(trigger, eventName, payload, state) {
   if (trigger.op === "clear_stage") return eventName === "clear_stage" && trigger.stageId === payload.stageId;
   if (trigger.op === "defeat_rank") return eventName === "defeat_rank" && trigger.rank === payload.rank;
   if (trigger.op === "defeat_enemy") return eventName === "defeat_enemy" && trigger.enemyId === payload.enemyId;
+  if (trigger.op === "defeat_enemy_count") {
+    return eventName === "defeat_enemy_count" && trigger.enemyId === payload.enemyId && (state.metrics.defeatedEnemyCounts?.[trigger.enemyId] || 0) >= trigger.amount;
+  }
   if (trigger.op === "reach_chain") return (state.status.chain || 0) >= trigger.amount;
   if (trigger.op === "collect_cards") return state.inventory.unlockedCards.length >= trigger.amount;
   if (trigger.op === "collect_gems") return state.inventory.gems.length >= trigger.amount;

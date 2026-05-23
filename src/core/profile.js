@@ -216,6 +216,8 @@ function createRunSummary(state, index, profile, before, won) {
     roomsCleared: state.metrics.roomsCleared,
     enemiesDefeated: state.metrics.enemiesDefeated,
     maxChain: state.metrics.maxChain,
+    enemyIntentsResolved: state.metrics.enemyIntentsResolved || 0,
+    bossPhaseTriggers: state.metrics.bossPhaseTriggers || 0,
     gold: state.player.gold,
     deckSize: state.deck.length,
     gemCount: state.inventory.gemBag.length,

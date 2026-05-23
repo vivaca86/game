@@ -171,7 +171,9 @@ function gainShield(state, index, card, amount) {
 
 function damageEnemy(enemy, amount, state, index, card, context) {
   if (!enemy || amount <= 0) return;
-  const finalAmount = context?.gemEchoed ? amount : modifiedDamageAmount(card, state, index, amount);
+  const modifiedAmount = context?.gemEchoed ? amount : modifiedDamageAmount(card, state, index, amount);
+  const weakAmount = state.status.playerWeak > 0 ? Math.max(1, Math.ceil(modifiedAmount * 0.75)) : modifiedAmount;
+  const finalAmount = weakAmount;
   const markBonus = enemy.status?.mark ? Math.ceil(finalAmount * 0.2) : 0;
   let incoming = finalAmount + markBonus;
   const blocked = Math.min(enemy.block || 0, incoming);
@@ -181,7 +183,13 @@ function damageEnemy(enemy, amount, state, index, card, context) {
   addLog(state, `${card.name}: ${enemy.name}에게 피해 ${incoming}`);
   if (enemy.hp <= 0) {
     context.killedThisPlay = true;
+    context.killedEnemyIds = context.killedEnemyIds || [];
+    context.killedEnemyIds.push(enemy.id);
+    context.killedEnemyRanks = context.killedEnemyRanks || [];
+    context.killedEnemyRanks.push(enemy.rank);
     state.metrics.enemiesDefeated += 1;
+    state.metrics.defeatedEnemyCounts = state.metrics.defeatedEnemyCounts || {};
+    state.metrics.defeatedEnemyCounts[enemy.id] = (state.metrics.defeatedEnemyCounts[enemy.id] || 0) + 1;
     if (enemy.rank === "elite") state.metrics.elitesDefeated += 1;
     state.enemies = state.enemies.filter((target) => target.instanceId !== enemy.instanceId);
   }

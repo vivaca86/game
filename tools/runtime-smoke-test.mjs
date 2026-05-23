@@ -113,6 +113,8 @@ if (state.inventory.unlockedCards.length <= 5) {
 if (state.inventory.achievements.length === 0) {
   throw new Error("업적 보상 연결 검증 실패");
 }
+if ((state.metrics.enemyIntentsResolved || 0) <= 0) throw new Error("적 의도 처리 검증 실패");
+if ((state.metrics.bossPhaseTriggers || 0) <= 0) throw new Error("보스 페이즈 검증 실패");
 const profileResult = finalizeRunProfile(state, index, profile);
 profile = profileResult.profile;
 if (!profile.clearedStages.includes("stage_sunny_gate")) throw new Error("프로필 스테이지 클리어 기록 실패");
@@ -126,6 +128,7 @@ const nextRun = startRun(index, {
   profile
 });
 if (nextRun.stageId !== "stage_lavender_hall") throw new Error("해금 스테이지 새 런 시작 실패");
+if (!nextRun.enemies.some((enemy) => enemy.role && enemy.intents.length >= 3)) throw new Error("적 역할/추가 패턴 검증 실패");
 const snapshot = createSaveSnapshot(state);
 const restored = restoreRunState(snapshot, index);
 if (!restored?.inventory?.gemBag?.length) throw new Error("저장 보석 보관함 복원 실패");
@@ -135,4 +138,4 @@ if (!restored.inventory.arcanas.includes("arcana_star_bakery")) throw new Error(
 if (!restored.resultSummary?.unlocks?.length) throw new Error("저장 런 결과 복원 실패");
 
 console.log("런타임 스모크 통과");
-console.log(`phase=${state.phase}, rooms=${state.metrics.roomsCleared}, cards=${state.inventory.unlockedCards.length}, gems=${state.inventory.gemBag.length}, achievements=${state.inventory.achievements.length}, profileStages=${profile.unlockedStages.length}, gold=${state.player.gold}`);
+console.log(`phase=${state.phase}, rooms=${state.metrics.roomsCleared}, cards=${state.inventory.unlockedCards.length}, gems=${state.inventory.gemBag.length}, achievements=${state.inventory.achievements.length}, intents=${state.metrics.enemyIntentsResolved}, bossPhases=${state.metrics.bossPhaseTriggers}, profileStages=${profile.unlockedStages.length}, gold=${state.player.gold}`);

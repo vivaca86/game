@@ -445,6 +445,21 @@ h1 {
   background: #edf8ff;
 }
 
+.enemy-status {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.enemy-status span {
+  padding: 4px 7px;
+  border-radius: 999px;
+  background: #fff2c6;
+  color: #6f5a1f;
+  font-size: 12px;
+  font-weight: 800;
+}
+
 .hp-line {
   height: 10px;
   overflow: hidden;

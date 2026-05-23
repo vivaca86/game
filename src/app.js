@@ -1,5 +1,5 @@
 import { loadGameData } from "./core/data-loader.js";
-import { nextIntent, playCard, endTurn } from "./core/combat.js";
+import { intentDetail, nextIntent, playCard, endTurn } from "./core/combat.js";
 import { advanceRoom, startRun } from "./core/progression.js";
 import { applyEventChoice, applyRewardOption, rerollReward } from "./core/rewards.js";
 import { cardCost } from "./core/card-effects.js";
@@ -259,6 +259,8 @@ function renderRun() {
         <span>보호막 ${state.player.shield}</span>
         <span>기운 ${state.player.energy}/${state.player.maxEnergy}</span>
         <span>별사탕 ${state.player.gold}</span>
+        ${state.status.playerMarked > 0 ? `<span>표식 ${state.status.playerMarked}</span>` : ""}
+        ${state.status.playerWeak > 0 ? `<span>약화 ${state.status.playerWeak}</span>` : ""}
         <span>보석 ${state.inventory.gemBag.length}개</span>
         <span>장착 ${state.inventory.gemBag.filter((gem) => gem.equippedCardId).length}개</span>
         <span>유물 ${state.inventory.relics.length}개</span>
@@ -305,10 +307,11 @@ function renderCombat(state, index) {
           return `
             <article class="enemy-card">
               <strong>${enemy.name}</strong>
-              <span>${enemy.rank === "boss" ? "보스" : enemy.rank === "elite" ? "정예" : "일반"}</span>
+              <span>${enemy.rank === "boss" ? "보스" : enemy.rank === "elite" ? "정예" : "일반"} · ${enemy.role || "기본형"}</span>
               <div class="hp-line"><i style="width:${Math.max(0, Math.round((enemy.hp / enemy.maxHp) * 100))}%"></i></div>
               <small>체력 ${enemy.hp}/${enemy.maxHp} · 방어 ${enemy.block || 0}</small>
-              <small>의도: ${intent.label}</small>
+              <small>의도: ${intent.label} · ${intentDetail(intent)}</small>
+              ${renderEnemyStatus(enemy)}
             </article>
           `;
         }).join("")}
@@ -332,6 +335,13 @@ function renderCombat(state, index) {
   `;
 }
 
+function renderEnemyStatus(enemy) {
+  const entries = Object.entries(enemy.status || {}).filter(([, value]) => value > 0);
+  if (entries.length === 0) return "";
+  const labels = { mark: "표식", weak: "약화" };
+  return `<div class="enemy-status">${entries.map(([key, value]) => `<span>${labels[key] || key} ${value}</span>`).join("")}</div>`;
+}
+
 function renderRunResult(state) {
   const summary = state.resultSummary;
   const title = state.phase === "stage_clear" ? "스테이지 클리어" : "탐험 실패";
@@ -349,6 +359,8 @@ function renderRunResult(state) {
         <div><span>클리어 방</span><strong>${summary?.roomsCleared ?? state.metrics.roomsCleared}</strong></div>
         <div><span>처치</span><strong>${summary?.enemiesDefeated ?? state.metrics.enemiesDefeated}</strong></div>
         <div><span>최대 연쇄</span><strong>${summary?.maxChain ?? state.metrics.maxChain}</strong></div>
+        <div><span>적 의도</span><strong>${summary?.enemyIntentsResolved ?? state.metrics.enemyIntentsResolved ?? 0}</strong></div>
+        <div><span>보스 변화</span><strong>${summary?.bossPhaseTriggers ?? state.metrics.bossPhaseTriggers ?? 0}</strong></div>
         <div><span>별사탕</span><strong>${summary?.gold ?? state.player.gold}</strong></div>
         <div><span>덱</span><strong>${summary?.deckSize ?? state.deck.length}</strong></div>
         <div><span>보석</span><strong>${summary?.gemCount ?? state.inventory.gemBag.length}</strong></div>

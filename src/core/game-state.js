@@ -50,6 +50,9 @@ export function createNewRun(index, options = {}) {
       maxChain: 0,
       enemiesDefeated: 0,
       elitesDefeated: 0,
+      defeatedEnemyCounts: {},
+      enemyIntentsResolved: 0,
+      bossPhaseTriggers: 0,
       roomsCleared: 0
     },
     pendingReward: null,

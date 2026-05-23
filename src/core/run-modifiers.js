@@ -281,7 +281,15 @@ function dealDirectDamage(state, index, enemy, amount, sourceName, context) {
   if (incoming > 0) addLog(state, `${sourceName}: ${enemy.name}에게 피해 ${incoming}`);
   if (enemy.hp > 0) return false;
   if (context) context.killedThisPlay = true;
+  if (context) {
+    context.killedEnemyIds = context.killedEnemyIds || [];
+    context.killedEnemyIds.push(enemy.id);
+    context.killedEnemyRanks = context.killedEnemyRanks || [];
+    context.killedEnemyRanks.push(enemy.rank);
+  }
   state.metrics.enemiesDefeated += 1;
+  state.metrics.defeatedEnemyCounts = state.metrics.defeatedEnemyCounts || {};
+  state.metrics.defeatedEnemyCounts[enemy.id] = (state.metrics.defeatedEnemyCounts[enemy.id] || 0) + 1;
   if (enemy.rank === "elite") state.metrics.elitesDefeated += 1;
   state.enemies = state.enemies.filter((target) => target.instanceId !== enemy.instanceId);
   return true;

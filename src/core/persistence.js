@@ -77,6 +77,19 @@ export function restoreRunState(snapshot, index) {
     resultSummary: structuredClone(snapshot.resultSummary || null),
     log: [...(snapshot.log || [])]
   });
+  state.metrics = {
+    cardsPlayedThisTurn: 0,
+    cardsPlayedThisCombat: 0,
+    maxChain: 0,
+    enemiesDefeated: 0,
+    elitesDefeated: 0,
+    defeatedEnemyCounts: {},
+    enemyIntentsResolved: 0,
+    bossPhaseTriggers: 0,
+    roomsCleared: 0,
+    ...(state.metrics || {}),
+    defeatedEnemyCounts: structuredClone(state.metrics?.defeatedEnemyCounts || {})
+  };
   ensureGemState(state);
   ensureModifierState(state);
   return state;

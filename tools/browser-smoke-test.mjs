@@ -59,6 +59,8 @@ await page.click("#startRunButton");
 await page.waitForSelector(".run-board", { timeout: 10000 });
 await page.waitForSelector(".play-card", { timeout: 10000 });
 await page.waitForSelector(".arcana-chip", { timeout: 10000 });
+const enemyText = await page.textContent(".enemy-card");
+if (!enemyText?.includes("의도") || !enemyText.includes("형")) throw new Error("적 역할/의도 표시 실패");
 
 const enabledCards = await page.locator(".play-card:not(:disabled)").count();
 if (enabledCards === 0) throw new Error("사용 가능한 카드가 없습니다.");
