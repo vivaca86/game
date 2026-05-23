@@ -140,10 +140,13 @@ if (enabledCards === 0) throw new Error("사용 가능한 카드가 없습니다
 await page.locator(".play-card:not(:disabled)").first().click();
 await page.click('[data-action="debug-relic"]');
 await page.waitForSelector(".relic-chip", { timeout: 10000 });
+await page.waitForSelector(".relic-chip .item-icon-relic", { timeout: 10000 });
 await page.click('[data-action="debug-arcana"]');
 await page.waitForFunction(() => document.querySelectorAll(".arcana-chip").length >= 2, null, { timeout: 10000 });
+await page.waitForSelector(".arcana-chip .item-icon-arcana", { timeout: 10000 });
 await page.click('[data-action="debug-gem"]');
 await page.waitForSelector(".gem-card", { timeout: 10000 });
+await page.waitForSelector('.gem-card .gem-icon[class*="gem-rarity-"]', { timeout: 10000 });
 await page.waitForSelector(".gem-option", { timeout: 10000 });
 await page.locator('[data-action="equip-gem"]').first().click();
 await page.waitForSelector('[data-action="unequip-gem"]', { timeout: 10000 });
@@ -153,7 +156,9 @@ await page.waitForSelector("#loadRunButton:not(:disabled)", { timeout: 10000 });
 await page.click("#loadRunButton");
 await page.waitForSelector('[data-action="unequip-gem"]', { timeout: 10000 });
 await page.waitForSelector(".relic-chip", { timeout: 10000 });
+await page.waitForSelector(".relic-chip .item-icon-relic", { timeout: 10000 });
 await page.waitForFunction(() => document.querySelectorAll(".arcana-chip").length >= 2, null, { timeout: 10000 });
+await page.waitForSelector(".arcana-chip .item-icon-arcana", { timeout: 10000 });
 await page.waitForSelector(".socket-card-preview", { timeout: 10000 });
 await page.waitForSelector(".equipped-effect-list", { timeout: 10000 });
 await page.waitForSelector(".socket-card .card-art-socket", { timeout: 10000 });
@@ -190,6 +195,9 @@ await page.waitForSelector(".market-box .reward-preview-card", { timeout: 10000 
 const rewardCardCount = await page.locator(".market-box .reward-kind-card").count();
 const rewardCardArtCount = await page.locator(".market-box .reward-kind-card .card-art-preview").count();
 if (rewardCardCount > 0 && rewardCardArtCount === 0) throw new Error("보상 카드 미리보기 일러스트 표시 실패");
+const rewardRelicOrArcanaCount = await page.locator(".market-box .reward-kind-relic, .market-box .reward-kind-arcana").count();
+const rewardItemIconCount = await page.locator(".market-box .reward-kind-relic .item-icon, .market-box .reward-kind-arcana .item-icon").count();
+if (rewardRelicOrArcanaCount > 0 && rewardItemIconCount === 0) throw new Error("유물/기운 보상 아이콘 표시 실패");
 
 const marketText = await page.textContent(".market-box");
 if (!marketText?.includes("비용") || !marketText.includes("별사탕")) {

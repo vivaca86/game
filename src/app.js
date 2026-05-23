@@ -861,14 +861,14 @@ function renderBuildPanel(state, index) {
         <div class="build-column">
           <strong>유물</strong>
           <div class="build-chip-list">
-            ${relics.length === 0 ? "<span class='muted'>보유 유물 없음</span>" : relics.map((relic) => `<span class="build-chip relic-chip" title="${relic.text}">${relic.name}</span>`).join("")}
+            ${relics.length === 0 ? "<span class='muted'>보유 유물 없음</span>" : relics.map((relic) => renderBuildItemChip("relic", relic)).join("")}
           </div>
           <button class="secondary-btn" data-action="debug-relic">유물 지급</button>
         </div>
         <div class="build-column">
           <strong>기운</strong>
           <div class="build-chip-list">
-            ${arcanas.length === 0 ? "<span class='muted'>보유 기운 없음</span>" : arcanas.map((arcana) => `<span class="build-chip arcana-chip" title="${arcana.text}">${arcana.name}</span>`).join("")}
+            ${arcanas.length === 0 ? "<span class='muted'>보유 기운 없음</span>" : arcanas.map((arcana) => renderBuildItemChip("arcana", arcana)).join("")}
           </div>
           <button class="secondary-btn" data-action="debug-arcana">기운 지급</button>
         </div>
@@ -1012,14 +1012,16 @@ function gemEffectSummary(gem) {
 
 function gemVisualClass(gem) {
   const op = gem.effects?.[0]?.op || "";
-  if (op.includes("damage")) return "gem-red";
-  if (op.includes("shield")) return "gem-blue";
-  if (op.includes("cost")) return "gem-yellow";
-  if (op.includes("heal")) return "gem-green";
-  if (op.includes("mark")) return "gem-coral";
-  if (op.includes("echo")) return "gem-violet";
-  if (op.includes("chain") || op.includes("bridge")) return "gem-rainbow";
-  return "gem-white";
+  const rarity = `gem-rarity-${gem.rarity || "common"}`;
+  const socket = gem.socketTypes?.[0] ? `gem-socket-${gem.socketTypes[0]}` : "gem-socket-any";
+  if (op.includes("damage")) return `gem-red ${rarity} ${socket}`;
+  if (op.includes("shield")) return `gem-blue ${rarity} ${socket}`;
+  if (op.includes("cost")) return `gem-yellow ${rarity} ${socket}`;
+  if (op.includes("heal")) return `gem-green ${rarity} ${socket}`;
+  if (op.includes("mark")) return `gem-coral ${rarity} ${socket}`;
+  if (op.includes("echo")) return `gem-violet ${rarity} ${socket}`;
+  if (op.includes("chain") || op.includes("bridge")) return `gem-rainbow ${rarity} ${socket}`;
+  return `gem-white ${rarity} ${socket}`;
 }
 
 function renderEvent(state, index) {
@@ -1195,13 +1197,13 @@ function rewardPreviewItems(reward = {}, index) {
   if (reward.relicPool?.length) {
     reward.relicPool.forEach((id) => {
       const relic = index.relics.get(id);
-      if (relic) items.push({ kind: "relic", title: relic.name, detail: relic.text, short: "유물" });
+      if (relic) items.push({ kind: "relic", title: relic.name, detail: relicEffectSummary(relic), short: "유물", source: relic });
     });
   }
   if (reward.arcanaPool?.length) {
     reward.arcanaPool.forEach((id) => {
       const arcana = index.arcanas.get(id);
-      if (arcana) items.push({ kind: "arcana", title: arcana.name, detail: arcana.text, short: "기운" });
+      if (arcana) items.push({ kind: "arcana", title: arcana.name, detail: arcanaEffectSummary(arcana), short: "기운", source: arcana });
     });
   }
   if (reward.upgradeRandomCard) items.push({ kind: "upgrade", title: "카드 강화", detail: "덱의 카드 1장을 강화합니다.", short: "강화" });
@@ -1226,11 +1228,11 @@ function rewardOptionPreviewItems(option, index) {
   }
   if (option.type === "relic") {
     const relic = index.relics.get(option.relicId);
-    return relic ? [{ kind: "relic", title: relic.name, detail: relic.text, short: "유물" }] : [];
+    return relic ? [{ kind: "relic", title: relic.name, detail: relicEffectSummary(relic), short: "유물", source: relic }] : [];
   }
   if (option.type === "arcana") {
     const arcana = index.arcanas.get(option.arcanaId);
-    return arcana ? [{ kind: "arcana", title: arcana.name, detail: arcana.text, short: "기운" }] : [];
+    return arcana ? [{ kind: "arcana", title: arcana.name, detail: arcanaEffectSummary(arcana), short: "기운", source: arcana }] : [];
   }
   if (option.type === "gold") return [{ kind: "gold", title: "별사탕", detail: `${option.amount}개 획득`, short: "별사탕" }];
   return [{ kind: option.type, title: option.title, detail: option.description, short: option.type }];
@@ -1241,6 +1243,8 @@ function renderRewardPreviewItem(item) {
     ? renderCardArt(item.card, "preview")
     : item.kind === "gem"
     ? `<span class="gem-icon ${item.visual}"></span>`
+    : ["relic", "arcana"].includes(item.kind)
+    ? renderItemIcon(item.kind, item.source)
     : `<span class="reward-icon reward-icon-${item.kind}" ${item.accent ? `style="--preview-accent:${item.accent}"` : ""}>${item.cost ?? rewardIconText(item.kind)}</span>`;
   return `
     <span class="reward-preview-card reward-kind-${item.kind}" ${item.accent ? `style="--preview-accent:${item.accent}"` : ""}>
@@ -1249,6 +1253,30 @@ function renderRewardPreviewItem(item) {
         <strong>${item.title}</strong>
         <small>${item.detail}</small>
       </span>
+    </span>
+  `;
+}
+
+function renderBuildItemChip(kind, item) {
+  const summary = kind === "relic" ? relicEffectSummary(item) : arcanaEffectSummary(item);
+  return `
+    <span class="build-chip ${kind}-chip ${kind}-chip-${item.rarity || "common"}" title="${item.text}">
+      ${renderItemIcon(kind, item)}
+      <span>
+        <b>${item.name}</b>
+        <em>${summary}</em>
+      </span>
+    </span>
+  `;
+}
+
+function renderItemIcon(kind, item = {}) {
+  const motif = kind === "relic" ? relicMotif(item) : arcanaMotif(item);
+  return `
+    <span class="item-icon item-icon-${kind} ${kind}-motif-${motif} item-rarity-${item.rarity || "common"}" aria-hidden="true">
+      <span class="item-shape main"></span>
+      <span class="item-shape mark-one"></span>
+      <span class="item-shape mark-two"></span>
     </span>
   `;
 }
@@ -1294,6 +1322,56 @@ function shortCardSubject(subject) {
 
 function rewardIconText(kind) {
   return ({ card: "카", relic: "유", arcana: "기", gold: "★", heal: "＋", upgrade: "↑", socket: "◇", combat: "!" })[kind] || "·";
+}
+
+function relicEffectSummary(relic) {
+  const effect = relic.effects?.[0];
+  if (!effect) return relic.text;
+  if (effect.op === "shield_at_battle_start") return `전투 시작 보호막 ${effect.amount}`;
+  if (effect.op === "modify_gold_reward_percent") return `별사탕 보상 +${effect.amount}%`;
+  if (effect.op === "reveal_next_room_type") return `다음 방 ${effect.amount}개 보기`;
+  if (effect.op === "modify_reward_options") return `보상 선택지 +${effect.amount}`;
+  if (effect.op === "free_first_high_cost_card") return "첫 고비용 카드 무료";
+  if (effect.op === "retain_cards_between_turns") return `카드 ${effect.amount}장 보존`;
+  if (effect.op === "modify_shop_cost_percent") return `상점 비용 ${effect.amount}%`;
+  if (effect.op === "extra_card_reward_after_elite") return "정예 카드 보상 +1";
+  return relic.text;
+}
+
+function arcanaEffectSummary(arcana) {
+  const effect = arcana.effects?.[0];
+  if (!effect) return arcana.text;
+  if (effect.op === "enable_cost_ladder_chain") return "비용 순서 연쇄";
+  if (effect.op === "modify_gem_reward_chance_percent") return `보석 보상 +${effect.amount}%`;
+  if (effect.op === "damage_random_on_guard_play") return `방어 시 피해 ${effect.amount}`;
+  if (effect.op === "damage_all_on_attack_kill") return `처치 시 전체 피해 ${effect.amount}`;
+  if (effect.op === "heal_after_combat_if_low_hp") return "낮은 체력 전투 후 회복";
+  if (effect.op === "draw_when_cards_played") return `카드 ${effect.threshold}장 사용 시 드로우`;
+  if (effect.op === "reduce_first_skill_cost_each_turn") return "첫 기술 비용 감소";
+  if (effect.op === "preserve_chain_once_per_turn") return "연쇄 보존";
+  return arcana.text;
+}
+
+function relicMotif(relic) {
+  const text = [relic.name, relic.text, relic.effects?.[0]?.op].join(" ");
+  if (/등불|shield|보호막/.test(text)) return "lantern";
+  if (/주머니|gold|별사탕/.test(text)) return "pouch";
+  if (/나침반|map|방/.test(text)) return "compass";
+  if (/카드|reward/.test(text)) return "card";
+  if (/상점|cost/.test(text)) return "tag";
+  if (/베개|retain/.test(text)) return "pillow";
+  return "charm";
+}
+
+function arcanaMotif(arcana) {
+  const text = [arcana.name, arcana.text, arcana.effects?.[0]?.op].join(" ");
+  if (/리듬|chain|연쇄|순서/.test(text)) return "rhythm";
+  if (/방울|gem|보석/.test(text)) return "bubble";
+  if (/구름|guard|방어/.test(text)) return "cloud";
+  if (/공격|처치|damage/.test(text)) return "spark";
+  if (/회복|heal/.test(text)) return "leaf";
+  if (/기술|cost|비용/.test(text)) return "rune";
+  return "aura";
 }
 
 function escapeHtml(value) {
