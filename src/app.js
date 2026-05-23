@@ -269,14 +269,13 @@ function renderSetupPreview(index, profile, characterId, stageId) {
         <span class="route-kicker">선택 캐릭터</span>
         <strong>${character.name} · ${character.role}</strong>
         <p>${character.passiveText}</p>
+        ${renderCharacterPassiveChips(character)}
         <div class="preview-stat-row">
           <span>체력 ${character.maxHp}</span>
           <span>기운 ${character.energy}</span>
           <span>시작 덱 ${starterCards.length}장</span>
         </div>
-        <div class="starter-card-strip" aria-label="${character.name} 시작 카드">
-          ${starterCards.slice(0, 5).map((card) => `<span style="--card-accent:${accentFor(card.color)}">${card.name}</span>`).join("")}
-        </div>
+        ${renderStarterCardStrip(starterCards, character.name)}
       </div>
     </section>
     <section class="setup-preview-card stage-preview-card">
@@ -306,6 +305,50 @@ function renderStageKeyArt(stage) {
       <span class="stage-spark two"></span>
     </div>
   `;
+}
+
+function renderCharacterPassiveChips(character) {
+  const chips = (character.passiveEffects || []).map(characterPassiveChip);
+  if (chips.length === 0) return "";
+  return `
+    <div class="character-passive-chips" aria-label="${character.name} 패시브 요약">
+      ${chips.map((chip) => `
+        <span class="character-passive-chip passive-${chip.tone}">
+          <b>${chip.icon}</b>
+          <em>${chip.label}</em>
+          <small>${chip.value}</small>
+        </span>
+      `).join("")}
+    </div>
+  `;
+}
+
+function characterPassiveChip(effect) {
+  if (effect.op === "first_attack_damage_bonus_each_battle") return { tone: "attack", icon: "공", label: "첫 공격", value: `+${effect.amount}` };
+  if (effect.op === "shield_at_battle_start") return { tone: "guard", icon: "막", label: "시작 보호막", value: `+${effect.amount}` };
+  if (effect.op === "draw_when_cards_played") return { tone: "flow", icon: "손", label: `${effect.threshold}장 연계`, value: `드로우 ${effect.amount}` };
+  if (effect.op === "heal_once_when_hp_ratio_below") return { tone: "heal", icon: "회", label: "위기 회복", value: `${Math.round((effect.ratio || 0.5) * 100)}% · +${effect.amount}` };
+  if (effect.op === "gain_energy_on_chain") return { tone: "flow", icon: "연", label: `연쇄 ${effect.threshold}`, value: `기운 +${effect.amount}` };
+  if (effect.op === "bonus_gold_after_elite") return { tone: "reward", icon: "별", label: "정예 보너스", value: `+${effect.amount}` };
+  return { tone: "note", icon: "특", label: "패시브", value: effect.op || "효과" };
+}
+
+function renderStarterCardStrip(starterCards, characterName) {
+  return `
+    <div class="starter-card-strip" aria-label="${characterName} 시작 카드">
+      ${starterCards.slice(0, 5).map((card) => `
+        <span class="starter-card-pill type-${card.type}" style="--card-accent:${accentFor(card.color)}">
+          <b>${cardTypeIcon(card.type)}</b>
+          <em>${card.name}</em>
+          <small>${typeLabels[card.type] || card.type}</small>
+        </span>
+      `).join("")}
+    </div>
+  `;
+}
+
+function cardTypeIcon(type) {
+  return ({ attack: "공", guard: "막", skill: "술", power: "지", curse: "방", temp: "임" })[type] || "카";
 }
 
 function renderCharacterPortrait(character) {
@@ -480,6 +523,7 @@ function renderCodexCharacter(character, entryClass, stateBadge) {
         <span><b>${stateBadge}</b> · ${character.role} · 체력 ${character.maxHp}</span>
         <strong>${character.name}</strong>
         <p>${character.passiveText}</p>
+        ${renderCharacterPassiveChips(character)}
       </div>
     </article>
   `;
