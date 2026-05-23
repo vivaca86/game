@@ -7,6 +7,7 @@ import { cardRoleSummary } from "./core/card-roles.js";
 import { gemFitHints, gemRoleSummary } from "./core/gem-roles.js";
 import { buildFitHints, buildItemRoleSummary } from "./core/build-roles.js";
 import { eventChoiceRiskSummary, eventChoiceRoleSummary, eventChoiceSignalItems, eventRiskSpread, eventRoleSummary } from "./core/event-roles.js";
+import { rewardOptionInsight } from "./core/reward-insights.js";
 import {
   canEquipGemToCard,
   ensureGemState,
@@ -2595,11 +2596,13 @@ function renderReward(state, index) {
       <div class="choice-list market-list">
         ${reward.options.map((option) => {
           const affordable = !option.cost || canPayCost(state, option.cost);
+          const insight = rewardOptionInsight(option, state, index);
           return `
-          <button class="choice-btn market-choice reward-${option.type} ${affordable ? "" : "locked-choice"}" data-action="reward-choice" data-reward-id="${option.id}" ${affordable ? "" : "disabled"}>
+          <button class="choice-btn market-choice reward-${option.type} reward-fit-${insight.tone} ${affordable ? "" : "locked-choice"}" data-action="reward-choice" data-reward-id="${option.id}" ${affordable ? "" : "disabled"}>
             <span class="choice-cost ${affordable ? "can-pay" : "cannot-pay"}">${option.cost ? costLabel(option.cost) : "비용 없음"}</span>
             <strong>${option.title}</strong>
             <span class="choice-note">${affordable ? option.description : shortageLabel(state, option.cost)}</span>
+            ${renderRewardInsight(insight)}
             ${renderChoiceImpactList(rewardOptionImpactItems(option, state, index, affordable))}
             <span class="reward-preview-grid">
               ${rewardOptionPreviewItems(option, index).map(renderRewardPreviewItem).join("")}
@@ -2610,6 +2613,28 @@ function renderReward(state, index) {
       </div>
       <button class="secondary-btn reroll-btn" data-action="reroll" ${reward.rerolls <= 0 ? "disabled" : ""}>다시 보기 ${reward.rerolls}</button>
     </section>
+  `;
+}
+
+function renderRewardInsight(insight) {
+  return `
+    <span class="reward-fit-panel fit-${insight.tone}" aria-label="보상 추천도 ${insight.label}">
+      <span class="reward-fit-score">
+        <b>${insight.score}</b>
+        <em>${insight.label}</em>
+      </span>
+      <span class="reward-fit-chip-list">
+        ${insight.items.map((item) => `
+          <span class="reward-fit-chip fit-chip-${item.tone || "note"}">
+            <b>${item.icon || "·"}</b>
+            <span>
+              <em>${item.label}</em>
+              <strong>${item.value}</strong>
+            </span>
+          </span>
+        `).join("")}
+      </span>
+    </span>
   `;
 }
 

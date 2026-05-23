@@ -4148,6 +4148,26 @@ h1 {
   box-shadow: 0 10px 22px rgba(75, 70, 105, 0.1);
 }
 
+.market-choice[class*="reward-"] {
+  min-height: 388px;
+}
+
+.reward-fit-great {
+  border-color: rgba(103, 217, 165, 0.35);
+}
+
+.reward-fit-good {
+  border-color: rgba(117, 167, 247, 0.35);
+}
+
+.reward-fit-ok {
+  border-color: rgba(232, 170, 46, 0.34);
+}
+
+.reward-fit-low {
+  border-color: rgba(255, 127, 143, 0.38);
+}
+
 .event-choice {
   gap: 8px;
   min-height: 336px;
@@ -4236,6 +4256,176 @@ h1 {
   font-size: 13px;
   font-weight: 800;
   line-height: 1.35;
+}
+
+.reward-fit-panel {
+  display: grid;
+  gap: 7px;
+  padding: 8px;
+  border: 1px solid rgba(76, 79, 112, 0.08);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.78);
+}
+
+.fit-great {
+  background: #f0fff7;
+}
+
+.fit-good {
+  background: #f1f7ff;
+}
+
+.fit-ok {
+  background: #fff8df;
+}
+
+.fit-low {
+  background: #fff0f3;
+}
+
+.reward-fit-score {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  gap: 7px;
+  align-items: center;
+}
+
+.reward-fit-score b {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border-radius: 11px;
+  background: #8b91a8;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 1000;
+}
+
+.reward-fit-score em {
+  min-width: 0;
+  color: #383a56;
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 1000;
+  overflow-wrap: anywhere;
+}
+
+.fit-great .reward-fit-score b {
+  background: #67d9a5;
+}
+
+.fit-good .reward-fit-score b {
+  background: #75a7f7;
+}
+
+.fit-ok .reward-fit-score b {
+  background: #e8aa2e;
+}
+
+.fit-low .reward-fit-score b {
+  background: #ff7f8f;
+}
+
+.reward-fit-chip-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.reward-fit-chip {
+  display: inline-grid;
+  grid-template-columns: 22px minmax(0, 1fr);
+  gap: 5px;
+  align-items: center;
+  max-width: 100%;
+  min-height: 34px;
+  padding: 4px 7px 4px 4px;
+  border-radius: 8px;
+  background: #edf8ff;
+  color: #425a70;
+  font-size: 10px;
+  font-weight: 900;
+}
+
+.reward-fit-chip > b {
+  display: grid;
+  width: 22px;
+  height: 22px;
+  place-items: center;
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.82);
+  font-size: 10px;
+}
+
+.reward-fit-chip span,
+.reward-fit-chip em,
+.reward-fit-chip strong {
+  display: block;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.reward-fit-chip em {
+  color: currentColor;
+  font-size: 9px;
+  font-style: normal;
+  opacity: 0.72;
+}
+
+.reward-fit-chip strong {
+  color: currentColor;
+  font-size: 11px;
+  line-height: 1.12;
+}
+
+.fit-chip-cost,
+.fit-chip-gold,
+.fit-chip-card,
+.fit-chip-economy,
+.fit-chip-power,
+.fit-chip-relic,
+.fit-chip-reward {
+  background: #fff2c6;
+  color: #7c5d15;
+}
+
+.fit-chip-gem,
+.fit-chip-heal,
+.fit-chip-safe {
+  background: #e8f8f1;
+  color: #347159;
+}
+
+.fit-chip-danger {
+  background: #ffe1e7;
+  color: #a33c50;
+}
+
+.fit-chip-flow,
+.fit-chip-note {
+  background: #f2edff;
+  color: #6555a0;
+}
+
+.fit-chip-scout {
+  background: #e9f6ff;
+  color: #3d75a3;
+}
+
+.fit-chip-damage {
+  background: #ffe8ee;
+  color: #a33c50;
+}
+
+.fit-chip-guard {
+  background: #e9f6ff;
+  color: #3d75a3;
+}
+
+.fit-chip-status {
+  background: #ffeaf4;
+  color: #a84276;
 }
 
 .choice-impact-list {
@@ -5981,6 +6171,38 @@ h1 {
   .current-room-chip {
     min-width: 58px;
     padding: 6px 8px;
+  }
+
+  .market-choice[class*="reward-"] {
+    min-height: 0;
+  }
+
+  .reward-fit-panel {
+    padding: 7px;
+  }
+
+  .reward-fit-score {
+    grid-template-columns: 30px minmax(0, 1fr);
+  }
+
+  .reward-fit-score b {
+    width: 30px;
+    height: 30px;
+    border-radius: 10px;
+    font-size: 13px;
+  }
+
+  .reward-fit-chip {
+    grid-template-columns: 20px minmax(0, 1fr);
+    min-height: 32px;
+    padding: 4px 6px 4px 4px;
+  }
+
+  .reward-fit-chip > b {
+    width: 20px;
+    height: 20px;
+    border-radius: 7px;
+    font-size: 9px;
   }
 
   .deck-overview {

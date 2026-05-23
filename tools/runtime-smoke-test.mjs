@@ -6,6 +6,7 @@ import { cardRoleAudit } from "../src/core/card-roles.js";
 import { gemAudit } from "../src/core/gem-roles.js";
 import { buildItemAudit } from "../src/core/build-roles.js";
 import { eventAudit } from "../src/core/event-roles.js";
+import { rewardOptionInsightAudit } from "../src/core/reward-insights.js";
 import { cleanseDisruption, playCard, endTurn } from "../src/core/combat.js";
 import { startRun, advanceRoom } from "../src/core/progression.js";
 import { applyEventChoice, applyRewardOption } from "../src/core/rewards.js";
@@ -235,6 +236,9 @@ const rewardOptions = createRewardOptions(state, index, "reward");
 if (rewardOptions.filter((option) => option.type === "card").length < 4) throw new Error("유물 카드 보상 증가 검증 실패");
 if (!rewardOptions.some((option) => option.type === "relic")) throw new Error("유물 보상 선택지 검증 실패");
 if (!rewardOptions.some((option) => option.type === "arcana")) throw new Error("기운 보상 선택지 검증 실패");
+const rewardInsightAudit = rewardOptionInsightAudit(state, index, rewardOptions);
+if (rewardInsightAudit.missingInsights.length > 0) throw new Error(`보상 추천 신호 누락: ${rewardInsightAudit.missingInsights.join(",")}`);
+if (Object.keys(rewardInsightAudit.typeCounts).length < 4) throw new Error("보상 추천 타입 폭 부족");
 
 const socketTestCardId = state.deck.find((cardId) => {
   const card = index.cards.get(cardId);

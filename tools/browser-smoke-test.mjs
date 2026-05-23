@@ -480,6 +480,8 @@ await advanceUntilMarketBox();
 await page.waitForSelector(".market-box .choice-wallet", { timeout: 10000 });
 await page.waitForSelector(".market-box .choice-cost", { timeout: 10000 });
 await page.waitForSelector(".market-box .choice-impact-chip", { timeout: 10000 });
+await page.waitForSelector(".market-box .reward-fit-panel", { timeout: 10000 });
+await page.waitForSelector(".market-box .reward-fit-chip", { timeout: 10000 });
 await page.waitForSelector(".market-box .reward-preview-card", { timeout: 10000 });
 const rewardCardCount = await page.locator(".market-box .reward-kind-card").count();
 const rewardCardArtCount = await page.locator(".market-box .reward-kind-card .card-art-preview").count();
@@ -497,8 +499,11 @@ if (!marketText?.includes("비용") || !marketText.includes("별사탕")) {
 
 const marketImpactChipCount = await page.locator(".market-box .choice-impact-chip").count();
 if (marketImpactChipCount < 3) throw new Error("상점/보상 선택지 효과 요약 칩 부족");
+const rewardFitPanelCount = await page.locator(".market-box .reward-fit-panel").count();
+const rewardFitChipCount = await page.locator(".market-box .reward-fit-chip").count();
+if (rewardFitPanelCount < 3 || rewardFitChipCount < 6) throw new Error("상점/보상 추천 신호 칩 부족");
 
-const overflowItems = await page.locator(".market-box, .market-choice, .choice-impact-chip, .reward-preview-card, .choice-wallet, .card-art-preview, .build-role-chip, .build-fit-list").evaluateAll((elements) => elements
+const overflowItems = await page.locator(".market-box, .market-choice, .choice-impact-chip, .reward-fit-panel, .reward-fit-chip, .reward-preview-card, .choice-wallet, .card-art-preview, .build-role-chip, .build-fit-list").evaluateAll((elements) => elements
   .filter((element) => element.scrollWidth > element.clientWidth + 2 || element.scrollHeight > element.clientHeight + 2)
   .map((element) => element.className));
 if (overflowItems.length > 0) {
@@ -513,6 +518,12 @@ const mobileColumns = await page.locator(".market-list").evaluate((element) => g
 if (mobileColumns !== 1) throw new Error("모바일 상점/보상 선택지 1열 반응형 확인 실패");
 const mobileRouteColumns = await page.locator(".route-node-list").evaluate((element) => getComputedStyle(element).gridTemplateColumns.split(" ").length);
 if (mobileRouteColumns !== 2) throw new Error("모바일 스테이지 경로 2열 반응형 확인 실패");
+const mobileMarketOverflow = await page.locator(".market-box, .market-choice, .choice-impact-chip, .reward-fit-panel, .reward-fit-chip, .reward-preview-card, .choice-wallet, .card-art-preview, .build-role-chip, .build-fit-list").evaluateAll((elements) => elements
+  .filter((element) => element.scrollWidth > element.clientWidth + 2 || element.scrollHeight > element.clientHeight + 2)
+  .map((element) => element.className));
+if (mobileMarketOverflow.length > 0) {
+  throw new Error(`모바일 상점/이벤트/보상 UI 넘침: ${mobileMarketOverflow.slice(0, 4).join(" | ")}`);
+}
 await page.screenshot({ path: "tmp/market-ui-mobile.png", fullPage: true });
 
 await page.setViewportSize({ width: 1366, height: 900 });
