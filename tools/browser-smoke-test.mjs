@@ -195,6 +195,10 @@ await page.evaluate(() => {
     snapshot.enemies[0].hp = Math.min(snapshot.enemies[0].maxHp || 10, 10);
     snapshot.enemies[0].block = 0;
     snapshot.enemies[0].status = { ...(snapshot.enemies[0].status || {}), mark: 2, weak: 1 };
+    snapshot.enemies[0].intents = [
+      { type: "special", effect: "chain_down", amount: 2, costIncrease: 1, label: "리본 헝클기" },
+      ...(snapshot.enemies[0].intents || [])
+    ];
   }
   localStorage.setItem("sunny_maze_run_v1", JSON.stringify(snapshot));
 });
@@ -215,6 +219,8 @@ await page.waitForSelector(".turn-outcome-panel", { timeout: 10000 });
 await page.waitForSelector(".turn-outcome-card", { timeout: 10000 });
 await page.waitForSelector(".enemy-pattern-row", { timeout: 10000 });
 await page.waitForSelector(".enemy-pattern-chip", { timeout: 10000 });
+await page.waitForSelector(".intent-effect-strip", { timeout: 10000 });
+await page.waitForSelector(".intent-effect-chip", { timeout: 10000 });
 await page.waitForSelector(".enemy-status-chip.status-mark", { timeout: 10000 });
 await page.waitForSelector(".enemy-status-chip.status-weak", { timeout: 10000 });
 await page.waitForSelector(".play-card .card-ready-chip.ready", { timeout: 10000 });
@@ -311,7 +317,10 @@ await page.waitForSelector(".arcana-chip", { timeout: 10000 });
 const enemyText = await page.textContent(".enemy-card");
 if (!enemyText?.includes("이번") || !enemyText.includes("형")) throw new Error("적 역할/의도 표시 실패");
 if (!enemyText.includes("역할") || !enemyText.includes("패턴") || !enemyText.includes("위협")) throw new Error("몬스터 역할/패턴 칩 표시 실패");
-const combatOverflowItems = await page.locator(".combat-forecast, .turn-outcome-panel, .turn-outcome-card, .combat-status-card, .status-card-copy, .enemy-pattern-chip, .enemy-status-chip, .disruption-control, .enemy-card, .intent-card, .intent-node, .monster-portrait, .play-card, .card-art, .card-role-chip, .card-art-role-mark, .card-cue-chip, .hand-gem-chip, .card-preview-chip").evaluateAll((elements) => elements
+if (!enemyText.includes("대상") || !enemyText.includes("후속") || !enemyText.includes("다음 비용 +1")) {
+  throw new Error("몬스터 의도 결과 칩 표시 실패");
+}
+const combatOverflowItems = await page.locator(".combat-forecast, .turn-outcome-panel, .turn-outcome-card, .combat-status-card, .status-card-copy, .enemy-pattern-chip, .intent-effect-chip, .enemy-status-chip, .disruption-control, .enemy-card, .intent-card, .intent-node, .monster-portrait, .play-card, .card-art, .card-role-chip, .card-art-role-mark, .card-cue-chip, .hand-gem-chip, .card-preview-chip").evaluateAll((elements) => elements
   .filter((element) => element.scrollWidth > element.clientWidth + 2 || element.scrollHeight > element.clientHeight + 2)
   .map((element) => element.className));
 if (combatOverflowItems.length > 0) {
@@ -337,7 +346,7 @@ if (deckMobileOverflow.length > 0) {
 await page.locator(".deck-overview").screenshot({ path: "tmp/deck-overview-mobile.png" });
 const combatStatusMobileColumns = await page.locator(".combat-status-board").evaluate((element) => getComputedStyle(element).gridTemplateColumns.split(" ").length);
 if (combatStatusMobileColumns !== 1) throw new Error("모바일 전투 상태판 1열 반응형 확인 실패");
-const combatStatusMobileOverflow = await page.locator(".current-room-panel, .current-room-core, .current-room-chip, .turn-outcome-panel, .turn-outcome-card, .combat-status-card, .status-card-copy, .enemy-pattern-chip, .enemy-status-chip, .card-cue-chip, .hand-gem-chip, .card-preview-chip").evaluateAll((elements) => elements
+const combatStatusMobileOverflow = await page.locator(".current-room-panel, .current-room-core, .current-room-chip, .turn-outcome-panel, .turn-outcome-card, .combat-status-card, .status-card-copy, .enemy-pattern-chip, .intent-effect-chip, .enemy-status-chip, .card-cue-chip, .hand-gem-chip, .card-preview-chip").evaluateAll((elements) => elements
   .filter((element) => element.scrollWidth > element.clientWidth + 2 || element.scrollHeight > element.clientHeight + 2)
   .map((element) => element.className));
 if (combatStatusMobileOverflow.length > 0) {

@@ -3214,6 +3214,85 @@ h1 {
   color: #6f5a1f;
 }
 
+.intent-effect-strip {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 5px;
+}
+
+.intent-effect-chip {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr);
+  gap: 6px;
+  align-items: center;
+  min-width: 0;
+  min-height: 42px;
+  padding: 6px;
+  border-radius: 8px;
+  background: #edf8ff;
+  color: #425a70;
+  box-shadow: inset 0 0 0 1px rgba(76, 79, 112, 0.05);
+}
+
+.intent-effect-chip > b {
+  display: grid;
+  width: 24px;
+  height: 24px;
+  place-items: center;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.78);
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.intent-effect-chip span,
+.intent-effect-chip em,
+.intent-effect-chip strong {
+  display: block;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.intent-effect-chip em {
+  color: currentColor;
+  font-size: 9px;
+  font-style: normal;
+  font-weight: 900;
+  opacity: 0.72;
+}
+
+.intent-effect-chip strong {
+  color: currentColor;
+  font-size: 11px;
+  line-height: 1.14;
+}
+
+.effect-attack {
+  background: #ffe1e7;
+  color: #a33c50;
+}
+
+.effect-guard,
+.effect-heal {
+  background: #e8f8f1;
+  color: #347159;
+}
+
+.effect-trick {
+  background: #f2edff;
+  color: #6555a0;
+}
+
+.effect-summon {
+  background: #fff2c6;
+  color: #7c5d15;
+}
+
+.effect-note {
+  background: #edf8ff;
+  color: #425a70;
+}
+
 .intent-timeline {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));

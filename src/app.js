@@ -1774,6 +1774,7 @@ function renderEnemyCard(enemy, state, index) {
           <small>${intentDetail(intent)}</small>
         </div>
       </div>
+      ${renderIntentEffectStrip(intent, enemy)}
       ${renderIntentTimeline(enemy, state.turn)}
       ${renderEnemyStatus(enemy)}
     </article>
@@ -1862,6 +1863,52 @@ function intentPatternName(intent) {
   if (intent.effect === "reduce_energy") return "기운";
   if (intent.effect === "chain_down") return "연쇄";
   return "특수";
+}
+
+function renderIntentEffectStrip(intent, enemy) {
+  const items = intentEffectItems(intent, enemy);
+  if (items.length === 0) return "";
+  return `
+    <div class="intent-effect-strip" aria-label="${enemy.name} 의도 결과">
+      ${items.map((item) => `
+        <span class="intent-effect-chip effect-${item.tone}">
+          <b>${item.icon}</b>
+          <span>
+            <em>${item.label}</em>
+            <strong>${item.value}</strong>
+          </span>
+        </span>
+      `).join("")}
+    </div>
+  `;
+}
+
+function intentEffectItems(intent, enemy) {
+  if (!intent) return [{ tone: "note", icon: "대", label: "결과", value: "대기" }];
+  const items = [{ tone: "note", icon: "대", label: "대상", value: intentTargetLabel(intent) }];
+  if (intent.type === "attack") items.push({ tone: "attack", icon: "피", label: "결과", value: `피해 ${intent.amount || 0}` });
+  if (intent.type === "guard") items.push({ tone: "guard", icon: "막", label: "결과", value: `방어 +${intent.amount || 0}` });
+  if (intent.type === "debuff") items.push({ tone: "trick", icon: statusIcon(intent.status), label: "상태", value: `${statusLabel(intent.status)} +${intent.amount || 1}` });
+  if (intent.effect === "pierce_attack") items.push({ tone: "attack", icon: "관", label: "결과", value: `관통 ${intent.amount || 0}` });
+  if (intent.effect === "fortify_all") items.push({ tone: "guard", icon: "전", label: "결과", value: `전체 방어 +${intent.amount || 0}` });
+  if (intent.effect === "heal_self") items.push({ tone: "heal", icon: "회", label: "결과", value: `회복 +${intent.amount || 0}` });
+  if (intent.effect === "add_temp_card") items.push({ tone: "trick", icon: "방", label: "후속", value: `방해 +${intent.amount || 1}장` });
+  if (intent.effect === "reduce_energy") items.push({ tone: "trick", icon: "기", label: "후속", value: `다음 기운 -${intent.amount || 1}` });
+  if (intent.effect === "chain_down") {
+    items.push({ tone: "trick", icon: "연", label: "후속", value: `연쇄 -${intent.amount || 1}` });
+    if (intent.costIncrease) items.push({ tone: "trick", icon: "값", label: "후속", value: `다음 비용 +${intent.costIncrease}` });
+  }
+  if (intent.effect === "summon") items.push({ tone: "summon", icon: "호", label: "결과", value: "친구 호출" });
+  if (enemy.family) items.push({ tone: enemyPatternTone([intent]), icon: "계", label: "계열", value: enemy.family });
+  return items.slice(0, 4);
+}
+
+function intentTargetLabel(intent) {
+  if (!intent) return "없음";
+  if (intent.type === "guard" || intent.effect === "heal_self") return "자신";
+  if (intent.effect === "fortify_all") return "모든 적";
+  if (intent.effect === "summon") return "전장";
+  return "플레이어";
 }
 
 function renderEnemyImpactBadges(enemy, feedback) {
