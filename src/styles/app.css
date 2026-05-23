@@ -216,17 +216,6 @@ h1 {
   font-weight: 700;
 }
 
-.art-window {
-  display: grid;
-  min-height: 92px;
-  place-items: center;
-  padding: 12px;
-  border: 2px dashed rgba(63, 67, 96, 0.18);
-  border-radius: 8px;
-  background: linear-gradient(145deg, rgba(255, 232, 163, 0.8), rgba(218, 242, 255, 0.8));
-  text-align: center;
-}
-
 .sample-card p {
   flex: 1;
   margin-bottom: 0;
@@ -1329,8 +1318,269 @@ h1 {
 }
 
 .play-card {
-  min-height: 190px;
+  min-height: 248px;
   border: 3px solid var(--card-accent);
+}
+
+.card-art {
+  display: grid;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  min-height: 92px;
+  align-content: end;
+  padding: 8px;
+  border: 2px solid color-mix(in srgb, var(--card-accent) 36%, #ffffff);
+  border-radius: 8px;
+  background:
+    radial-gradient(circle at 22% 20%, rgba(255, 255, 255, 0.92) 0 10%, transparent 11%),
+    linear-gradient(145deg, color-mix(in srgb, var(--card-accent) 18%, #ffffff), #fff7db 72%);
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.62);
+}
+
+.card-art-glow,
+.card-art-shape {
+  position: absolute;
+  display: block;
+}
+
+.card-art-glow {
+  z-index: -1;
+  inset: 8px;
+  border-radius: 18px;
+  background:
+    radial-gradient(circle at 50% 48%, color-mix(in srgb, var(--card-accent) 32%, transparent), transparent 58%);
+}
+
+.card-art-shape {
+  background: color-mix(in srgb, var(--card-accent) 74%, #ffffff);
+  box-shadow: 0 8px 16px rgba(76, 70, 116, 0.12);
+}
+
+.card-art-shape.main {
+  left: 50%;
+  top: 24px;
+  width: 44px;
+  height: 38px;
+  transform: translateX(-50%);
+}
+
+.card-art-shape.aux {
+  left: 18%;
+  top: 18px;
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.84);
+}
+
+.card-art-shape.trail-one,
+.card-art-shape.trail-two {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.8);
+  box-shadow: none;
+}
+
+.card-art-shape.trail-one {
+  right: 18%;
+  top: 20px;
+}
+
+.card-art-shape.trail-two {
+  right: 12%;
+  top: 42px;
+}
+
+.card-art-label {
+  display: grid;
+  position: relative;
+  z-index: 2;
+  gap: 2px;
+  padding: 6px 7px;
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.78);
+  color: #383a56;
+  line-height: 1.2;
+  text-align: center;
+  backdrop-filter: blur(3px);
+}
+
+.card-art-label strong,
+.card-art-label small {
+  display: block;
+  overflow-wrap: anywhere;
+}
+
+.card-art-label strong {
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.card-art-label small {
+  color: #686c88;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.motif-burst .main {
+  border-radius: 50% 45% 48% 40%;
+  clip-path: polygon(50% 0, 62% 30%, 100% 22%, 74% 50%, 100% 80%, 62% 70%, 50% 100%, 38% 70%, 0 80%, 26% 50%, 0 22%, 38% 30%);
+}
+
+.motif-shield .main {
+  border-radius: 18px 18px 26px 26px;
+  clip-path: polygon(50% 0, 88% 14%, 78% 70%, 50% 100%, 22% 70%, 12% 14%);
+}
+
+.motif-star .main {
+  clip-path: polygon(50% 0, 62% 36%, 100% 36%, 69% 58%, 82% 100%, 50% 74%, 18% 100%, 31% 58%, 0 36%, 38% 36%);
+}
+
+.motif-ribbon .main {
+  width: 58px;
+  height: 22px;
+  border-radius: 999px;
+  transform: translateX(-50%) rotate(-9deg);
+}
+
+.motif-ribbon .aux {
+  left: 50%;
+  top: 29px;
+  width: 16px;
+  height: 16px;
+  transform: translateX(-50%) rotate(45deg);
+  border-radius: 4px;
+}
+
+.motif-charm .main {
+  width: 38px;
+  height: 44px;
+  border-radius: 7px;
+  transform: translateX(-50%) rotate(-5deg);
+}
+
+.motif-potion .main {
+  width: 36px;
+  height: 42px;
+  border-radius: 9px 9px 16px 16px;
+}
+
+.motif-potion .main::before {
+  content: "";
+  position: absolute;
+  left: 10px;
+  top: -9px;
+  width: 16px;
+  height: 12px;
+  border-radius: 5px 5px 2px 2px;
+  background: color-mix(in srgb, var(--card-accent) 52%, #ffffff);
+}
+
+.motif-cloud .main {
+  width: 58px;
+  height: 28px;
+  border-radius: 999px;
+}
+
+.motif-cloud .aux {
+  left: 38%;
+  top: 13px;
+  width: 26px;
+  height: 26px;
+}
+
+.motif-seal .main {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, rgba(255, 255, 255, 0.9) 0 34%, transparent 36%),
+    color-mix(in srgb, var(--card-accent) 72%, #ffffff);
+}
+
+.motif-disrupt .main {
+  width: 46px;
+  height: 36px;
+  border: 3px dashed color-mix(in srgb, var(--card-accent) 78%, #7d6eb2);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.48);
+  transform: translateX(-50%) rotate(-6deg);
+}
+
+.motif-spark .main {
+  border-radius: 50% 18% 50% 18%;
+  transform: translateX(-50%) rotate(12deg);
+}
+
+.card-art-hand {
+  min-height: 70px;
+  padding: 6px;
+}
+
+.card-art-hand .card-art-shape.main {
+  top: 14px;
+  width: 34px;
+  height: 30px;
+}
+
+.card-art-hand .card-art-shape.aux,
+.card-art-hand .card-art-shape.trail-one,
+.card-art-hand .card-art-shape.trail-two {
+  transform: scale(0.8);
+}
+
+.card-art-hand .card-art-label {
+  padding: 5px;
+}
+
+.card-art-hand .card-art-label small {
+  display: none;
+}
+
+.card-art-socket {
+  min-height: 78px;
+}
+
+.card-art-preview {
+  width: 54px;
+  min-width: 54px;
+  min-height: 50px;
+  padding: 4px;
+}
+
+.card-art-preview .card-art-label {
+  display: none;
+}
+
+.card-art-preview .card-art-shape.main {
+  top: 12px;
+  width: 28px;
+  height: 26px;
+}
+
+.card-art-preview .card-art-shape.aux {
+  left: 9px;
+  top: 10px;
+  width: 12px;
+  height: 12px;
+  transform: none;
+}
+
+.card-art-preview .card-art-shape.trail-one {
+  right: 9px;
+  top: 10px;
+  width: 7px;
+  height: 7px;
+}
+
+.card-art-preview .card-art-shape.trail-two {
+  right: 8px;
+  top: 31px;
+  width: 7px;
+  height: 7px;
 }
 
 .play-card.card-type-curse,
@@ -1514,6 +1764,7 @@ h1 {
 }
 
 .reward-kind-card {
+  grid-template-columns: 64px minmax(0, 1fr);
   background: linear-gradient(90deg, color-mix(in srgb, var(--preview-accent, #ff8ea2) 18%, #ffffff), #ffffff 58%);
 }
 
@@ -1923,7 +2174,7 @@ h1 {
 
 .socket-card-frame {
   display: grid;
-  grid-template-rows: auto auto 1fr;
+  grid-template-rows: auto auto minmax(78px, 1fr);
   gap: 7px;
   min-height: 170px;
   padding: 10px;
@@ -1936,21 +2187,6 @@ h1 {
 .socket-card-frame strong {
   overflow-wrap: anywhere;
   color: #383a56;
-}
-
-.socket-art {
-  display: grid;
-  min-height: 78px;
-  place-items: center;
-  padding: 8px;
-  border-radius: 8px;
-  background:
-    linear-gradient(145deg, rgba(255, 232, 163, 0.85), rgba(218, 242, 255, 0.9));
-  color: #4f536d;
-  font-size: 13px;
-  font-weight: 900;
-  line-height: 1.25;
-  text-align: center;
 }
 
 .socket-card-meta {

@@ -58,6 +58,8 @@ const lockedStageOptions = await page.locator("#stageSelect option:disabled").co
 if (lockedStageOptions === 0) throw new Error("잠긴 스테이지 표시 실패");
 const setupRoomChips = await page.locator(".stage-room-strip .room-mini").count();
 if (setupRoomChips === 0) throw new Error("스테이지 방 구성 칩 표시 실패");
+const sampleCardArtCount = await page.locator(".sample-card .card-art-sample").count();
+if (sampleCardArtCount < 3) throw new Error("카드 샘플 일러스트 표시 실패");
 
 await page.click("#startRunButton");
 await page.waitForSelector(".run-board", { timeout: 10000 });
@@ -114,10 +116,11 @@ if (routeOverflowItems.length > 0) {
 }
 await page.screenshot({ path: "tmp/stage-route-desktop.png", fullPage: true });
 await page.waitForSelector(".play-card", { timeout: 10000 });
+await page.waitForSelector(".play-card .card-art-hand", { timeout: 10000 });
 await page.waitForSelector(".arcana-chip", { timeout: 10000 });
 const enemyText = await page.textContent(".enemy-card");
 if (!enemyText?.includes("이번") || !enemyText.includes("형")) throw new Error("적 역할/의도 표시 실패");
-const combatOverflowItems = await page.locator(".combat-forecast, .disruption-control, .enemy-card, .intent-card, .intent-node, .monster-portrait").evaluateAll((elements) => elements
+const combatOverflowItems = await page.locator(".combat-forecast, .disruption-control, .enemy-card, .intent-card, .intent-node, .monster-portrait, .play-card, .card-art").evaluateAll((elements) => elements
   .filter((element) => element.scrollWidth > element.clientWidth + 2 || element.scrollHeight > element.clientHeight + 2)
   .map((element) => element.className));
 if (combatOverflowItems.length > 0) {
@@ -153,6 +156,7 @@ await page.waitForSelector(".relic-chip", { timeout: 10000 });
 await page.waitForFunction(() => document.querySelectorAll(".arcana-chip").length >= 2, null, { timeout: 10000 });
 await page.waitForSelector(".socket-card-preview", { timeout: 10000 });
 await page.waitForSelector(".equipped-effect-list", { timeout: 10000 });
+await page.waitForSelector(".socket-card .card-art-socket", { timeout: 10000 });
 
 const runText = await page.textContent("#runRoot");
 if (!runText?.includes("체력") || !runText.includes("기운") || !runText.includes("현재 빌드") || !runText.includes("보석 작업대")) {
@@ -183,13 +187,16 @@ await advanceUntilMarketBox();
 await page.waitForSelector(".market-box .choice-wallet", { timeout: 10000 });
 await page.waitForSelector(".market-box .choice-cost", { timeout: 10000 });
 await page.waitForSelector(".market-box .reward-preview-card", { timeout: 10000 });
+const rewardCardCount = await page.locator(".market-box .reward-kind-card").count();
+const rewardCardArtCount = await page.locator(".market-box .reward-kind-card .card-art-preview").count();
+if (rewardCardCount > 0 && rewardCardArtCount === 0) throw new Error("보상 카드 미리보기 일러스트 표시 실패");
 
 const marketText = await page.textContent(".market-box");
 if (!marketText?.includes("비용") || !marketText.includes("별사탕")) {
   throw new Error("상점/이벤트/보상 비용 표시 확인 실패");
 }
 
-const overflowItems = await page.locator(".market-box, .market-choice, .reward-preview-card, .choice-wallet").evaluateAll((elements) => elements
+const overflowItems = await page.locator(".market-box, .market-choice, .reward-preview-card, .choice-wallet, .card-art-preview").evaluateAll((elements) => elements
   .filter((element) => element.scrollWidth > element.clientWidth + 2 || element.scrollHeight > element.clientHeight + 2)
   .map((element) => element.className));
 if (overflowItems.length > 0) {

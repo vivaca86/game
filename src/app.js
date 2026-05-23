@@ -117,9 +117,7 @@ function renderCards(cards) {
           <span>${typeLabels[card.type] || card.type} · ${rarityLabels[card.rarity] || card.rarity}</span>
         </div>
       </div>
-      <div class="art-window">
-        <span>${card.illustration.subject}</span>
-      </div>
+      ${renderCardArt(card, "sample")}
       <p>${card.text}</p>
       <div class="tag-row">
         ${card.tags.map((tag) => `<span>${tag}</span>`).join("")}
@@ -495,6 +493,7 @@ function renderCombat(state, index) {
               <span class="cost">${cost}</span>
               <strong>${card.name}</strong>
               <small>${typeLabels[card.type] || card.type}</small>
+              ${renderCardArt(card, "hand")}
               <p>${card.text}</p>
             </button>
           `;
@@ -938,7 +937,7 @@ function renderSocketCard(state, index, cardId) {
         <div class="socket-card-frame">
           <span class="cost">${currentCost}</span>
           <strong>${card.name}</strong>
-          <div class="socket-art">${card.illustration?.subject || card.name}</div>
+          ${renderCardArt(card, "socket")}
         </div>
         <div class="socket-card-meta">
           <strong>${typeLabels[card.type] || card.type} 카드 ${upgraded ? "· 강화됨" : ""}</strong>
@@ -1219,7 +1218,7 @@ function rewardPreviewItems(reward = {}, index) {
 function rewardOptionPreviewItems(option, index) {
   if (option.type === "card") {
     const card = index.cards.get(option.cardId);
-    return card ? [{ kind: "card", title: card.name, detail: option.description, short: "카드", accent: accentFor(card.color), cost: card.cost }] : [];
+    return card ? [{ kind: "card", title: card.name, detail: option.description, short: "카드", accent: accentFor(card.color), cost: card.cost, card }] : [];
   }
   if (option.type === "gem") {
     const gem = index.gems.get(option.gemId);
@@ -1238,7 +1237,9 @@ function rewardOptionPreviewItems(option, index) {
 }
 
 function renderRewardPreviewItem(item) {
-  const icon = item.kind === "gem"
+  const icon = item.card
+    ? renderCardArt(item.card, "preview")
+    : item.kind === "gem"
     ? `<span class="gem-icon ${item.visual}"></span>`
     : `<span class="reward-icon reward-icon-${item.kind}" ${item.accent ? `style="--preview-accent:${item.accent}"` : ""}>${item.cost ?? rewardIconText(item.kind)}</span>`;
   return `
@@ -1250,6 +1251,45 @@ function renderRewardPreviewItem(item) {
       </span>
     </span>
   `;
+}
+
+function renderCardArt(card, variant = "sample") {
+  const subject = card.illustration?.subject || card.name;
+  const mood = card.illustration?.mood || "";
+  const motif = cardArtMotif(card);
+  return `
+    <span class="card-art card-art-${variant} motif-${motif} card-art-type-${card.type}" style="--card-accent:${accentFor(card.color)}" aria-label="${escapeHtml(subject)}">
+      <span class="card-art-glow"></span>
+      <span class="card-art-shape main"></span>
+      <span class="card-art-shape aux"></span>
+      <span class="card-art-shape trail-one"></span>
+      <span class="card-art-shape trail-two"></span>
+      <span class="card-art-label">
+        <strong>${escapeHtml(shortCardSubject(subject))}</strong>
+        ${mood ? `<small>${escapeHtml(mood)}</small>` : ""}
+      </span>
+    </span>
+  `;
+}
+
+function cardArtMotif(card) {
+  const text = [card.name, card.illustration?.subject, ...(card.tags || [])].join(" ");
+  if (["curse", "temp"].includes(card.type)) return "disrupt";
+  if (/방패|보호|방석|쿠션|장벽|거울/.test(text) || card.type === "guard") return "shield";
+  if (/별|반짝|빛|충전|별사탕/.test(text)) return "star";
+  if (/리본|연쇄|물결|소나기/.test(text)) return "ribbon";
+  if (/부적|종이|지도|스티커/.test(text)) return "charm";
+  if (/간식|병|회복|선물/.test(text)) return "potion";
+  if (/구름|방울|비눗/.test(text)) return "cloud";
+  if (card.type === "power" || /약속|지속/.test(text)) return "seal";
+  if (card.type === "attack" || /펀치|망치|돌진|꼬리별|타격/.test(text)) return "burst";
+  return "spark";
+}
+
+function shortCardSubject(subject) {
+  const words = String(subject).trim().split(/\s+/);
+  if (words.length <= 3) return subject;
+  return words.slice(-3).join(" ");
 }
 
 function rewardIconText(kind) {
