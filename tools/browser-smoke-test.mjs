@@ -68,6 +68,29 @@ await page.waitForSelector(".combat-forecast", { timeout: 10000 });
 await page.waitForSelector(".monster-portrait", { timeout: 10000 });
 await page.waitForSelector(".intent-card", { timeout: 10000 });
 await page.waitForSelector(".intent-timeline .intent-node.current", { timeout: 10000 });
+await page.evaluate(() => {
+  const raw = localStorage.getItem("sunny_maze_run_v1");
+  if (!raw) throw new Error("저장된 탐험 스냅샷 없음");
+  const snapshot = JSON.parse(raw);
+  const hand = Array.isArray(snapshot.hand) ? snapshot.hand.filter((cardId) => cardId !== "card_temp_dust") : [];
+  snapshot.hand = ["card_temp_dust", ...hand];
+  snapshot.player = { ...(snapshot.player || {}), energy: Math.max(snapshot.player?.energy || 0, 3) };
+  snapshot.status = { ...(snapshot.status || {}), disruptionsCleared: 0 };
+  localStorage.setItem("sunny_maze_run_v1", JSON.stringify(snapshot));
+});
+await page.reload({ waitUntil: "networkidle" });
+await page.waitForSelector("#loadRunButton:not(:disabled)", { timeout: 10000 });
+await page.click("#loadRunButton");
+await page.waitForSelector(".stage-route-panel", { timeout: 10000 });
+await page.waitForSelector(".combat-forecast", { timeout: 10000 });
+await page.waitForSelector(".disruption-control", { timeout: 10000 });
+await page.waitForSelector(".play-card.card-type-temp", { timeout: 10000 });
+const disruptionText = await page.textContent(".disruption-control");
+if (!disruptionText?.includes("방해 대응") || !disruptionText.includes("정리 · 기운 1")) {
+  throw new Error("방해 카드 정리 UI 표시 실패");
+}
+const disruptionCardBorderStyle = await page.locator(".play-card.card-type-temp").first().evaluate((element) => getComputedStyle(element).borderStyle);
+if (!disruptionCardBorderStyle.includes("dashed")) throw new Error("방해 카드 프레임 구분 실패");
 const routeText = await page.textContent(".stage-route-panel");
 if (!routeText?.includes("스테이지 경로") || !routeText.includes("현재 방") || !routeText.includes("보스")) {
   throw new Error("스테이지 경로판 표시 실패");
@@ -91,13 +114,20 @@ await page.waitForSelector(".play-card", { timeout: 10000 });
 await page.waitForSelector(".arcana-chip", { timeout: 10000 });
 const enemyText = await page.textContent(".enemy-card");
 if (!enemyText?.includes("이번") || !enemyText.includes("형")) throw new Error("적 역할/의도 표시 실패");
-const combatOverflowItems = await page.locator(".combat-forecast, .enemy-card, .intent-card, .intent-node, .monster-portrait").evaluateAll((elements) => elements
+const combatOverflowItems = await page.locator(".combat-forecast, .disruption-control, .enemy-card, .intent-card, .intent-node, .monster-portrait").evaluateAll((elements) => elements
   .filter((element) => element.scrollWidth > element.clientWidth + 2 || element.scrollHeight > element.clientHeight + 2)
   .map((element) => element.className));
 if (combatOverflowItems.length > 0) {
   throw new Error(`전투 UI 넘침: ${combatOverflowItems.slice(0, 4).join(" | ")}`);
 }
 await page.screenshot({ path: "tmp/combat-ui-desktop.png", fullPage: true });
+
+await page.click('[data-action="cleanse-disruption"]');
+await page.waitForFunction(() => {
+  const controlGone = !document.querySelector(".disruption-control");
+  const clearedChip = [...document.querySelectorAll(".forecast-chip")].some((element) => element.textContent?.includes("정리 1"));
+  return controlGone && clearedChip;
+}, null, { timeout: 10000 });
 
 const enabledCards = await page.locator(".play-card:not(:disabled)").count();
 if (enabledCards === 0) throw new Error("사용 가능한 카드가 없습니다.");

@@ -1,5 +1,5 @@
 import { loadGameData } from "./core/data-loader.js";
-import { intentDetail, nextIntent, playCard, endTurn } from "./core/combat.js";
+import { cleanseDisruption, disruptionCleanseCost, intentDetail, nextIntent, playCard, endTurn } from "./core/combat.js";
 import { advanceRoom, startRun } from "./core/progression.js";
 import { applyEventChoice, applyRewardOption, rerollReward } from "./core/rewards.js";
 import { cardCost } from "./core/card-effects.js";
@@ -481,6 +481,7 @@ function renderCombat(state, index) {
   return `
     <div class="combat-grid">
       ${renderCombatForecast(state, index, forecast)}
+      ${renderDisruptionControl(state, index)}
       <section class="enemy-row">
         ${state.enemies.map((enemy) => renderEnemyCard(enemy, state)).join("")}
       </section>
@@ -489,7 +490,7 @@ function renderCombat(state, index) {
           const card = index.cards.get(cardId);
           const cost = cardCost(card, state, index);
           return `
-            <button class="play-card" data-action="play-card" data-hand-index="${handIndex}" style="--card-accent:${accentFor(card.color)}" ${cost > state.player.energy ? "disabled" : ""}>
+            <button class="play-card card-type-${card.type}" data-action="play-card" data-hand-index="${handIndex}" style="--card-accent:${accentFor(card.color)}" ${cost > state.player.energy ? "disabled" : ""}>
               <span class="cost">${cost}</span>
               <strong>${card.name}</strong>
               <small>${typeLabels[card.type] || card.type}</small>
@@ -500,6 +501,28 @@ function renderCombat(state, index) {
       </section>
       <button class="secondary-btn" data-action="end-turn">턴 종료</button>
     </div>
+  `;
+}
+
+function renderDisruptionControl(state, index) {
+  const disruptions = state.hand
+    .map((cardId, handIndex) => ({ card: index.cards.get(cardId), handIndex }))
+    .filter((item) => item.card && ["curse", "temp"].includes(item.card.type));
+  if (disruptions.length === 0) return "";
+  const target = (disruptions.find((item) => state.player.energy >= disruptionCleanseCost(item.card)) || disruptions[0]).card;
+  const cost = disruptionCleanseCost(target);
+  const canCleanse = state.player.energy >= cost;
+  return `
+    <section class="disruption-control">
+      <div>
+        <span class="route-kicker">방해 대응</span>
+        <strong>${target.name}</strong>
+        <p>손패 방해 ${disruptions.length}장 · 효과 발동 없이 이번 전투에서 정리</p>
+      </div>
+      <button class="secondary-btn disruption-btn" data-action="cleanse-disruption" ${canCleanse ? "" : "disabled"}>
+        정리 · 기운 ${cost}
+      </button>
+    </section>
   `;
 }
 
@@ -518,7 +541,7 @@ function renderCombatForecast(state, index, forecast) {
         </div>
       </div>
       <div class="forecast-chip-list">
-        ${combatStatusChips(state, forecast).map((chip) => `<span class="forecast-chip ${chip.tone}">${chip.label}</span>`).join("")}
+        ${combatStatusChips(state, index, forecast).map((chip) => `<span class="forecast-chip ${chip.tone}">${chip.label}</span>`).join("")}
       </div>
       ${renderBattleRules(state, index)}
     </section>
@@ -639,7 +662,7 @@ function combatForecast(state) {
   };
 }
 
-function combatStatusChips(state, forecast) {
+function combatStatusChips(state, index, forecast) {
   const chips = [
     { label: `연쇄 ${state.status.chain || 0}`, tone: "chain" },
     { label: `손패 ${state.hand.length}`, tone: "hand" },
@@ -653,6 +676,9 @@ function combatStatusChips(state, forecast) {
   if (state.status.retainShield > 0) chips.push({ label: `보호막 유지 ${state.status.retainShield}`, tone: "guard" });
   if (state.status.reflectRatio > 0 && forecast.totalDamage > 0) chips.push({ label: `반사 ${Math.ceil(forecast.totalDamage * state.status.reflectRatio)}`, tone: "guard" });
   if (state.status.battleRuleTriggers > 0) chips.push({ label: `약속 발동 ${state.status.battleRuleTriggers}`, tone: "guard" });
+  const disruptionCount = state.hand.filter((cardId) => ["curse", "temp"].includes(index.cards.get(cardId)?.type)).length;
+  if (disruptionCount > 0) chips.push({ label: `방해 ${disruptionCount}`, tone: "danger" });
+  if (state.status.disruptionsCleared > 0) chips.push({ label: `정리 ${state.status.disruptionsCleared}`, tone: "guard" });
   if (state.status.nextTurnEnergyPenalty > 0) chips.push({ label: `다음 기운 -${state.status.nextTurnEnergyPenalty}`, tone: "danger" });
   return chips;
 }
@@ -996,6 +1022,7 @@ function bindRunActions() {
     button.addEventListener("click", () => {
       const action = button.dataset.action;
       if (action === "play-card") playCard(state, index, Number(button.dataset.handIndex));
+      if (action === "cleanse-disruption") cleanseDisruption(state, index);
       if (action === "end-turn") endTurn(state, index);
       if (action === "reward-choice") applyRewardOption(state, index, button.dataset.rewardId);
       if (action === "event-choice") applyEventChoice(state, index, Number(button.dataset.choiceIndex));

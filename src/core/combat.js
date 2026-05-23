@@ -91,6 +91,30 @@ export function playCard(state, index, handIndex) {
   return true;
 }
 
+export function cleanseDisruption(state, index) {
+  if (state.phase !== "combat") return false;
+  const disruptions = state.hand
+    .map((cardId, handIndex) => ({ cardId, card: index.cards.get(cardId), handIndex }))
+    .filter((item) => item.card && ["curse", "temp"].includes(item.card.type));
+  if (disruptions.length === 0) {
+    addLog(state, "정리할 방해 카드가 없습니다.");
+    return false;
+  }
+  const target = disruptions.find((item) => state.player.energy >= disruptionCleanseCost(item.card)) || disruptions[0];
+  const { cardId, card, handIndex } = target;
+  const cost = disruptionCleanseCost(card);
+  if (state.player.energy < cost) {
+    addLog(state, `방해 정리에는 기운 ${cost}이 필요합니다.`);
+    return false;
+  }
+  state.player.energy -= cost;
+  state.hand.splice(handIndex, 1);
+  state.exhaustPile.push(cardId);
+  state.status.disruptionsCleared = (state.status.disruptionsCleared || 0) + 1;
+  addLog(state, `방해 정리: ${card.name}`);
+  return true;
+}
+
 export function endTurn(state, index) {
   if (state.phase !== "combat") return false;
   const incoming = { normalDamage: 0, piercingDamage: 0 };
@@ -156,6 +180,11 @@ export function intentDetail(intent) {
   if (intent.effect === "chain_down") return `연쇄 -${intent.amount || 1}`;
   if (intent.effect === "summon") return "친구 호출";
   return intent.label || intent.type;
+}
+
+export function disruptionCleanseCost(card) {
+  if (!card || !["curse", "temp"].includes(card.type)) return 0;
+  return card.type === "curse" ? 2 : 1;
 }
 
 function completeCombat(state, index) {

@@ -2,7 +2,7 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { createGameIndex, assertRuntimeData } from "../src/core/data-loader.js";
-import { playCard, endTurn } from "../src/core/combat.js";
+import { cleanseDisruption, playCard, endTurn } from "../src/core/combat.js";
 import { startRun, advanceRoom } from "../src/core/progression.js";
 import { applyEventChoice, applyRewardOption } from "../src/core/rewards.js";
 import { cardCost } from "../src/core/card-effects.js";
@@ -110,6 +110,36 @@ if (!playCard(markState, index, 0)) throw new Error("표식 피해 카드 사용
 const markedDamage = markedHpBefore - markState.enemies[0].hp;
 if (markedDamage <= 11) throw new Error(`표식 피해 보너스 실패: ${markedDamage}`);
 if ((markState.enemies[0].status.mark || 0) !== 1) throw new Error("표식 소모 실패");
+
+const disruptionState = startRun(index, {
+  characterId: "char_haru",
+  stageId: "stage_sunny_gate",
+  seed: 20260528,
+  profile
+});
+disruptionState.player.energy = 1;
+disruptionState.hand = ["card_temp_dust", "card_sunbean_punch"];
+const disruptionEnergyBefore = disruptionState.player.energy;
+if (!cleanseDisruption(disruptionState, index)) throw new Error("방해 카드 정리 실패");
+if (disruptionState.hand.includes("card_temp_dust")) throw new Error("방해 카드 손패 제거 실패");
+if (!disruptionState.exhaustPile.includes("card_temp_dust")) throw new Error("방해 카드 소멸 더미 이동 실패");
+if (disruptionState.player.energy !== disruptionEnergyBefore - 1) throw new Error("방해 카드 정리 비용 실패");
+if (disruptionState.status.chain) throw new Error("방해 카드 정리가 연쇄를 올리면 안 됩니다");
+if ((disruptionState.status.disruptionsCleared || 0) !== 1) throw new Error("방해 카드 정리 기록 실패");
+if (disruptionState.player.energy !== 0 || disruptionState.hand.some((cardId) => ["card_temp_dust"].includes(cardId))) throw new Error("방해 카드 정리 후 상태 검증 실패");
+
+const curseState = startRun(index, {
+  characterId: "char_haru",
+  stageId: "stage_sunny_gate",
+  seed: 20260529,
+  profile
+});
+curseState.player.energy = 1;
+curseState.hand = ["card_temp_sleepy"];
+if (cleanseDisruption(curseState, index)) throw new Error("저주 카드 저비용 정리 차단 실패");
+curseState.player.energy = 2;
+if (!cleanseDisruption(curseState, index)) throw new Error("저주 카드 정리 실패");
+if (curseState.player.energy !== 0) throw new Error("저주 카드 정리 비용 실패");
 
 const firstCardId = state.deck[0];
 const firstCard = index.cards.get(firstCardId);

@@ -2,7 +2,7 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { createGameIndex, assertRuntimeData } from "../src/core/data-loader.js";
-import { endTurn, playCard } from "../src/core/combat.js";
+import { cleanseDisruption, disruptionCleanseCost, endTurn, playCard } from "../src/core/combat.js";
 import { startRun, advanceRoom } from "../src/core/progression.js";
 import { applyEventChoice, applyRewardOption } from "../src/core/rewards.js";
 import { cardCost } from "../src/core/card-effects.js";
@@ -64,6 +64,10 @@ function simulateRun({ stage, seed }) {
   while (!["stage_clear", "defeat"].includes(state.phase) && safety < 900) {
     safety += 1;
     if (state.phase === "combat") {
+      if (shouldCleanseDisruption(state)) {
+        cleanseDisruption(state, index);
+        continue;
+      }
       const handIndex = chooseCardToPlay(state);
       if (handIndex >= 0) playCard(state, index, handIndex);
       else endTurn(state, index);
@@ -110,6 +114,20 @@ function simulateRun({ stage, seed }) {
     damageTaken: state.status.damageTakenThisCombat || 0,
     rewardChoices
   };
+}
+
+function shouldCleanseDisruption(state) {
+  const disruptions = state.hand
+    .map((cardId) => index.cards.get(cardId))
+    .filter((card) => card && ["curse", "temp"].includes(card.type));
+  const target = disruptions.find((card) => disruptionCleanseCost(card) <= state.player.energy);
+  if (!target) return false;
+  const remainingEnergy = state.player.energy - disruptionCleanseCost(target);
+  const playableUsefulCards = state.hand.filter((cardId) => {
+    const card = index.cards.get(cardId);
+    return card && !["curse", "temp"].includes(card.type) && cardCost(card, state, index) <= remainingEnergy;
+  });
+  return playableUsefulCards.length <= 1 || state.hand.length >= 5;
 }
 
 function chooseCardToPlay(state) {

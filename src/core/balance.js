@@ -41,9 +41,9 @@ export const BALANCE = Object.freeze({
     attackStageStep: 4,
     blockStageStep: 5,
     bossPhaseBlockPerStage: 1,
-    lateReliefStart: 6,
-    lateReliefPerStage: 0.06,
-    lateReliefFloor: 0.65
+    lateReliefStart: 8,
+    lateReliefPerStage: 0.035,
+    lateReliefFloor: 0.78
   }
 });
 

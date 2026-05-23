@@ -805,6 +805,37 @@ h1 {
   font-weight: 900;
 }
 
+.disruption-control {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: center;
+  padding: 13px;
+  border: 2px solid rgba(255, 142, 162, 0.3);
+  border-radius: 8px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.88), rgba(255, 225, 231, 0.56)),
+    #ffffff;
+}
+
+.disruption-control strong {
+  display: block;
+  color: #383a56;
+  font-size: 18px;
+}
+
+.disruption-control p {
+  margin: 4px 0 0;
+  color: #686c88;
+  font-size: 13px;
+  font-weight: 900;
+  line-height: 1.4;
+}
+
+.disruption-btn {
+  flex: 0 0 auto;
+}
+
 .enemy-row {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -1078,6 +1109,14 @@ h1 {
 .play-card {
   min-height: 190px;
   border: 3px solid var(--card-accent);
+}
+
+.play-card.card-type-curse,
+.play-card.card-type-temp {
+  border-style: dashed;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.84), rgba(242, 237, 255, 0.54)),
+    #fffaf0;
 }
 
 .play-card:disabled,
@@ -1775,6 +1814,7 @@ h1 {
   }
 
   .forecast-main,
+  .disruption-control,
   .stage-route-head,
   .choice-head {
     display: grid;
