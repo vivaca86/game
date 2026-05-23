@@ -345,6 +345,7 @@ async function advanceUntilMarketBox() {
 await advanceUntilMarketBox();
 await page.waitForSelector(".market-box .choice-wallet", { timeout: 10000 });
 await page.waitForSelector(".market-box .choice-cost", { timeout: 10000 });
+await page.waitForSelector(".market-box .choice-impact-chip", { timeout: 10000 });
 await page.waitForSelector(".market-box .reward-preview-card", { timeout: 10000 });
 const rewardCardCount = await page.locator(".market-box .reward-kind-card").count();
 const rewardCardArtCount = await page.locator(".market-box .reward-kind-card .card-art-preview").count();
@@ -358,13 +359,17 @@ if (!marketText?.includes("비용") || !marketText.includes("별사탕")) {
   throw new Error("상점/이벤트/보상 비용 표시 확인 실패");
 }
 
-const overflowItems = await page.locator(".market-box, .market-choice, .reward-preview-card, .choice-wallet, .card-art-preview").evaluateAll((elements) => elements
+const marketImpactChipCount = await page.locator(".market-box .choice-impact-chip").count();
+if (marketImpactChipCount < 3) throw new Error("상점/보상 선택지 효과 요약 칩 부족");
+
+const overflowItems = await page.locator(".market-box, .market-choice, .choice-impact-chip, .reward-preview-card, .choice-wallet, .card-art-preview").evaluateAll((elements) => elements
   .filter((element) => element.scrollWidth > element.clientWidth + 2 || element.scrollHeight > element.clientHeight + 2)
   .map((element) => element.className));
 if (overflowItems.length > 0) {
   throw new Error(`상점/이벤트/보상 UI 넘침: ${overflowItems.slice(0, 4).join(" | ")}`);
 }
 
+await page.locator(".market-choice").first().screenshot({ path: "tmp/choice-impact-market-card.png" });
 await page.screenshot({ path: "tmp/market-ui-desktop.png", fullPage: true });
 await page.setViewportSize({ width: 390, height: 820 });
 await page.waitForTimeout(120);
@@ -453,18 +458,22 @@ await page.click("#loadRunButton");
 await page.waitForSelector(".event-box", { timeout: 10000 });
 await page.waitForSelector(".event-scene", { timeout: 10000 });
 await page.waitForSelector(".choice-reward-icon", { timeout: 10000 });
+await page.waitForSelector(".event-choice .choice-impact-chip", { timeout: 10000 });
 await page.waitForSelector(".event-choice .reward-preview-card", { timeout: 10000 });
 const eventText = await page.textContent(".event-box");
 if (!eventText?.includes("리본 분수") || !eventText.includes("카드를 강화한다")) throw new Error("이벤트 화면 핵심 문구 표시 실패");
 const eventChoiceCount = await page.locator(".event-choice").count();
 const eventIconCount = await page.locator(".event-choice .choice-reward-icon").count();
 if (eventChoiceCount < 3 || eventIconCount !== eventChoiceCount) throw new Error("이벤트 선택지 아이콘 표시 실패");
-const eventOverflowItems = await page.locator(".event-box, .event-head, .event-visual-card, .event-choice, .choice-reward-icon").evaluateAll((elements) => elements
+const eventImpactChipCount = await page.locator(".event-choice .choice-impact-chip").count();
+if (eventImpactChipCount < eventChoiceCount) throw new Error("이벤트 선택지 효과 요약 칩 부족");
+const eventOverflowItems = await page.locator(".event-box, .event-head, .event-visual-card, .event-choice, .choice-reward-icon, .choice-impact-chip").evaluateAll((elements) => elements
   .filter((element) => element.scrollWidth > element.clientWidth + 2 || element.scrollHeight > element.clientHeight + 2)
   .map((element) => element.className));
 if (eventOverflowItems.length > 0) {
   throw new Error(`이벤트 UI 넘침: ${eventOverflowItems.slice(0, 4).join(" | ")}`);
 }
+await page.locator(".event-choice").first().screenshot({ path: "tmp/choice-impact-event-card.png" });
 await page.screenshot({ path: "tmp/event-ui-desktop.png", fullPage: true });
 await page.setViewportSize({ width: 390, height: 820 });
 await page.waitForTimeout(120);

@@ -3446,6 +3446,80 @@ h1 {
   line-height: 1.35;
 }
 
+.choice-impact-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.choice-impact-chip {
+  display: inline-grid;
+  grid-template-columns: 24px minmax(0, 1fr);
+  gap: 6px;
+  align-items: center;
+  max-width: 100%;
+  min-height: 38px;
+  padding: 5px 8px 5px 5px;
+  border-radius: 8px;
+  background: #edf8ff;
+  color: #425a70;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.choice-impact-chip > b {
+  display: grid;
+  width: 24px;
+  height: 24px;
+  place-items: center;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.78);
+  font-size: 10px;
+}
+
+.choice-impact-chip span,
+.choice-impact-chip em,
+.choice-impact-chip strong {
+  display: block;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.choice-impact-chip em {
+  color: currentColor;
+  font-size: 10px;
+  font-style: normal;
+  opacity: 0.74;
+}
+
+.choice-impact-chip strong {
+  color: currentColor;
+  font-size: 12px;
+  line-height: 1.15;
+}
+
+.impact-cost,
+.impact-gold,
+.impact-card,
+.impact-power,
+.impact-relic {
+  background: #fff2c6;
+  color: #7c5d15;
+}
+
+.impact-gem,
+.impact-arcana,
+.impact-heal,
+.impact-safe {
+  background: #e8f8f1;
+  color: #347159;
+}
+
+.impact-danger {
+  background: #ffe1e7;
+  color: #a33c50;
+}
+
 .locked-choice {
   background: #f2f0e8;
 }

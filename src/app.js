@@ -1891,6 +1891,7 @@ function renderEvent(state, index) {
             </span>
             <strong>${choice.label}</strong>
             <span class="choice-note">${affordable ? rewardLabel(choice.reward) : shortageLabel(state, cost)}</span>
+            ${renderChoiceImpactList(eventChoiceImpactItems(choice, cost, state, index, affordable))}
             <span class="reward-preview-grid">
               ${rewardPreviewItems(choice.reward || {}, index).map(renderRewardPreviewItem).join("")}
             </span>
@@ -1962,6 +1963,7 @@ function renderReward(state, index) {
             <span class="choice-cost ${affordable ? "can-pay" : "cannot-pay"}">${option.cost ? costLabel(option.cost) : "비용 없음"}</span>
             <strong>${option.title}</strong>
             <span class="choice-note">${affordable ? option.description : shortageLabel(state, option.cost)}</span>
+            ${renderChoiceImpactList(rewardOptionImpactItems(option, state, index, affordable))}
             <span class="reward-preview-grid">
               ${rewardOptionPreviewItems(option, index).map(renderRewardPreviewItem).join("")}
             </span>
@@ -2042,6 +2044,76 @@ function rewardLabel(reward = {}) {
     .map((item) => item.short)
     .filter(Boolean)
     .join(" · ") || "보상 없음";
+}
+
+function renderChoiceImpactList(items = []) {
+  const visibleItems = items.filter(Boolean).slice(0, 5);
+  if (visibleItems.length === 0) return "";
+  return `
+    <span class="choice-impact-list">
+      ${visibleItems.map((item) => `
+        <span class="choice-impact-chip impact-${item.tone || "note"}">
+          <b>${item.icon || "·"}</b>
+          <span>
+            <em>${item.label}</em>
+            <strong>${item.value}</strong>
+          </span>
+        </span>
+      `).join("")}
+    </span>
+  `;
+}
+
+function eventChoiceImpactItems(choice = {}, cost = {}, state, index, affordable = true) {
+  return [
+    ...costImpactItems(cost, state, affordable),
+    ...rewardImpactItems(choice.reward || {}, index),
+    affordable ? null : { tone: "danger", icon: "!", label: "부족", value: shortageLabel(state, cost) }
+  ];
+}
+
+function rewardOptionImpactItems(option = {}, state, index, affordable = true) {
+  const reward = rewardFromOption(option);
+  return [
+    ...costImpactItems(option.cost || {}, state, affordable),
+    ...rewardImpactItems(reward, index),
+    option.upgraded ? { tone: "power", icon: "강", label: "강화", value: "획득 즉시" } : null,
+    affordable ? null : { tone: "danger", icon: "!", label: "부족", value: shortageLabel(state, option.cost || {}) }
+  ];
+}
+
+function rewardFromOption(option = {}) {
+  if (option.type === "card") return { cardPool: [option.cardId] };
+  if (option.type === "gem") return { gemPool: [option.gemId] };
+  if (option.type === "relic") return { relicPool: [option.relicId] };
+  if (option.type === "arcana") return { arcanaPool: [option.arcanaId] };
+  if (option.type === "gold") return { gold: option.amount || 0 };
+  return {};
+}
+
+function costImpactItems(cost = {}, state, affordable = true) {
+  const items = [];
+  if (cost.gold) items.push({ tone: affordable ? "cost" : "danger", icon: "비", label: "비용", value: `별사탕 ${cost.gold}` });
+  if (cost.hp) items.push({ tone: affordable ? "danger" : "danger", icon: "체", label: "소모", value: `체력 ${cost.hp}` });
+  if (items.length === 0) items.push({ tone: "safe", icon: "무", label: "비용", value: "없음" });
+  return items;
+}
+
+function rewardImpactItems(reward = {}, index) {
+  const items = [];
+  if (reward.cardPool?.length) items.push({ tone: "card", icon: "카", label: "덱 성장", value: `${reward.cardPool.length}장 후보` });
+  if (reward.gemPool?.length) items.push({ tone: "gem", icon: "보", label: "보석", value: `${reward.gemPool.length}종 후보` });
+  if (reward.relicPool?.length) items.push({ tone: "relic", icon: "유", label: "유물", value: `${reward.relicPool.length}종 후보` });
+  if (reward.arcanaPool?.length) items.push({ tone: "arcana", icon: "기", label: "기운", value: `${reward.arcanaPool.length}종 후보` });
+  if (reward.upgradeRandomCard) items.push({ tone: "power", icon: "강", label: "강화", value: `${reward.upgradeRandomCard}장` });
+  if (reward.heal) items.push({ tone: "heal", icon: "회", label: "회복", value: `${reward.heal}` });
+  if (reward.gold) items.push({ tone: "gold", icon: "별", label: "획득", value: `${reward.gold}` });
+  if (reward.openGemSocket) items.push({ tone: "gem", icon: "홈", label: "소켓", value: "+1" });
+  if (reward.combat) {
+    const enemy = index.enemies.get(reward.combat);
+    items.push({ tone: "danger", icon: "전", label: "추가 전투", value: enemy?.name || "준비" });
+  }
+  return items;
 }
 
 function shortageLabel(state, cost = {}) {
