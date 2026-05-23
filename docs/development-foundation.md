@@ -6,6 +6,8 @@
 
 - 로컬 실행: `node tools/serve-static.mjs`
 - 정적 빌드: `node tools/build-static.mjs`
+- 카드 데이터 재생성: `node tools/generate-full-card-data.mjs`
+- 카드 이후 콘텐츠 재생성: `node tools/generate-full-content-data.mjs`
 - 데이터 검증: `node tools/validate-data.mjs`
 - `npm`이 설치된 환경에서는 `npm run dev`, `npm run build`, `npm run data:validate`도 사용할 수 있다.
 - 현재 구조는 별도 번들러 없이 브라우저에서 바로 실행되는 정적 HTML 기준이다.
@@ -40,5 +42,14 @@
 ## 진행 현황
 
 - 카드 113장 풀 데이터 골격 완료
+- 보석 58종 풀 데이터 골격 완료
+- 캐릭터 23명 풀 데이터 골격 완료
+- 스테이지 15개 풀 데이터 골격 완료
+- 유물 16종 풀 데이터 골격 완료
+- 기운 12종 풀 데이터 골격 완료
+- 이벤트 10종 풀 데이터 골격 완료
+- 업적 161개 풀 데이터 골격 완료
+- 지원 몬스터 60종 데이터 골격 완료
 - 카드명, 효과 설명, 태그, 일러스트 방향은 한글 기준
-- 카드 효과 op는 검증 도구에서 등록 여부를 검사한다.
+- 모든 목표 수량은 검증 도구에서 정확히 일치해야 통과한다.
+- 효과, 해금, 보상, 참조 관계는 검증 도구에서 누락과 잘못된 참조를 검사한다.

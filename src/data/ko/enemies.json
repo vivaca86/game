@@ -1,89 +1,2027 @@
 [
   {
-    "id": "enemy_cloud_slime",
-    "name": "몽실 슬라임",
+    "id": "enemy_cloud_buddy",
+    "name": "몽실 구름 친구",
     "rank": "normal",
     "family": "구름",
     "maxHp": 22,
     "block": 0,
     "intents": [
-      { "type": "attack", "amount": 5, "label": "말랑 박치기" },
-      { "type": "guard", "amount": 4, "label": "몸 부풀리기" }
+      {
+        "type": "attack",
+        "amount": 5,
+        "label": "장난 공격"
+      },
+      {
+        "type": "guard",
+        "amount": 4,
+        "label": "동글 방어"
+      }
     ],
-    "rewards": { "gold": [8, 12], "xp": 3 }
+    "rewards": {
+      "gold": [
+        8,
+        13
+      ],
+      "xp": 3
+    }
   },
   {
-    "id": "enemy_paper_doll",
-    "name": "종이부적 인형",
+    "id": "enemy_cloud_trick",
+    "name": "몽실 구름 장난꾼",
+    "rank": "normal",
+    "family": "구름",
+    "maxHp": 28,
+    "block": 1,
+    "intents": [
+      {
+        "type": "attack",
+        "amount": 4,
+        "label": "폴짝 치기"
+      },
+      {
+        "type": "debuff",
+        "status": "mark",
+        "amount": 1,
+        "label": "장난 표식"
+      }
+    ],
+    "rewards": {
+      "gold": [
+        10,
+        15
+      ],
+      "xp": 4
+    }
+  },
+  {
+    "id": "enemy_paper_buddy",
+    "name": "종이 부적 친구",
     "rank": "normal",
     "family": "부적",
-    "maxHp": 28,
-    "block": 0,
+    "maxHp": 27,
+    "block": 1,
     "intents": [
-      { "type": "attack", "amount": 4, "label": "종이 톡" },
-      { "type": "debuff", "status": "mark", "amount": 1, "label": "표식 붙이기" }
+      {
+        "type": "attack",
+        "amount": 6,
+        "label": "장난 공격"
+      },
+      {
+        "type": "guard",
+        "amount": 4,
+        "label": "동글 방어"
+      }
     ],
-    "rewards": { "gold": [9, 14], "xp": 4 }
+    "rewards": {
+      "gold": [
+        10,
+        15
+      ],
+      "xp": 4
+    }
   },
   {
-    "id": "enemy_sprout_knight",
-    "name": "새싹 기사",
+    "id": "enemy_paper_trick",
+    "name": "종이 부적 장난꾼",
+    "rank": "normal",
+    "family": "부적",
+    "maxHp": 34,
+    "block": 2,
+    "intents": [
+      {
+        "type": "attack",
+        "amount": 5,
+        "label": "폴짝 치기"
+      },
+      {
+        "type": "debuff",
+        "status": "weak",
+        "amount": 1,
+        "label": "장난 표식"
+      }
+    ],
+    "rewards": {
+      "gold": [
+        12,
+        17
+      ],
+      "xp": 5
+    }
+  },
+  {
+    "id": "enemy_sprout_buddy",
+    "name": "초록 새싹 친구",
     "rank": "normal",
     "family": "새싹",
-    "maxHp": 34,
+    "maxHp": 32,
+    "block": 2,
+    "intents": [
+      {
+        "type": "attack",
+        "amount": 7,
+        "label": "장난 공격"
+      },
+      {
+        "type": "guard",
+        "amount": 5,
+        "label": "동글 방어"
+      }
+    ],
+    "rewards": {
+      "gold": [
+        12,
+        17
+      ],
+      "xp": 5
+    }
+  },
+  {
+    "id": "enemy_sprout_trick",
+    "name": "초록 새싹 장난꾼",
+    "rank": "normal",
+    "family": "새싹",
+    "maxHp": 40,
     "block": 3,
     "intents": [
-      { "type": "attack", "amount": 7, "label": "잎사귀 찌르기" },
-      { "type": "guard", "amount": 6, "label": "방패 들기" }
+      {
+        "type": "attack",
+        "amount": 6,
+        "label": "폴짝 치기"
+      },
+      {
+        "type": "debuff",
+        "status": "mark",
+        "amount": 1,
+        "label": "장난 표식"
+      }
     ],
-    "rewards": { "gold": [11, 16], "xp": 5 }
+    "rewards": {
+      "gold": [
+        14,
+        19
+      ],
+      "xp": 6
+    }
   },
   {
-    "id": "enemy_lantern_puff",
-    "name": "등불 솜뭉치",
-    "rank": "elite",
+    "id": "enemy_lantern_buddy",
+    "name": "반짝 등불 친구",
+    "rank": "normal",
     "family": "등불",
+    "maxHp": 37,
+    "block": 0,
+    "intents": [
+      {
+        "type": "attack",
+        "amount": 8,
+        "label": "장난 공격"
+      },
+      {
+        "type": "guard",
+        "amount": 5,
+        "label": "동글 방어"
+      }
+    ],
+    "rewards": {
+      "gold": [
+        14,
+        19
+      ],
+      "xp": 6
+    }
+  },
+  {
+    "id": "enemy_lantern_trick",
+    "name": "반짝 등불 장난꾼",
+    "rank": "normal",
+    "family": "등불",
+    "maxHp": 46,
+    "block": 4,
+    "intents": [
+      {
+        "type": "attack",
+        "amount": 7,
+        "label": "폴짝 치기"
+      },
+      {
+        "type": "debuff",
+        "status": "weak",
+        "amount": 1,
+        "label": "장난 표식"
+      }
+    ],
+    "rewards": {
+      "gold": [
+        16,
+        21
+      ],
+      "xp": 7
+    }
+  },
+  {
+    "id": "enemy_candy_buddy",
+    "name": "달콤 별사탕 친구",
+    "rank": "normal",
+    "family": "별사탕",
+    "maxHp": 42,
+    "block": 1,
+    "intents": [
+      {
+        "type": "attack",
+        "amount": 9,
+        "label": "장난 공격"
+      },
+      {
+        "type": "guard",
+        "amount": 6,
+        "label": "동글 방어"
+      }
+    ],
+    "rewards": {
+      "gold": [
+        16,
+        21
+      ],
+      "xp": 7
+    }
+  },
+  {
+    "id": "enemy_candy_trick",
+    "name": "달콤 별사탕 장난꾼",
+    "rank": "normal",
+    "family": "별사탕",
+    "maxHp": 52,
+    "block": 1,
+    "intents": [
+      {
+        "type": "attack",
+        "amount": 8,
+        "label": "폴짝 치기"
+      },
+      {
+        "type": "debuff",
+        "status": "mark",
+        "amount": 1,
+        "label": "장난 표식"
+      }
+    ],
+    "rewards": {
+      "gold": [
+        18,
+        23
+      ],
+      "xp": 8
+    }
+  },
+  {
+    "id": "enemy_ribbon_buddy",
+    "name": "빙글 리본 친구",
+    "rank": "normal",
+    "family": "리본",
+    "maxHp": 47,
+    "block": 2,
+    "intents": [
+      {
+        "type": "attack",
+        "amount": 10,
+        "label": "장난 공격"
+      },
+      {
+        "type": "guard",
+        "amount": 6,
+        "label": "동글 방어"
+      }
+    ],
+    "rewards": {
+      "gold": [
+        18,
+        23
+      ],
+      "xp": 8
+    }
+  },
+  {
+    "id": "enemy_ribbon_trick",
+    "name": "빙글 리본 장난꾼",
+    "rank": "normal",
+    "family": "리본",
+    "maxHp": 58,
+    "block": 2,
+    "intents": [
+      {
+        "type": "attack",
+        "amount": 9,
+        "label": "폴짝 치기"
+      },
+      {
+        "type": "debuff",
+        "status": "weak",
+        "amount": 1,
+        "label": "장난 표식"
+      }
+    ],
+    "rewards": {
+      "gold": [
+        20,
+        25
+      ],
+      "xp": 9
+    }
+  },
+  {
+    "id": "enemy_bubble_buddy",
+    "name": "통통 방울 친구",
+    "rank": "normal",
+    "family": "방울",
+    "maxHp": 52,
+    "block": 0,
+    "intents": [
+      {
+        "type": "attack",
+        "amount": 11,
+        "label": "장난 공격"
+      },
+      {
+        "type": "guard",
+        "amount": 7,
+        "label": "동글 방어"
+      }
+    ],
+    "rewards": {
+      "gold": [
+        20,
+        25
+      ],
+      "xp": 9
+    }
+  },
+  {
+    "id": "enemy_bubble_trick",
+    "name": "통통 방울 장난꾼",
+    "rank": "normal",
+    "family": "방울",
+    "maxHp": 64,
+    "block": 3,
+    "intents": [
+      {
+        "type": "attack",
+        "amount": 10,
+        "label": "폴짝 치기"
+      },
+      {
+        "type": "debuff",
+        "status": "mark",
+        "amount": 1,
+        "label": "장난 표식"
+      }
+    ],
+    "rewards": {
+      "gold": [
+        22,
+        27
+      ],
+      "xp": 10
+    }
+  },
+  {
+    "id": "enemy_plush_buddy",
+    "name": "푹신 말랑 친구",
+    "rank": "normal",
+    "family": "말랑",
+    "maxHp": 57,
+    "block": 1,
+    "intents": [
+      {
+        "type": "attack",
+        "amount": 12,
+        "label": "장난 공격"
+      },
+      {
+        "type": "guard",
+        "amount": 7,
+        "label": "동글 방어"
+      }
+    ],
+    "rewards": {
+      "gold": [
+        22,
+        27
+      ],
+      "xp": 10
+    }
+  },
+  {
+    "id": "enemy_plush_trick",
+    "name": "푹신 말랑 장난꾼",
+    "rank": "normal",
+    "family": "말랑",
+    "maxHp": 70,
+    "block": 4,
+    "intents": [
+      {
+        "type": "attack",
+        "amount": 11,
+        "label": "폴짝 치기"
+      },
+      {
+        "type": "debuff",
+        "status": "weak",
+        "amount": 1,
+        "label": "장난 표식"
+      }
+    ],
+    "rewards": {
+      "gold": [
+        24,
+        29
+      ],
+      "xp": 11
+    }
+  },
+  {
+    "id": "enemy_prism_buddy",
+    "name": "무지개 프리즘 친구",
+    "rank": "normal",
+    "family": "프리즘",
+    "maxHp": 62,
+    "block": 2,
+    "intents": [
+      {
+        "type": "attack",
+        "amount": 13,
+        "label": "장난 공격"
+      },
+      {
+        "type": "guard",
+        "amount": 8,
+        "label": "동글 방어"
+      }
+    ],
+    "rewards": {
+      "gold": [
+        24,
+        29
+      ],
+      "xp": 11
+    }
+  },
+  {
+    "id": "enemy_prism_trick",
+    "name": "무지개 프리즘 장난꾼",
+    "rank": "normal",
+    "family": "프리즘",
+    "maxHp": 76,
+    "block": 1,
+    "intents": [
+      {
+        "type": "attack",
+        "amount": 12,
+        "label": "폴짝 치기"
+      },
+      {
+        "type": "debuff",
+        "status": "mark",
+        "amount": 1,
+        "label": "장난 표식"
+      }
+    ],
+    "rewards": {
+      "gold": [
+        26,
+        31
+      ],
+      "xp": 12
+    }
+  },
+  {
+    "id": "enemy_moon_buddy",
+    "name": "졸린 달빛 친구",
+    "rank": "normal",
+    "family": "달빛",
+    "maxHp": 67,
+    "block": 0,
+    "intents": [
+      {
+        "type": "attack",
+        "amount": 14,
+        "label": "장난 공격"
+      },
+      {
+        "type": "guard",
+        "amount": 8,
+        "label": "동글 방어"
+      }
+    ],
+    "rewards": {
+      "gold": [
+        26,
+        31
+      ],
+      "xp": 12
+    }
+  },
+  {
+    "id": "enemy_moon_trick",
+    "name": "졸린 달빛 장난꾼",
+    "rank": "normal",
+    "family": "달빛",
+    "maxHp": 82,
+    "block": 2,
+    "intents": [
+      {
+        "type": "attack",
+        "amount": 13,
+        "label": "폴짝 치기"
+      },
+      {
+        "type": "debuff",
+        "status": "weak",
+        "amount": 1,
+        "label": "장난 표식"
+      }
+    ],
+    "rewards": {
+      "gold": [
+        28,
+        33
+      ],
+      "xp": 13
+    }
+  },
+  {
+    "id": "enemy_peach_buddy",
+    "name": "분홍 복숭아 친구",
+    "rank": "normal",
+    "family": "복숭아",
+    "maxHp": 72,
+    "block": 1,
+    "intents": [
+      {
+        "type": "attack",
+        "amount": 15,
+        "label": "장난 공격"
+      },
+      {
+        "type": "guard",
+        "amount": 9,
+        "label": "동글 방어"
+      }
+    ],
+    "rewards": {
+      "gold": [
+        28,
+        33
+      ],
+      "xp": 13
+    }
+  },
+  {
+    "id": "enemy_peach_trick",
+    "name": "분홍 복숭아 장난꾼",
+    "rank": "normal",
+    "family": "복숭아",
+    "maxHp": 88,
+    "block": 3,
+    "intents": [
+      {
+        "type": "attack",
+        "amount": 14,
+        "label": "폴짝 치기"
+      },
+      {
+        "type": "debuff",
+        "status": "mark",
+        "amount": 1,
+        "label": "장난 표식"
+      }
+    ],
+    "rewards": {
+      "gold": [
+        30,
+        35
+      ],
+      "xp": 14
+    }
+  },
+  {
+    "id": "enemy_toy_buddy",
+    "name": "딸깍 장난감 친구",
+    "rank": "normal",
+    "family": "장난감",
+    "maxHp": 77,
+    "block": 2,
+    "intents": [
+      {
+        "type": "attack",
+        "amount": 16,
+        "label": "장난 공격"
+      },
+      {
+        "type": "guard",
+        "amount": 9,
+        "label": "동글 방어"
+      }
+    ],
+    "rewards": {
+      "gold": [
+        30,
+        35
+      ],
+      "xp": 14
+    }
+  },
+  {
+    "id": "enemy_toy_trick",
+    "name": "딸깍 장난감 장난꾼",
+    "rank": "normal",
+    "family": "장난감",
+    "maxHp": 94,
+    "block": 4,
+    "intents": [
+      {
+        "type": "attack",
+        "amount": 15,
+        "label": "폴짝 치기"
+      },
+      {
+        "type": "debuff",
+        "status": "weak",
+        "amount": 1,
+        "label": "장난 표식"
+      }
+    ],
+    "rewards": {
+      "gold": [
+        32,
+        37
+      ],
+      "xp": 15
+    }
+  },
+  {
+    "id": "enemy_leaf_buddy",
+    "name": "살랑 잎사귀 친구",
+    "rank": "normal",
+    "family": "잎사귀",
+    "maxHp": 82,
+    "block": 0,
+    "intents": [
+      {
+        "type": "attack",
+        "amount": 17,
+        "label": "장난 공격"
+      },
+      {
+        "type": "guard",
+        "amount": 10,
+        "label": "동글 방어"
+      }
+    ],
+    "rewards": {
+      "gold": [
+        32,
+        37
+      ],
+      "xp": 15
+    }
+  },
+  {
+    "id": "enemy_leaf_trick",
+    "name": "살랑 잎사귀 장난꾼",
+    "rank": "normal",
+    "family": "잎사귀",
+    "maxHp": 100,
+    "block": 1,
+    "intents": [
+      {
+        "type": "attack",
+        "amount": 16,
+        "label": "폴짝 치기"
+      },
+      {
+        "type": "debuff",
+        "status": "mark",
+        "amount": 1,
+        "label": "장난 표식"
+      }
+    ],
+    "rewards": {
+      "gold": [
+        34,
+        39
+      ],
+      "xp": 16
+    }
+  },
+  {
+    "id": "enemy_star_buddy",
+    "name": "반짝 별빛 친구",
+    "rank": "normal",
+    "family": "별빛",
+    "maxHp": 87,
+    "block": 1,
+    "intents": [
+      {
+        "type": "attack",
+        "amount": 18,
+        "label": "장난 공격"
+      },
+      {
+        "type": "guard",
+        "amount": 10,
+        "label": "동글 방어"
+      }
+    ],
+    "rewards": {
+      "gold": [
+        34,
+        39
+      ],
+      "xp": 16
+    }
+  },
+  {
+    "id": "enemy_star_trick",
+    "name": "반짝 별빛 장난꾼",
+    "rank": "normal",
+    "family": "별빛",
+    "maxHp": 106,
+    "block": 2,
+    "intents": [
+      {
+        "type": "attack",
+        "amount": 17,
+        "label": "폴짝 치기"
+      },
+      {
+        "type": "debuff",
+        "status": "weak",
+        "amount": 1,
+        "label": "장난 표식"
+      }
+    ],
+    "rewards": {
+      "gold": [
+        36,
+        41
+      ],
+      "xp": 17
+    }
+  },
+  {
+    "id": "enemy_cookie_buddy",
+    "name": "바삭 쿠키 친구",
+    "rank": "normal",
+    "family": "쿠키",
+    "maxHp": 92,
+    "block": 2,
+    "intents": [
+      {
+        "type": "attack",
+        "amount": 19,
+        "label": "장난 공격"
+      },
+      {
+        "type": "guard",
+        "amount": 11,
+        "label": "동글 방어"
+      }
+    ],
+    "rewards": {
+      "gold": [
+        36,
+        41
+      ],
+      "xp": 17
+    }
+  },
+  {
+    "id": "enemy_cookie_trick",
+    "name": "바삭 쿠키 장난꾼",
+    "rank": "normal",
+    "family": "쿠키",
+    "maxHp": 112,
+    "block": 3,
+    "intents": [
+      {
+        "type": "attack",
+        "amount": 18,
+        "label": "폴짝 치기"
+      },
+      {
+        "type": "debuff",
+        "status": "mark",
+        "amount": 1,
+        "label": "장난 표식"
+      }
+    ],
+    "rewards": {
+      "gold": [
+        38,
+        43
+      ],
+      "xp": 18
+    }
+  },
+  {
+    "id": "enemy_cloud_elite",
+    "name": "몽실 구름 대장",
+    "rank": "elite",
+    "family": "구름",
     "maxHp": 68,
+    "block": 5,
+    "intents": [
+      {
+        "type": "attack",
+        "amount": 10,
+        "label": "커다란 장난"
+      },
+      {
+        "type": "guard",
+        "amount": 9,
+        "label": "대장 방어"
+      },
+      {
+        "type": "special",
+        "effect": "add_temp_card",
+        "amount": 1,
+        "label": "특별 장난"
+      }
+    ],
+    "rewards": {
+      "gold": [
+        28,
+        38
+      ],
+      "xp": 11,
+      "relicChance": 0.35
+    }
+  },
+  {
+    "id": "enemy_paper_elite",
+    "name": "종이 부적 대장",
+    "rank": "elite",
+    "family": "부적",
+    "maxHp": 80,
     "block": 6,
     "intents": [
-      { "type": "attack", "amount": 10, "label": "반짝 돌진" },
-      { "type": "special", "effect": "add_burn", "amount": 2, "label": "따끈한 불씨" },
-      { "type": "guard", "amount": 9, "label": "불빛 감싸기" }
+      {
+        "type": "attack",
+        "amount": 11,
+        "label": "커다란 장난"
+      },
+      {
+        "type": "guard",
+        "amount": 10,
+        "label": "대장 방어"
+      },
+      {
+        "type": "special",
+        "effect": "reduce_energy",
+        "amount": 1,
+        "label": "특별 장난"
+      }
     ],
-    "rewards": { "gold": [28, 36], "xp": 11, "relicChance": 0.35 }
+    "rewards": {
+      "gold": [
+        33,
+        43
+      ],
+      "xp": 13,
+      "relicChance": 0.35
+    }
   },
   {
-    "id": "boss_round_gatekeeper",
-    "name": "동글 문지기",
+    "id": "enemy_sprout_elite",
+    "name": "초록 새싹 대장",
+    "rank": "elite",
+    "family": "새싹",
+    "maxHp": 92,
+    "block": 7,
+    "intents": [
+      {
+        "type": "attack",
+        "amount": 12,
+        "label": "커다란 장난"
+      },
+      {
+        "type": "guard",
+        "amount": 11,
+        "label": "대장 방어"
+      },
+      {
+        "type": "special",
+        "effect": "add_temp_card",
+        "amount": 1,
+        "label": "특별 장난"
+      }
+    ],
+    "rewards": {
+      "gold": [
+        38,
+        48
+      ],
+      "xp": 15,
+      "relicChance": 0.35
+    }
+  },
+  {
+    "id": "enemy_lantern_elite",
+    "name": "반짝 등불 대장",
+    "rank": "elite",
+    "family": "등불",
+    "maxHp": 104,
+    "block": 8,
+    "intents": [
+      {
+        "type": "attack",
+        "amount": 13,
+        "label": "커다란 장난"
+      },
+      {
+        "type": "guard",
+        "amount": 12,
+        "label": "대장 방어"
+      },
+      {
+        "type": "special",
+        "effect": "reduce_energy",
+        "amount": 1,
+        "label": "특별 장난"
+      }
+    ],
+    "rewards": {
+      "gold": [
+        43,
+        53
+      ],
+      "xp": 17,
+      "relicChance": 0.35
+    }
+  },
+  {
+    "id": "enemy_candy_elite",
+    "name": "달콤 별사탕 대장",
+    "rank": "elite",
+    "family": "별사탕",
+    "maxHp": 116,
+    "block": 9,
+    "intents": [
+      {
+        "type": "attack",
+        "amount": 14,
+        "label": "커다란 장난"
+      },
+      {
+        "type": "guard",
+        "amount": 13,
+        "label": "대장 방어"
+      },
+      {
+        "type": "special",
+        "effect": "add_temp_card",
+        "amount": 1,
+        "label": "특별 장난"
+      }
+    ],
+    "rewards": {
+      "gold": [
+        48,
+        58
+      ],
+      "xp": 19,
+      "relicChance": 0.35
+    }
+  },
+  {
+    "id": "enemy_ribbon_elite",
+    "name": "빙글 리본 대장",
+    "rank": "elite",
+    "family": "리본",
+    "maxHp": 128,
+    "block": 10,
+    "intents": [
+      {
+        "type": "attack",
+        "amount": 15,
+        "label": "커다란 장난"
+      },
+      {
+        "type": "guard",
+        "amount": 14,
+        "label": "대장 방어"
+      },
+      {
+        "type": "special",
+        "effect": "reduce_energy",
+        "amount": 1,
+        "label": "특별 장난"
+      }
+    ],
+    "rewards": {
+      "gold": [
+        53,
+        63
+      ],
+      "xp": 21,
+      "relicChance": 0.35
+    }
+  },
+  {
+    "id": "enemy_bubble_elite",
+    "name": "통통 방울 대장",
+    "rank": "elite",
+    "family": "방울",
+    "maxHp": 140,
+    "block": 11,
+    "intents": [
+      {
+        "type": "attack",
+        "amount": 16,
+        "label": "커다란 장난"
+      },
+      {
+        "type": "guard",
+        "amount": 15,
+        "label": "대장 방어"
+      },
+      {
+        "type": "special",
+        "effect": "add_temp_card",
+        "amount": 1,
+        "label": "특별 장난"
+      }
+    ],
+    "rewards": {
+      "gold": [
+        58,
+        68
+      ],
+      "xp": 23,
+      "relicChance": 0.35
+    }
+  },
+  {
+    "id": "enemy_plush_elite",
+    "name": "푹신 말랑 대장",
+    "rank": "elite",
+    "family": "말랑",
+    "maxHp": 152,
+    "block": 12,
+    "intents": [
+      {
+        "type": "attack",
+        "amount": 17,
+        "label": "커다란 장난"
+      },
+      {
+        "type": "guard",
+        "amount": 16,
+        "label": "대장 방어"
+      },
+      {
+        "type": "special",
+        "effect": "reduce_energy",
+        "amount": 1,
+        "label": "특별 장난"
+      }
+    ],
+    "rewards": {
+      "gold": [
+        63,
+        73
+      ],
+      "xp": 25,
+      "relicChance": 0.35
+    }
+  },
+  {
+    "id": "enemy_prism_elite",
+    "name": "무지개 프리즘 대장",
+    "rank": "elite",
+    "family": "프리즘",
+    "maxHp": 164,
+    "block": 13,
+    "intents": [
+      {
+        "type": "attack",
+        "amount": 18,
+        "label": "커다란 장난"
+      },
+      {
+        "type": "guard",
+        "amount": 17,
+        "label": "대장 방어"
+      },
+      {
+        "type": "special",
+        "effect": "add_temp_card",
+        "amount": 1,
+        "label": "특별 장난"
+      }
+    ],
+    "rewards": {
+      "gold": [
+        68,
+        78
+      ],
+      "xp": 27,
+      "relicChance": 0.35
+    }
+  },
+  {
+    "id": "enemy_moon_elite",
+    "name": "졸린 달빛 대장",
+    "rank": "elite",
+    "family": "달빛",
+    "maxHp": 176,
+    "block": 14,
+    "intents": [
+      {
+        "type": "attack",
+        "amount": 19,
+        "label": "커다란 장난"
+      },
+      {
+        "type": "guard",
+        "amount": 18,
+        "label": "대장 방어"
+      },
+      {
+        "type": "special",
+        "effect": "reduce_energy",
+        "amount": 1,
+        "label": "특별 장난"
+      }
+    ],
+    "rewards": {
+      "gold": [
+        73,
+        83
+      ],
+      "xp": 29,
+      "relicChance": 0.35
+    }
+  },
+  {
+    "id": "enemy_peach_elite",
+    "name": "분홍 복숭아 대장",
+    "rank": "elite",
+    "family": "복숭아",
+    "maxHp": 188,
+    "block": 15,
+    "intents": [
+      {
+        "type": "attack",
+        "amount": 20,
+        "label": "커다란 장난"
+      },
+      {
+        "type": "guard",
+        "amount": 19,
+        "label": "대장 방어"
+      },
+      {
+        "type": "special",
+        "effect": "add_temp_card",
+        "amount": 1,
+        "label": "특별 장난"
+      }
+    ],
+    "rewards": {
+      "gold": [
+        78,
+        88
+      ],
+      "xp": 31,
+      "relicChance": 0.35
+    }
+  },
+  {
+    "id": "enemy_toy_elite",
+    "name": "딸깍 장난감 대장",
+    "rank": "elite",
+    "family": "장난감",
+    "maxHp": 200,
+    "block": 16,
+    "intents": [
+      {
+        "type": "attack",
+        "amount": 21,
+        "label": "커다란 장난"
+      },
+      {
+        "type": "guard",
+        "amount": 20,
+        "label": "대장 방어"
+      },
+      {
+        "type": "special",
+        "effect": "reduce_energy",
+        "amount": 1,
+        "label": "특별 장난"
+      }
+    ],
+    "rewards": {
+      "gold": [
+        83,
+        93
+      ],
+      "xp": 33,
+      "relicChance": 0.35
+    }
+  },
+  {
+    "id": "enemy_leaf_elite",
+    "name": "살랑 잎사귀 대장",
+    "rank": "elite",
+    "family": "잎사귀",
+    "maxHp": 212,
+    "block": 17,
+    "intents": [
+      {
+        "type": "attack",
+        "amount": 22,
+        "label": "커다란 장난"
+      },
+      {
+        "type": "guard",
+        "amount": 21,
+        "label": "대장 방어"
+      },
+      {
+        "type": "special",
+        "effect": "add_temp_card",
+        "amount": 1,
+        "label": "특별 장난"
+      }
+    ],
+    "rewards": {
+      "gold": [
+        88,
+        98
+      ],
+      "xp": 35,
+      "relicChance": 0.35
+    }
+  },
+  {
+    "id": "enemy_star_elite",
+    "name": "반짝 별빛 대장",
+    "rank": "elite",
+    "family": "별빛",
+    "maxHp": 224,
+    "block": 18,
+    "intents": [
+      {
+        "type": "attack",
+        "amount": 23,
+        "label": "커다란 장난"
+      },
+      {
+        "type": "guard",
+        "amount": 22,
+        "label": "대장 방어"
+      },
+      {
+        "type": "special",
+        "effect": "reduce_energy",
+        "amount": 1,
+        "label": "특별 장난"
+      }
+    ],
+    "rewards": {
+      "gold": [
+        93,
+        103
+      ],
+      "xp": 37,
+      "relicChance": 0.35
+    }
+  },
+  {
+    "id": "enemy_cookie_elite",
+    "name": "바삭 쿠키 대장",
+    "rank": "elite",
+    "family": "쿠키",
+    "maxHp": 236,
+    "block": 19,
+    "intents": [
+      {
+        "type": "attack",
+        "amount": 24,
+        "label": "커다란 장난"
+      },
+      {
+        "type": "guard",
+        "amount": 23,
+        "label": "대장 방어"
+      },
+      {
+        "type": "special",
+        "effect": "add_temp_card",
+        "amount": 1,
+        "label": "특별 장난"
+      }
+    ],
+    "rewards": {
+      "gold": [
+        98,
+        108
+      ],
+      "xp": 39,
+      "relicChance": 0.35
+    }
+  },
+  {
+    "id": "boss_sunny_gate",
+    "name": "햇살 현관 왕방울",
     "rank": "boss",
-    "family": "문지기",
+    "family": "왕방울",
     "maxHp": 140,
     "block": 10,
     "phaseRules": [
-      { "hpBelowRatio": 0.5, "addIntent": { "type": "special", "effect": "summon", "enemyId": "enemy_cloud_slime", "label": "친구 부르기" } }
+      {
+        "hpBelowRatio": 0.5,
+        "addIntent": {
+          "type": "special",
+          "effect": "summon",
+          "enemyId": "enemy_cloud_buddy",
+          "label": "친구 부르기"
+        }
+      }
     ],
     "intents": [
-      { "type": "attack", "amount": 14, "label": "문짝 쿵" },
-      { "type": "guard", "amount": 12, "label": "동그란 잠금" },
-      { "type": "special", "effect": "shuffle_junk", "cardId": "card_temp_dust", "amount": 1, "label": "먼지 카드" }
+      {
+        "type": "attack",
+        "amount": 14,
+        "label": "왕방울 쿵"
+      },
+      {
+        "type": "guard",
+        "amount": 12,
+        "label": "동그란 잠금"
+      },
+      {
+        "type": "special",
+        "effect": "add_temp_card",
+        "cardId": "card_temp_dust",
+        "amount": 1,
+        "label": "장난 카드"
+      }
     ],
-    "rewards": { "gold": [70, 90], "xp": 25, "relicChance": 1 }
+    "rewards": {
+      "gold": [
+        70,
+        90
+      ],
+      "xp": 25,
+      "relicChance": 1
+    }
   },
   {
-    "id": "boss_mint_garden_king",
-    "name": "민트정원 왕방울",
+    "id": "boss_lavender_hall",
+    "name": "라벤더 복도 왕방울",
     "rank": "boss",
-    "family": "방울",
-    "maxHp": 190,
+    "family": "왕방울",
+    "maxHp": 174,
     "block": 12,
     "phaseRules": [
-      { "hpBelowRatio": 0.35, "addIntent": { "type": "attack", "amount": 22, "label": "왕방울 굴리기" } }
+      {
+        "hpBelowRatio": 0.5,
+        "addIntent": {
+          "type": "special",
+          "effect": "summon",
+          "enemyId": "enemy_paper_buddy",
+          "label": "친구 부르기"
+        }
+      }
     ],
     "intents": [
-      { "type": "attack", "amount": 16, "label": "방울 굴리기" },
-      { "type": "debuff", "status": "weak", "amount": 1, "label": "상쾌한 어지럼" },
-      { "type": "guard", "amount": 16, "label": "민트 껍질" }
+      {
+        "type": "attack",
+        "amount": 16,
+        "label": "왕방울 쿵"
+      },
+      {
+        "type": "guard",
+        "amount": 14,
+        "label": "동그란 잠금"
+      },
+      {
+        "type": "special",
+        "effect": "add_temp_card",
+        "cardId": "card_temp_dust",
+        "amount": 1,
+        "label": "장난 카드"
+      }
     ],
-    "rewards": { "gold": [90, 120], "xp": 32, "relicChance": 1 }
+    "rewards": {
+      "gold": [
+        80,
+        102
+      ],
+      "xp": 29,
+      "relicChance": 1
+    }
+  },
+  {
+    "id": "boss_mint_garden",
+    "name": "민트 정원 왕방울",
+    "rank": "boss",
+    "family": "왕방울",
+    "maxHp": 208,
+    "block": 14,
+    "phaseRules": [
+      {
+        "hpBelowRatio": 0.5,
+        "addIntent": {
+          "type": "special",
+          "effect": "summon",
+          "enemyId": "enemy_sprout_buddy",
+          "label": "친구 부르기"
+        }
+      }
+    ],
+    "intents": [
+      {
+        "type": "attack",
+        "amount": 18,
+        "label": "왕방울 쿵"
+      },
+      {
+        "type": "guard",
+        "amount": 16,
+        "label": "동그란 잠금"
+      },
+      {
+        "type": "special",
+        "effect": "add_temp_card",
+        "cardId": "card_temp_dust",
+        "amount": 1,
+        "label": "장난 카드"
+      }
+    ],
+    "rewards": {
+      "gold": [
+        90,
+        114
+      ],
+      "xp": 33,
+      "relicChance": 1
+    }
+  },
+  {
+    "id": "boss_peach_canal",
+    "name": "복숭아 운하 왕방울",
+    "rank": "boss",
+    "family": "왕방울",
+    "maxHp": 242,
+    "block": 16,
+    "phaseRules": [
+      {
+        "hpBelowRatio": 0.5,
+        "addIntent": {
+          "type": "special",
+          "effect": "summon",
+          "enemyId": "enemy_lantern_buddy",
+          "label": "친구 부르기"
+        }
+      }
+    ],
+    "intents": [
+      {
+        "type": "attack",
+        "amount": 20,
+        "label": "왕방울 쿵"
+      },
+      {
+        "type": "guard",
+        "amount": 18,
+        "label": "동그란 잠금"
+      },
+      {
+        "type": "special",
+        "effect": "add_temp_card",
+        "cardId": "card_temp_dust",
+        "amount": 1,
+        "label": "장난 카드"
+      }
+    ],
+    "rewards": {
+      "gold": [
+        100,
+        126
+      ],
+      "xp": 37,
+      "relicChance": 1
+    }
+  },
+  {
+    "id": "boss_cloud_rooftop",
+    "name": "구름 지붕길 왕방울",
+    "rank": "boss",
+    "family": "왕방울",
+    "maxHp": 276,
+    "block": 18,
+    "phaseRules": [
+      {
+        "hpBelowRatio": 0.5,
+        "addIntent": {
+          "type": "special",
+          "effect": "summon",
+          "enemyId": "enemy_candy_buddy",
+          "label": "친구 부르기"
+        }
+      }
+    ],
+    "intents": [
+      {
+        "type": "attack",
+        "amount": 22,
+        "label": "왕방울 쿵"
+      },
+      {
+        "type": "guard",
+        "amount": 20,
+        "label": "동그란 잠금"
+      },
+      {
+        "type": "special",
+        "effect": "add_temp_card",
+        "cardId": "card_temp_dust",
+        "amount": 1,
+        "label": "장난 카드"
+      }
+    ],
+    "rewards": {
+      "gold": [
+        110,
+        138
+      ],
+      "xp": 41,
+      "relicChance": 1
+    }
+  },
+  {
+    "id": "boss_ribbon_station",
+    "name": "리본 정거장 왕방울",
+    "rank": "boss",
+    "family": "왕방울",
+    "maxHp": 310,
+    "block": 20,
+    "phaseRules": [
+      {
+        "hpBelowRatio": 0.5,
+        "addIntent": {
+          "type": "special",
+          "effect": "summon",
+          "enemyId": "enemy_ribbon_buddy",
+          "label": "친구 부르기"
+        }
+      }
+    ],
+    "intents": [
+      {
+        "type": "attack",
+        "amount": 24,
+        "label": "왕방울 쿵"
+      },
+      {
+        "type": "guard",
+        "amount": 22,
+        "label": "동그란 잠금"
+      },
+      {
+        "type": "special",
+        "effect": "add_temp_card",
+        "cardId": "card_temp_dust",
+        "amount": 1,
+        "label": "장난 카드"
+      }
+    ],
+    "rewards": {
+      "gold": [
+        120,
+        150
+      ],
+      "xp": 45,
+      "relicChance": 1
+    }
+  },
+  {
+    "id": "boss_candy_cavern",
+    "name": "별사탕 동굴 왕방울",
+    "rank": "boss",
+    "family": "왕방울",
+    "maxHp": 344,
+    "block": 22,
+    "phaseRules": [
+      {
+        "hpBelowRatio": 0.5,
+        "addIntent": {
+          "type": "special",
+          "effect": "summon",
+          "enemyId": "enemy_bubble_buddy",
+          "label": "친구 부르기"
+        }
+      }
+    ],
+    "intents": [
+      {
+        "type": "attack",
+        "amount": 26,
+        "label": "왕방울 쿵"
+      },
+      {
+        "type": "guard",
+        "amount": 24,
+        "label": "동그란 잠금"
+      },
+      {
+        "type": "special",
+        "effect": "add_temp_card",
+        "cardId": "card_temp_dust",
+        "amount": 1,
+        "label": "장난 카드"
+      }
+    ],
+    "rewards": {
+      "gold": [
+        130,
+        162
+      ],
+      "xp": 49,
+      "relicChance": 1
+    }
+  },
+  {
+    "id": "boss_prism_school",
+    "name": "프리즘 교실 왕방울",
+    "rank": "boss",
+    "family": "왕방울",
+    "maxHp": 378,
+    "block": 24,
+    "phaseRules": [
+      {
+        "hpBelowRatio": 0.5,
+        "addIntent": {
+          "type": "special",
+          "effect": "summon",
+          "enemyId": "enemy_plush_buddy",
+          "label": "친구 부르기"
+        }
+      }
+    ],
+    "intents": [
+      {
+        "type": "attack",
+        "amount": 28,
+        "label": "왕방울 쿵"
+      },
+      {
+        "type": "guard",
+        "amount": 26,
+        "label": "동그란 잠금"
+      },
+      {
+        "type": "special",
+        "effect": "add_temp_card",
+        "cardId": "card_temp_dust",
+        "amount": 1,
+        "label": "장난 카드"
+      }
+    ],
+    "rewards": {
+      "gold": [
+        140,
+        174
+      ],
+      "xp": 53,
+      "relicChance": 1
+    }
+  },
+  {
+    "id": "boss_moon_attic",
+    "name": "달빛 다락 왕방울",
+    "rank": "boss",
+    "family": "왕방울",
+    "maxHp": 412,
+    "block": 26,
+    "phaseRules": [
+      {
+        "hpBelowRatio": 0.5,
+        "addIntent": {
+          "type": "special",
+          "effect": "summon",
+          "enemyId": "enemy_prism_buddy",
+          "label": "친구 부르기"
+        }
+      }
+    ],
+    "intents": [
+      {
+        "type": "attack",
+        "amount": 30,
+        "label": "왕방울 쿵"
+      },
+      {
+        "type": "guard",
+        "amount": 28,
+        "label": "동그란 잠금"
+      },
+      {
+        "type": "special",
+        "effect": "add_temp_card",
+        "cardId": "card_temp_dust",
+        "amount": 1,
+        "label": "장난 카드"
+      }
+    ],
+    "rewards": {
+      "gold": [
+        150,
+        186
+      ],
+      "xp": 57,
+      "relicChance": 1
+    }
+  },
+  {
+    "id": "boss_sprout_fort",
+    "name": "새싹 요새 왕방울",
+    "rank": "boss",
+    "family": "왕방울",
+    "maxHp": 446,
+    "block": 28,
+    "phaseRules": [
+      {
+        "hpBelowRatio": 0.5,
+        "addIntent": {
+          "type": "special",
+          "effect": "summon",
+          "enemyId": "enemy_moon_buddy",
+          "label": "친구 부르기"
+        }
+      }
+    ],
+    "intents": [
+      {
+        "type": "attack",
+        "amount": 32,
+        "label": "왕방울 쿵"
+      },
+      {
+        "type": "guard",
+        "amount": 30,
+        "label": "동그란 잠금"
+      },
+      {
+        "type": "special",
+        "effect": "add_temp_card",
+        "cardId": "card_temp_dust",
+        "amount": 1,
+        "label": "장난 카드"
+      }
+    ],
+    "rewards": {
+      "gold": [
+        160,
+        198
+      ],
+      "xp": 61,
+      "relicChance": 1
+    }
+  },
+  {
+    "id": "boss_bubble_port",
+    "name": "방울 항구 왕방울",
+    "rank": "boss",
+    "family": "왕방울",
+    "maxHp": 480,
+    "block": 30,
+    "phaseRules": [
+      {
+        "hpBelowRatio": 0.5,
+        "addIntent": {
+          "type": "special",
+          "effect": "summon",
+          "enemyId": "enemy_peach_buddy",
+          "label": "친구 부르기"
+        }
+      }
+    ],
+    "intents": [
+      {
+        "type": "attack",
+        "amount": 34,
+        "label": "왕방울 쿵"
+      },
+      {
+        "type": "guard",
+        "amount": 32,
+        "label": "동그란 잠금"
+      },
+      {
+        "type": "special",
+        "effect": "add_temp_card",
+        "cardId": "card_temp_dust",
+        "amount": 1,
+        "label": "장난 카드"
+      }
+    ],
+    "rewards": {
+      "gold": [
+        170,
+        210
+      ],
+      "xp": 65,
+      "relicChance": 1
+    }
+  },
+  {
+    "id": "boss_plush_theater",
+    "name": "말랑 극장 왕방울",
+    "rank": "boss",
+    "family": "왕방울",
+    "maxHp": 514,
+    "block": 32,
+    "phaseRules": [
+      {
+        "hpBelowRatio": 0.5,
+        "addIntent": {
+          "type": "special",
+          "effect": "summon",
+          "enemyId": "enemy_toy_buddy",
+          "label": "친구 부르기"
+        }
+      }
+    ],
+    "intents": [
+      {
+        "type": "attack",
+        "amount": 36,
+        "label": "왕방울 쿵"
+      },
+      {
+        "type": "guard",
+        "amount": 34,
+        "label": "동그란 잠금"
+      },
+      {
+        "type": "special",
+        "effect": "add_temp_card",
+        "cardId": "card_temp_dust",
+        "amount": 1,
+        "label": "장난 카드"
+      }
+    ],
+    "rewards": {
+      "gold": [
+        180,
+        222
+      ],
+      "xp": 69,
+      "relicChance": 1
+    }
+  },
+  {
+    "id": "boss_morning_observatory",
+    "name": "아침 관측소 왕방울",
+    "rank": "boss",
+    "family": "왕방울",
+    "maxHp": 548,
+    "block": 34,
+    "phaseRules": [
+      {
+        "hpBelowRatio": 0.5,
+        "addIntent": {
+          "type": "special",
+          "effect": "summon",
+          "enemyId": "enemy_leaf_buddy",
+          "label": "친구 부르기"
+        }
+      }
+    ],
+    "intents": [
+      {
+        "type": "attack",
+        "amount": 38,
+        "label": "왕방울 쿵"
+      },
+      {
+        "type": "guard",
+        "amount": 36,
+        "label": "동그란 잠금"
+      },
+      {
+        "type": "special",
+        "effect": "add_temp_card",
+        "cardId": "card_temp_dust",
+        "amount": 1,
+        "label": "장난 카드"
+      }
+    ],
+    "rewards": {
+      "gold": [
+        190,
+        234
+      ],
+      "xp": 73,
+      "relicChance": 1
+    }
+  },
+  {
+    "id": "boss_dream_arcade",
+    "name": "꿈빛 오락실 왕방울",
+    "rank": "boss",
+    "family": "왕방울",
+    "maxHp": 582,
+    "block": 36,
+    "phaseRules": [
+      {
+        "hpBelowRatio": 0.5,
+        "addIntent": {
+          "type": "special",
+          "effect": "summon",
+          "enemyId": "enemy_star_buddy",
+          "label": "친구 부르기"
+        }
+      }
+    ],
+    "intents": [
+      {
+        "type": "attack",
+        "amount": 40,
+        "label": "왕방울 쿵"
+      },
+      {
+        "type": "guard",
+        "amount": 38,
+        "label": "동그란 잠금"
+      },
+      {
+        "type": "special",
+        "effect": "add_temp_card",
+        "cardId": "card_temp_dust",
+        "amount": 1,
+        "label": "장난 카드"
+      }
+    ],
+    "rewards": {
+      "gold": [
+        200,
+        246
+      ],
+      "xp": 77,
+      "relicChance": 1
+    }
+  },
+  {
+    "id": "boss_rainbow_keep",
+    "name": "무지개 성채 왕방울",
+    "rank": "boss",
+    "family": "왕방울",
+    "maxHp": 616,
+    "block": 38,
+    "phaseRules": [
+      {
+        "hpBelowRatio": 0.5,
+        "addIntent": {
+          "type": "special",
+          "effect": "summon",
+          "enemyId": "enemy_cookie_buddy",
+          "label": "친구 부르기"
+        }
+      }
+    ],
+    "intents": [
+      {
+        "type": "attack",
+        "amount": 42,
+        "label": "왕방울 쿵"
+      },
+      {
+        "type": "guard",
+        "amount": 40,
+        "label": "동그란 잠금"
+      },
+      {
+        "type": "special",
+        "effect": "add_temp_card",
+        "cardId": "card_temp_dust",
+        "amount": 1,
+        "label": "장난 카드"
+      }
+    ],
+    "rewards": {
+      "gold": [
+        210,
+        258
+      ],
+      "xp": 81,
+      "relicChance": 1
+    }
   }
 ]

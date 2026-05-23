@@ -3,54 +3,1153 @@
     "id": "gem_coral_edge",
     "name": "산호날 보석",
     "rarity": "common",
-    "socketTypes": ["attack"],
+    "socketTypes": [
+      "attack"
+    ],
     "text": "장착한 카드의 피해 +25%.",
-    "effects": [{ "op": "modify_damage_percent", "amount": 25 }],
-    "unlock": { "type": "starter_pool" }
+    "effects": [
+      {
+        "op": "modify_damage_percent",
+        "amount": 25
+      }
+    ],
+    "unlock": {
+      "type": "starter_pool"
+    }
   },
   {
     "id": "gem_mint_breeze",
     "name": "민트바람 보석",
     "rarity": "common",
-    "socketTypes": ["skill", "guard"],
+    "socketTypes": [
+      "skill",
+      "guard"
+    ],
     "text": "장착한 카드를 사용하면 체력 1 회복.",
-    "effects": [{ "op": "heal_on_play", "amount": 1 }],
-    "unlock": { "type": "starter_pool" }
+    "effects": [
+      {
+        "op": "heal_on_play",
+        "amount": 1
+      }
+    ],
+    "unlock": {
+      "type": "starter_pool"
+    }
   },
   {
     "id": "gem_lavender_echo",
     "name": "라벤더 메아리",
     "rarity": "rare",
-    "socketTypes": ["attack", "skill", "guard"],
+    "socketTypes": [
+      "attack",
+      "skill",
+      "guard"
+    ],
     "text": "장착한 카드의 기본 효과가 35% 위력으로 한 번 더 발동.",
-    "effects": [{ "op": "echo_basic_effect", "ratio": 0.35 }],
-    "unlock": { "type": "stage_clear", "stageId": "stage_lavender_hall" }
+    "effects": [
+      {
+        "op": "echo_basic_effect",
+        "ratio": 0.35
+      }
+    ],
+    "unlock": {
+      "type": "stage_clear",
+      "stageId": "stage_lavender_hall"
+    }
   },
   {
     "id": "gem_sky_discount",
     "name": "하늘깃 보석",
     "rarity": "rare",
-    "socketTypes": ["attack", "skill", "guard"],
+    "socketTypes": [
+      "attack",
+      "skill",
+      "guard"
+    ],
     "text": "장착한 카드의 비용 -1. 비용은 0 아래로 내려가지 않습니다.",
-    "effects": [{ "op": "modify_cost", "amount": -1, "min": 0 }],
-    "unlock": { "type": "event", "eventId": "event_bubble_shop" }
+    "effects": [
+      {
+        "op": "modify_cost",
+        "amount": -1,
+        "min": 0
+      }
+    ],
+    "unlock": {
+      "type": "event",
+      "eventId": "event_bubble_shop"
+    }
   },
   {
     "id": "gem_peach_splash",
     "name": "복숭아 파동석",
     "rarity": "uncommon",
-    "socketTypes": ["attack"],
+    "socketTypes": [
+      "attack"
+    ],
     "text": "단일 피해 카드가 주변 적에게 30% 피해를 줍니다.",
-    "effects": [{ "op": "splash_damage", "ratio": 0.3 }],
-    "unlock": { "type": "stage_clear", "stageId": "stage_mint_garden" }
+    "effects": [
+      {
+        "op": "splash_damage",
+        "ratio": 0.3
+      }
+    ],
+    "unlock": {
+      "type": "stage_clear",
+      "stageId": "stage_mint_garden"
+    }
   },
   {
     "id": "gem_star_chain",
     "name": "별고리 보석",
     "rarity": "legendary",
-    "socketTypes": ["attack", "skill", "guard"],
+    "socketTypes": [
+      "attack",
+      "skill",
+      "guard"
+    ],
     "text": "장착한 카드는 연쇄를 끊지 않습니다.",
-    "effects": [{ "op": "preserve_chain" }],
-    "unlock": { "type": "achievement", "achievementId": "ach_chain_ten" }
+    "effects": [
+      {
+        "op": "preserve_chain"
+      }
+    ],
+    "unlock": {
+      "type": "achievement",
+      "achievementId": "ach_chain_ten"
+    }
+  },
+  {
+    "id": "gem_morning_edge",
+    "name": "아침 칼날석",
+    "rarity": "common",
+    "socketTypes": [
+      "attack"
+    ],
+    "text": "장착한 카드의 피해 +15%.",
+    "effects": [
+      {
+        "op": "modify_damage_percent",
+        "amount": 15
+      }
+    ],
+    "unlock": {
+      "type": "starter_pool"
+    }
+  },
+  {
+    "id": "gem_morning_guard",
+    "name": "아침 방석석",
+    "rarity": "common",
+    "socketTypes": [
+      "guard"
+    ],
+    "text": "장착한 카드의 보호막 +19%.",
+    "effects": [
+      {
+        "op": "modify_shield_percent",
+        "amount": 19
+      }
+    ],
+    "unlock": {
+      "type": "starter_pool"
+    }
+  },
+  {
+    "id": "gem_morning_spark",
+    "name": "아침 반짝석",
+    "rarity": "uncommon",
+    "socketTypes": [
+      "skill",
+      "attack",
+      "guard"
+    ],
+    "text": "장착한 카드를 사용하면 표식 2을 줍니다.",
+    "effects": [
+      {
+        "op": "apply_mark_on_play",
+        "amount": 2
+      }
+    ],
+    "unlock": {
+      "type": "starter_pool"
+    }
+  },
+  {
+    "id": "gem_morning_echo",
+    "name": "아침 메아리석",
+    "rarity": "rare",
+    "socketTypes": [
+      "attack",
+      "skill",
+      "guard"
+    ],
+    "text": "장착한 카드의 기본 효과가 25% 위력으로 한 번 더 발동합니다.",
+    "effects": [
+      {
+        "op": "echo_basic_effect",
+        "ratio": 0.25
+      }
+    ],
+    "unlock": {
+      "type": "stage_clear",
+      "stageId": "stage_peach_canal"
+    }
+  },
+  {
+    "id": "gem_cloud_edge",
+    "name": "구름 칼날석",
+    "rarity": "common",
+    "socketTypes": [
+      "attack"
+    ],
+    "text": "장착한 카드의 피해 +16%.",
+    "effects": [
+      {
+        "op": "modify_damage_percent",
+        "amount": 16
+      }
+    ],
+    "unlock": {
+      "type": "starter_pool"
+    }
+  },
+  {
+    "id": "gem_cloud_guard",
+    "name": "구름 방석석",
+    "rarity": "common",
+    "socketTypes": [
+      "guard"
+    ],
+    "text": "장착한 카드의 보호막 +20%.",
+    "effects": [
+      {
+        "op": "modify_shield_percent",
+        "amount": 20
+      }
+    ],
+    "unlock": {
+      "type": "starter_pool"
+    }
+  },
+  {
+    "id": "gem_cloud_spark",
+    "name": "구름 반짝석",
+    "rarity": "uncommon",
+    "socketTypes": [
+      "skill",
+      "attack",
+      "guard"
+    ],
+    "text": "장착한 카드를 사용하면 표식 2을 줍니다.",
+    "effects": [
+      {
+        "op": "apply_mark_on_play",
+        "amount": 2
+      }
+    ],
+    "unlock": {
+      "type": "stage_clear",
+      "stageId": "stage_peach_canal"
+    }
+  },
+  {
+    "id": "gem_cloud_echo",
+    "name": "구름 메아리석",
+    "rarity": "rare",
+    "socketTypes": [
+      "attack",
+      "skill",
+      "guard"
+    ],
+    "text": "장착한 카드의 기본 효과가 30% 위력으로 한 번 더 발동합니다.",
+    "effects": [
+      {
+        "op": "echo_basic_effect",
+        "ratio": 0.3
+      }
+    ],
+    "unlock": {
+      "type": "stage_clear",
+      "stageId": "stage_cloud_rooftop"
+    }
+  },
+  {
+    "id": "gem_mint_edge",
+    "name": "민트 칼날석",
+    "rarity": "common",
+    "socketTypes": [
+      "attack"
+    ],
+    "text": "장착한 카드의 피해 +17%.",
+    "effects": [
+      {
+        "op": "modify_damage_percent",
+        "amount": 17
+      }
+    ],
+    "unlock": {
+      "type": "starter_pool"
+    }
+  },
+  {
+    "id": "gem_mint_guard",
+    "name": "민트 방석석",
+    "rarity": "common",
+    "socketTypes": [
+      "guard"
+    ],
+    "text": "장착한 카드의 보호막 +21%.",
+    "effects": [
+      {
+        "op": "modify_shield_percent",
+        "amount": 21
+      }
+    ],
+    "unlock": {
+      "type": "stage_clear",
+      "stageId": "stage_peach_canal"
+    }
+  },
+  {
+    "id": "gem_mint_spark",
+    "name": "민트 반짝석",
+    "rarity": "uncommon",
+    "socketTypes": [
+      "skill",
+      "attack",
+      "guard"
+    ],
+    "text": "장착한 카드를 사용하면 표식 2을 줍니다.",
+    "effects": [
+      {
+        "op": "apply_mark_on_play",
+        "amount": 2
+      }
+    ],
+    "unlock": {
+      "type": "stage_clear",
+      "stageId": "stage_cloud_rooftop"
+    }
+  },
+  {
+    "id": "gem_mint_echo",
+    "name": "민트 메아리석",
+    "rarity": "rare",
+    "socketTypes": [
+      "attack",
+      "skill",
+      "guard"
+    ],
+    "text": "장착한 카드의 기본 효과가 35% 위력으로 한 번 더 발동합니다.",
+    "effects": [
+      {
+        "op": "echo_basic_effect",
+        "ratio": 0.35
+      }
+    ],
+    "unlock": {
+      "type": "stage_clear",
+      "stageId": "stage_ribbon_station"
+    }
+  },
+  {
+    "id": "gem_peach_edge",
+    "name": "복숭아 칼날석",
+    "rarity": "common",
+    "socketTypes": [
+      "attack"
+    ],
+    "text": "장착한 카드의 피해 +18%.",
+    "effects": [
+      {
+        "op": "modify_damage_percent",
+        "amount": 18
+      }
+    ],
+    "unlock": {
+      "type": "stage_clear",
+      "stageId": "stage_peach_canal"
+    }
+  },
+  {
+    "id": "gem_peach_guard",
+    "name": "복숭아 방석석",
+    "rarity": "common",
+    "socketTypes": [
+      "guard"
+    ],
+    "text": "장착한 카드의 보호막 +22%.",
+    "effects": [
+      {
+        "op": "modify_shield_percent",
+        "amount": 22
+      }
+    ],
+    "unlock": {
+      "type": "stage_clear",
+      "stageId": "stage_cloud_rooftop"
+    }
+  },
+  {
+    "id": "gem_peach_spark",
+    "name": "복숭아 반짝석",
+    "rarity": "uncommon",
+    "socketTypes": [
+      "skill",
+      "attack",
+      "guard"
+    ],
+    "text": "장착한 카드를 사용하면 표식 2을 줍니다.",
+    "effects": [
+      {
+        "op": "apply_mark_on_play",
+        "amount": 2
+      }
+    ],
+    "unlock": {
+      "type": "stage_clear",
+      "stageId": "stage_ribbon_station"
+    }
+  },
+  {
+    "id": "gem_peach_echo",
+    "name": "복숭아 메아리석",
+    "rarity": "rare",
+    "socketTypes": [
+      "attack",
+      "skill",
+      "guard"
+    ],
+    "text": "장착한 카드의 기본 효과가 40% 위력으로 한 번 더 발동합니다.",
+    "effects": [
+      {
+        "op": "echo_basic_effect",
+        "ratio": 0.4
+      }
+    ],
+    "unlock": {
+      "type": "stage_clear",
+      "stageId": "stage_candy_cavern"
+    }
+  },
+  {
+    "id": "gem_lavender_edge",
+    "name": "라벤더 칼날석",
+    "rarity": "common",
+    "socketTypes": [
+      "attack"
+    ],
+    "text": "장착한 카드의 피해 +19%.",
+    "effects": [
+      {
+        "op": "modify_damage_percent",
+        "amount": 19
+      }
+    ],
+    "unlock": {
+      "type": "stage_clear",
+      "stageId": "stage_cloud_rooftop"
+    }
+  },
+  {
+    "id": "gem_lavender_guard",
+    "name": "라벤더 방석석",
+    "rarity": "common",
+    "socketTypes": [
+      "guard"
+    ],
+    "text": "장착한 카드의 보호막 +23%.",
+    "effects": [
+      {
+        "op": "modify_shield_percent",
+        "amount": 23
+      }
+    ],
+    "unlock": {
+      "type": "stage_clear",
+      "stageId": "stage_ribbon_station"
+    }
+  },
+  {
+    "id": "gem_lavender_spark",
+    "name": "라벤더 반짝석",
+    "rarity": "uncommon",
+    "socketTypes": [
+      "skill",
+      "attack",
+      "guard"
+    ],
+    "text": "장착한 카드를 사용하면 표식 2을 줍니다.",
+    "effects": [
+      {
+        "op": "apply_mark_on_play",
+        "amount": 2
+      }
+    ],
+    "unlock": {
+      "type": "stage_clear",
+      "stageId": "stage_candy_cavern"
+    }
+  },
+  {
+    "id": "gem_bubble_edge",
+    "name": "방울 칼날석",
+    "rarity": "common",
+    "socketTypes": [
+      "attack"
+    ],
+    "text": "장착한 카드의 피해 +20%.",
+    "effects": [
+      {
+        "op": "modify_damage_percent",
+        "amount": 20
+      }
+    ],
+    "unlock": {
+      "type": "stage_clear",
+      "stageId": "stage_ribbon_station"
+    }
+  },
+  {
+    "id": "gem_bubble_guard",
+    "name": "방울 방석석",
+    "rarity": "common",
+    "socketTypes": [
+      "guard"
+    ],
+    "text": "장착한 카드의 보호막 +24%.",
+    "effects": [
+      {
+        "op": "modify_shield_percent",
+        "amount": 24
+      }
+    ],
+    "unlock": {
+      "type": "stage_clear",
+      "stageId": "stage_candy_cavern"
+    }
+  },
+  {
+    "id": "gem_bubble_spark",
+    "name": "방울 반짝석",
+    "rarity": "uncommon",
+    "socketTypes": [
+      "skill",
+      "attack",
+      "guard"
+    ],
+    "text": "장착한 카드를 사용하면 표식 2을 줍니다.",
+    "effects": [
+      {
+        "op": "apply_mark_on_play",
+        "amount": 2
+      }
+    ],
+    "unlock": {
+      "type": "stage_clear",
+      "stageId": "stage_prism_school"
+    }
+  },
+  {
+    "id": "gem_bubble_echo",
+    "name": "방울 메아리석",
+    "rarity": "rare",
+    "socketTypes": [
+      "attack",
+      "skill",
+      "guard"
+    ],
+    "text": "장착한 카드의 기본 효과가 30% 위력으로 한 번 더 발동합니다.",
+    "effects": [
+      {
+        "op": "echo_basic_effect",
+        "ratio": 0.3
+      }
+    ],
+    "unlock": {
+      "type": "stage_clear",
+      "stageId": "stage_moon_attic"
+    }
+  },
+  {
+    "id": "gem_ribbon_edge",
+    "name": "리본 칼날석",
+    "rarity": "common",
+    "socketTypes": [
+      "attack"
+    ],
+    "text": "장착한 카드의 피해 +21%.",
+    "effects": [
+      {
+        "op": "modify_damage_percent",
+        "amount": 21
+      }
+    ],
+    "unlock": {
+      "type": "stage_clear",
+      "stageId": "stage_candy_cavern"
+    }
+  },
+  {
+    "id": "gem_ribbon_guard",
+    "name": "리본 방석석",
+    "rarity": "common",
+    "socketTypes": [
+      "guard"
+    ],
+    "text": "장착한 카드의 보호막 +25%.",
+    "effects": [
+      {
+        "op": "modify_shield_percent",
+        "amount": 25
+      }
+    ],
+    "unlock": {
+      "type": "stage_clear",
+      "stageId": "stage_prism_school"
+    }
+  },
+  {
+    "id": "gem_ribbon_spark",
+    "name": "리본 반짝석",
+    "rarity": "uncommon",
+    "socketTypes": [
+      "skill",
+      "attack",
+      "guard"
+    ],
+    "text": "장착한 카드를 사용하면 표식 2을 줍니다.",
+    "effects": [
+      {
+        "op": "apply_mark_on_play",
+        "amount": 2
+      }
+    ],
+    "unlock": {
+      "type": "stage_clear",
+      "stageId": "stage_moon_attic"
+    }
+  },
+  {
+    "id": "gem_ribbon_echo",
+    "name": "리본 메아리석",
+    "rarity": "rare",
+    "socketTypes": [
+      "attack",
+      "skill",
+      "guard"
+    ],
+    "text": "장착한 카드의 기본 효과가 35% 위력으로 한 번 더 발동합니다.",
+    "effects": [
+      {
+        "op": "echo_basic_effect",
+        "ratio": 0.35
+      }
+    ],
+    "unlock": {
+      "type": "stage_clear",
+      "stageId": "stage_sprout_fort"
+    }
+  },
+  {
+    "id": "gem_candy_edge",
+    "name": "별사탕 칼날석",
+    "rarity": "common",
+    "socketTypes": [
+      "attack"
+    ],
+    "text": "장착한 카드의 피해 +22%.",
+    "effects": [
+      {
+        "op": "modify_damage_percent",
+        "amount": 22
+      }
+    ],
+    "unlock": {
+      "type": "stage_clear",
+      "stageId": "stage_prism_school"
+    }
+  },
+  {
+    "id": "gem_candy_guard",
+    "name": "별사탕 방석석",
+    "rarity": "common",
+    "socketTypes": [
+      "guard"
+    ],
+    "text": "장착한 카드의 보호막 +26%.",
+    "effects": [
+      {
+        "op": "modify_shield_percent",
+        "amount": 26
+      }
+    ],
+    "unlock": {
+      "type": "stage_clear",
+      "stageId": "stage_moon_attic"
+    }
+  },
+  {
+    "id": "gem_candy_spark",
+    "name": "별사탕 반짝석",
+    "rarity": "uncommon",
+    "socketTypes": [
+      "skill",
+      "attack",
+      "guard"
+    ],
+    "text": "장착한 카드를 사용하면 표식 3을 줍니다.",
+    "effects": [
+      {
+        "op": "apply_mark_on_play",
+        "amount": 3
+      }
+    ],
+    "unlock": {
+      "type": "stage_clear",
+      "stageId": "stage_sprout_fort"
+    }
+  },
+  {
+    "id": "gem_candy_echo",
+    "name": "별사탕 메아리석",
+    "rarity": "rare",
+    "socketTypes": [
+      "attack",
+      "skill",
+      "guard"
+    ],
+    "text": "장착한 카드의 기본 효과가 40% 위력으로 한 번 더 발동합니다.",
+    "effects": [
+      {
+        "op": "echo_basic_effect",
+        "ratio": 0.4
+      }
+    ],
+    "unlock": {
+      "type": "stage_clear",
+      "stageId": "stage_bubble_port"
+    }
+  },
+  {
+    "id": "gem_sprout_edge",
+    "name": "새싹 칼날석",
+    "rarity": "common",
+    "socketTypes": [
+      "attack"
+    ],
+    "text": "장착한 카드의 피해 +23%.",
+    "effects": [
+      {
+        "op": "modify_damage_percent",
+        "amount": 23
+      }
+    ],
+    "unlock": {
+      "type": "stage_clear",
+      "stageId": "stage_moon_attic"
+    }
+  },
+  {
+    "id": "gem_sprout_guard",
+    "name": "새싹 방석석",
+    "rarity": "common",
+    "socketTypes": [
+      "guard"
+    ],
+    "text": "장착한 카드의 보호막 +27%.",
+    "effects": [
+      {
+        "op": "modify_shield_percent",
+        "amount": 27
+      }
+    ],
+    "unlock": {
+      "type": "stage_clear",
+      "stageId": "stage_sprout_fort"
+    }
+  },
+  {
+    "id": "gem_sprout_spark",
+    "name": "새싹 반짝석",
+    "rarity": "uncommon",
+    "socketTypes": [
+      "skill",
+      "attack",
+      "guard"
+    ],
+    "text": "장착한 카드를 사용하면 표식 3을 줍니다.",
+    "effects": [
+      {
+        "op": "apply_mark_on_play",
+        "amount": 3
+      }
+    ],
+    "unlock": {
+      "type": "stage_clear",
+      "stageId": "stage_bubble_port"
+    }
+  },
+  {
+    "id": "gem_sprout_echo",
+    "name": "새싹 메아리석",
+    "rarity": "rare",
+    "socketTypes": [
+      "attack",
+      "skill",
+      "guard"
+    ],
+    "text": "장착한 카드의 기본 효과가 25% 위력으로 한 번 더 발동합니다.",
+    "effects": [
+      {
+        "op": "echo_basic_effect",
+        "ratio": 0.25
+      }
+    ],
+    "unlock": {
+      "type": "stage_clear",
+      "stageId": "stage_plush_theater"
+    }
+  },
+  {
+    "id": "gem_plush_edge",
+    "name": "말랑 칼날석",
+    "rarity": "common",
+    "socketTypes": [
+      "attack"
+    ],
+    "text": "장착한 카드의 피해 +24%.",
+    "effects": [
+      {
+        "op": "modify_damage_percent",
+        "amount": 24
+      }
+    ],
+    "unlock": {
+      "type": "stage_clear",
+      "stageId": "stage_sprout_fort"
+    }
+  },
+  {
+    "id": "gem_plush_guard",
+    "name": "말랑 방석석",
+    "rarity": "common",
+    "socketTypes": [
+      "guard"
+    ],
+    "text": "장착한 카드의 보호막 +28%.",
+    "effects": [
+      {
+        "op": "modify_shield_percent",
+        "amount": 28
+      }
+    ],
+    "unlock": {
+      "type": "stage_clear",
+      "stageId": "stage_bubble_port"
+    }
+  },
+  {
+    "id": "gem_plush_spark",
+    "name": "말랑 반짝석",
+    "rarity": "uncommon",
+    "socketTypes": [
+      "skill",
+      "attack",
+      "guard"
+    ],
+    "text": "장착한 카드를 사용하면 표식 3을 줍니다.",
+    "effects": [
+      {
+        "op": "apply_mark_on_play",
+        "amount": 3
+      }
+    ],
+    "unlock": {
+      "type": "stage_clear",
+      "stageId": "stage_plush_theater"
+    }
+  },
+  {
+    "id": "gem_plush_echo",
+    "name": "말랑 메아리석",
+    "rarity": "rare",
+    "socketTypes": [
+      "attack",
+      "skill",
+      "guard"
+    ],
+    "text": "장착한 카드의 기본 효과가 30% 위력으로 한 번 더 발동합니다.",
+    "effects": [
+      {
+        "op": "echo_basic_effect",
+        "ratio": 0.3
+      }
+    ],
+    "unlock": {
+      "type": "stage_clear",
+      "stageId": "stage_morning_observatory"
+    }
+  },
+  {
+    "id": "gem_prism_edge",
+    "name": "프리즘 칼날석",
+    "rarity": "common",
+    "socketTypes": [
+      "attack"
+    ],
+    "text": "장착한 카드의 피해 +25%.",
+    "effects": [
+      {
+        "op": "modify_damage_percent",
+        "amount": 25
+      }
+    ],
+    "unlock": {
+      "type": "stage_clear",
+      "stageId": "stage_bubble_port"
+    }
+  },
+  {
+    "id": "gem_prism_guard",
+    "name": "프리즘 방석석",
+    "rarity": "common",
+    "socketTypes": [
+      "guard"
+    ],
+    "text": "장착한 카드의 보호막 +29%.",
+    "effects": [
+      {
+        "op": "modify_shield_percent",
+        "amount": 29
+      }
+    ],
+    "unlock": {
+      "type": "stage_clear",
+      "stageId": "stage_plush_theater"
+    }
+  },
+  {
+    "id": "gem_prism_spark",
+    "name": "프리즘 반짝석",
+    "rarity": "uncommon",
+    "socketTypes": [
+      "skill",
+      "attack",
+      "guard"
+    ],
+    "text": "장착한 카드를 사용하면 표식 3을 줍니다.",
+    "effects": [
+      {
+        "op": "apply_mark_on_play",
+        "amount": 3
+      }
+    ],
+    "unlock": {
+      "type": "stage_clear",
+      "stageId": "stage_morning_observatory"
+    }
+  },
+  {
+    "id": "gem_prism_echo",
+    "name": "프리즘 메아리석",
+    "rarity": "rare",
+    "socketTypes": [
+      "attack",
+      "skill",
+      "guard"
+    ],
+    "text": "장착한 카드의 기본 효과가 35% 위력으로 한 번 더 발동합니다.",
+    "effects": [
+      {
+        "op": "echo_basic_effect",
+        "ratio": 0.35
+      }
+    ],
+    "unlock": {
+      "type": "stage_clear",
+      "stageId": "stage_dream_arcade"
+    }
+  },
+  {
+    "id": "gem_moon_edge",
+    "name": "달빛 칼날석",
+    "rarity": "common",
+    "socketTypes": [
+      "attack"
+    ],
+    "text": "장착한 카드의 피해 +26%.",
+    "effects": [
+      {
+        "op": "modify_damage_percent",
+        "amount": 26
+      }
+    ],
+    "unlock": {
+      "type": "stage_clear",
+      "stageId": "stage_plush_theater"
+    }
+  },
+  {
+    "id": "gem_moon_guard",
+    "name": "달빛 방석석",
+    "rarity": "common",
+    "socketTypes": [
+      "guard"
+    ],
+    "text": "장착한 카드의 보호막 +30%.",
+    "effects": [
+      {
+        "op": "modify_shield_percent",
+        "amount": 30
+      }
+    ],
+    "unlock": {
+      "type": "stage_clear",
+      "stageId": "stage_morning_observatory"
+    }
+  },
+  {
+    "id": "gem_moon_spark",
+    "name": "달빛 반짝석",
+    "rarity": "uncommon",
+    "socketTypes": [
+      "skill",
+      "attack",
+      "guard"
+    ],
+    "text": "장착한 카드를 사용하면 표식 3을 줍니다.",
+    "effects": [
+      {
+        "op": "apply_mark_on_play",
+        "amount": 3
+      }
+    ],
+    "unlock": {
+      "type": "stage_clear",
+      "stageId": "stage_dream_arcade"
+    }
+  },
+  {
+    "id": "gem_moon_echo",
+    "name": "달빛 메아리석",
+    "rarity": "rare",
+    "socketTypes": [
+      "attack",
+      "skill",
+      "guard"
+    ],
+    "text": "장착한 카드의 기본 효과가 40% 위력으로 한 번 더 발동합니다.",
+    "effects": [
+      {
+        "op": "echo_basic_effect",
+        "ratio": 0.4
+      }
+    ],
+    "unlock": {
+      "type": "stage_clear",
+      "stageId": "stage_rainbow_keep"
+    }
+  },
+  {
+    "id": "gem_rainbow_edge",
+    "name": "무지개 칼날석",
+    "rarity": "common",
+    "socketTypes": [
+      "attack"
+    ],
+    "text": "장착한 카드의 피해 +27%.",
+    "effects": [
+      {
+        "op": "modify_damage_percent",
+        "amount": 27
+      }
+    ],
+    "unlock": {
+      "type": "stage_clear",
+      "stageId": "stage_morning_observatory"
+    }
+  },
+  {
+    "id": "gem_rainbow_guard",
+    "name": "무지개 방석석",
+    "rarity": "common",
+    "socketTypes": [
+      "guard"
+    ],
+    "text": "장착한 카드의 보호막 +31%.",
+    "effects": [
+      {
+        "op": "modify_shield_percent",
+        "amount": 31
+      }
+    ],
+    "unlock": {
+      "type": "stage_clear",
+      "stageId": "stage_dream_arcade"
+    }
+  },
+  {
+    "id": "gem_rainbow_spark",
+    "name": "무지개 반짝석",
+    "rarity": "uncommon",
+    "socketTypes": [
+      "skill",
+      "attack",
+      "guard"
+    ],
+    "text": "장착한 카드를 사용하면 표식 3을 줍니다.",
+    "effects": [
+      {
+        "op": "apply_mark_on_play",
+        "amount": 3
+      }
+    ],
+    "unlock": {
+      "type": "stage_clear",
+      "stageId": "stage_rainbow_keep"
+    }
+  },
+  {
+    "id": "gem_rainbow_echo",
+    "name": "무지개 메아리석",
+    "rarity": "rare",
+    "socketTypes": [
+      "attack",
+      "skill",
+      "guard"
+    ],
+    "text": "장착한 카드의 기본 효과가 25% 위력으로 한 번 더 발동합니다.",
+    "effects": [
+      {
+        "op": "echo_basic_effect",
+        "ratio": 0.25
+      }
+    ],
+    "unlock": {
+      "type": "stage_clear",
+      "stageId": "stage_sunny_gate"
+    }
+  },
+  {
+    "id": "gem_rainbow_bridge",
+    "name": "무지개 다리석",
+    "rarity": "legendary",
+    "socketTypes": [
+      "attack",
+      "skill",
+      "guard"
+    ],
+    "text": "장착한 카드는 사용 후 다음 카드의 색 보너스를 한 번 대신 이어줍니다.",
+    "effects": [
+      {
+        "op": "bridge_next_color_bonus",
+        "amount": 1
+      }
+    ],
+    "unlock": {
+      "type": "stage_clear",
+      "stageId": "stage_rainbow_keep"
+    }
   }
 ]

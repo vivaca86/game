@@ -6,36 +6,511 @@
     "biome": "아이보리 성문",
     "floorCount": 6,
     "backgroundKey": "bright_gate",
-    "enemyPool": ["enemy_cloud_slime", "enemy_paper_doll"],
-    "elitePool": ["enemy_lantern_puff"],
-    "bossEnemyId": "boss_round_gatekeeper",
-    "rooms": ["combat", "combat", "event", "elite", "reward", "boss"],
-    "unlock": { "type": "starter" }
+    "enemyPool": [
+      "enemy_cloud_buddy",
+      "enemy_cloud_trick",
+      "enemy_lantern_buddy"
+    ],
+    "elitePool": [
+      "enemy_cloud_elite"
+    ],
+    "bossEnemyId": "boss_sunny_gate",
+    "rooms": [
+      "combat",
+      "combat",
+      "event",
+      "elite",
+      "reward",
+      "boss"
+    ],
+    "clearRewards": {
+      "gold": 60,
+      "unlockStageId": "stage_lavender_hall"
+    },
+    "unlock": {
+      "type": "starter"
+    }
   },
   {
     "id": "stage_lavender_hall",
     "name": "라벤더 복도",
     "order": 2,
     "biome": "보랏빛 장난감 회랑",
-    "floorCount": 7,
+    "floorCount": 6,
     "backgroundKey": "lavender_hall",
-    "enemyPool": ["enemy_paper_doll", "enemy_sprout_knight", "enemy_cloud_slime"],
-    "elitePool": ["enemy_lantern_puff"],
-    "bossEnemyId": "boss_round_gatekeeper",
-    "rooms": ["combat", "event", "combat", "shop", "elite", "reward", "boss"],
-    "unlock": { "type": "stage_clear", "stageId": "stage_sunny_gate" }
+    "enemyPool": [
+      "enemy_paper_buddy",
+      "enemy_paper_trick",
+      "enemy_candy_buddy"
+    ],
+    "elitePool": [
+      "enemy_paper_elite"
+    ],
+    "bossEnemyId": "boss_lavender_hall",
+    "rooms": [
+      "combat",
+      "combat",
+      "event",
+      "elite",
+      "reward",
+      "boss"
+    ],
+    "clearRewards": {
+      "gold": 75,
+      "unlockStageId": "stage_mint_garden"
+    },
+    "unlock": {
+      "type": "stage_clear",
+      "stageId": "stage_sunny_gate"
+    }
   },
   {
     "id": "stage_mint_garden",
     "name": "민트 정원",
     "order": 3,
     "biome": "상쾌한 온실 미로",
-    "floorCount": 8,
+    "floorCount": 7,
     "backgroundKey": "mint_garden",
-    "enemyPool": ["enemy_sprout_knight", "enemy_lantern_puff", "enemy_cloud_slime"],
-    "elitePool": ["enemy_lantern_puff"],
-    "bossEnemyId": "boss_mint_garden_king",
-    "rooms": ["combat", "combat", "event", "elite", "shop", "event", "reward", "boss"],
-    "unlock": { "type": "stage_clear", "stageId": "stage_lavender_hall" }
+    "enemyPool": [
+      "enemy_sprout_buddy",
+      "enemy_sprout_trick",
+      "enemy_ribbon_buddy"
+    ],
+    "elitePool": [
+      "enemy_sprout_elite"
+    ],
+    "bossEnemyId": "boss_mint_garden",
+    "rooms": [
+      "combat",
+      "combat",
+      "event",
+      "elite",
+      "reward",
+      "boss"
+    ],
+    "clearRewards": {
+      "gold": 90,
+      "unlockStageId": "stage_peach_canal"
+    },
+    "unlock": {
+      "type": "stage_clear",
+      "stageId": "stage_lavender_hall"
+    }
+  },
+  {
+    "id": "stage_peach_canal",
+    "name": "복숭아 운하",
+    "order": 4,
+    "biome": "분홍빛 물길",
+    "floorCount": 7,
+    "backgroundKey": "peach_canal",
+    "enemyPool": [
+      "enemy_lantern_buddy",
+      "enemy_lantern_trick",
+      "enemy_bubble_buddy"
+    ],
+    "elitePool": [
+      "enemy_lantern_elite"
+    ],
+    "bossEnemyId": "boss_peach_canal",
+    "rooms": [
+      "combat",
+      "combat",
+      "event",
+      "elite",
+      "reward",
+      "boss"
+    ],
+    "clearRewards": {
+      "gold": 105,
+      "unlockStageId": "stage_cloud_rooftop"
+    },
+    "unlock": {
+      "type": "stage_clear",
+      "stageId": "stage_mint_garden"
+    }
+  },
+  {
+    "id": "stage_cloud_rooftop",
+    "name": "구름 지붕길",
+    "order": 5,
+    "biome": "하늘색 기와 지붕",
+    "floorCount": 8,
+    "backgroundKey": "cloud_rooftop",
+    "enemyPool": [
+      "enemy_candy_buddy",
+      "enemy_candy_trick",
+      "enemy_plush_buddy"
+    ],
+    "elitePool": [
+      "enemy_candy_elite"
+    ],
+    "bossEnemyId": "boss_cloud_rooftop",
+    "rooms": [
+      "combat",
+      "combat",
+      "event",
+      "elite",
+      "reward",
+      "boss"
+    ],
+    "clearRewards": {
+      "gold": 120,
+      "unlockStageId": "stage_ribbon_station"
+    },
+    "unlock": {
+      "type": "stage_clear",
+      "stageId": "stage_peach_canal"
+    }
+  },
+  {
+    "id": "stage_ribbon_station",
+    "name": "리본 정거장",
+    "order": 6,
+    "biome": "리본 기차 승강장",
+    "floorCount": 8,
+    "backgroundKey": "ribbon_station",
+    "enemyPool": [
+      "enemy_ribbon_buddy",
+      "enemy_ribbon_trick",
+      "enemy_prism_buddy"
+    ],
+    "elitePool": [
+      "enemy_ribbon_elite"
+    ],
+    "bossEnemyId": "boss_ribbon_station",
+    "rooms": [
+      "combat",
+      "event",
+      "combat",
+      "shop",
+      "elite",
+      "event",
+      "reward",
+      "boss"
+    ],
+    "clearRewards": {
+      "gold": 135,
+      "unlockStageId": "stage_candy_cavern"
+    },
+    "unlock": {
+      "type": "stage_clear",
+      "stageId": "stage_cloud_rooftop"
+    }
+  },
+  {
+    "id": "stage_candy_cavern",
+    "name": "별사탕 동굴",
+    "order": 7,
+    "biome": "반짝이는 설탕 동굴",
+    "floorCount": 9,
+    "backgroundKey": "candy_cavern",
+    "enemyPool": [
+      "enemy_bubble_buddy",
+      "enemy_bubble_trick",
+      "enemy_moon_buddy"
+    ],
+    "elitePool": [
+      "enemy_bubble_elite"
+    ],
+    "bossEnemyId": "boss_candy_cavern",
+    "rooms": [
+      "combat",
+      "event",
+      "combat",
+      "shop",
+      "elite",
+      "event",
+      "reward",
+      "boss"
+    ],
+    "clearRewards": {
+      "gold": 150,
+      "unlockStageId": "stage_prism_school"
+    },
+    "unlock": {
+      "type": "stage_clear",
+      "stageId": "stage_ribbon_station"
+    }
+  },
+  {
+    "id": "stage_prism_school",
+    "name": "프리즘 교실",
+    "order": 8,
+    "biome": "무지개 유리 교실",
+    "floorCount": 9,
+    "backgroundKey": "prism_school",
+    "enemyPool": [
+      "enemy_plush_buddy",
+      "enemy_plush_trick",
+      "enemy_peach_buddy"
+    ],
+    "elitePool": [
+      "enemy_plush_elite"
+    ],
+    "bossEnemyId": "boss_prism_school",
+    "rooms": [
+      "combat",
+      "event",
+      "combat",
+      "shop",
+      "elite",
+      "event",
+      "reward",
+      "boss"
+    ],
+    "clearRewards": {
+      "gold": 165,
+      "unlockStageId": "stage_moon_attic"
+    },
+    "unlock": {
+      "type": "stage_clear",
+      "stageId": "stage_candy_cavern"
+    }
+  },
+  {
+    "id": "stage_moon_attic",
+    "name": "달빛 다락",
+    "order": 9,
+    "biome": "졸린 장난감 다락",
+    "floorCount": 10,
+    "backgroundKey": "moon_attic",
+    "enemyPool": [
+      "enemy_prism_buddy",
+      "enemy_prism_trick",
+      "enemy_toy_buddy"
+    ],
+    "elitePool": [
+      "enemy_prism_elite"
+    ],
+    "bossEnemyId": "boss_moon_attic",
+    "rooms": [
+      "combat",
+      "event",
+      "combat",
+      "shop",
+      "elite",
+      "event",
+      "reward",
+      "boss"
+    ],
+    "clearRewards": {
+      "gold": 180,
+      "unlockStageId": "stage_sprout_fort"
+    },
+    "unlock": {
+      "type": "stage_clear",
+      "stageId": "stage_prism_school"
+    }
+  },
+  {
+    "id": "stage_sprout_fort",
+    "name": "새싹 요새",
+    "order": 10,
+    "biome": "초록 잎사귀 성벽",
+    "floorCount": 10,
+    "backgroundKey": "sprout_fort",
+    "enemyPool": [
+      "enemy_moon_buddy",
+      "enemy_moon_trick",
+      "enemy_leaf_buddy"
+    ],
+    "elitePool": [
+      "enemy_moon_elite"
+    ],
+    "bossEnemyId": "boss_sprout_fort",
+    "rooms": [
+      "combat",
+      "event",
+      "combat",
+      "shop",
+      "elite",
+      "event",
+      "reward",
+      "boss"
+    ],
+    "clearRewards": {
+      "gold": 195,
+      "unlockStageId": "stage_bubble_port"
+    },
+    "unlock": {
+      "type": "stage_clear",
+      "stageId": "stage_moon_attic"
+    }
+  },
+  {
+    "id": "stage_bubble_port",
+    "name": "방울 항구",
+    "order": 11,
+    "biome": "비눗방울 부두",
+    "floorCount": 11,
+    "backgroundKey": "bubble_port",
+    "enemyPool": [
+      "enemy_peach_buddy",
+      "enemy_peach_trick",
+      "enemy_star_buddy"
+    ],
+    "elitePool": [
+      "enemy_peach_elite"
+    ],
+    "bossEnemyId": "boss_bubble_port",
+    "rooms": [
+      "combat",
+      "event",
+      "combat",
+      "shop",
+      "elite",
+      "event",
+      "reward",
+      "boss"
+    ],
+    "clearRewards": {
+      "gold": 210,
+      "unlockStageId": "stage_plush_theater"
+    },
+    "unlock": {
+      "type": "stage_clear",
+      "stageId": "stage_sprout_fort"
+    }
+  },
+  {
+    "id": "stage_plush_theater",
+    "name": "말랑 극장",
+    "order": 12,
+    "biome": "봉제 인형 무대",
+    "floorCount": 11,
+    "backgroundKey": "plush_theater",
+    "enemyPool": [
+      "enemy_toy_buddy",
+      "enemy_toy_trick",
+      "enemy_cookie_buddy"
+    ],
+    "elitePool": [
+      "enemy_toy_elite"
+    ],
+    "bossEnemyId": "boss_plush_theater",
+    "rooms": [
+      "combat",
+      "event",
+      "combat",
+      "shop",
+      "elite",
+      "event",
+      "reward",
+      "boss"
+    ],
+    "clearRewards": {
+      "gold": 225,
+      "unlockStageId": "stage_morning_observatory"
+    },
+    "unlock": {
+      "type": "stage_clear",
+      "stageId": "stage_bubble_port"
+    }
+  },
+  {
+    "id": "stage_morning_observatory",
+    "name": "아침 관측소",
+    "order": 13,
+    "biome": "햇살 망원경 탑",
+    "floorCount": 12,
+    "backgroundKey": "morning_observatory",
+    "enemyPool": [
+      "enemy_leaf_buddy",
+      "enemy_leaf_trick",
+      "enemy_cloud_buddy"
+    ],
+    "elitePool": [
+      "enemy_leaf_elite"
+    ],
+    "bossEnemyId": "boss_morning_observatory",
+    "rooms": [
+      "combat",
+      "event",
+      "combat",
+      "shop",
+      "elite",
+      "event",
+      "reward",
+      "boss"
+    ],
+    "clearRewards": {
+      "gold": 240,
+      "unlockStageId": "stage_dream_arcade"
+    },
+    "unlock": {
+      "type": "stage_clear",
+      "stageId": "stage_plush_theater"
+    }
+  },
+  {
+    "id": "stage_dream_arcade",
+    "name": "꿈빛 오락실",
+    "order": 14,
+    "biome": "파스텔 놀이기계 거리",
+    "floorCount": 12,
+    "backgroundKey": "dream_arcade",
+    "enemyPool": [
+      "enemy_star_buddy",
+      "enemy_star_trick",
+      "enemy_paper_buddy"
+    ],
+    "elitePool": [
+      "enemy_star_elite"
+    ],
+    "bossEnemyId": "boss_dream_arcade",
+    "rooms": [
+      "combat",
+      "event",
+      "combat",
+      "shop",
+      "elite",
+      "event",
+      "reward",
+      "boss"
+    ],
+    "clearRewards": {
+      "gold": 255,
+      "unlockStageId": "stage_rainbow_keep"
+    },
+    "unlock": {
+      "type": "stage_clear",
+      "stageId": "stage_morning_observatory"
+    }
+  },
+  {
+    "id": "stage_rainbow_keep",
+    "name": "무지개 성채",
+    "order": 15,
+    "biome": "일곱 빛깔 마지막 성",
+    "floorCount": 13,
+    "backgroundKey": "rainbow_keep",
+    "enemyPool": [
+      "enemy_cookie_buddy",
+      "enemy_cookie_trick",
+      "enemy_sprout_buddy"
+    ],
+    "elitePool": [
+      "enemy_cookie_elite"
+    ],
+    "bossEnemyId": "boss_rainbow_keep",
+    "rooms": [
+      "combat",
+      "event",
+      "combat",
+      "shop",
+      "elite",
+      "event",
+      "reward",
+      "boss"
+    ],
+    "clearRewards": {
+      "gold": 270,
+      "unlockStageId": null
+    },
+    "unlock": {
+      "type": "stage_clear",
+      "stageId": "stage_dream_arcade"
+    }
   }
 ]

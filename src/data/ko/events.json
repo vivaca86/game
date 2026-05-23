@@ -5,10 +5,41 @@
     "type": "shop",
     "text": "투명한 방울 안에 보석과 카드가 둥둥 떠 있습니다.",
     "choices": [
-      { "label": "보석을 산다", "cost": { "gold": 40 }, "reward": { "gemPool": ["gem_sky_discount", "gem_mint_breeze"] } },
-      { "label": "카드를 산다", "cost": { "gold": 30 }, "reward": { "cardPool": ["card_bubble_map", "card_paper_charm"] } },
-      { "label": "그냥 지나간다", "reward": {} }
-    ]
+      {
+        "label": "카드를 고른다",
+        "cost": {
+          "gold": 25
+        },
+        "reward": {
+          "cardPool": [
+            "card_sunbean_punch",
+            "card_cloud_cushion"
+          ]
+        }
+      },
+      {
+        "label": "보석을 살펴본다",
+        "cost": {
+          "gold": 35
+        },
+        "reward": {
+          "gemPool": [
+            "gem_coral_edge",
+            "gem_morning_guard"
+          ]
+        }
+      },
+      {
+        "label": "장난을 받아준다",
+        "reward": {
+          "combat": "enemy_cloud_buddy",
+          "gold": 20
+        }
+      }
+    ],
+    "unlock": {
+      "type": "starter_pool"
+    }
   },
   {
     "id": "event_ribbon_fountain",
@@ -16,10 +47,37 @@
     "type": "choice",
     "text": "분수에서 알록달록한 리본 물줄기가 솟아납니다.",
     "choices": [
-      { "label": "카드를 강화한다", "cost": { "hp": 5 }, "reward": { "upgradeRandomCard": 1 } },
-      { "label": "체력을 회복한다", "reward": { "heal": 12 } },
-      { "label": "별사탕을 던진다", "cost": { "gold": 20 }, "reward": { "relicPool": ["relic_ribbon_box"] } }
-    ]
+      {
+        "label": "카드를 강화한다",
+        "cost": {
+          "hp": 5
+        },
+        "reward": {
+          "upgradeRandomCard": 1
+        }
+      },
+      {
+        "label": "유물을 살펴본다",
+        "cost": {
+          "gold": 39
+        },
+        "reward": {
+          "relicPool": [
+            "relic_candy_pouch"
+          ]
+        }
+      },
+      {
+        "label": "장난을 받아준다",
+        "reward": {
+          "heal": 9,
+          "openGemSocket": false
+        }
+      }
+    ],
+    "unlock": {
+      "type": "starter_pool"
+    }
   },
   {
     "id": "event_sleeping_gate",
@@ -27,10 +85,41 @@
     "type": "choice",
     "text": "커다란 문이 꾸벅꾸벅 졸고 있습니다.",
     "choices": [
-      { "label": "살짝 깨운다", "reward": { "combat": "enemy_cloud_slime", "gold": 25 } },
-      { "label": "조용히 지나간다", "reward": { "skipNextCombat": true } },
-      { "label": "문을 닦아준다", "reward": { "heal": 6, "gold": 10 } }
-    ]
+      {
+        "label": "카드를 고른다",
+        "cost": {
+          "gold": 35
+        },
+        "reward": {
+          "cardPool": [
+            "card_sprout_guard",
+            "card_star_candy"
+          ]
+        }
+      },
+      {
+        "label": "유물을 살펴본다",
+        "cost": {
+          "gold": 43
+        },
+        "reward": {
+          "relicPool": [
+            "relic_soft_compass"
+          ]
+        }
+      },
+      {
+        "label": "장난을 받아준다",
+        "reward": {
+          "combat": "enemy_paper_buddy",
+          "gold": 26
+        }
+      }
+    ],
+    "unlock": {
+      "type": "stage_clear",
+      "stageId": "stage_sunny_gate"
+    }
   },
   {
     "id": "event_gem_bench",
@@ -38,9 +127,283 @@
     "type": "station",
     "text": "작은 작업대가 카드의 빈 소켓을 반짝이게 합니다.",
     "choices": [
-      { "label": "보석을 장착한다", "reward": { "openGemSocket": true } },
-      { "label": "소켓을 하나 늘린다", "cost": { "gold": 55 }, "reward": { "addSocketToRandomCard": 1 } },
-      { "label": "작업대를 접는다", "reward": {} }
-    ]
+      {
+        "label": "카드를 강화한다",
+        "cost": {
+          "hp": 7
+        },
+        "reward": {
+          "upgradeRandomCard": 1
+        }
+      },
+      {
+        "label": "보석을 살펴본다",
+        "cost": {
+          "gold": 47
+        },
+        "reward": {
+          "gemPool": [
+            "gem_sky_discount",
+            "gem_cloud_edge"
+          ]
+        }
+      },
+      {
+        "label": "장난을 받아준다",
+        "reward": {
+          "heal": 11,
+          "openGemSocket": false
+        }
+      }
+    ],
+    "unlock": {
+      "type": "stage_clear",
+      "stageId": "stage_lavender_hall"
+    }
+  },
+  {
+    "id": "event_peach_mailbox",
+    "name": "복숭아 우체통",
+    "type": "choice",
+    "text": "향긋한 우체통에 누군가의 초대장이 꽂혀 있습니다.",
+    "choices": [
+      {
+        "label": "카드를 고른다",
+        "cost": {
+          "gold": 45
+        },
+        "reward": {
+          "cardPool": [
+            "card_morning_tap",
+            "card_morning_wave"
+          ]
+        }
+      },
+      {
+        "label": "유물을 살펴본다",
+        "cost": {
+          "gold": 51
+        },
+        "reward": {
+          "relicPool": [
+            "relic_sun_cookie"
+          ]
+        }
+      },
+      {
+        "label": "장난을 받아준다",
+        "reward": {
+          "combat": "enemy_sprout_buddy",
+          "gold": 32
+        }
+      }
+    ],
+    "unlock": {
+      "type": "stage_clear",
+      "stageId": "stage_mint_garden"
+    }
+  },
+  {
+    "id": "event_cloud_picnic",
+    "name": "구름 소풍자리",
+    "type": "rest",
+    "text": "폭신한 돗자리와 따뜻한 간식이 놓여 있습니다.",
+    "choices": [
+      {
+        "label": "카드를 강화한다",
+        "cost": {
+          "hp": 9
+        },
+        "reward": {
+          "upgradeRandomCard": 1
+        }
+      },
+      {
+        "label": "유물을 살펴본다",
+        "cost": {
+          "gold": 55
+        },
+        "reward": {
+          "relicPool": [
+            "relic_mint_thermos"
+          ]
+        }
+      },
+      {
+        "label": "장난을 받아준다",
+        "reward": {
+          "heal": 13,
+          "openGemSocket": false
+        }
+      }
+    ],
+    "unlock": {
+      "type": "stage_clear",
+      "stageId": "stage_peach_canal"
+    }
+  },
+  {
+    "id": "event_star_lottery",
+    "name": "별사탕 추첨기",
+    "type": "choice",
+    "text": "손잡이를 돌리면 작은 별들이 굴러갑니다.",
+    "choices": [
+      {
+        "label": "카드를 고른다",
+        "cost": {
+          "gold": 55
+        },
+        "reward": {
+          "cardPool": [
+            "card_morning_shower",
+            "card_morning_gift"
+          ]
+        }
+      },
+      {
+        "label": "보석을 살펴본다",
+        "cost": {
+          "gold": 59
+        },
+        "reward": {
+          "gemPool": [
+            "gem_morning_edge",
+            "gem_cloud_echo"
+          ]
+        }
+      },
+      {
+        "label": "장난을 받아준다",
+        "reward": {
+          "combat": "enemy_lantern_buddy",
+          "gold": 38
+        }
+      }
+    ],
+    "unlock": {
+      "type": "stage_clear",
+      "stageId": "stage_cloud_rooftop"
+    }
+  },
+  {
+    "id": "event_prism_class",
+    "name": "프리즘 수업",
+    "type": "station",
+    "text": "칠판 위에 카드 색을 바꾸는 공식이 적혀 있습니다.",
+    "choices": [
+      {
+        "label": "카드를 강화한다",
+        "cost": {
+          "hp": 11
+        },
+        "reward": {
+          "upgradeRandomCard": 1
+        }
+      },
+      {
+        "label": "유물을 살펴본다",
+        "cost": {
+          "gold": 63
+        },
+        "reward": {
+          "relicPool": [
+            "relic_bubble_lens"
+          ]
+        }
+      },
+      {
+        "label": "장난을 받아준다",
+        "reward": {
+          "heal": 15,
+          "openGemSocket": false
+        }
+      }
+    ],
+    "unlock": {
+      "type": "stage_clear",
+      "stageId": "stage_ribbon_station"
+    }
+  },
+  {
+    "id": "event_plush_lost_child",
+    "name": "길 잃은 인형",
+    "type": "choice",
+    "text": "작은 봉제 인형이 길을 잃고 울먹입니다.",
+    "choices": [
+      {
+        "label": "카드를 고른다",
+        "cost": {
+          "gold": 65
+        },
+        "reward": {
+          "cardPool": [
+            "card_cloud_snack",
+            "card_cloud_promise"
+          ]
+        }
+      },
+      {
+        "label": "유물을 살펴본다",
+        "cost": {
+          "gold": 67
+        },
+        "reward": {
+          "relicPool": [
+            "relic_peach_coupon"
+          ]
+        }
+      },
+      {
+        "label": "장난을 받아준다",
+        "reward": {
+          "combat": "enemy_candy_buddy",
+          "gold": 44
+        }
+      }
+    ],
+    "unlock": {
+      "type": "stage_clear",
+      "stageId": "stage_candy_cavern"
+    }
+  },
+  {
+    "id": "event_rainbow_gate",
+    "name": "무지개 회전문",
+    "type": "choice",
+    "text": "일곱 빛깔 문이 다음 방을 살짝 바꿔 줍니다.",
+    "choices": [
+      {
+        "label": "카드를 강화한다",
+        "cost": {
+          "hp": 13
+        },
+        "reward": {
+          "upgradeRandomCard": 1
+        }
+      },
+      {
+        "label": "보석을 살펴본다",
+        "cost": {
+          "gold": 71
+        },
+        "reward": {
+          "gemPool": [
+            "gem_morning_echo",
+            "gem_mint_spark"
+          ]
+        }
+      },
+      {
+        "label": "장난을 받아준다",
+        "reward": {
+          "heal": 17,
+          "openGemSocket": false
+        }
+      }
+    ],
+    "unlock": {
+      "type": "stage_clear",
+      "stageId": "stage_prism_school"
+    }
   }
 ]

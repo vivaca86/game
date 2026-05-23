@@ -7,6 +7,8 @@
     "dev": "node tools/serve-static.mjs",
     "build": "node tools/build-static.mjs",
     "preview": "node tools/serve-static.mjs dist",
+    "data:generate:cards": "node tools/generate-full-card-data.mjs",
+    "data:generate:content": "node tools/generate-full-content-data.mjs",
     "data:validate": "node tools/validate-data.mjs",
     "check": "npm run data:validate && npm run build"
   }
