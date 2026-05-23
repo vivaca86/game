@@ -135,8 +135,21 @@ await page.evaluate(() => {
   const snapshot = JSON.parse(raw);
   const hand = Array.isArray(snapshot.hand) ? snapshot.hand.filter((cardId) => !["card_temp_dust", "card_sunbean_punch"].includes(cardId)) : [];
   snapshot.hand = ["card_temp_dust", "card_sunbean_punch", ...hand].slice(0, 5);
-  snapshot.player = { ...(snapshot.player || {}), energy: Math.max(snapshot.player?.energy || 0, 3) };
-  snapshot.status = { ...(snapshot.status || {}), disruptionsCleared: 0 };
+  snapshot.player = { ...(snapshot.player || {}), energy: Math.max(snapshot.player?.energy || 0, 3), shield: 8 };
+  snapshot.status = {
+    ...(snapshot.status || {}),
+    disruptionsCleared: 0,
+    chain: 3,
+    playerMarked: 2,
+    playerWeak: 1,
+    damageReduction: 4,
+    retainShield: 5,
+    reflectRatio: 0.5,
+    nextTurnEnergyPenalty: 1
+  };
+  if (Array.isArray(snapshot.enemies) && snapshot.enemies[0]) {
+    snapshot.enemies[0].status = { ...(snapshot.enemies[0].status || {}), mark: 2, weak: 1 };
+  }
   localStorage.setItem("sunny_maze_run_v1", JSON.stringify(snapshot));
 });
 await page.reload({ waitUntil: "networkidle" });
@@ -144,6 +157,13 @@ await page.waitForSelector("#loadRunButton:not(:disabled)", { timeout: 10000 });
 await page.click("#loadRunButton");
 await page.waitForSelector(".stage-route-panel", { timeout: 10000 });
 await page.waitForSelector(".combat-forecast", { timeout: 10000 });
+await page.waitForSelector(".combat-status-board", { timeout: 10000 });
+await page.waitForSelector(".combat-status-card.status-card-mark", { timeout: 10000 });
+await page.waitForSelector(".combat-status-card.status-card-weak", { timeout: 10000 });
+await page.waitForSelector(".combat-status-card.status-card-reflect", { timeout: 10000 });
+await page.waitForSelector(".combat-status-card .status-card-meter b", { timeout: 10000 });
+await page.waitForSelector(".enemy-status-chip.status-mark", { timeout: 10000 });
+await page.waitForSelector(".enemy-status-chip.status-weak", { timeout: 10000 });
 await page.waitForSelector(".disruption-control", { timeout: 10000 });
 await page.waitForSelector(".play-card.card-type-temp", { timeout: 10000 });
 const disruptionText = await page.textContent(".disruption-control");
@@ -159,6 +179,9 @@ if (!routeText?.includes("스테이지 경로") || !routeText.includes("현재 �
 const combatForecastText = await page.textContent(".combat-forecast");
 if (!combatForecastText?.includes("이번 턴 예고") || (!combatForecastText.includes("예상 피해") && !combatForecastText.includes("피해 없음"))) {
   throw new Error("전투 예고판 표시 실패");
+}
+if (!combatForecastText.includes("상태판") || !combatForecastText.includes("표식") || !combatForecastText.includes("반사")) {
+  throw new Error("전투 상태판 핵심 상태 표시 실패");
 }
 const intentNodeCount = await page.locator(".intent-node").count();
 if (intentNodeCount < 2) throw new Error("몬스터 의도 타임라인 표시 실패");
@@ -178,13 +201,25 @@ await page.waitForSelector(".play-card .card-art-hand", { timeout: 10000 });
 await page.waitForSelector(".arcana-chip", { timeout: 10000 });
 const enemyText = await page.textContent(".enemy-card");
 if (!enemyText?.includes("이번") || !enemyText.includes("형")) throw new Error("적 역할/의도 표시 실패");
-const combatOverflowItems = await page.locator(".combat-forecast, .disruption-control, .enemy-card, .intent-card, .intent-node, .monster-portrait, .play-card, .card-art").evaluateAll((elements) => elements
+const combatOverflowItems = await page.locator(".combat-forecast, .combat-status-card, .status-card-copy, .enemy-status-chip, .disruption-control, .enemy-card, .intent-card, .intent-node, .monster-portrait, .play-card, .card-art").evaluateAll((elements) => elements
   .filter((element) => element.scrollWidth > element.clientWidth + 2 || element.scrollHeight > element.clientHeight + 2)
   .map((element) => element.className));
 if (combatOverflowItems.length > 0) {
   throw new Error(`전투 UI 넘침: ${combatOverflowItems.slice(0, 4).join(" | ")}`);
 }
 await page.screenshot({ path: "tmp/combat-ui-desktop.png", fullPage: true });
+await page.setViewportSize({ width: 390, height: 820 });
+await page.waitForTimeout(120);
+const combatStatusMobileColumns = await page.locator(".combat-status-board").evaluate((element) => getComputedStyle(element).gridTemplateColumns.split(" ").length);
+if (combatStatusMobileColumns !== 1) throw new Error("모바일 전투 상태판 1열 반응형 확인 실패");
+const combatStatusMobileOverflow = await page.locator(".combat-status-card, .status-card-copy, .enemy-status-chip").evaluateAll((elements) => elements
+  .filter((element) => element.scrollWidth > element.clientWidth + 2 || element.scrollHeight > element.clientHeight + 2)
+  .map((element) => element.className));
+if (combatStatusMobileOverflow.length > 0) {
+  throw new Error(`모바일 전투 상태판 넘침: ${combatStatusMobileOverflow.slice(0, 4).join(" | ")}`);
+}
+await page.screenshot({ path: "tmp/combat-status-mobile.png", fullPage: true });
+await page.setViewportSize({ width: 1366, height: 900 });
 
 await page.click('[data-action="cleanse-disruption"]');
 await page.waitForFunction(() => {

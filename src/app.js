@@ -909,8 +909,135 @@ function renderCombatForecast(state, index, forecast) {
       <div class="forecast-chip-list">
         ${combatStatusChips(state, index, forecast).map((chip) => `<span class="forecast-chip ${chip.tone}">${chip.label}</span>`).join("")}
       </div>
+      ${renderCombatStatusBoard(state, index, forecast)}
       ${renderBattleRules(state, index)}
     </section>
+  `;
+}
+
+function renderCombatStatusBoard(state, index, forecast) {
+  const disruptionCount = state.hand.filter((cardId) => ["curse", "temp"].includes(index.cards.get(cardId)?.type)).length;
+  const predictedReflect = state.status.reflectRatio > 0 && forecast.totalDamage > 0 ? Math.ceil(forecast.totalDamage * state.status.reflectRatio) : 0;
+  const cards = [
+    {
+      key: "hp",
+      tone: state.player.hp / state.player.maxHp <= 0.35 ? "danger" : "health",
+      icon: "체",
+      label: "체력",
+      value: `${state.player.hp}/${state.player.maxHp}`,
+      detail: forecast.totalDamage > 0 ? `예상 후 ${Math.max(0, state.player.hp - forecast.totalDamage)}` : "피해 없음",
+      fill: boundedPercent(state.player.hp, state.player.maxHp)
+    },
+    {
+      key: "shield",
+      tone: "guard",
+      icon: "막",
+      label: "보호막",
+      value: state.player.shield,
+      detail: forecast.blocked > 0 ? `${forecast.blocked} 차단 예정` : "차단 대기",
+      fill: boundedPercent(state.player.shield, Math.max(state.player.maxHp, 1))
+    },
+    {
+      key: "energy",
+      tone: "energy",
+      icon: "기",
+      label: "기운",
+      value: `${state.player.energy}/${state.player.maxEnergy}`,
+      detail: state.status.nextTurnEnergyPenalty > 0 ? `다음 턴 -${state.status.nextTurnEnergyPenalty}` : "사용 가능",
+      fill: boundedPercent(state.player.energy, state.player.maxEnergy)
+    },
+    {
+      key: "chain",
+      tone: "chain",
+      icon: "연",
+      label: "연쇄",
+      value: state.status.chain || 0,
+      detail: state.status.preserveNextChain ? "다음에도 유지" : "이번 턴 흐름",
+      fill: boundedPercent(state.status.chain || 0, 8)
+    },
+    {
+      key: "incoming",
+      tone: forecast.totalDamage > 0 ? "danger" : "guard",
+      icon: "예",
+      label: "예상 피해",
+      value: forecast.totalDamage,
+      detail: forecast.piercingDamage > 0 ? `관통 ${forecast.piercingDamage}` : "보호막 반영",
+      fill: boundedPercent(forecast.totalDamage, state.player.maxHp)
+    }
+  ];
+  if (state.status.playerMarked > 0) cards.push({
+    key: "mark",
+    tone: "danger",
+    icon: statusIcon("mark"),
+    label: "표식",
+    value: state.status.playerMarked,
+    detail: `받는 피해 +${markDamagePercent(state.status.playerMarked)}%`,
+    fill: boundedPercent(state.status.playerMarked, 4)
+  });
+  if (state.status.playerWeak > 0) cards.push({
+    key: "weak",
+    tone: "danger",
+    icon: statusIcon("weak"),
+    label: "약화",
+    value: state.status.playerWeak,
+    detail: "카드 피해 75%",
+    fill: boundedPercent(state.status.playerWeak, 3)
+  });
+  if (state.status.damageReduction > 0) cards.push({
+    key: "reduce",
+    tone: "guard",
+    icon: "감",
+    label: "피해 감소",
+    value: state.status.damageReduction,
+    detail: "이번 적 차례",
+    fill: boundedPercent(state.status.damageReduction, 12)
+  });
+  if (state.status.retainShield > 0) cards.push({
+    key: "retain",
+    tone: "guard",
+    icon: "유",
+    label: "보호막 유지",
+    value: state.status.retainShield,
+    detail: "턴 종료 후 보존",
+    fill: boundedPercent(state.status.retainShield, 12)
+  });
+  if (state.status.reflectRatio > 0) cards.push({
+    key: "reflect",
+    tone: "guard",
+    icon: "반",
+    label: "반사",
+    value: predictedReflect > 0 ? predictedReflect : `${Math.round(state.status.reflectRatio * 100)}%`,
+    detail: "받은 피해 되돌림",
+    fill: boundedPercent(state.status.reflectRatio * 100, 100)
+  });
+  if (disruptionCount > 0) cards.push({
+    key: "disruption",
+    tone: "danger",
+    icon: "방",
+    label: "방해",
+    value: disruptionCount,
+    detail: "정리 액션 가능",
+    fill: boundedPercent(disruptionCount, 5)
+  });
+  return `
+    <div class="combat-status-board" aria-label="전투 상태판">
+      <span class="combat-status-title">상태판</span>
+      ${cards.map(renderCombatStatusCard).join("")}
+    </div>
+  `;
+}
+
+function renderCombatStatusCard(card) {
+  return `
+    <article class="combat-status-card status-card-${card.key} status-tone-${card.tone}" style="--status-fill:${card.fill}%">
+      <span class="status-card-icon">${card.icon}</span>
+      <span class="status-card-copy">
+        <em>${card.label}</em>
+        <strong>${card.value}</strong>
+        <small>${card.detail}</small>
+      </span>
+      <i class="status-card-meter"><b></b></i>
+    </article>
   `;
 }
 
@@ -1031,7 +1158,13 @@ function renderEnemyStatus(enemy) {
   const entries = Object.entries(enemy.status || {}).filter(([, value]) => value > 0);
   if (entries.length === 0) return "";
   return `<div class="enemy-status">${entries.map(([key, value]) => `
-    <span class="status-${key}" title="${statusDetail(key, value)}">${statusLabel(key)} ${value}${statusInlineDetail(key, value)}</span>
+    <span class="enemy-status-chip status-${key}" title="${statusDetail(key, value)}">
+      <b>${statusIcon(key)}</b>
+      <span>
+        <em>${statusLabel(key)} ${value}</em>
+        <small>${statusShortDetail(key, value)}</small>
+      </span>
+    </span>
   `).join("")}</div>`;
 }
 
@@ -1165,10 +1298,14 @@ function statusLabel(status) {
   return ({ mark: "표식", weak: "약화" })[status] || status;
 }
 
-function statusInlineDetail(status, value) {
-  if (status === "mark") return ` · 피해 +${markDamagePercent(value)}%`;
-  if (status === "weak") return " · 피해 감소";
-  return "";
+function statusIcon(status) {
+  return ({ mark: "표", weak: "약" })[status] || "상";
+}
+
+function statusShortDetail(status, value) {
+  if (status === "mark") return `피해 +${markDamagePercent(value)}%`;
+  if (status === "weak") return "주는 피해 감소";
+  return statusDetail(status, value);
 }
 
 function statusDetail(status, value) {
@@ -1179,6 +1316,10 @@ function statusDetail(status, value) {
 
 function markDamagePercent(value) {
   return Math.round(Math.min(0.6, Math.max(0, value || 0) * 0.15) * 100);
+}
+
+function boundedPercent(value, total) {
+  return Math.max(0, Math.min(100, Math.round(((value || 0) / Math.max(1, total || 1)) * 100)));
 }
 
 function renderRunResult(state) {

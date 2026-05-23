@@ -1591,6 +1591,139 @@ h1 {
   color: #6555a0;
 }
 
+.combat-status-board {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(148px, 1fr));
+  gap: 8px;
+}
+
+.combat-status-title {
+  grid-column: 1 / -1;
+  color: #686c88;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.combat-status-card {
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr);
+  gap: 8px;
+  align-items: center;
+  min-height: 82px;
+  padding: 9px;
+  border: 2px solid rgba(76, 79, 112, 0.1);
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.64);
+}
+
+.status-card-icon {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  border-radius: 12px;
+  background: #edf8ff;
+  color: #4f6880;
+  font-weight: 900;
+}
+
+.status-card-copy {
+  display: grid;
+  min-width: 0;
+  gap: 1px;
+}
+
+.status-card-copy em,
+.status-card-copy strong,
+.status-card-copy small {
+  display: block;
+  overflow-wrap: anywhere;
+}
+
+.status-card-copy em {
+  color: #686c88;
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 900;
+}
+
+.status-card-copy strong {
+  color: #383a56;
+  font-size: 18px;
+  line-height: 1.05;
+}
+
+.status-card-copy small {
+  color: #5f6680;
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.status-card-meter {
+  grid-column: 1 / -1;
+  display: block;
+  height: 6px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(124, 204, 247, 0.18);
+}
+
+.status-card-meter b {
+  display: block;
+  width: var(--status-fill, 0%);
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #7cccf7, #67d9a5);
+}
+
+.status-tone-health .status-card-icon,
+.status-tone-health .status-card-meter b {
+  background: #67d9a5;
+  color: #ffffff;
+}
+
+.status-tone-guard {
+  background: #f2fff8;
+}
+
+.status-tone-guard .status-card-icon,
+.status-tone-guard .status-card-meter b {
+  background: #67d9a5;
+  color: #ffffff;
+}
+
+.status-tone-energy {
+  background: #f2fbff;
+}
+
+.status-tone-energy .status-card-icon,
+.status-tone-energy .status-card-meter b {
+  background: #7cccf7;
+  color: #ffffff;
+}
+
+.status-tone-chain {
+  background: #faf7ff;
+}
+
+.status-tone-chain .status-card-icon,
+.status-tone-chain .status-card-meter b {
+  background: #a99cff;
+  color: #ffffff;
+}
+
+.status-tone-danger {
+  background: #fff5f7;
+}
+
+.status-tone-danger .status-card-icon,
+.status-tone-danger .status-card-meter b {
+  background: #ff8ea2;
+  color: #ffffff;
+}
+
 .battle-rule-list {
   display: flex;
   flex-wrap: wrap;
@@ -1998,27 +2131,57 @@ h1 {
 }
 
 .enemy-status {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(132px, 1fr));
+  gap: 6px;
 }
 
-.enemy-status span {
-  padding: 4px 7px;
-  border-radius: 999px;
+.enemy-status-chip {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+  gap: 7px;
+  align-items: center;
+  min-height: 46px;
+  padding: 7px;
+  border-radius: 8px;
   background: #fff2c6;
   color: #6f5a1f;
+  font-weight: 900;
+}
+
+.enemy-status-chip b {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.72);
   font-size: 12px;
-  font-weight: 800;
+}
+
+.enemy-status-chip span,
+.enemy-status-chip em,
+.enemy-status-chip small {
+  display: block;
   overflow-wrap: anywhere;
 }
 
-.enemy-status .status-mark {
+.enemy-status-chip em {
+  font-size: 12px;
+  font-style: normal;
+}
+
+.enemy-status-chip small {
+  font-size: 11px;
+  line-height: 1.25;
+}
+
+.enemy-status-chip.status-mark {
   background: #ffe1e7;
   color: #a33c50;
 }
 
-.enemy-status .status-weak {
+.enemy-status-chip.status-weak {
   background: #f2edff;
   color: #6555a0;
 }
@@ -3882,6 +4045,10 @@ h1 {
 
   .forecast-main {
     display: grid;
+  }
+
+  .combat-status-board {
+    grid-template-columns: 1fr;
   }
 
   .forecast-meter {
