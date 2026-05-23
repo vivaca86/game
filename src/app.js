@@ -1844,6 +1844,7 @@ function renderSocketCard(state, index, cardId) {
   const canOpenSocket = capacity < card.sockets.max && ((state.status.socketBonus || 0) > 0 || (state.status.gemWorkshopCharges || 0) > 0);
   const currentCost = cardCost(card, state, index);
   const upgraded = state.upgradedCards.includes(card.id);
+  const growthItems = socketGrowthItems(card, currentCost, upgraded, capacity, equippedGems.length, validGems.length);
   return `
     <article class="socket-card socket-card-${card.type}" style="--card-accent:${accentFor(card.color)}">
       <div class="socket-card-preview">
@@ -1857,6 +1858,14 @@ function renderSocketCard(state, index, cardId) {
           <small>기본 비용 ${card.cost} · 현재 비용 ${currentCost} · 소켓 ${capacity}/${card.sockets.max}</small>
           <p>${upgraded ? card.upgrade?.text || card.text : card.text}</p>
         </div>
+      </div>
+      <div class="socket-growth-row" aria-label="${card.name} 성장 상태">
+        ${growthItems.map((item) => `
+          <span class="socket-growth-chip growth-${item.tone}">
+            <b>${item.label}</b>
+            <em>${item.value}</em>
+          </span>
+        `).join("")}
       </div>
       <div class="socket-row" aria-label="${card.name} 소켓">
         ${sockets.map((instanceId, slotIndex) => {
@@ -1885,6 +1894,7 @@ function renderSocketCard(state, index, cardId) {
               <span class="gem-icon ${gemVisualClass(gem)}"></span>
               <strong>${isFull ? "교체" : "장착"} · ${gem.name}</strong>
               <small>${gemEffectSummary(gem)}</small>
+              ${renderGemComparisonList(gem, card, state, index, currentCost)}
             </button>
           `;
         }).join("")}
@@ -1892,6 +1902,47 @@ function renderSocketCard(state, index, cardId) {
       </div>
     </article>
   `;
+}
+
+function socketGrowthItems(card, currentCost, upgraded, capacity, equippedCount, validGemCount) {
+  return [
+    { tone: upgraded ? "power" : "note", label: "강화", value: upgraded ? "완료" : "기본" },
+    { tone: currentCost < card.cost ? "flow" : "note", label: "비용", value: `${card.cost}→${currentCost}` },
+    { tone: equippedCount >= capacity ? "full" : "socket", label: "소켓", value: `${equippedCount}/${capacity}` },
+    { tone: validGemCount > 0 ? "gem" : "note", label: "후보", value: `${validGemCount}개` }
+  ];
+}
+
+function renderGemComparisonList(gem, card, state, index, currentCost) {
+  const items = gemComparisonItems(gem, card, state, index, currentCost);
+  if (items.length === 0) return "";
+  return `
+    <span class="gem-comparison-list">
+      ${items.slice(0, 3).map((item) => `
+        <span class="gem-comparison-chip compare-${item.tone}">
+          <b>${item.label}</b>
+          <em>${item.value}</em>
+        </span>
+      `).join("")}
+    </span>
+  `;
+}
+
+function gemComparisonItems(gem, card, state, index, currentCost) {
+  const effect = gem.effects?.[0];
+  const socketTypes = (gem.socketTypes || []).map((type) => gemTypeLabels[type] || type).join("/");
+  const items = socketTypes ? [{ tone: "socket", label: "소켓", value: socketTypes }] : [];
+  if (!effect) return items;
+  if (effect.op === "modify_damage_percent") items.push({ tone: "damage", label: "피해", value: `+${effect.amount}%` });
+  if (effect.op === "modify_shield_percent") items.push({ tone: "guard", label: "보호막", value: `+${effect.amount}%` });
+  if (effect.op === "modify_cost") items.push({ tone: "flow", label: "비용", value: `${currentCost}→${Math.max(0, currentCost + effect.amount)}` });
+  if (effect.op === "heal_on_play") items.push({ tone: "heal", label: "회복", value: `${effect.amount}` });
+  if (effect.op === "apply_mark_on_play") items.push({ tone: "status", label: "표식", value: `${effect.amount}` });
+  if (effect.op === "echo_basic_effect") items.push({ tone: "flow", label: "메아리", value: `${Math.round(effect.ratio * 100)}%` });
+  if (effect.op === "splash_damage") items.push({ tone: "damage", label: "주변", value: `${Math.round(effect.ratio * 100)}%` });
+  if (effect.op === "preserve_chain") items.push({ tone: "flow", label: "연쇄", value: "유지" });
+  if (effect.op === "bridge_next_color_bonus") items.push({ tone: "flow", label: "다음 색", value: "보너스" });
+  return items;
 }
 
 function renderGemCard(index, instance) {

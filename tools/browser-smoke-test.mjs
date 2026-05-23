@@ -326,6 +326,20 @@ await page.click('[data-action="debug-gem"]');
 await page.waitForSelector(".gem-card", { timeout: 10000 });
 await page.waitForSelector('.gem-card .gem-icon[class*="gem-rarity-"]', { timeout: 10000 });
 await page.waitForSelector(".gem-option", { timeout: 10000 });
+await page.waitForSelector(".socket-growth-row", { timeout: 10000 });
+await page.waitForSelector(".socket-growth-chip", { timeout: 10000 });
+await page.waitForSelector(".gem-comparison-chip", { timeout: 10000 });
+const socketGrowthText = await page.textContent(".socket-card");
+if (!socketGrowthText?.includes("강화") || !socketGrowthText.includes("소켓") || !socketGrowthText.includes("후보")) {
+  throw new Error("보석 작업대 카드 성장 상태 표시 실패");
+}
+const socketComparisonOverflow = await page.locator(".socket-card, .socket-growth-chip, .gem-option, .gem-comparison-chip").evaluateAll((elements) => elements
+  .filter((element) => element.scrollWidth > element.clientWidth + 2 || element.scrollHeight > element.clientHeight + 2)
+  .map((element) => element.className));
+if (socketComparisonOverflow.length > 0) {
+  throw new Error(`보석 장착 후보 비교 UI 넘침: ${socketComparisonOverflow.slice(0, 4).join(" | ")}`);
+}
+await page.locator(".socket-card").first().screenshot({ path: "tmp/socket-card-growth-desktop.png" });
 await page.locator('[data-action="equip-gem"]').first().click();
 await page.waitForSelector('[data-action="unequip-gem"]', { timeout: 10000 });
 await page.click('[data-action="save-run"]');
@@ -340,6 +354,19 @@ await page.waitForSelector(".arcana-chip .item-icon-arcana", { timeout: 10000 })
 await page.waitForSelector(".socket-card-preview", { timeout: 10000 });
 await page.waitForSelector(".equipped-effect-list", { timeout: 10000 });
 await page.waitForSelector(".socket-card .card-art-socket", { timeout: 10000 });
+await page.waitForSelector(".socket-growth-chip", { timeout: 10000 });
+await page.setViewportSize({ width: 390, height: 820 });
+await page.waitForTimeout(120);
+const socketGrowthMobileColumns = await page.locator(".socket-growth-row").first().evaluate((element) => getComputedStyle(element).gridTemplateColumns.split(" ").length);
+if (socketGrowthMobileColumns !== 2) throw new Error("모바일 카드 성장 상태 2열 반응형 확인 실패");
+const socketGrowthMobileOverflow = await page.locator(".socket-card, .socket-growth-chip, .socket-dot, .effect-chip").evaluateAll((elements) => elements
+  .filter((element) => element.scrollWidth > element.clientWidth + 2 || element.scrollHeight > element.clientHeight + 2)
+  .map((element) => element.className));
+if (socketGrowthMobileOverflow.length > 0) {
+  throw new Error(`모바일 카드 성장 상태 UI 넘침: ${socketGrowthMobileOverflow.slice(0, 4).join(" | ")}`);
+}
+await page.locator(".socket-card").first().screenshot({ path: "tmp/socket-card-growth-mobile.png" });
+await page.setViewportSize({ width: 1366, height: 900 });
 
 const runText = await page.textContent("#runRoot");
 if (!runText?.includes("체력") || !runText.includes("기운") || !runText.includes("현재 빌드") || !runText.includes("보석 작업대")) {
