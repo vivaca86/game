@@ -9,13 +9,15 @@ import {
   equipGemToCard,
   equippedGemInstancesForCard,
   grantGem,
+  modifiedDamageAmount,
+  modifiedShieldAmount,
   normalizeCardSockets,
   openSocketForCard,
   socketCapacity,
   unequipGem,
   unequippedGemInstances
 } from "./core/gems.js";
-import { adjustedRewardCost, ensureModifierState, grantArcana, grantRelic } from "./core/run-modifiers.js";
+import { adjustedRewardCost, ensureModifierState, grantArcana, grantRelic, modifiedCharacterDamageAmount } from "./core/run-modifiers.js";
 import { bossPhaseBlock } from "./core/balance.js";
 import { clearSavedRun, hasSavedRun, loadSavedRun, saveRun } from "./core/persistence.js";
 import {
@@ -886,9 +888,10 @@ function renderCardPreviewChip(chip) {
 }
 
 function cardEffectPreviewChips(card, state, index) {
+  const preview = createCardPreviewState(state);
   const chips = [];
   for (const effect of card.effects || []) {
-    const chip = cardEffectPreviewChip(effect, card, state, index);
+    const chip = cardEffectPreviewChip(effect, card, state, index, preview);
     if (Array.isArray(chip)) chips.push(...chip);
     else if (chip) chips.push(chip);
   }
@@ -898,33 +901,46 @@ function cardEffectPreviewChips(card, state, index) {
   return chips.slice(0, 5);
 }
 
-function cardEffectPreviewChip(effect, card, state, index) {
-  const front = state.enemies[0];
-  const enemyCount = state.enemies.length;
-  if (effect.op === "damage_front") return damagePreviewChip("피", estimateCardDamage(effect.amount, state, front), "피해");
-  if (effect.op === "damage_all") return damagePreviewChip("전", estimateCardDamage(effect.amount, state, front) * enemyCount, `전체 ${enemyCount}`);
-  if (effect.op === "damage_random") return damagePreviewChip("무", estimateCardDamage(effect.amount, state, front) * (effect.hits || 1), `무작위 x${effect.hits || 1}`);
+function cardEffectPreviewChip(effect, card, state, index, preview) {
+  const front = previewFrontEnemy(preview);
+  const aliveEnemies = preview.enemies.filter((enemy) => enemy.hp > 0);
+  if (effect.op === "damage_front") return previewDamageEffect("피", "피해", effect.amount, front, card, preview, index);
+  if (effect.op === "damage_all") {
+    const result = aliveEnemies.reduce((sum, enemy) => {
+      const next = previewDamageEnemy(effect.amount, enemy, card, preview, index);
+      return { damage: sum.damage + next.damage, blocked: sum.blocked + next.blocked, killed: sum.killed || next.killed };
+    }, { damage: 0, blocked: 0, killed: false });
+    return damagePreviewChip("전", result, `전체 ${aliveEnemies.length}`);
+  }
+  if (effect.op === "damage_random") {
+    const amount = previewModifiedDamage(effect.amount, card, preview, index);
+    return { tone: "damage", icon: "무", label: `무작위 ${amount}x${effect.hits || 1}` };
+  }
   if (effect.op === "damage_bonus_if_cards_played_at_least") {
     const ready = state.metrics.cardsPlayedThisTurn >= effect.threshold;
-    return ready ? damagePreviewChip("추", estimateCardDamage(effect.amount, state, front), "조건 피해") : { tone: "note", icon: "조", label: `${effect.threshold}장 필요` };
+    return ready ? previewDamageEffect("추", "조건 피해", effect.amount, front, card, preview, index) : { tone: "note", icon: "조", label: `${effect.threshold}장 필요` };
   }
   if (effect.op === "damage_bonus_if_chain_at_least") {
     const ready = (state.status.chain || 0) >= effect.threshold;
-    return ready ? damagePreviewChip("연", estimateCardDamage(effect.amount, state, front), "연쇄 피해") : { tone: "note", icon: "연", label: `연쇄 ${effect.threshold} 필요` };
+    return ready ? previewDamageEffect("연", "연쇄 피해", effect.amount, front, card, preview, index) : { tone: "note", icon: "연", label: `연쇄 ${effect.threshold} 필요` };
   }
   if (effect.op === "damage_bonus_if_hand_at_most") {
     const ready = state.hand.length <= effect.threshold;
-    return ready ? damagePreviewChip("손", estimateCardDamage(effect.amount, state, front), "손패 보너스") : { tone: "note", icon: "손", label: `${effect.threshold}장 이하` };
+    return ready ? previewDamageEffect("손", "손패 보너스", effect.amount, front, card, preview, index) : { tone: "note", icon: "손", label: `${effect.threshold}장 이하` };
   }
   if (effect.op === "damage_bonus_vs_marked") {
-    const markedCount = state.enemies.filter((enemy) => enemy.status?.mark > 0).length;
-    return markedCount > 0 ? damagePreviewChip("표", effect.amount * markedCount, `표식 ${markedCount}`) : { tone: "note", icon: "표", label: "표식 대상 필요" };
+    const marked = aliveEnemies.filter((enemy) => enemy.status?.mark > 0);
+    const result = marked.reduce((sum, enemy) => {
+      const next = previewDamageEnemy(effect.amount, enemy, card, preview, index);
+      return { damage: sum.damage + next.damage, blocked: sum.blocked + next.blocked, killed: sum.killed || next.killed };
+    }, { damage: 0, blocked: 0, killed: false });
+    return marked.length > 0 ? damagePreviewChip("표", result, `표식 ${marked.length}`) : { tone: "note", icon: "표", label: "표식 대상 필요" };
   }
-  if (effect.op === "gain_shield") return { tone: "guard", icon: "막", label: `보호막 +${effect.amount}` };
+  if (effect.op === "gain_shield") return { tone: "guard", icon: "막", label: `보호막 +${modifiedShieldAmount(card, state, index, effect.amount)}` };
   if (effect.op === "retain_shield_next_turn") return { tone: "guard", icon: "유", label: `유지 ${effect.amount}` };
   if (effect.op === "reduce_next_attack") return { tone: "guard", icon: "감", label: `피해감소 ${effect.amount}` };
   if (effect.op === "draw") return { tone: "flow", icon: "뽑", label: `드로우 ${effect.amount}` };
-  if (effect.op === "draw_if_kill") return { tone: "flow", icon: "처", label: `처치 시 ${effect.amount}` };
+  if (effect.op === "draw_if_kill") return { tone: preview.killedThisPlay ? "flow" : "note", icon: "처", label: preview.killedThisPlay ? `처치 드로우 +${effect.amount}` : `처치 시 +${effect.amount}` };
   if (effect.op === "gain_energy") return { tone: "flow", icon: "기", label: `기운 +${effect.amount}` };
   if (effect.op === "lose_energy") return { tone: "danger", icon: "기", label: `기운 -${effect.amount}` };
   if (effect.op === "discount_next_card") return { tone: "flow", icon: "할", label: `다음 비용 -${effect.amount}` };
@@ -948,15 +964,52 @@ function cardEffectPreviewChip(effect, card, state, index) {
   return { tone: "note", icon: "효", label: effect.op };
 }
 
-function damagePreviewChip(icon, value, label) {
-  return { tone: "damage", icon, label: `${label} ${value}` };
+function previewDamageEffect(icon, label, amount, enemy, card, preview, index) {
+  return damagePreviewChip(icon, previewDamageEnemy(amount, enemy, card, preview, index), label);
 }
 
-function estimateCardDamage(amount, state, enemy) {
-  if (!amount || !enemy) return 0;
-  const weakAmount = state.status.playerWeak > 0 ? Math.max(1, Math.ceil(amount * 0.75)) : amount;
-  const markBonus = enemy.status?.mark ? Math.ceil(weakAmount * Math.min(0.6, enemy.status.mark * 0.15)) : 0;
-  return Math.max(0, weakAmount + markBonus - (enemy.block || 0));
+function damagePreviewChip(icon, result, label) {
+  const blocked = result.blocked > 0 ? ` · 차단 ${result.blocked}` : "";
+  const killed = result.killed ? " · 처치 예상" : "";
+  return { tone: "damage", icon, label: `${label} ${result.damage}${blocked}${killed}` };
+}
+
+function createCardPreviewState(state) {
+  return {
+    ...state,
+    player: { ...state.player },
+    status: { ...state.status },
+    metrics: { ...state.metrics },
+    log: [],
+    enemies: state.enemies.map((enemy) => ({
+      ...enemy,
+      status: { ...(enemy.status || {}) }
+    }))
+  };
+}
+
+function previewFrontEnemy(preview) {
+  return preview.enemies.find((enemy) => enemy.hp > 0) || null;
+}
+
+function previewDamageEnemy(amount, enemy, card, preview, index) {
+  if (!amount || !enemy || enemy.hp <= 0) return { damage: 0, blocked: 0, killed: false };
+  const finalAmount = previewModifiedDamage(amount, card, preview, index);
+  const markBonus = enemy.status?.mark ? Math.ceil(finalAmount * Math.min(0.6, enemy.status.mark * 0.15)) : 0;
+  let incoming = finalAmount + markBonus;
+  const blocked = Math.min(enemy.block || 0, incoming);
+  enemy.block = Math.max(0, (enemy.block || 0) - blocked);
+  incoming -= blocked;
+  enemy.hp = Math.max(0, enemy.hp - incoming);
+  const killed = enemy.hp <= 0;
+  if (killed) preview.killedThisPlay = true;
+  return { damage: incoming, blocked, killed };
+}
+
+function previewModifiedDamage(amount, card, preview, index) {
+  const characterAmount = modifiedCharacterDamageAmount(card, preview, index, amount);
+  const gemAmount = modifiedDamageAmount(card, preview, index, characterAmount);
+  return preview.status.playerWeak > 0 ? Math.max(1, Math.ceil(gemAmount * 0.75)) : gemAmount;
 }
 
 function renderDisruptionControl(state, index) {
