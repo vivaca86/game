@@ -95,8 +95,8 @@ await page.evaluate(() => {
   const raw = localStorage.getItem("sunny_maze_run_v1");
   if (!raw) throw new Error("저장된 탐험 스냅샷 없음");
   const snapshot = JSON.parse(raw);
-  const hand = Array.isArray(snapshot.hand) ? snapshot.hand.filter((cardId) => cardId !== "card_temp_dust") : [];
-  snapshot.hand = ["card_temp_dust", ...hand];
+  const hand = Array.isArray(snapshot.hand) ? snapshot.hand.filter((cardId) => !["card_temp_dust", "card_sunbean_punch"].includes(cardId)) : [];
+  snapshot.hand = ["card_temp_dust", "card_sunbean_punch", ...hand].slice(0, 5);
   snapshot.player = { ...(snapshot.player || {}), energy: Math.max(snapshot.player?.energy || 0, 3) };
   snapshot.status = { ...(snapshot.status || {}), disruptionsCleared: 0 };
   localStorage.setItem("sunny_maze_run_v1", JSON.stringify(snapshot));
@@ -154,10 +154,41 @@ await page.waitForFunction(() => {
   const clearedChip = [...document.querySelectorAll(".forecast-chip")].some((element) => element.textContent?.includes("정리 1"));
   return controlGone && clearedChip;
 }, null, { timeout: 10000 });
+await page.waitForSelector(".action-feedback-cleanse", { timeout: 10000 });
+const cleanseFeedbackText = await page.textContent(".action-feedback-cleanse");
+if (!cleanseFeedbackText?.includes("방해 정리") || !cleanseFeedbackText.includes("먼지 카드")) {
+  throw new Error("방해 정리 액션 피드백 표시 실패");
+}
 
 const enabledCards = await page.locator(".play-card:not(:disabled)").count();
 if (enabledCards === 0) throw new Error("사용 가능한 카드가 없습니다.");
 await page.locator(".play-card:not(:disabled)").first().click();
+await page.waitForSelector(".action-feedback-card", { timeout: 10000 });
+await page.waitForSelector(".action-feedback-card .feedback-stat-damage", { timeout: 10000 });
+const actionFeedbackText = await page.textContent(".action-feedback-card");
+if (!actionFeedbackText?.includes("카드 사용") || !actionFeedbackText.includes("햇콩 펀치")) {
+  throw new Error("카드 사용 액션 피드백 표시 실패");
+}
+const enemyHitCount = await page.locator(".enemy-hit").count();
+const remainingEnemyCount = await page.locator(".enemy-card").count();
+if (remainingEnemyCount > 0 && enemyHitCount === 0) throw new Error("피격 몬스터 강조 표시 실패");
+const actionFeedbackOverflowItems = await page.locator(".action-feedback, .action-feedback-copy, .feedback-stat, .enemy-hit").evaluateAll((elements) => elements
+  .filter((element) => element.scrollWidth > element.clientWidth + 2 || element.scrollHeight > element.clientHeight + 2)
+  .map((element) => element.className));
+if (actionFeedbackOverflowItems.length > 0) {
+  throw new Error(`액션 피드백 UI 넘침: ${actionFeedbackOverflowItems.slice(0, 4).join(" | ")}`);
+}
+await page.screenshot({ path: "tmp/action-feedback-desktop.png", fullPage: true });
+await page.setViewportSize({ width: 390, height: 820 });
+await page.waitForTimeout(120);
+const actionFeedbackMobileOverflow = await page.locator(".action-feedback, .action-feedback-copy, .feedback-stat").evaluateAll((elements) => elements
+  .filter((element) => element.scrollWidth > element.clientWidth + 2 || element.scrollHeight > element.clientHeight + 2)
+  .map((element) => element.className));
+if (actionFeedbackMobileOverflow.length > 0) {
+  throw new Error(`모바일 액션 피드백 UI 넘침: ${actionFeedbackMobileOverflow.slice(0, 4).join(" | ")}`);
+}
+await page.screenshot({ path: "tmp/action-feedback-mobile.png", fullPage: true });
+await page.setViewportSize({ width: 1366, height: 900 });
 await page.click('[data-action="debug-relic"]');
 await page.waitForSelector(".relic-chip", { timeout: 10000 });
 await page.waitForSelector(".relic-chip .item-icon-relic", { timeout: 10000 });

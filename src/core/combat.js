@@ -3,6 +3,7 @@ import { applyCardEffects, cardCost } from "./card-effects.js";
 import { addLog, drawCards } from "./game-state.js";
 import { openReward } from "./rewards.js";
 import { ensureGemState } from "./gems.js";
+import { setActionFeedback } from "./action-feedback.js";
 import { bossPhaseBlock, enemyAttackBonus, enemyBlockBonus, enemyIntentAmount, enemyMaxHp } from "./balance.js";
 import {
   afterCardPlayedModifiers,
@@ -66,7 +67,24 @@ export function playCard(state, index, handIndex) {
   state.metrics.cardsPlayedThisCombat += 1;
   state.status.chain = (state.status.chain || 0) + 1;
   state.metrics.maxChain = Math.max(state.metrics.maxChain, state.status.chain);
-  const context = { cardId, cost, killedThisPlay: false, exhaustSelf: false };
+  const context = {
+    cardId,
+    cost,
+    killedThisPlay: false,
+    exhaustSelf: false,
+    feedback: {
+      damage: 0,
+      blocked: 0,
+      shield: 0,
+      draw: 0,
+      energy: 0,
+      healed: 0,
+      marks: 0,
+      defeated: 0,
+      targetInstanceIds: [],
+      targetNames: []
+    }
+  };
   const enemiesBefore = state.enemies.length;
   applyCardEffects({ card, state, index, context });
   context.killedThisPlay = context.killedThisPlay || state.enemies.length < enemiesBefore;
@@ -86,6 +104,7 @@ export function playCard(state, index, handIndex) {
   else state.discardPile.push(cardId);
 
   state.status.previousCard = { id: card.id, cost };
+  setCardActionFeedback(state, card, context);
   checkAchievements(state, index, "reach_chain");
   if (state.enemies.length === 0) completeCombat(state, index);
   return true;
@@ -111,6 +130,15 @@ export function cleanseDisruption(state, index) {
   state.hand.splice(handIndex, 1);
   state.exhaustPile.push(cardId);
   state.status.disruptionsCleared = (state.status.disruptionsCleared || 0) + 1;
+  setActionFeedback(state, {
+    kind: "cleanse",
+    tone: "trick",
+    icon: "정",
+    title: "방해 정리",
+    subject: card.name,
+    detail: `기운 ${cost}을 써서 이번 전투에서 제외했습니다.`,
+    metrics: [{ label: "정리", value: state.status.disruptionsCleared }]
+  });
   addLog(state, `방해 정리: ${card.name}`);
   return true;
 }
@@ -137,6 +165,7 @@ export function endTurn(state, index) {
   }
   state.status.reflectRatio = 0;
   addLog(state, damage > 0 ? `피해 ${damage} 받음` : "공격을 막았습니다.");
+  setEnemyTurnFeedback(state, { damage, blocked, piercing: incoming.piercingDamage, markBonus });
 
   discardHandWithModifiers(state, index);
   state.turn += 1;
@@ -160,6 +189,51 @@ export function endTurn(state, index) {
     completeCombat(state, index);
   }
   return true;
+}
+
+function setCardActionFeedback(state, card, context) {
+  const feedback = context.feedback || {};
+  const metrics = [
+    feedback.damage > 0 ? { label: "피해", value: feedback.damage } : null,
+    feedback.blocked > 0 ? { label: "차단", value: feedback.blocked } : null,
+    feedback.shield > 0 ? { label: "보호막", value: feedback.shield } : null,
+    feedback.draw > 0 ? { label: "드로우", value: feedback.draw } : null,
+    feedback.energy > 0 ? { label: "기운", value: `+${feedback.energy}` } : null,
+    feedback.healed > 0 ? { label: "회복", value: feedback.healed } : null,
+    feedback.marks > 0 ? { label: "표식", value: feedback.marks } : null,
+    feedback.defeated > 0 ? { label: "처치", value: feedback.defeated } : null
+  ].filter(Boolean);
+  const targetNames = [...new Set(feedback.targetNames || [])].slice(0, 2);
+  setActionFeedback(state, {
+    kind: "card",
+    tone: card.type,
+    icon: cardFeedbackIcon(card.type),
+    title: "카드 사용",
+    subject: card.name,
+    detail: targetNames.length > 0 ? `${targetNames.join(", ")}에게 효과 적용` : `${card.type === "guard" ? "방어 흐름" : "카드 효과"} 발동`,
+    metrics,
+    targetInstanceIds: feedback.targetInstanceIds || []
+  });
+}
+
+function setEnemyTurnFeedback(state, { damage, blocked, piercing, markBonus }) {
+  setActionFeedback(state, {
+    kind: "enemy",
+    tone: damage > 0 ? "danger" : "guard",
+    icon: damage > 0 ? "피" : "막",
+    title: "적 차례",
+    subject: damage > 0 ? `피해 ${damage}` : "공격 방어",
+    detail: damage > 0 ? "적 의도를 처리했습니다." : "보호막과 효과로 피해를 막았습니다.",
+    metrics: [
+      { label: "차단", value: blocked },
+      piercing > 0 ? { label: "관통", value: piercing } : null,
+      markBonus > 0 ? { label: "표식", value: `+${markBonus}` } : null
+    ].filter(Boolean)
+  });
+}
+
+function cardFeedbackIcon(type) {
+  return ({ attack: "공", guard: "방", skill: "기", power: "지", temp: "방", curse: "저" })[type] || "카";
 }
 
 export function nextIntent(enemy, turn) {

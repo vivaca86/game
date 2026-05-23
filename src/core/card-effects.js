@@ -52,7 +52,7 @@ export function applyEffect({ effect, card, state, index, context }) {
       state.enemies.filter((enemy) => enemy.status?.mark > 0).forEach((enemy) => damageEnemy(enemy, effect.amount, state, index, card, context));
       break;
     case "gain_shield":
-      gainShield(state, index, card, effect.amount);
+      gainShield(state, index, card, effect.amount, context);
       break;
     case "retain_shield_next_turn":
       state.status.retainShield = Math.max(state.status.retainShield || 0, effect.amount);
@@ -62,12 +62,20 @@ export function applyEffect({ effect, card, state, index, context }) {
       break;
     case "draw":
       drawCards(state, effect.amount);
+      addFeedbackValue(context, "draw", effect.amount);
       break;
     case "draw_if_kill":
-      if (context.killedThisPlay) drawCards(state, effect.amount);
+      if (context.killedThisPlay) {
+        drawCards(state, effect.amount);
+        addFeedbackValue(context, "draw", effect.amount);
+      }
       break;
     case "gain_energy":
-      state.player.energy = Math.min(state.player.maxEnergy + 3, state.player.energy + effect.amount);
+      {
+        const before = state.player.energy;
+        state.player.energy = Math.min(state.player.maxEnergy + 3, state.player.energy + effect.amount);
+        addFeedbackValue(context, "energy", state.player.energy - before);
+      }
       break;
     case "lose_energy":
       state.player.energy = Math.max(0, state.player.energy - effect.amount);
@@ -80,9 +88,10 @@ export function applyEffect({ effect, card, state, index, context }) {
       break;
     case "apply_mark":
       applyStatus(frontEnemy(state), "mark", effect.amount);
+      addFeedbackValue(context, "marks", effect.amount);
       break;
     case "heal_if_hp_ratio_below":
-      if (state.player.hp / state.player.maxHp <= effect.ratio) healPlayer(state, effect.amount, index);
+      if (state.player.hp / state.player.maxHp <= effect.ratio) addFeedbackValue(context, "healed", healPlayer(state, effect.amount, index));
       break;
     case "enable_reflect_damage":
       state.status.reflectRatio = Math.max(state.status.reflectRatio || 0, effect.ratio);
@@ -119,17 +128,19 @@ export function healPlayer(state, amount, index = null) {
   const before = state.player.hp;
   state.player.hp = Math.min(state.player.maxHp, state.player.hp + amount);
   const healed = state.player.hp - before;
-  if (healed <= 0) return;
+  if (healed <= 0) return 0;
   addLog(state, `체력 ${healed} 회복`);
   afterPlayerHealed(state, index, healed);
+  return healed;
 }
 
 function applyGemAfterCardPlayed({ card, state, index, context }) {
   for (const effect of gemEffectsForCard(state, index, card.id, "heal_on_play")) {
-    healPlayer(state, effect.amount, index);
+    addFeedbackValue(context, "healed", healPlayer(state, effect.amount, index));
   }
   for (const effect of gemEffectsForCard(state, index, card.id, "apply_mark_on_play")) {
     applyStatus(frontEnemy(state), "mark", effect.amount);
+    addFeedbackValue(context, "marks", effect.amount);
   }
   for (const effect of gemEffectsForCard(state, index, card.id, "bridge_next_color_bonus")) {
     state.status.nextCardDiscount = Math.max(state.status.nextCardDiscount || 0, effect.amount);
@@ -166,9 +177,10 @@ function frontEnemy(state) {
   return state.enemies[0] || null;
 }
 
-function gainShield(state, index, card, amount) {
+function gainShield(state, index, card, amount, context) {
   const finalAmount = modifiedShieldAmount(card, state, index, amount);
   state.player.shield += finalAmount;
+  addFeedbackValue(context, "shield", finalAmount);
   addLog(state, `보호막 ${finalAmount} 획득`);
 }
 
@@ -184,6 +196,7 @@ function damageEnemy(enemy, amount, state, index, card, context) {
   enemy.block = Math.max(0, (enemy.block || 0) - blocked);
   incoming -= blocked;
   enemy.hp = Math.max(0, enemy.hp - incoming);
+  recordDamageFeedback(context, enemy, incoming, blocked);
   if (markBonus > 0 && incoming > 0) {
     context.markedEnemyInstanceIds = context.markedEnemyInstanceIds || [];
     if (!context.markedEnemyInstanceIds.includes(enemy.instanceId)) context.markedEnemyInstanceIds.push(enemy.instanceId);
@@ -191,6 +204,7 @@ function damageEnemy(enemy, amount, state, index, card, context) {
   addLog(state, `${card.name}: ${enemy.name}에게 피해 ${incoming}`);
   if (enemy.hp <= 0) {
     context.killedThisPlay = true;
+    addFeedbackValue(context, "defeated", 1);
     context.killedEnemyIds = context.killedEnemyIds || [];
     context.killedEnemyIds.push(enemy.id);
     context.killedEnemyRanks = context.killedEnemyRanks || [];
@@ -209,6 +223,22 @@ function damageEnemy(enemy, amount, state, index, card, context) {
         .forEach((target) => damageEnemy(target, splashAmount, state, index, card, { ...context, splashing: true }));
     }
   }
+}
+
+function addFeedbackValue(context, key, amount) {
+  if (!context?.feedback || !amount) return;
+  context.feedback[key] = (context.feedback[key] || 0) + amount;
+}
+
+function recordDamageFeedback(context, enemy, damage, blocked) {
+  if (!context?.feedback || !enemy) return;
+  addFeedbackValue(context, "damage", damage);
+  addFeedbackValue(context, "blocked", blocked);
+  if (damage <= 0 && blocked <= 0) return;
+  context.feedback.targetInstanceIds = context.feedback.targetInstanceIds || [];
+  context.feedback.targetNames = context.feedback.targetNames || [];
+  if (!context.feedback.targetInstanceIds.includes(enemy.instanceId)) context.feedback.targetInstanceIds.push(enemy.instanceId);
+  if (!context.feedback.targetNames.includes(enemy.name)) context.feedback.targetNames.push(enemy.name);
 }
 
 function applyStatus(enemy, status, amount) {

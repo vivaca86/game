@@ -533,6 +533,7 @@ function renderRun() {
         <button class="secondary-btn" data-action="save-run">저장</button>
         <button class="secondary-btn" data-action="clear-save">저장 삭제</button>
       </div>
+      ${renderActionFeedback(state)}
       ${renderStageRoute(state, stage, index)}
       ${renderPhase(state, index)}
       ${renderBuildPanel(state, index)}
@@ -541,6 +542,38 @@ function renderRun() {
     </section>
   `;
   bindRunActions();
+}
+
+function renderActionFeedback(state) {
+  const feedback = state.status.actionFeedback;
+  if (!feedback) return "";
+  return `
+    <section class="action-feedback action-feedback-${feedback.kind} feedback-tone-${feedback.tone}" data-feedback-id="${feedback.id}">
+      <span class="action-feedback-icon" aria-hidden="true">${escapeHtml(feedback.icon)}</span>
+      <div class="action-feedback-copy">
+        <span>${escapeHtml(feedback.title)}</span>
+        <strong>${escapeHtml(feedback.subject)}</strong>
+        ${feedback.detail ? `<p>${escapeHtml(feedback.detail)}</p>` : ""}
+      </div>
+      <div class="action-feedback-metrics">
+        ${(feedback.metrics || []).map((metric) => `
+          <span class="feedback-stat feedback-stat-${feedbackMetricClass(metric.label)}">
+            <em>${escapeHtml(metric.label)}</em>
+            <b>${escapeHtml(metric.value)}</b>
+          </span>
+        `).join("")}
+      </div>
+    </section>
+  `;
+}
+
+function feedbackMetricClass(label = "") {
+  if (label.includes("피해") || label.includes("처치")) return "damage";
+  if (label.includes("차단") || label.includes("보호막")) return "guard";
+  if (label.includes("회복")) return "heal";
+  if (label.includes("드로우") || label.includes("기운")) return "flow";
+  if (label.includes("별사탕") || label.includes("획득")) return "reward";
+  return "note";
 }
 
 function renderStageRoute(state, stage, index) {
@@ -708,8 +741,9 @@ function renderBattleRules(state, index) {
 function renderEnemyCard(enemy, state, index) {
   const intent = nextIntent(enemy, state.turn);
   const tone = intentTone(intent);
+  const hit = state.status.actionFeedback?.targetInstanceIds?.includes(enemy.instanceId);
   return `
-    <article class="enemy-card enemy-rank-${enemy.rank} intent-${tone}">
+    <article class="enemy-card enemy-rank-${enemy.rank} intent-${tone} ${hit ? "enemy-hit" : ""}">
       <div class="enemy-head">
         ${renderMonsterPortrait(enemy)}
         <div>
