@@ -16,6 +16,7 @@ import {
   unequippedGemInstances
 } from "./core/gems.js";
 import { adjustedRewardCost, ensureModifierState, grantArcana, grantRelic } from "./core/run-modifiers.js";
+import { bossPhaseBlock } from "./core/balance.js";
 import { clearSavedRun, hasSavedRun, loadSavedRun, saveRun } from "./core/persistence.js";
 import {
   applyProfileToRun,
@@ -483,7 +484,7 @@ function renderCombat(state, index) {
       ${renderCombatForecast(state, index, forecast)}
       ${renderDisruptionControl(state, index)}
       <section class="enemy-row">
-        ${state.enemies.map((enemy) => renderEnemyCard(enemy, state)).join("")}
+        ${state.enemies.map((enemy) => renderEnemyCard(enemy, state, index)).join("")}
       </section>
       <section class="hand-row">
         ${state.hand.map((cardId, handIndex) => {
@@ -566,15 +567,13 @@ function renderBattleRules(state, index) {
   `;
 }
 
-function renderEnemyCard(enemy, state) {
+function renderEnemyCard(enemy, state, index) {
   const intent = nextIntent(enemy, state.turn);
   const tone = intentTone(intent);
   return `
     <article class="enemy-card enemy-rank-${enemy.rank} intent-${tone}">
       <div class="enemy-head">
-        <span class="monster-portrait rank-${enemy.rank}">
-          <i>${enemyIcon(enemy)}</i>
-        </span>
+        ${renderMonsterPortrait(enemy)}
         <div>
           <strong>${enemy.name}</strong>
           <span>${enemyRankLabel(enemy.rank)} · ${enemy.role || "기본형"} · ${enemy.family || "미로"}</span>
@@ -585,6 +584,7 @@ function renderEnemyCard(enemy, state) {
         <span>체력 ${enemy.hp}/${enemy.maxHp}</span>
         <span>방어 ${enemy.block || 0}</span>
       </div>
+      ${renderBossPhasePanel(enemy, state, index)}
       <div class="intent-card intent-${tone}">
         <span class="intent-icon">${intentIcon(intent)}</span>
         <div>
@@ -595,6 +595,52 @@ function renderEnemyCard(enemy, state) {
       ${renderIntentTimeline(enemy, state.turn)}
       ${renderEnemyStatus(enemy)}
     </article>
+  `;
+}
+
+function renderMonsterPortrait(enemy) {
+  const familyClass = monsterFamilyClass(enemy.family);
+  const accent = monsterAccent(enemy);
+  const crown = enemy.rank === "boss" ? `<span class="monster-rank-crown" aria-hidden="true"><b></b></span>` : "";
+  const sparkle = enemy.rank === "elite" ? `<span class="monster-sparkle" aria-hidden="true"></span>` : "";
+  return `
+    <span class="monster-portrait rank-${enemy.rank} family-${familyClass}" style="${accent}" aria-hidden="true">
+      ${crown}
+      ${sparkle}
+      <span class="monster-ear ear-left"></span>
+      <span class="monster-ear ear-right"></span>
+      <span class="monster-face">
+        <span class="monster-eye eye-left"></span>
+        <span class="monster-eye eye-right"></span>
+        <span class="monster-cheek cheek-left"></span>
+        <span class="monster-cheek cheek-right"></span>
+        <span class="monster-mouth"></span>
+      </span>
+      <span class="monster-motif motif-one"></span>
+      <span class="monster-motif motif-two"></span>
+    </span>
+  `;
+}
+
+function renderBossPhasePanel(enemy, state, index) {
+  if (enemy.rank !== "boss" || !enemy.phaseRules?.length) return "";
+  const stage = index.stages.get(state.stageId);
+  const shield = bossPhaseBlock(stage?.order || 1);
+  const ratio = enemy.maxHp > 0 ? enemy.hp / enemy.maxHp : 1;
+  return `
+    <div class="boss-phase-panel" aria-label="${enemy.name} 보스 변화">
+      ${enemy.phaseRules.map((rule, ruleIndex) => {
+        const threshold = Math.round((rule.hpBelowRatio || 0) * 100);
+        const triggered = enemy.phaseRulesTriggered?.includes(ruleIndex);
+        const armed = !triggered && ratio <= (rule.hpBelowRatio || 0);
+        return `
+          <span class="boss-phase-step ${triggered ? "triggered" : armed ? "armed" : ""}">
+            <b>${triggered ? "발동 완료" : armed ? "곧 발동" : `${threshold}% 이하`}</b>
+            <em>${phaseRuleDetail(rule)} · 장벽 +${shield}</em>
+          </span>
+        `;
+      }).join("")}
+    </div>
   `;
 }
 
@@ -706,14 +752,47 @@ function intentIcon(intent) {
   return "특";
 }
 
-function enemyIcon(enemy) {
-  if (enemy.rank === "boss") return "왕";
-  if (enemy.rank === "elite") return "정";
-  return (enemy.family || enemy.name || "몬").slice(0, 1);
-}
-
 function enemyRankLabel(rank) {
   return rank === "boss" ? "보스" : rank === "elite" ? "정예" : "일반";
+}
+
+function monsterFamilyClass(family = "") {
+  return ({
+    "구름": "cloud",
+    "부적": "paper",
+    "방울": "bubble",
+    "토끼": "bunny",
+    "왕방울": "royal-bubble",
+    "새싹": "sprout",
+    "리본": "ribbon",
+    "별": "star",
+    "말랑": "plush",
+    "달빛": "moon"
+  })[family] || "maze";
+}
+
+function monsterAccent(enemy) {
+  const palette = ({
+    cloud: ["#7cccf7", "#eaf8ff", "#4f9ccc"],
+    paper: ["#ffd45f", "#fff7db", "#c58a22"],
+    bubble: ["#9ee8ff", "#f1fbff", "#5aa9ce"],
+    bunny: ["#ffb3c2", "#fff1f4", "#c96b81"],
+    "royal-bubble": ["#ff8ea2", "#fff1c8", "#c65367"],
+    sprout: ["#67d9a5", "#ecfff6", "#3b9871"],
+    ribbon: ["#ff9fcf", "#fff0f8", "#b94c82"],
+    star: ["#ffd45f", "#fff8d7", "#bb8c1d"],
+    plush: ["#d0a2ff", "#f8f0ff", "#7b61b5"],
+    moon: ["#a99cff", "#f2edff", "#6657b0"],
+    maze: ["#7cccf7", "#ffffff", "#4f536d"]
+  })[monsterFamilyClass(enemy.family)] || ["#7cccf7", "#ffffff", "#4f536d"];
+  if (enemy.rank === "elite") palette[0] = "#a99cff";
+  if (enemy.rank === "boss") palette[0] = "#ff8ea2";
+  return `--monster-a:${palette[0]};--monster-b:${palette[1]};--monster-line:${palette[2]};`;
+}
+
+function phaseRuleDetail(rule) {
+  if (!rule?.addIntent) return "패턴 변화";
+  return rule.addIntent.label || intentDetail(rule.addIntent);
 }
 
 function statusLabel(status) {

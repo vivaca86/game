@@ -66,6 +66,7 @@ await page.waitForSelector(".route-node.active", { timeout: 10000 });
 await page.waitForSelector(".route-node.room-boss", { timeout: 10000 });
 await page.waitForSelector(".combat-forecast", { timeout: 10000 });
 await page.waitForSelector(".monster-portrait", { timeout: 10000 });
+await page.waitForSelector(".monster-face", { timeout: 10000 });
 await page.waitForSelector(".intent-card", { timeout: 10000 });
 await page.waitForSelector(".intent-timeline .intent-node.current", { timeout: 10000 });
 await page.evaluate(() => {
@@ -101,6 +102,8 @@ if (!combatForecastText?.includes("이번 턴 예고") || (!combatForecastText.i
 }
 const intentNodeCount = await page.locator(".intent-node").count();
 if (intentNodeCount < 2) throw new Error("몬스터 의도 타임라인 표시 실패");
+const monsterFaceParts = await page.locator(".monster-face, .monster-eye, .monster-mouth").count();
+if (monsterFaceParts < 4) throw new Error("마스코트 몬스터 초상 구성 실패");
 const routeNodeCount = await page.locator(".route-node").count();
 if (routeNodeCount < 7) throw new Error(`스테이지 경로 노드 부족: ${routeNodeCount}`);
 const routeOverflowItems = await page.locator(".stage-route-panel, .route-node, .route-next-card").evaluateAll((elements) => elements
@@ -201,6 +204,60 @@ if (mobileColumns !== 1) throw new Error("모바일 상점/보상 선택지 1열
 const mobileRouteColumns = await page.locator(".route-node-list").evaluate((element) => getComputedStyle(element).gridTemplateColumns.split(" ").length);
 if (mobileRouteColumns !== 2) throw new Error("모바일 스테이지 경로 2열 반응형 확인 실패");
 await page.screenshot({ path: "tmp/market-ui-mobile.png", fullPage: true });
+
+await page.setViewportSize({ width: 1366, height: 900 });
+await page.evaluate(async () => {
+  const raw = localStorage.getItem("sunny_maze_run_v1");
+  if (!raw) throw new Error("보스 검증용 저장 스냅샷 없음");
+  const snapshot = JSON.parse(raw);
+  const [stages, enemies] = await Promise.all([
+    fetch("/src/data/ko/stages.json").then((response) => response.json()),
+    fetch("/src/data/ko/enemies.json").then((response) => response.json())
+  ]);
+  const stage = stages.find((item) => item.order === 1) || stages[0];
+  const boss = enemies.find((enemy) => enemy.id === stage.bossEnemyId) || enemies.find((enemy) => enemy.rank === "boss");
+  if (!stage || !boss) throw new Error("보스 검증 데이터 없음");
+  const bossRoomIndex = Array.isArray(stage.rooms) ? stage.rooms.findIndex((room) => room === "boss") : -1;
+  snapshot.phase = "combat";
+  snapshot.stageId = stage.id;
+  snapshot.currentRoomType = "boss";
+  snapshot.roomIndex = bossRoomIndex >= 0 ? bossRoomIndex : 0;
+  snapshot.turn = 1;
+  snapshot.pendingReward = null;
+  snapshot.pendingEvent = null;
+  snapshot.player = { ...(snapshot.player || {}), energy: 3, maxEnergy: 3, shield: 0 };
+  snapshot.hand = Array.isArray(snapshot.hand) && snapshot.hand.length > 0 ? snapshot.hand.slice(0, 5) : ["card_sunbean_punch"];
+  snapshot.enemies = [{
+    ...structuredClone(boss),
+    maxHp: boss.maxHp,
+    hp: Math.floor(boss.maxHp * 0.45),
+    block: boss.block || 0,
+    instanceId: "boss_visual_check",
+    status: { mark: 2 },
+    role: "호출형 보스",
+    intents: structuredClone(boss.intents || []),
+    phaseRules: structuredClone(boss.phaseRules || []),
+    phaseRulesTriggered: []
+  }];
+  localStorage.setItem("sunny_maze_run_v1", JSON.stringify(snapshot));
+});
+await page.reload({ waitUntil: "networkidle" });
+await page.waitForSelector("#loadRunButton:not(:disabled)", { timeout: 10000 });
+await page.click("#loadRunButton");
+await page.waitForSelector(".enemy-card.enemy-rank-boss", { timeout: 10000 });
+await page.waitForSelector(".boss-phase-panel", { timeout: 10000 });
+await page.waitForSelector(".monster-rank-crown", { timeout: 10000 });
+const bossPhaseText = await page.textContent(".boss-phase-panel");
+if (!bossPhaseText?.includes("곧 발동") || !bossPhaseText.includes("장벽 +")) throw new Error("보스 페이즈 예고 표시 실패");
+const bossVisualParts = await page.locator(".enemy-rank-boss .monster-face, .enemy-rank-boss .monster-rank-crown, .enemy-rank-boss .monster-eye").count();
+if (bossVisualParts < 4) throw new Error("보스 마스코트 초상 구성 실패");
+const bossOverflowItems = await page.locator(".enemy-rank-boss, .boss-phase-panel, .monster-portrait").evaluateAll((elements) => elements
+  .filter((element) => element.scrollWidth > element.clientWidth + 2 || element.scrollHeight > element.clientHeight + 2)
+  .map((element) => element.className));
+if (bossOverflowItems.length > 0) {
+  throw new Error(`보스 패턴 UI 넘침: ${bossOverflowItems.slice(0, 4).join(" | ")}`);
+}
+await page.screenshot({ path: "tmp/boss-phase-desktop.png", fullPage: true });
 
 if (errors.length > 0) {
   throw new Error(`브라우저 콘솔 오류: ${errors.join(" | ")}`);
