@@ -729,7 +729,7 @@ function renderRun() {
         <button class="secondary-btn" data-action="save-run">저장</button>
         <button class="secondary-btn" data-action="clear-save">저장 삭제</button>
       </div>
-      ${renderActionFeedback(state)}
+      ${state.phase === "room_complete" ? "" : renderActionFeedback(state)}
       ${renderStageRoute(state, stage, index)}
       ${renderCurrentRoomPanel(state, stage, index)}
       ${renderPhase(state, index)}
@@ -933,8 +933,32 @@ function renderRoomComplete(state, index) {
           <p>${nextRoomDetail(nextRoomType, boss, stage)}</p>
         </article>
       </div>
+      ${renderRoomCompleteFeedback(state)}
       <button class="primary-btn room-advance-btn" data-action="advance">${nextRoomType ? "다음 방으로" : "결과 보기"}</button>
     </section>
+  `;
+}
+
+function renderRoomCompleteFeedback(state) {
+  const feedback = state.status?.actionFeedback;
+  if (!feedback) return "";
+  return `
+    <article class="room-complete-feedback room-complete-feedback-${feedback.kind} feedback-tone-${feedback.tone}">
+      <span class="room-complete-feedback-icon" aria-hidden="true">${escapeHtml(feedback.icon)}</span>
+      <div class="room-complete-feedback-copy">
+        <span>직전 결과 · ${escapeHtml(feedback.title)}</span>
+        <strong>${escapeHtml(feedback.subject)}</strong>
+        ${feedback.detail ? `<p>${escapeHtml(feedback.detail)}</p>` : ""}
+      </div>
+      <div class="room-complete-feedback-metrics">
+        ${(feedback.metrics || []).map((metric) => `
+          <span class="feedback-stat feedback-stat-${feedbackMetricClass(metric.label)}">
+            <em>${escapeHtml(metric.label)}</em>
+            <b>${escapeHtml(metric.value)}</b>
+          </span>
+        `).join("")}
+      </div>
+    </article>
   `;
 }
 

@@ -401,6 +401,22 @@ await page.evaluate(async () => {
     enemiesDefeated: 4,
     maxChain: 5
   };
+  snapshot.status = {
+    ...(snapshot.status || {}),
+    actionFeedback: {
+      id: "smoke_room_complete_feedback",
+      kind: "reward",
+      tone: "gold",
+      icon: "별",
+      title: "보상 획득",
+      subject: "별사탕 묶음",
+      detail: "방금 고른 보상이 다음 방 준비에 반영되었습니다.",
+      metrics: [
+        { label: "획득", value: "96" },
+        { label: "선택", value: "보상" }
+      ]
+    }
+  };
   snapshot.player = { ...(snapshot.player || {}), hp: 48, maxHp: 64, gold: 96 };
   localStorage.setItem("sunny_maze_run_v1", JSON.stringify(snapshot));
 });
@@ -411,25 +427,29 @@ await page.waitForSelector(".room-complete-panel", { timeout: 10000 });
 await page.waitForSelector(".room-complete-emblem", { timeout: 10000 });
 await page.waitForSelector(".room-complete-card", { timeout: 10000 });
 await page.waitForSelector(".next-room-preview", { timeout: 10000 });
+await page.waitForSelector(".room-complete-feedback", { timeout: 10000 });
+await page.waitForSelector(".room-complete-feedback-icon", { timeout: 10000 });
+await page.waitForSelector(".room-complete-feedback-metrics .feedback-stat", { timeout: 10000 });
 await page.waitForSelector(".room-advance-btn", { timeout: 10000 });
 const roomCompleteText = await page.textContent(".room-complete-panel");
-if (!roomCompleteText?.includes("방 완료") || !roomCompleteText.includes("이번 방 성과") || !roomCompleteText.includes("다음 방")) {
+if (!roomCompleteText?.includes("방 완료") || !roomCompleteText.includes("이번 방 성과") || !roomCompleteText.includes("다음 방") || !roomCompleteText.includes("직전 결과")) {
   throw new Error("방 완료 전환 패널 핵심 문구 표시 실패");
 }
 const roomCompleteProgressWidth = await page.locator(".room-complete-meter i").evaluate((element) => parseFloat(getComputedStyle(element).width));
 if (!(roomCompleteProgressWidth > 0)) throw new Error("방 완료 진행 바 표시 실패");
-const roomCompleteOverflowItems = await page.locator(".room-complete-panel, .room-complete-head, .room-complete-emblem, .room-complete-card, .next-room-preview, .room-advance-btn").evaluateAll((elements) => elements
+const roomCompleteOverflowItems = await page.locator(".room-complete-panel, .room-complete-head, .room-complete-emblem, .room-complete-card, .next-room-preview, .room-complete-feedback, .room-complete-feedback-copy, .feedback-stat, .room-advance-btn").evaluateAll((elements) => elements
   .filter((element) => element.scrollWidth > element.clientWidth + 2 || element.scrollHeight > element.clientHeight + 2)
   .map((element) => element.className));
 if (roomCompleteOverflowItems.length > 0) {
   throw new Error(`방 완료 전환 UI 넘침: ${roomCompleteOverflowItems.slice(0, 4).join(" | ")}`);
 }
+await page.locator(".room-complete-feedback").screenshot({ path: "tmp/room-complete-feedback-card.png" });
 await page.screenshot({ path: "tmp/room-complete-desktop.png", fullPage: true });
 await page.setViewportSize({ width: 390, height: 820 });
 await page.waitForTimeout(120);
 const roomCompleteMobileColumns = await page.locator(".room-complete-grid").evaluate((element) => getComputedStyle(element).gridTemplateColumns.split(" ").length);
 if (roomCompleteMobileColumns !== 1) throw new Error("모바일 방 완료 카드 1열 반응형 확인 실패");
-const roomCompleteMobileOverflow = await page.locator(".room-complete-panel, .room-complete-head, .room-complete-emblem, .room-complete-card, .next-room-preview, .room-advance-btn").evaluateAll((elements) => elements
+const roomCompleteMobileOverflow = await page.locator(".room-complete-panel, .room-complete-head, .room-complete-emblem, .room-complete-card, .next-room-preview, .room-complete-feedback, .room-complete-feedback-copy, .feedback-stat, .room-advance-btn").evaluateAll((elements) => elements
   .filter((element) => element.scrollWidth > element.clientWidth + 2 || element.scrollHeight > element.clientHeight + 2)
   .map((element) => element.className));
 if (roomCompleteMobileOverflow.length > 0) {
