@@ -183,6 +183,8 @@ async function main() {
 function renderGameSetup(index) {
   const root = qs("#gameRoot");
   const profile = runtime.profile;
+  const selectedCharacterId = index.data.characters.find((character) => isUnlocked(profile, "unlockedCharacters", character.id))?.id || index.data.characters[0]?.id;
+  const selectedStageId = index.data.stages.find((stage) => isUnlocked(profile, "unlockedStages", stage.id))?.id || index.data.stages[0]?.id;
   root.innerHTML = `
     ${renderProfilePanel(profile, index)}
     <div class="setup-grid">
@@ -190,7 +192,7 @@ function renderGameSetup(index) {
         <select id="characterSelect">
           ${index.data.characters.map((character) => {
             const unlocked = isUnlocked(profile, "unlockedCharacters", character.id);
-            return `<option value="${character.id}" ${unlocked ? "" : "disabled"}>${unlocked ? "" : "잠김 · "}${character.name} · ${character.role}</option>`;
+            return `<option value="${character.id}" ${unlocked ? "" : "disabled"} ${character.id === selectedCharacterId ? "selected" : ""}>${unlocked ? "" : "잠김 · "}${character.name} · ${character.role}</option>`;
           }).join("")}
         </select>
       </label>
@@ -199,7 +201,7 @@ function renderGameSetup(index) {
           ${index.data.stages.map((stage) => {
             const unlocked = isUnlocked(profile, "unlockedStages", stage.id);
             const cleared = profile.clearedStages.includes(stage.id);
-            return `<option value="${stage.id}" ${unlocked ? "" : "disabled"}>${unlocked ? "" : "잠김 · "}${stage.order}. ${stage.name}${cleared ? " · 클리어" : ""}</option>`;
+            return `<option value="${stage.id}" ${unlocked ? "" : "disabled"} ${stage.id === selectedStageId ? "selected" : ""}>${unlocked ? "" : "잠김 · "}${stage.order}. ${stage.name}${cleared ? " · 클리어" : ""}</option>`;
           }).join("")}
         </select>
       </label>
@@ -207,8 +209,16 @@ function renderGameSetup(index) {
       <button class="secondary-btn" id="loadRunButton" ${hasSavedRun() ? "" : "disabled"}>저장 불러오기</button>
       <button class="secondary-btn" id="clearProfileButton">진행 초기화</button>
     </div>
+    <div id="setupPreview" class="setup-preview">
+      ${renderSetupPreview(index, profile, selectedCharacterId, selectedStageId)}
+    </div>
     <div id="runRoot"></div>
   `;
+  const refreshSetupPreview = () => {
+    qs("#setupPreview").innerHTML = renderSetupPreview(index, profile, qs("#characterSelect").value, qs("#stageSelect").value);
+  };
+  qs("#characterSelect").addEventListener("change", refreshSetupPreview);
+  qs("#stageSelect").addEventListener("change", refreshSetupPreview);
   qs("#startRunButton").addEventListener("click", () => {
     const characterId = qs("#characterSelect").value;
     const stageId = qs("#stageSelect").value;
@@ -231,6 +241,80 @@ function renderGameSetup(index) {
     renderStages(runtime.data.stages, runtime.data.enemies, runtime.profile);
     renderGameSetup(index);
   });
+}
+
+function renderSetupPreview(index, profile, characterId, stageId) {
+  const character = index.characters.get(characterId) || index.data.characters[0];
+  const stage = index.stages.get(stageId) || index.data.stages[0];
+  const boss = index.enemies.get(stage.bossEnemyId);
+  const cleared = profile.clearedStages.includes(stage.id);
+  const starterCards = (character.starterDeck || []).map((cardId) => index.cards.get(cardId)).filter(Boolean);
+  return `
+    <section class="setup-preview-card character-preview-card" style="--character-accent:${accentFor(character.color)}">
+      ${renderCharacterPortrait(character)}
+      <div class="setup-preview-copy">
+        <span class="route-kicker">선택 캐릭터</span>
+        <strong>${character.name} · ${character.role}</strong>
+        <p>${character.passiveText}</p>
+        <div class="preview-stat-row">
+          <span>체력 ${character.maxHp}</span>
+          <span>기운 ${character.energy}</span>
+          <span>시작 덱 ${starterCards.length}장</span>
+        </div>
+        <div class="starter-card-strip" aria-label="${character.name} 시작 카드">
+          ${starterCards.slice(0, 5).map((card) => `<span style="--card-accent:${accentFor(card.color)}">${card.name}</span>`).join("")}
+        </div>
+      </div>
+    </section>
+    <section class="setup-preview-card stage-preview-card">
+      <div class="stage-key-art stage-key-${stage.backgroundKey || "bright_gate"}">
+        <span class="stage-sun"></span>
+        <span class="stage-landmark"></span>
+        <span class="stage-path"></span>
+        <span class="stage-spark one"></span>
+        <span class="stage-spark two"></span>
+      </div>
+      <div class="setup-preview-copy">
+        <span class="route-kicker">${cleared ? "클리어한 스테이지" : "도전 스테이지"}</span>
+        <strong>${stage.order}. ${stage.name}</strong>
+        <p>${stage.biome} · 보스 ${boss?.name || "미정"}</p>
+        <div class="preview-stat-row">
+          <span>${stage.floorCount}개 방</span>
+          <span>보상 별사탕 ${stage.clearRewards?.gold || 0}</span>
+          <span>${cleared ? "클리어" : "진행 가능"}</span>
+        </div>
+        ${renderStageRoomStrip(stage)}
+      </div>
+    </section>
+  `;
+}
+
+function renderCharacterPortrait(character) {
+  const motif = characterMotifClass(character);
+  return `
+    <span class="character-portrait character-motif-${motif}" style="--character-accent:${accentFor(character.color)}" aria-hidden="true">
+      <span class="character-hair"></span>
+      <span class="character-face">
+        <span class="character-eye left"></span>
+        <span class="character-eye right"></span>
+        <span class="character-cheek left"></span>
+        <span class="character-cheek right"></span>
+        <span class="character-smile"></span>
+      </span>
+      <span class="character-cloak"></span>
+      <span class="character-badge"></span>
+    </span>
+  `;
+}
+
+function characterMotifClass(character) {
+  const text = [character.name, character.role, character.passiveText].join(" ");
+  if (/수호|보호|방어|기사/.test(text)) return "guard";
+  if (/리본|마술|카드|연쇄|뽑/.test(text)) return "magic";
+  if (/새싹|회복|정원|체력/.test(text)) return "sprout";
+  if (/별|빛|기운|소풍/.test(text)) return "star";
+  if (/구름|방울|하늘/.test(text)) return "cloud";
+  return "sunny";
 }
 
 function renderProfilePanel(profile, index) {

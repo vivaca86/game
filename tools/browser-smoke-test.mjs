@@ -60,6 +60,22 @@ const setupRoomChips = await page.locator(".stage-room-strip .room-mini").count(
 if (setupRoomChips === 0) throw new Error("스테이지 방 구성 칩 표시 실패");
 const sampleCardArtCount = await page.locator(".sample-card .card-art-sample").count();
 if (sampleCardArtCount < 3) throw new Error("카드 샘플 일러스트 표시 실패");
+await page.waitForSelector(".setup-preview", { timeout: 10000 });
+await page.waitForSelector(".character-portrait", { timeout: 10000 });
+await page.waitForSelector(".stage-key-art", { timeout: 10000 });
+await page.waitForSelector(".starter-card-strip", { timeout: 10000 });
+const setupOverflowItems = await page.locator(".setup-preview-card, .character-portrait, .stage-key-art").evaluateAll((elements) => elements
+  .filter((element) => element.scrollWidth > element.clientWidth + 2 || element.scrollHeight > element.clientHeight + 2)
+  .map((element) => element.className));
+if (setupOverflowItems.length > 0) {
+  throw new Error(`선택 미리보기 UI 넘침: ${setupOverflowItems.slice(0, 4).join(" | ")}`);
+}
+const moruEnabled = await page.locator('#characterSelect option[value="char_moru"]:not(:disabled)').count();
+if (moruEnabled > 0) {
+  await page.selectOption("#characterSelect", "char_moru");
+  await page.waitForFunction(() => document.querySelector("#setupPreview")?.textContent?.includes("모루"), null, { timeout: 10000 });
+}
+await page.screenshot({ path: "tmp/setup-preview-desktop.png", fullPage: true });
 
 await page.click("#startRunButton");
 await page.waitForSelector(".run-board", { timeout: 10000 });
