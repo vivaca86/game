@@ -1075,6 +1075,7 @@ function renderHandCard(card, handIndex, state, index) {
       <small>${typeLabels[card.type] || card.type}</small>
       ${renderCardArt(card, "hand")}
       <p>${card.text}</p>
+      ${renderCardPlayCue(card, state, cost, canPlay, previews, equippedGems)}
       ${renderHandGemEffects(equippedGems, card, state, index, cost)}
       <span class="card-preview-list" aria-label="${card.name} 효과 미리보기">
         ${previews.map(renderCardPreviewChip).join("") || `<span class="card-preview-chip preview-note"><b>효</b><em>특수 효과</em></span>`}
@@ -1085,6 +1086,94 @@ function renderHandCard(card, handIndex, state, index) {
 
 function renderCardPreviewChip(chip) {
   return `<span class="card-preview-chip preview-${chip.tone}"><b>${chip.icon}</b><em>${chip.label}</em></span>`;
+}
+
+function renderCardPlayCue(card, state, cost, canPlay, previews, equippedGems) {
+  const items = cardPlayCueItems(card, state, cost, canPlay, previews, equippedGems);
+  if (items.length === 0) return "";
+  return `
+    <span class="card-play-cue" aria-label="${card.name} 발동 흐름">
+      ${items.map((item) => `
+        <span class="card-cue-chip cue-${item.key} cue-${item.tone}">
+          <b>${item.label}</b>
+          <em>${item.value}</em>
+        </span>
+      `).join("")}
+    </span>
+  `;
+}
+
+function cardPlayCueItems(card, state, cost, canPlay, previews, equippedGems) {
+  const items = [
+    {
+      key: "cost",
+      tone: canPlay ? "flow" : "danger",
+      label: "1 비용",
+      value: canPlay ? `기운 ${cost}` : `${Math.max(1, cost - state.player.energy)} 부족`
+    }
+  ];
+  const primaryPreview = previews.find((chip) => !["danger", "note"].includes(chip.tone)) || previews[0];
+  if (primaryPreview) {
+    items.push({
+      key: "effect",
+      tone: primaryPreview.tone,
+      label: "2 효과",
+      value: primaryPreview.label
+    });
+  }
+  const condition = cardConditionCue(card, state);
+  if (condition) items.push(condition);
+  if (equippedGems.length > 0) {
+    items.push({
+      key: "gem",
+      tone: "gem",
+      label: "보석",
+      value: `${equippedGems.length}개 적용`
+    });
+  }
+  if (card.type === "temp" || card.type === "curse" || card.effects?.some((effect) => effect.op === "exhaust_self")) {
+    items.push({
+      key: "exit",
+      tone: "note",
+      label: "사용 후",
+      value: "소멸"
+    });
+  }
+  return items.slice(0, 4);
+}
+
+function cardConditionCue(card, state) {
+  for (const effect of card.effects || []) {
+    if (effect.op === "damage_bonus_if_cards_played_at_least") {
+      const ready = state.metrics.cardsPlayedThisTurn >= effect.threshold;
+      return { key: "condition", tone: ready ? "reward" : "note", label: "조건", value: ready ? "활성" : `${effect.threshold}장 필요` };
+    }
+    if (effect.op === "damage_bonus_if_chain_at_least") {
+      const ready = (state.status.chain || 0) >= effect.threshold;
+      return { key: "condition", tone: ready ? "reward" : "note", label: "조건", value: ready ? "연쇄 활성" : `연쇄 ${effect.threshold}` };
+    }
+    if (effect.op === "damage_bonus_if_hand_at_most") {
+      const ready = state.hand.length <= effect.threshold;
+      return { key: "condition", tone: ready ? "reward" : "note", label: "조건", value: ready ? "손패 활성" : `${effect.threshold}장 이하` };
+    }
+    if (effect.op === "damage_bonus_vs_marked") {
+      const markedCount = state.enemies.filter((enemy) => enemy.status?.mark > 0).length;
+      return { key: "condition", tone: markedCount > 0 ? "reward" : "note", label: "조건", value: markedCount > 0 ? `표식 ${markedCount}` : "표식 필요" };
+    }
+    if (effect.op === "draw_if_kill") {
+      return { key: "condition", tone: "note", label: "조건", value: "처치 시" };
+    }
+    if (effect.op === "heal_if_hp_ratio_below") {
+      const ready = state.player.hp / state.player.maxHp <= effect.ratio;
+      return { key: "condition", tone: ready ? "heal" : "note", label: "조건", value: ready ? "회복 준비" : `${Math.round(effect.ratio * 100)}% 이하` };
+    }
+    if (effect.op === "repeat_previous_basic_effect" || effect.op === "repeat_previous_basic_effect_if_cost_at_most") {
+      const previous = state.status.previousCard;
+      const ready = previous && (!effect.cost || previous.cost <= effect.cost) && previous.id !== card.id;
+      return { key: "condition", tone: ready ? "flow" : "note", label: "조건", value: ready ? "이전 카드" : "이전 필요" };
+    }
+  }
+  return null;
 }
 
 function renderHandGemEffects(equippedGems, card, state, index, currentCost) {
