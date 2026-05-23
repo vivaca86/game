@@ -1,5 +1,6 @@
 import { addLog } from "./game-state.js";
 import { grantGem } from "./gems.js";
+import { grantArcana, grantRelic } from "./run-modifiers.js";
 
 export function checkAchievements(state, index, eventName, payload = {}) {
   const newlyUnlocked = [];
@@ -7,7 +8,7 @@ export function checkAchievements(state, index, eventName, payload = {}) {
     if (state.inventory.achievements.includes(achievement.id)) continue;
     if (!matchesTrigger(achievement.trigger, eventName, payload, state)) continue;
     state.inventory.achievements.push(achievement.id);
-    applyAchievementReward(state, achievement.reward);
+    applyAchievementReward(state, index, achievement.reward);
     newlyUnlocked.push(achievement);
     addLog(state, `업적 달성: ${achievement.name}`);
   }
@@ -31,12 +32,12 @@ function matchesTrigger(trigger, eventName, payload, state) {
   return false;
 }
 
-function applyAchievementReward(state, reward = {}) {
+function applyAchievementReward(state, index, reward = {}) {
   if (reward.gold) state.player.gold += reward.gold;
   if (reward.unlockCardId && !state.inventory.unlockedCards.includes(reward.unlockCardId)) state.inventory.unlockedCards.push(reward.unlockCardId);
   if (reward.unlockGemId && !state.inventory.gems.includes(reward.unlockGemId)) grantGem(state, reward.unlockGemId);
-  if (reward.unlockRelicId && !state.inventory.relics.includes(reward.unlockRelicId)) state.inventory.relics.push(reward.unlockRelicId);
-  if (reward.unlockArcanaId && !state.inventory.arcanas.includes(reward.unlockArcanaId)) state.inventory.arcanas.push(reward.unlockArcanaId);
+  if (reward.unlockRelicId && !state.inventory.relics.includes(reward.unlockRelicId)) grantRelic(state, index, reward.unlockRelicId);
+  if (reward.unlockArcanaId && !state.inventory.arcanas.includes(reward.unlockArcanaId)) grantArcana(state, index, reward.unlockArcanaId);
   if (reward.unlockCharacterId && !state.inventory.unlockedCharacters.includes(reward.unlockCharacterId)) state.inventory.unlockedCharacters.push(reward.unlockCharacterId);
   if (reward.metaUpgradeId) state.inventory.lastMetaReward = reward.metaUpgradeId;
 }

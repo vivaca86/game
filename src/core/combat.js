@@ -1,8 +1,17 @@
 import { checkAchievements } from "./achievements.js";
 import { applyCardEffects, cardCost } from "./card-effects.js";
-import { addLog, discardHand, drawCards } from "./game-state.js";
+import { addLog, drawCards } from "./game-state.js";
 import { openReward } from "./rewards.js";
 import { ensureGemState } from "./gems.js";
+import {
+  afterCardPlayedModifiers,
+  afterCombatCompleteModifiers,
+  applyBattleStartModifiers,
+  consumeChainPreserve,
+  discardHandWithModifiers,
+  nextTurnShieldWithModifiers,
+  resetTurnModifierState
+} from "./run-modifiers.js";
 
 let enemyInstanceSeq = 1;
 
@@ -21,8 +30,11 @@ export function startCombat(state, index, roomType = "combat") {
   state.turn = 1;
   state.status.chain = 0;
   state.status.previousCard = null;
+  state.player.shield = 0;
+  state.player.energy = state.player.maxEnergy;
   state.metrics.cardsPlayedThisTurn = 0;
   state.metrics.cardsPlayedThisCombat = 0;
+  applyBattleStartModifiers(state, index);
   addLog(state, `${roomLabel(roomType)} 시작`);
 }
 
@@ -48,7 +60,8 @@ export function playCard(state, index, handIndex) {
   const context = { cardId, cost, killedThisPlay: false, exhaustSelf: false };
   const enemiesBefore = state.enemies.length;
   applyCardEffects({ card, state, index, context });
-  context.killedThisPlay = state.enemies.length < enemiesBefore;
+  context.killedThisPlay = context.killedThisPlay || state.enemies.length < enemiesBefore;
+  afterCardPlayedModifiers({ state, index, card, context, cost });
 
   if (context.killedThisPlay) {
     checkAchievements(state, index, "defeat_rank", { rank: "normal" });
@@ -76,11 +89,13 @@ export function endTurn(state, index) {
   const reduced = Math.max(0, incomingDamage - (state.status.damageReduction || 0));
   const blocked = Math.min(state.player.shield, reduced);
   const damage = Math.max(0, reduced - blocked);
-  state.player.shield = Math.max(0, state.status.retainShield || 0);
+  const remainingShield = Math.max(0, state.player.shield - blocked);
+  state.player.shield = nextTurnShieldWithModifiers(state, index, remainingShield, state.status.retainShield || 0);
   state.player.hp = Math.max(0, state.player.hp - damage);
+  state.status.damageTakenThisCombat = (state.status.damageTakenThisCombat || 0) + damage;
   addLog(state, damage > 0 ? `피해 ${damage} 받음` : "공격을 막았습니다.");
 
-  discardHand(state);
+  discardHandWithModifiers(state, index);
   state.turn += 1;
   state.player.energy = Math.max(1, state.player.maxEnergy - (state.status.nextTurnEnergyPenalty || 0));
   state.status.nextTurnEnergyPenalty = 0;
@@ -88,7 +103,8 @@ export function endTurn(state, index) {
   state.status.retainShield = 0;
   state.metrics.cardsPlayedThisTurn = 0;
   if (state.status.preserveNextChain) state.status.preserveNextChain = false;
-  else state.status.chain = 0;
+  else if (!consumeChainPreserve(state, index)) state.status.chain = 0;
+  resetTurnModifierState(state);
   drawCards(state, 5);
 
   if (state.player.hp <= 0) {
@@ -112,6 +128,7 @@ function completeCombat(state, index) {
     checkAchievements(state, index, "defeat_enemy", { enemyId: stage.bossEnemyId });
     checkAchievements(state, index, "clear_stage", { stageId: state.stageId });
   }
+  afterCombatCompleteModifiers(state, index);
   openReward(state, index, source);
 }
 

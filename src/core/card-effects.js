@@ -6,12 +6,14 @@ import {
   modifiedDamageAmount,
   modifiedShieldAmount
 } from "./gems.js";
+import { adjustedModifierCardCost, afterPlayerHealed, consumeChainPreserve } from "./run-modifiers.js";
 
 export function cardCost(card, state, index = null) {
   const discount = state.status.nextCardDiscount || 0;
   const increase = state.status.nextCardCostIncrease || 0;
   const baseCost = Math.max(0, card.cost - discount + increase);
-  return adjustedCardCost(card, state, index, baseCost);
+  const gemCost = adjustedCardCost(card, state, index, baseCost);
+  return adjustedModifierCardCost(card, state, index, gemCost);
 }
 
 export function applyCardEffects({ card, state, index, context, effects = card.effects }) {
@@ -79,7 +81,7 @@ export function applyEffect({ effect, card, state, index, context }) {
       applyStatus(frontEnemy(state), "mark", effect.amount);
       break;
     case "heal_if_hp_ratio_below":
-      if (state.player.hp / state.player.maxHp <= effect.ratio) healPlayer(state, effect.amount);
+      if (state.player.hp / state.player.maxHp <= effect.ratio) healPlayer(state, effect.amount, index);
       break;
     case "enable_reflect_damage":
       state.status.reflectRatio = Math.max(state.status.reflectRatio || 0, effect.ratio);
@@ -101,6 +103,7 @@ export function applyEffect({ effect, card, state, index, context }) {
       break;
     case "reset_chain":
       if (state.status.preserveNextChain) state.status.preserveNextChain = false;
+      else if (consumeChainPreserve(state, index)) break;
       else state.status.chain = 0;
       break;
     case "exhaust_self":
@@ -111,14 +114,18 @@ export function applyEffect({ effect, card, state, index, context }) {
   }
 }
 
-export function healPlayer(state, amount) {
+export function healPlayer(state, amount, index = null) {
+  const before = state.player.hp;
   state.player.hp = Math.min(state.player.maxHp, state.player.hp + amount);
-  addLog(state, `체력 ${amount} 회복`);
+  const healed = state.player.hp - before;
+  if (healed <= 0) return;
+  addLog(state, `체력 ${healed} 회복`);
+  afterPlayerHealed(state, index, healed);
 }
 
 function applyGemAfterCardPlayed({ card, state, index, context }) {
   for (const effect of gemEffectsForCard(state, index, card.id, "heal_on_play")) {
-    healPlayer(state, effect.amount);
+    healPlayer(state, effect.amount, index);
   }
   for (const effect of gemEffectsForCard(state, index, card.id, "apply_mark_on_play")) {
     applyStatus(frontEnemy(state), "mark", effect.amount);

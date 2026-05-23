@@ -14,6 +14,7 @@ import {
   unequipGem,
   unequippedGemInstances
 } from "./core/gems.js";
+import { adjustedRewardCost, ensureModifierState, grantArcana, grantRelic } from "./core/run-modifiers.js";
 import { clearSavedRun, hasSavedRun, loadSavedRun, saveRun } from "./core/persistence.js";
 
 const labels = {
@@ -182,6 +183,7 @@ function renderRun() {
   const character = index.characters.get(state.characterId);
   const stage = index.stages.get(state.stageId);
   ensureGemState(state);
+  ensureModifierState(state);
   root.innerHTML = `
     <section class="run-board">
       <div class="run-status">
@@ -193,12 +195,16 @@ function renderRun() {
         <span>별사탕 ${state.player.gold}</span>
         <span>보석 ${state.inventory.gemBag.length}개</span>
         <span>장착 ${state.inventory.gemBag.filter((gem) => gem.equippedCardId).length}개</span>
+        <span>유물 ${state.inventory.relics.length}개</span>
+        <span>기운 ${state.inventory.arcanas.length}개</span>
+        ${state.status.revealedNextRoomType ? `<span>다음 방 ${phaseLabel(state.status.revealedNextRoomType)}</span>` : ""}
       </div>
       <div class="run-actions">
         <button class="secondary-btn" data-action="save-run">저장</button>
         <button class="secondary-btn" data-action="clear-save">저장 삭제</button>
       </div>
       ${renderPhase(state, index)}
+      ${renderBuildPanel(state, index)}
       ${renderGemVault(state, index)}
       <div class="log-list">${state.log.map((log) => `<span>${escapeHtml(log)}</span>`).join("")}</div>
     </section>
@@ -208,7 +214,7 @@ function renderRun() {
 
 function renderPhase(state, index) {
   if (state.phase === "combat") return renderCombat(state, index);
-  if (state.phase === "event") return renderEvent(state);
+  if (state.phase === "event") return renderEvent(state, index);
   if (state.phase === "reward") return renderReward(state);
   if (state.phase === "room_complete") return `<button class="primary-btn" data-action="advance">다음 방으로</button>`;
   if (state.phase === "stage_clear") return `<div class="clear-box"><strong>스테이지 클리어</strong><button class="primary-btn" data-action="restart">다시 탐험</button></div>`;
@@ -249,6 +255,36 @@ function renderCombat(state, index) {
       </section>
       <button class="secondary-btn" data-action="end-turn">턴 종료</button>
     </div>
+  `;
+}
+
+function renderBuildPanel(state, index) {
+  ensureModifierState(state);
+  const relics = state.inventory.relics.map((id) => index.relics.get(id)).filter(Boolean);
+  const arcanas = state.inventory.arcanas.map((id) => index.arcanas.get(id)).filter(Boolean);
+  return `
+    <section class="build-panel">
+      <div class="panel-head compact-head">
+        <h2>현재 빌드</h2>
+        <span>유물 ${relics.length} · 기운 ${arcanas.length}</span>
+      </div>
+      <div class="build-grid">
+        <div class="build-column">
+          <strong>유물</strong>
+          <div class="build-chip-list">
+            ${relics.length === 0 ? "<span class='muted'>보유 유물 없음</span>" : relics.map((relic) => `<span class="build-chip relic-chip" title="${relic.text}">${relic.name}</span>`).join("")}
+          </div>
+          <button class="secondary-btn" data-action="debug-relic">유물 지급</button>
+        </div>
+        <div class="build-column">
+          <strong>기운</strong>
+          <div class="build-chip-list">
+            ${arcanas.length === 0 ? "<span class='muted'>보유 기운 없음</span>" : arcanas.map((arcana) => `<span class="build-chip arcana-chip" title="${arcana.text}">${arcana.name}</span>`).join("")}
+          </div>
+          <button class="secondary-btn" data-action="debug-arcana">기운 지급</button>
+        </div>
+      </div>
+    </section>
   `;
 }
 
@@ -318,19 +354,22 @@ function renderSocketCard(state, index, cardId) {
   `;
 }
 
-function renderEvent(state) {
+function renderEvent(state, index) {
   const event = state.pendingEvent;
   return `
     <div class="choice-box">
       <strong>${event.name}</strong>
       <p>${event.text}</p>
       <div class="choice-list">
-        ${event.choices.map((choice, index) => `
-          <button class="choice-btn" data-action="event-choice" data-choice-index="${index}">
+        ${event.choices.map((choice, choiceIndex) => {
+          const cost = adjustedRewardCost(state, index, choice.cost || {}, { source: event.type, reward: choice.reward || {} });
+          return `
+          <button class="choice-btn" data-action="event-choice" data-choice-index="${choiceIndex}" ${canPayCost(state, cost) ? "" : "disabled"}>
             <strong>${choice.label}</strong>
-            <span>${costLabel(choice.cost)} ${rewardLabel(choice.reward)}</span>
+            <span>${costLabel(cost)} ${rewardLabel(choice.reward)}</span>
           </button>
-        `).join("")}
+        `;
+        }).join("")}
       </div>
     </div>
   `;
@@ -343,9 +382,9 @@ function renderReward(state) {
       <strong>보상 선택</strong>
       <div class="choice-list">
         ${reward.options.map((option) => `
-          <button class="choice-btn" data-action="reward-choice" data-reward-id="${option.id}">
+          <button class="choice-btn" data-action="reward-choice" data-reward-id="${option.id}" ${option.cost && !canPayCost(state, option.cost) ? "disabled" : ""}>
             <strong>${option.title}</strong>
-            <span>${option.description}</span>
+            <span>${option.cost ? `${costLabel(option.cost)} · ` : ""}${option.description}</span>
           </button>
         `).join("")}
       </div>
@@ -370,6 +409,14 @@ function bindRunActions() {
       if (action === "unequip-gem") unequipGem(state, button.dataset.gemInstanceId);
       if (action === "open-socket") openSocketForCard(state, index, button.dataset.cardId);
       if (action === "debug-gem") grantGem(state, index.data.gems[state.inventory.gemBag.length % index.data.gems.length].id);
+      if (action === "debug-relic") {
+        const nextRelic = index.data.relics.find((relic) => !state.inventory.relics.includes(relic.id));
+        if (nextRelic) grantRelic(state, index, nextRelic.id);
+      }
+      if (action === "debug-arcana") {
+        const nextArcana = index.data.arcanas.find((arcana) => !state.inventory.arcanas.includes(arcana.id));
+        if (nextArcana) grantArcana(state, index, nextArcana.id);
+      }
       if (action === "save-run") saveRun(state);
       if (action === "clear-save") {
         clearSavedRun();
@@ -382,7 +429,7 @@ function bindRunActions() {
 }
 
 function phaseLabel(phase) {
-  return ({ combat: "전투", event: "이벤트", reward: "보상", room_complete: "방 완료", stage_clear: "클리어", defeat: "실패" })[phase] || phase;
+  return ({ combat: "전투", elite: "정예", boss: "보스", shop: "상점", rest: "휴식", event: "이벤트", reward: "보상", room_complete: "방 완료", stage_clear: "클리어", defeat: "실패" })[phase] || phase;
 }
 
 function costLabel(cost = {}) {
@@ -391,10 +438,17 @@ function costLabel(cost = {}) {
   return "비용 없음";
 }
 
+function canPayCost(state, cost = {}) {
+  if (cost.gold && state.player.gold < cost.gold) return false;
+  if (cost.hp && state.player.hp <= cost.hp) return false;
+  return true;
+}
+
 function rewardLabel(reward = {}) {
   if (reward.cardPool) return "· 카드 보상";
   if (reward.gemPool) return "· 보석 보상";
   if (reward.relicPool) return "· 유물 보상";
+  if (reward.arcanaPool) return "· 기운 보상";
   if (reward.heal) return `· 체력 ${reward.heal} 회복`;
   if (reward.combat) return "· 전투 보상";
   return "";

@@ -5,16 +5,19 @@ import { addLog } from "./game-state.js";
 import { createNewRun } from "./game-state.js";
 import { openReward } from "./rewards.js";
 import { ensureGemState } from "./gems.js";
+import { initializeRunModifiers, modifiedGoldReward, updateRevealedRoom } from "./run-modifiers.js";
 
 export function startRun(index, options = {}) {
   const state = createNewRun(index, options);
   ensureGemState(state);
+  initializeRunModifiers(state, index);
   enterCurrentRoom(state, index);
   return state;
 }
 
 export function enterCurrentRoom(state, index) {
   const stage = index.stages.get(state.stageId);
+  updateRevealedRoom(state, index);
   const roomType = stage.rooms[state.roomIndex];
   state.currentRoomType = roomType;
   if (["combat", "elite", "boss"].includes(roomType)) {
@@ -29,11 +32,11 @@ export function enterCurrentRoom(state, index) {
     return state;
   }
   if (roomType === "shop" || roomType === "reward") {
-    openReward(state, index, roomType === "shop" ? "reward" : roomType);
+    openReward(state, index, roomType);
     return state;
   }
   if (roomType === "rest") {
-    healPlayer(state, Math.ceil(state.player.maxHp * 0.2));
+    healPlayer(state, Math.ceil(state.player.maxHp * 0.2), index);
     state.phase = "room_complete";
     return state;
   }
@@ -47,7 +50,7 @@ export function advanceRoom(state, index) {
   state.roomIndex += 1;
   if (state.roomIndex >= stage.rooms.length) {
     state.phase = "stage_clear";
-    if (stage.clearRewards?.gold) state.player.gold += stage.clearRewards.gold;
+    if (stage.clearRewards?.gold) state.player.gold += modifiedGoldReward(state, index, stage.clearRewards.gold);
     if (stage.clearRewards?.unlockStageId && !state.inventory.unlockedStages.includes(stage.clearRewards.unlockStageId)) {
       state.inventory.unlockedStages.push(stage.clearRewards.unlockStageId);
     }

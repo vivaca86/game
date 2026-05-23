@@ -1,12 +1,14 @@
 import { createRng } from "./random.js";
 import { createNewRun } from "./game-state.js";
 import { ensureGemState } from "./gems.js";
+import { ensureModifierState } from "./run-modifiers.js";
 
 export const SAVE_KEY = "sunny_maze_run_v1";
 
 export function createSaveSnapshot(state) {
   if (!state) return null;
   ensureGemState(state);
+  ensureModifierState(state);
   return {
     version: 1,
     savedAt: new Date().toISOString(),
@@ -72,6 +74,7 @@ export function restoreRunState(snapshot, index) {
     log: [...(snapshot.log || [])]
   });
   ensureGemState(state);
+  ensureModifierState(state);
   return state;
 }
 

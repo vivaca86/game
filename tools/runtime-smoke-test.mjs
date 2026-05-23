@@ -8,6 +8,8 @@ import { applyEventChoice, applyRewardOption } from "../src/core/rewards.js";
 import { cardCost } from "../src/core/card-effects.js";
 import { equipGemToCard, grantGem, openSocketForCard, socketCapacity } from "../src/core/gems.js";
 import { createSaveSnapshot, restoreRunState } from "../src/core/persistence.js";
+import { createRewardOptions } from "../src/core/rewards.js";
+import { grantArcana, grantRelic } from "../src/core/run-modifiers.js";
 
 const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const dataDir = path.join(rootDir, "src", "data", "ko");
@@ -46,6 +48,13 @@ const equipResult = equipGemToCard(state, index, discountGem.instanceId, firstCa
 if (!equipResult.ok) throw new Error("보석 장착 검증 실패");
 if (socketCapacity(state, index, firstCardId) < 1) throw new Error("카드 소켓 검증 실패");
 if (cardCost(firstCard, state, index) > Math.max(0, firstCard.cost - 1)) throw new Error("보석 비용 감소 검증 실패");
+if (!state.inventory.arcanas.includes("arcana_picnic_rhythm")) throw new Error("시작 기운 지급 검증 실패");
+if (!grantRelic(state, index, "relic_ribbon_box")) throw new Error("유물 지급 검증 실패");
+if (!grantArcana(state, index, "arcana_star_bakery")) throw new Error("기운 지급 검증 실패");
+const rewardOptions = createRewardOptions(state, index, "reward");
+if (rewardOptions.filter((option) => option.type === "card").length < 4) throw new Error("유물 카드 보상 증가 검증 실패");
+if (!rewardOptions.some((option) => option.type === "relic")) throw new Error("유물 보상 선택지 검증 실패");
+if (!rewardOptions.some((option) => option.type === "arcana")) throw new Error("기운 보상 선택지 검증 실패");
 
 const socketTestCardId = state.deck.find((cardId) => {
   const card = index.cards.get(cardId);
@@ -101,6 +110,8 @@ const snapshot = createSaveSnapshot(state);
 const restored = restoreRunState(snapshot, index);
 if (!restored?.inventory?.gemBag?.length) throw new Error("저장 보석 보관함 복원 실패");
 if (!Object.keys(restored.cardSockets || {}).length) throw new Error("저장 장착 보석 복원 실패");
+if (!restored.inventory.relics.includes("relic_ribbon_box")) throw new Error("저장 유물 복원 실패");
+if (!restored.inventory.arcanas.includes("arcana_star_bakery")) throw new Error("저장 기운 복원 실패");
 
 console.log("런타임 스모크 통과");
 console.log(`phase=${state.phase}, rooms=${state.metrics.roomsCleared}, cards=${state.inventory.unlockedCards.length}, gems=${state.inventory.gemBag.length}, achievements=${state.inventory.achievements.length}, gold=${state.player.gold}`);

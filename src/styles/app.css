@@ -438,7 +438,8 @@ h1 {
 }
 
 .play-card:disabled,
-.secondary-btn:disabled {
+.secondary-btn:disabled,
+.choice-btn:disabled {
   opacity: 0.45;
   cursor: not-allowed;
 }
@@ -483,8 +484,36 @@ h1 {
   background: rgba(255, 255, 255, 0.62);
 }
 
+.build-panel {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.68);
+}
+
 .compact-head {
   margin-bottom: 0;
+}
+
+.build-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.build-column {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  border-radius: 8px;
+  background: #fffaf0;
+}
+
+.build-chip-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
 }
 
 .gem-vault-grid {
@@ -511,6 +540,7 @@ h1 {
 }
 
 .gem-chip,
+.build-chip,
 .socket-dot,
 .muted {
   padding: 6px 9px;
@@ -522,6 +552,16 @@ h1 {
 .gem-chip {
   background: #f2edff;
   color: #6555a0;
+}
+
+.relic-chip {
+  background: #fff2c6;
+  color: #7c5d15;
+}
+
+.arcana-chip {
+  background: #e8f8f1;
+  color: #347159;
 }
 
 .muted {
@@ -571,6 +611,7 @@ h1 {
   .hero,
   .workbench,
   .setup-grid,
+  .build-grid,
   .gem-vault-grid {
     grid-template-columns: 1fr;
   }
