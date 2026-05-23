@@ -184,6 +184,8 @@ await page.waitForSelector(".combat-status-card.status-card-mark", { timeout: 10
 await page.waitForSelector(".combat-status-card.status-card-weak", { timeout: 10000 });
 await page.waitForSelector(".combat-status-card.status-card-reflect", { timeout: 10000 });
 await page.waitForSelector(".combat-status-card .status-card-meter b", { timeout: 10000 });
+await page.waitForSelector(".enemy-pattern-row", { timeout: 10000 });
+await page.waitForSelector(".enemy-pattern-chip", { timeout: 10000 });
 await page.waitForSelector(".enemy-status-chip.status-mark", { timeout: 10000 });
 await page.waitForSelector(".enemy-status-chip.status-weak", { timeout: 10000 });
 await page.waitForSelector(".play-card .card-ready-chip.ready", { timeout: 10000 });
@@ -274,12 +276,14 @@ await page.waitForSelector(".play-card .card-art-hand", { timeout: 10000 });
 await page.waitForSelector(".arcana-chip", { timeout: 10000 });
 const enemyText = await page.textContent(".enemy-card");
 if (!enemyText?.includes("이번") || !enemyText.includes("형")) throw new Error("적 역할/의도 표시 실패");
-const combatOverflowItems = await page.locator(".combat-forecast, .combat-status-card, .status-card-copy, .enemy-status-chip, .disruption-control, .enemy-card, .intent-card, .intent-node, .monster-portrait, .play-card, .card-art, .card-cue-chip, .hand-gem-chip, .card-preview-chip").evaluateAll((elements) => elements
+if (!enemyText.includes("역할") || !enemyText.includes("패턴") || !enemyText.includes("위협")) throw new Error("몬스터 역할/패턴 칩 표시 실패");
+const combatOverflowItems = await page.locator(".combat-forecast, .combat-status-card, .status-card-copy, .enemy-pattern-chip, .enemy-status-chip, .disruption-control, .enemy-card, .intent-card, .intent-node, .monster-portrait, .play-card, .card-art, .card-cue-chip, .hand-gem-chip, .card-preview-chip").evaluateAll((elements) => elements
   .filter((element) => element.scrollWidth > element.clientWidth + 2 || element.scrollHeight > element.clientHeight + 2)
   .map((element) => element.className));
 if (combatOverflowItems.length > 0) {
   throw new Error(`전투 UI 넘침: ${combatOverflowItems.slice(0, 4).join(" | ")}`);
 }
+await page.locator(".enemy-row").screenshot({ path: "tmp/enemy-pattern-cards-desktop.png" });
 await page.locator(".hand-row").screenshot({ path: "tmp/card-use-cue-desktop.png" });
 await page.locator(".hand-row").screenshot({ path: "tmp/hand-gem-effects-desktop.png" });
 await page.screenshot({ path: "tmp/combat-ui-desktop.png", fullPage: true });
@@ -298,13 +302,14 @@ if (deckMobileOverflow.length > 0) {
 await page.locator(".deck-overview").screenshot({ path: "tmp/deck-overview-mobile.png" });
 const combatStatusMobileColumns = await page.locator(".combat-status-board").evaluate((element) => getComputedStyle(element).gridTemplateColumns.split(" ").length);
 if (combatStatusMobileColumns !== 1) throw new Error("모바일 전투 상태판 1열 반응형 확인 실패");
-const combatStatusMobileOverflow = await page.locator(".current-room-panel, .current-room-core, .current-room-chip, .combat-status-card, .status-card-copy, .enemy-status-chip, .card-cue-chip, .hand-gem-chip, .card-preview-chip").evaluateAll((elements) => elements
+const combatStatusMobileOverflow = await page.locator(".current-room-panel, .current-room-core, .current-room-chip, .combat-status-card, .status-card-copy, .enemy-pattern-chip, .enemy-status-chip, .card-cue-chip, .hand-gem-chip, .card-preview-chip").evaluateAll((elements) => elements
   .filter((element) => element.scrollWidth > element.clientWidth + 2 || element.scrollHeight > element.clientHeight + 2)
   .map((element) => element.className));
 if (combatStatusMobileOverflow.length > 0) {
   throw new Error(`모바일 전투 상태판 넘침: ${combatStatusMobileOverflow.slice(0, 4).join(" | ")}`);
 }
 await page.locator(".current-room-panel").screenshot({ path: "tmp/current-room-panel-mobile.png" });
+await page.locator(".enemy-row").screenshot({ path: "tmp/enemy-pattern-cards-mobile.png" });
 await page.locator(".hand-row").screenshot({ path: "tmp/card-use-cue-mobile.png" });
 await page.locator(".hand-row").screenshot({ path: "tmp/hand-gem-effects-mobile.png" });
 await page.screenshot({ path: "tmp/combat-status-mobile.png", fullPage: true });
@@ -638,17 +643,20 @@ await page.waitForSelector("#loadRunButton:not(:disabled)", { timeout: 10000 });
 await page.click("#loadRunButton");
 await page.waitForSelector(".enemy-card.enemy-rank-boss", { timeout: 10000 });
 await page.waitForSelector(".boss-phase-panel", { timeout: 10000 });
+await page.waitForSelector(".boss-phase-head", { timeout: 10000 });
+await page.waitForSelector(".boss-phase-meter b", { timeout: 10000 });
 await page.waitForSelector(".monster-rank-crown", { timeout: 10000 });
 const bossPhaseText = await page.textContent(".boss-phase-panel");
-if (!bossPhaseText?.includes("곧 발동") || !bossPhaseText.includes("장벽 +")) throw new Error("보스 페이즈 예고 표시 실패");
+if (!bossPhaseText?.includes("곧 발동") || !bossPhaseText.includes("장벽 +") || !bossPhaseText.includes("페이즈") || !bossPhaseText.includes("체력")) throw new Error("보스 페이즈 예고 표시 실패");
 const bossVisualParts = await page.locator(".enemy-rank-boss .monster-face, .enemy-rank-boss .monster-rank-crown, .enemy-rank-boss .monster-eye").count();
 if (bossVisualParts < 4) throw new Error("보스 마스코트 초상 구성 실패");
-const bossOverflowItems = await page.locator(".enemy-rank-boss, .boss-phase-panel, .monster-portrait").evaluateAll((elements) => elements
+const bossOverflowItems = await page.locator(".enemy-rank-boss, .enemy-pattern-chip, .boss-phase-panel, .boss-phase-head, .boss-phase-step, .monster-portrait").evaluateAll((elements) => elements
   .filter((element) => element.scrollWidth > element.clientWidth + 2 || element.scrollHeight > element.clientHeight + 2)
   .map((element) => element.className));
 if (bossOverflowItems.length > 0) {
   throw new Error(`보스 패턴 UI 넘침: ${bossOverflowItems.slice(0, 4).join(" | ")}`);
 }
+await page.locator(".enemy-rank-boss").screenshot({ path: "tmp/boss-pattern-card-desktop.png" });
 await page.screenshot({ path: "tmp/boss-phase-desktop.png", fullPage: true });
 
 await page.evaluate(() => {

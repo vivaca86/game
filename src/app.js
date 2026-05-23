@@ -1547,6 +1547,7 @@ function renderEnemyCard(enemy, state, index) {
           <span>${enemyRankLabel(enemy.rank)} · ${enemy.role || "기본형"} · ${enemy.family || "미로"}</span>
         </div>
       </div>
+      ${renderEnemyPatternChips(enemy, state)}
       <div class="hp-line"><i style="width:${Math.max(0, Math.round((enemy.hp / enemy.maxHp) * 100))}%"></i></div>
       ${renderEnemyImpactBadges(enemy, state.status.actionFeedback)}
       <div class="enemy-stat-row">
@@ -1565,6 +1566,88 @@ function renderEnemyCard(enemy, state, index) {
       ${renderEnemyStatus(enemy)}
     </article>
   `;
+}
+
+function renderEnemyPatternChips(enemy, state) {
+  const items = enemyPatternItems(enemy, state);
+  return `
+    <div class="enemy-pattern-row" aria-label="${enemy.name} 역할과 패턴">
+      ${items.map((item) => `
+        <span class="enemy-pattern-chip pattern-${item.tone}">
+          <b>${item.label}</b>
+          <em>${item.value}</em>
+        </span>
+      `).join("")}
+    </div>
+  `;
+}
+
+function enemyPatternItems(enemy, state) {
+  const intents = Array.isArray(enemy.intents) ? enemy.intents : [];
+  const current = nextIntent(enemy, state.turn);
+  const patternNames = [...new Set(intents.map(intentPatternName).filter(Boolean))].slice(0, 3);
+  const maxAttack = intents
+    .filter((intent) => intent.type === "attack" || intent.effect === "pierce_attack")
+    .reduce((max, intent) => Math.max(max, intent.amount || 0), 0);
+  const hasDisruption = intents.some((intent) => ["debuff"].includes(intent.type) || ["add_temp_card", "reduce_energy", "chain_down"].includes(intent.effect));
+  const hasSummon = intents.some((intent) => intent.effect === "summon");
+  return [
+    { tone: enemyRoleTone(enemy), label: "역할", value: enemy.role || enemyRankLabel(enemy.rank) },
+    { tone: intentTone(current), label: "이번", value: intentShortDetail(current) },
+    { tone: enemyPatternTone(intents), label: "패턴", value: patternNames.join(" · ") || "기본" },
+    {
+      tone: hasSummon || hasDisruption || maxAttack >= 12 ? "danger" : maxAttack > 0 ? "attack" : "guard",
+      label: "위협",
+      value: hasSummon ? "호출" : hasDisruption ? "방해" : maxAttack > 0 ? `최대 ${maxAttack}` : "정비"
+    }
+  ];
+}
+
+function enemyRoleTone(enemy) {
+  const role = enemy.role || "";
+  if (enemy.rank === "boss" || role.includes("보스")) return "danger";
+  if (enemy.rank === "elite" || role.includes("정예")) return "reward";
+  if (/방해|관통|압박|연쇄/.test(role)) return "trick";
+  if (/방어|회복|장벽/.test(role)) return "guard";
+  return "attack";
+}
+
+function enemyPatternTone(intents) {
+  if (intents.some((intent) => intent.effect === "summon")) return "summon";
+  if (intents.some((intent) => intent.effect === "pierce_attack")) return "danger";
+  if (intents.some((intent) => intent.type === "debuff" || ["add_temp_card", "reduce_energy", "chain_down"].includes(intent.effect))) return "trick";
+  if (intents.some((intent) => intent.type === "guard" || ["fortify_all", "heal_self"].includes(intent.effect))) return "guard";
+  return "attack";
+}
+
+function intentShortDetail(intent) {
+  if (!intent) return "대기";
+  if (intent.type === "attack") return `피해 ${intent.amount || 0}`;
+  if (intent.type === "guard") return `방어 ${intent.amount || 0}`;
+  if (intent.type === "debuff") return `${statusLabel(intent.status)} ${intent.amount || 1}`;
+  if (intent.effect === "pierce_attack") return `관통 ${intent.amount || 0}`;
+  if (intent.effect === "fortify_all") return `전체 방어 ${intent.amount || 0}`;
+  if (intent.effect === "heal_self") return `회복 ${intent.amount || 0}`;
+  if (intent.effect === "summon") return "친구 호출";
+  if (intent.effect === "add_temp_card") return `방해 ${intent.amount || 1}`;
+  if (intent.effect === "reduce_energy") return `기운 -${intent.amount || 1}`;
+  if (intent.effect === "chain_down") return `연쇄 -${intent.amount || 1}`;
+  return intent.label || "특수";
+}
+
+function intentPatternName(intent) {
+  if (!intent) return "대기";
+  if (intent.type === "attack") return "공격";
+  if (intent.type === "guard") return "방어";
+  if (intent.type === "debuff") return "상태";
+  if (intent.effect === "pierce_attack") return "관통";
+  if (intent.effect === "fortify_all") return "장벽";
+  if (intent.effect === "heal_self") return "회복";
+  if (intent.effect === "summon") return "호출";
+  if (intent.effect === "add_temp_card") return "방해";
+  if (intent.effect === "reduce_energy") return "기운";
+  if (intent.effect === "chain_down") return "연쇄";
+  return "특수";
 }
 
 function renderEnemyImpactBadges(enemy, feedback) {
@@ -1616,8 +1699,15 @@ function renderBossPhasePanel(enemy, state, index) {
   const stage = index.stages.get(state.stageId);
   const shield = bossPhaseBlock(stage?.order || 1);
   const ratio = enemy.maxHp > 0 ? enemy.hp / enemy.maxHp : 1;
+  const triggeredCount = enemy.phaseRulesTriggered?.length || 0;
+  const hpPercent = boundedPercent(enemy.hp, enemy.maxHp);
   return `
     <div class="boss-phase-panel" aria-label="${enemy.name} 보스 변화">
+      <div class="boss-phase-head">
+        <span>페이즈 ${triggeredCount}/${enemy.phaseRules.length}</span>
+        <strong>체력 ${hpPercent}%</strong>
+      </div>
+      <i class="boss-phase-meter"><b style="width:${hpPercent}%"></b></i>
       ${enemy.phaseRules.map((rule, ruleIndex) => {
         const threshold = Math.round((rule.hpBelowRatio || 0) * 100);
         const triggered = enemy.phaseRulesTriggered?.includes(ruleIndex);
