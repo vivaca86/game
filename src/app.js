@@ -131,10 +131,21 @@ function renderStages(stages, enemies, profile) {
           <strong>${stage.name}${cleared ? " · 클리어" : unlocked ? "" : " · 잠김"}</strong>
           <p>${stage.biome}</p>
           <small>${stage.floorCount}개 방 · 보스 ${boss?.name || "미정"}</small>
+          ${renderStageRoomStrip(stage)}
         </div>
       </article>
     `;
   }).join("");
+}
+
+function renderStageRoomStrip(stage) {
+  return `
+    <div class="stage-room-strip" aria-label="${stage.name} 방 구성">
+      ${stage.rooms.map((roomType, roomIndex) => `
+        <span class="room-mini room-${roomType}" title="${roomIndex + 1}번 방 · ${roomLabel(roomType)}">${roomIcon(roomType)}</span>
+      `).join("")}
+    </div>
+  `;
 }
 
 function accentFor(color) {
@@ -375,6 +386,7 @@ function renderRun() {
         <button class="secondary-btn" data-action="save-run">저장</button>
         <button class="secondary-btn" data-action="clear-save">저장 삭제</button>
       </div>
+      ${renderStageRoute(state, stage, index)}
       ${renderPhase(state, index)}
       ${renderBuildPanel(state, index)}
       ${renderGemVault(state, index)}
@@ -382,6 +394,59 @@ function renderRun() {
     </section>
   `;
   bindRunActions();
+}
+
+function renderStageRoute(state, stage, index) {
+  const currentIndex = Math.min(state.roomIndex, stage.rooms.length - 1);
+  const currentRoomType = stage.rooms[currentIndex] || state.currentRoomType;
+  const isStageDone = ["stage_clear", "defeat"].includes(state.phase);
+  const roomComplete = state.phase === "room_complete";
+  const doneCount = isStageDone ? stage.rooms.length : Math.max(0, state.roomIndex + (roomComplete ? 1 : 0));
+  const progressRatio = Math.round((doneCount / stage.rooms.length) * 100);
+  const nextRoomIndex = roomComplete ? state.roomIndex + 1 : state.roomIndex;
+  const nextRoomType = stage.rooms[nextRoomIndex] || null;
+  const boss = index.enemies.get(stage.bossEnemyId);
+  return `
+    <section class="stage-route-panel">
+      <div class="stage-route-head">
+        <div>
+          <span class="route-kicker">스테이지 경로</span>
+          <strong>${stage.name}</strong>
+          <p>${stage.biome} · ${doneCount}/${stage.rooms.length}개 방 진행</p>
+        </div>
+        <div class="route-next-card">
+          <span>${isStageDone ? "결과" : roomComplete ? "다음 방" : "현재 방"}</span>
+          <strong>${isStageDone ? phaseLabel(state.phase) : roomLabel(nextRoomType || currentRoomType)}</strong>
+          <small>${boss ? `보스 ${boss.name}` : "보스 미정"} · 클리어 보상 별사탕 ${stage.clearRewards?.gold || 0}</small>
+        </div>
+      </div>
+      <div class="route-progress" aria-label="스테이지 진행률">
+        <i style="width:${progressRatio}%"></i>
+      </div>
+      <div class="route-node-list">
+        ${stage.rooms.map((roomType, roomIndex) => renderRouteNode(state, roomType, roomIndex, nextRoomIndex)).join("")}
+      </div>
+    </section>
+  `;
+}
+
+function renderRouteNode(state, roomType, roomIndex, nextRoomIndex) {
+  const isStageDone = state.phase === "stage_clear";
+  const currentDone = state.phase === "room_complete" && roomIndex === state.roomIndex;
+  const defeated = state.phase === "defeat" && roomIndex === state.roomIndex;
+  const completed = isStageDone || roomIndex < state.roomIndex || currentDone;
+  const active = roomIndex === state.roomIndex && !completed && !defeated;
+  const next = !active && !completed && roomIndex === nextRoomIndex;
+  const status = completed ? "완료" : defeated ? "실패" : active ? "진행 중" : next ? "다음" : "예정";
+  return `
+    <article class="route-node room-${roomType} ${completed ? "completed" : ""} ${active ? "active" : ""} ${next ? "next" : ""} ${defeated ? "defeated" : ""}">
+      <span class="route-node-icon">${roomIcon(roomType)}</span>
+      <div>
+        <strong>${roomIndex + 1}. ${roomLabel(roomType)}</strong>
+        <small>${status}</small>
+      </div>
+    </article>
+  `;
 }
 
 function syncCompletedRun(state, index) {
@@ -764,6 +829,14 @@ function bindRunActions() {
 
 function phaseLabel(phase) {
   return ({ combat: "전투", elite: "정예", boss: "보스", shop: "상점", rest: "휴식", event: "이벤트", reward: "보상", room_complete: "방 완료", stage_clear: "클리어", defeat: "실패" })[phase] || phase;
+}
+
+function roomLabel(roomType) {
+  return ({ combat: "일반전", elite: "정예전", boss: "보스전", shop: "상점", rest: "쉼터", event: "이벤트", reward: "보상" })[roomType] || roomType || "미정";
+}
+
+function roomIcon(roomType) {
+  return ({ combat: "전", elite: "정", boss: "보", shop: "상", rest: "쉼", event: "이", reward: "★" })[roomType] || "?";
 }
 
 function costLabel(cost = {}) {

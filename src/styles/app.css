@@ -287,6 +287,26 @@ h1 {
   font-weight: 700;
 }
 
+.stage-room-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 8px;
+}
+
+.room-mini {
+  display: grid;
+  width: 26px;
+  height: 26px;
+  place-items: center;
+  border: 2px solid rgba(76, 79, 112, 0.1);
+  border-radius: 8px;
+  background: #ffffff;
+  color: #4f536d;
+  font-size: 11px;
+  font-weight: 900;
+}
+
 .roadmap-panel {
   margin-top: 18px;
 }
@@ -473,6 +493,188 @@ h1 {
   padding: 7px 10px;
   border-radius: 999px;
   background: #fff2c6;
+}
+
+.stage-route-panel {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  border: 2px solid rgba(76, 79, 112, 0.12);
+  border-radius: 8px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(237, 248, 255, 0.68)),
+    #ffffff;
+  box-shadow: 0 12px 28px rgba(76, 70, 116, 0.09);
+}
+
+.stage-route-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: start;
+}
+
+.route-kicker {
+  display: inline-flex;
+  margin-bottom: 6px;
+  padding: 5px 9px;
+  border-radius: 999px;
+  background: #fff2c6;
+  color: #7c5d15;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.stage-route-head strong {
+  display: block;
+  color: #383a56;
+  font-size: 24px;
+}
+
+.stage-route-head p {
+  margin: 5px 0 0;
+  color: #5f6680;
+  font-weight: 800;
+}
+
+.route-next-card {
+  display: grid;
+  min-width: 230px;
+  gap: 4px;
+  padding: 12px;
+  border: 2px solid rgba(124, 204, 247, 0.26);
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.route-next-card span,
+.route-next-card small {
+  color: #686c88;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.route-next-card strong {
+  font-size: 20px;
+}
+
+.route-progress {
+  height: 12px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #d7e6ef;
+}
+
+.route-progress i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #7cccf7, #67d9a5, #ffd45f);
+}
+
+.route-node-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(104px, 1fr));
+  gap: 8px;
+}
+
+.route-node {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  gap: 8px;
+  align-items: center;
+  min-height: 66px;
+  padding: 9px;
+  border: 2px solid rgba(76, 79, 112, 0.1);
+  border-radius: 8px;
+  background: #fffaf0;
+}
+
+.route-node-icon {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #4f536d;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.route-node strong,
+.route-node small {
+  display: block;
+}
+
+.route-node strong {
+  overflow-wrap: anywhere;
+  color: #383a56;
+  font-size: 13px;
+}
+
+.route-node small {
+  margin-top: 2px;
+  color: #686c88;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.route-node.completed {
+  background: #e8f8f1;
+}
+
+.route-node.active {
+  border-color: #ff8ea2;
+  background: #fff2c6;
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.86);
+}
+
+.route-node.next {
+  border-color: #7cccf7;
+}
+
+.route-node.defeated {
+  border-color: #ff8ea2;
+  background: #ffe1e7;
+}
+
+.room-combat .route-node-icon,
+.room-combat.room-mini {
+  background: #edf8ff;
+  color: #375b78;
+}
+
+.room-elite .route-node-icon,
+.room-elite.room-mini {
+  background: #f2edff;
+  color: #6555a0;
+}
+
+.room-boss .route-node-icon,
+.room-boss.room-mini {
+  background: #ffe1e7;
+  color: #a33c50;
+}
+
+.room-event .route-node-icon,
+.room-event.room-mini {
+  background: #fff2c6;
+  color: #7c5d15;
+}
+
+.room-shop .route-node-icon,
+.room-shop.room-mini {
+  background: #dff3ff;
+  color: #4f6880;
+}
+
+.room-rest .route-node-icon,
+.room-rest.room-mini,
+.room-reward .route-node-icon,
+.room-reward.room-mini {
+  background: #e8f8f1;
+  color: #347159;
 }
 
 .combat-grid,
@@ -1235,13 +1437,19 @@ h1 {
   .gem-vault-grid,
   .socket-card-preview,
   .choice-head,
+  .stage-route-head,
   .profile-grid,
   .result-grid {
     grid-template-columns: 1fr;
   }
 
+  .stage-route-head,
   .choice-head {
     display: grid;
+  }
+
+  .route-next-card {
+    min-width: 0;
   }
 
   .choice-wallet {
@@ -1275,5 +1483,22 @@ h1 {
 
   .lead {
     font-size: 17px;
+  }
+
+  .route-node-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .stage-route-head strong {
+    font-size: 21px;
+  }
+
+  .route-node {
+    grid-template-columns: 30px minmax(0, 1fr);
+  }
+
+  .route-node-icon {
+    width: 30px;
+    height: 30px;
   }
 }

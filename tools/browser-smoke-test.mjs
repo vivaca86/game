@@ -56,9 +56,27 @@ const profileGoalCards = await page.locator(".goal-card").count();
 if (profileGoalCards === 0) throw new Error("프로필 목표 카드 표시 실패");
 const lockedStageOptions = await page.locator("#stageSelect option:disabled").count();
 if (lockedStageOptions === 0) throw new Error("잠긴 스테이지 표시 실패");
+const setupRoomChips = await page.locator(".stage-room-strip .room-mini").count();
+if (setupRoomChips === 0) throw new Error("스테이지 방 구성 칩 표시 실패");
 
 await page.click("#startRunButton");
 await page.waitForSelector(".run-board", { timeout: 10000 });
+await page.waitForSelector(".stage-route-panel", { timeout: 10000 });
+await page.waitForSelector(".route-node.active", { timeout: 10000 });
+await page.waitForSelector(".route-node.room-boss", { timeout: 10000 });
+const routeText = await page.textContent(".stage-route-panel");
+if (!routeText?.includes("스테이지 경로") || !routeText.includes("현재 방") || !routeText.includes("보스")) {
+  throw new Error("스테이지 경로판 표시 실패");
+}
+const routeNodeCount = await page.locator(".route-node").count();
+if (routeNodeCount < 7) throw new Error(`스테이지 경로 노드 부족: ${routeNodeCount}`);
+const routeOverflowItems = await page.locator(".stage-route-panel, .route-node, .route-next-card").evaluateAll((elements) => elements
+  .filter((element) => element.scrollWidth > element.clientWidth + 2 || element.scrollHeight > element.clientHeight + 2)
+  .map((element) => element.className));
+if (routeOverflowItems.length > 0) {
+  throw new Error(`스테이지 경로 UI 넘침: ${routeOverflowItems.slice(0, 4).join(" | ")}`);
+}
+await page.screenshot({ path: "tmp/stage-route-desktop.png", fullPage: true });
 await page.waitForSelector(".play-card", { timeout: 10000 });
 await page.waitForSelector(".arcana-chip", { timeout: 10000 });
 const enemyText = await page.textContent(".enemy-card");
@@ -133,6 +151,8 @@ await page.setViewportSize({ width: 390, height: 820 });
 await page.waitForTimeout(120);
 const mobileColumns = await page.locator(".market-list").evaluate((element) => getComputedStyle(element).gridTemplateColumns.split(" ").length);
 if (mobileColumns !== 1) throw new Error("모바일 상점/보상 선택지 1열 반응형 확인 실패");
+const mobileRouteColumns = await page.locator(".route-node-list").evaluate((element) => getComputedStyle(element).gridTemplateColumns.split(" ").length);
+if (mobileRouteColumns !== 2) throw new Error("모바일 스테이지 경로 2열 반응형 확인 실패");
 await page.screenshot({ path: "tmp/market-ui-mobile.png", fullPage: true });
 
 if (errors.length > 0) {
