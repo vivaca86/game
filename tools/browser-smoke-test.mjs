@@ -158,6 +158,9 @@ await page.reload({ waitUntil: "networkidle" });
 await page.waitForSelector("#loadRunButton:not(:disabled)", { timeout: 10000 });
 await page.click("#loadRunButton");
 await page.waitForSelector(".stage-route-panel", { timeout: 10000 });
+await page.waitForSelector(".current-room-panel", { timeout: 10000 });
+await page.waitForSelector(".current-room-emblem", { timeout: 10000 });
+await page.waitForSelector(".current-room-chip", { timeout: 10000 });
 await page.waitForSelector(".combat-forecast", { timeout: 10000 });
 await page.waitForSelector(".combat-status-board", { timeout: 10000 });
 await page.waitForSelector(".combat-status-card.status-card-mark", { timeout: 10000 });
@@ -183,6 +186,19 @@ const routeText = await page.textContent(".stage-route-panel");
 if (!routeText?.includes("스테이지 경로") || !routeText.includes("현재 방") || !routeText.includes("보스")) {
   throw new Error("스테이지 경로판 표시 실패");
 }
+const currentRoomText = await page.textContent(".current-room-panel");
+if (!currentRoomText?.includes("현재 방") || !currentRoomText.includes("전투") || !currentRoomText.includes("진행")) {
+  throw new Error("현재 방 안내판 핵심 정보 표시 실패");
+}
+const currentRoomChipCount = await page.locator(".current-room-chip").count();
+if (currentRoomChipCount < 4) throw new Error("현재 방 안내 칩 표시 부족");
+const currentRoomOverflowItems = await page.locator(".current-room-panel, .current-room-core, .current-room-emblem, .current-room-copy, .current-room-chip").evaluateAll((elements) => elements
+  .filter((element) => element.scrollWidth > element.clientWidth + 2 || element.scrollHeight > element.clientHeight + 2)
+  .map((element) => element.className));
+if (currentRoomOverflowItems.length > 0) {
+  throw new Error(`현재 방 안내판 UI 넘침: ${currentRoomOverflowItems.slice(0, 4).join(" | ")}`);
+}
+await page.locator(".current-room-panel").screenshot({ path: "tmp/current-room-panel-desktop.png" });
 const combatForecastText = await page.textContent(".combat-forecast");
 if (!combatForecastText?.includes("이번 턴 예고") || (!combatForecastText.includes("예상 피해") && !combatForecastText.includes("피해 없음"))) {
   throw new Error("전투 예고판 표시 실패");
@@ -221,14 +237,17 @@ if (combatOverflowItems.length > 0) {
 await page.screenshot({ path: "tmp/combat-ui-desktop.png", fullPage: true });
 await page.setViewportSize({ width: 390, height: 820 });
 await page.waitForTimeout(120);
+const currentRoomMobileColumns = await page.locator(".current-room-panel").evaluate((element) => getComputedStyle(element).gridTemplateColumns.split(" ").length);
+if (currentRoomMobileColumns !== 1) throw new Error("모바일 현재 방 안내판 1열 반응형 확인 실패");
 const combatStatusMobileColumns = await page.locator(".combat-status-board").evaluate((element) => getComputedStyle(element).gridTemplateColumns.split(" ").length);
 if (combatStatusMobileColumns !== 1) throw new Error("모바일 전투 상태판 1열 반응형 확인 실패");
-const combatStatusMobileOverflow = await page.locator(".combat-status-card, .status-card-copy, .enemy-status-chip, .card-preview-chip").evaluateAll((elements) => elements
+const combatStatusMobileOverflow = await page.locator(".current-room-panel, .current-room-core, .current-room-chip, .combat-status-card, .status-card-copy, .enemy-status-chip, .card-preview-chip").evaluateAll((elements) => elements
   .filter((element) => element.scrollWidth > element.clientWidth + 2 || element.scrollHeight > element.clientHeight + 2)
   .map((element) => element.className));
 if (combatStatusMobileOverflow.length > 0) {
   throw new Error(`모바일 전투 상태판 넘침: ${combatStatusMobileOverflow.slice(0, 4).join(" | ")}`);
 }
+await page.locator(".current-room-panel").screenshot({ path: "tmp/current-room-panel-mobile.png" });
 await page.screenshot({ path: "tmp/combat-status-mobile.png", fullPage: true });
 await page.setViewportSize({ width: 1366, height: 900 });
 

@@ -1315,6 +1315,167 @@ h1 {
   background: #fff2c6;
 }
 
+.current-room-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: center;
+  padding: 16px;
+  border: 2px solid rgba(76, 79, 112, 0.1);
+  border-radius: 8px;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.92), rgba(237, 248, 255, 0.76) 56%, rgba(255, 250, 240, 0.9)),
+    #ffffff;
+  box-shadow: 0 12px 28px rgba(76, 70, 116, 0.08);
+}
+
+.room-current-elite {
+  border-color: rgba(169, 156, 255, 0.28);
+  background: linear-gradient(135deg, #ffffff, #f2edff 60%, #fffaf0);
+}
+
+.room-current-boss {
+  border-color: rgba(255, 142, 162, 0.34);
+  background: linear-gradient(135deg, #ffffff, #ffe8ee 58%, #fff2c6);
+}
+
+.room-current-event,
+.room-current-shop,
+.room-current-reward {
+  border-color: rgba(255, 212, 95, 0.3);
+  background: linear-gradient(135deg, #ffffff, #fff8df 58%, #e9f6ff);
+}
+
+.current-room-core {
+  display: grid;
+  grid-template-columns: 58px minmax(0, 1fr);
+  gap: 12px;
+  align-items: center;
+  min-width: 0;
+}
+
+.current-room-emblem {
+  display: grid;
+  width: 58px;
+  height: 58px;
+  place-items: center;
+  border: 3px solid rgba(255, 255, 255, 0.94);
+  border-radius: 17px;
+  background: #edf8ff;
+  color: #375b78;
+  font-size: 18px;
+  font-weight: 900;
+  box-shadow: 0 9px 18px rgba(76, 70, 116, 0.13);
+}
+
+.current-room-emblem.room-combat {
+  background: linear-gradient(145deg, #edf8ff, #7cccf7);
+  color: #315a78;
+}
+
+.current-room-emblem.room-elite {
+  background: linear-gradient(145deg, #f2edff, #b9a9ff);
+  color: #6555a0;
+}
+
+.current-room-emblem.room-boss {
+  background: linear-gradient(145deg, #ffe1e7, #ff8ea2);
+  color: #9a3147;
+}
+
+.current-room-emblem.room-event,
+.current-room-emblem.room-shop,
+.current-room-emblem.room-reward {
+  background: linear-gradient(145deg, #fff2c6, #ffd45f);
+  color: #765715;
+}
+
+.current-room-emblem.room-rest {
+  background: linear-gradient(145deg, #e8f8f1, #67d9a5);
+  color: #347159;
+}
+
+.current-room-copy {
+  min-width: 0;
+}
+
+.current-room-copy strong,
+.current-room-copy p {
+  display: block;
+  overflow-wrap: anywhere;
+}
+
+.current-room-copy strong {
+  color: #383a56;
+  font-size: 23px;
+  line-height: 1.1;
+}
+
+.current-room-copy p {
+  margin: 6px 0 0;
+  color: #5f6680;
+  font-weight: 800;
+  line-height: 1.42;
+}
+
+.current-room-chip-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 7px;
+  min-width: 0;
+}
+
+.current-room-chip {
+  display: grid;
+  min-width: 64px;
+  gap: 2px;
+  padding: 7px 9px;
+  border-radius: 8px;
+  background: #edf8ff;
+  color: #425a70;
+  text-align: center;
+}
+
+.current-room-chip b,
+.current-room-chip em {
+  display: block;
+  overflow-wrap: anywhere;
+}
+
+.current-room-chip b {
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.current-room-chip em {
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 900;
+}
+
+.current-room-chip.chip-combat,
+.current-room-chip.chip-danger {
+  background: #ffe1e7;
+  color: #a33c50;
+}
+
+.current-room-chip.chip-guard,
+.current-room-chip.chip-heal {
+  background: #e8f8f1;
+  color: #347159;
+}
+
+.current-room-chip.chip-flow {
+  background: #e9f6ff;
+  color: #4f6880;
+}
+
+.current-room-chip.chip-reward {
+  background: #fff2c6;
+  color: #7c5d15;
+}
+
 .stage-route-panel {
   display: grid;
   gap: 12px;
@@ -4231,9 +4392,11 @@ h1 {
 
   .forecast-main,
   .disruption-control,
+  .current-room-panel,
   .stage-route-head,
   .choice-head {
     display: grid;
+    grid-template-columns: 1fr;
   }
 
   .route-next-card {
@@ -4242,6 +4405,10 @@ h1 {
 
   .room-advance-btn {
     width: fit-content;
+  }
+
+  .current-room-chip-list {
+    justify-content: flex-start;
   }
 
   .choice-wallet {
@@ -4361,6 +4528,30 @@ h1 {
   .room-advance-btn {
     width: 100%;
     min-width: 0;
+  }
+
+  .current-room-panel {
+    padding: 14px;
+  }
+
+  .current-room-core {
+    grid-template-columns: 50px minmax(0, 1fr);
+  }
+
+  .current-room-emblem {
+    width: 50px;
+    height: 50px;
+    border-radius: 15px;
+    font-size: 16px;
+  }
+
+  .current-room-copy strong {
+    font-size: 20px;
+  }
+
+  .current-room-chip {
+    min-width: 58px;
+    padding: 6px 8px;
   }
 
   .forecast-main {

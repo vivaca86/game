@@ -731,6 +731,7 @@ function renderRun() {
       </div>
       ${renderActionFeedback(state)}
       ${renderStageRoute(state, stage, index)}
+      ${renderCurrentRoomPanel(state, stage, index)}
       ${renderPhase(state, index)}
       ${renderBuildPanel(state, index)}
       ${renderGemVault(state, index)}
@@ -770,6 +771,61 @@ function feedbackMetricClass(label = "") {
   if (label.includes("드로우") || label.includes("기운")) return "flow";
   if (label.includes("별사탕") || label.includes("획득")) return "reward";
   return "note";
+}
+
+function renderCurrentRoomPanel(state, stage, index) {
+  if (!stage || ["room_complete", "stage_clear", "defeat"].includes(state.phase)) return "";
+  const roomType = state.currentRoomType || stage.rooms?.[state.roomIndex] || state.phase;
+  const roomNumber = Math.min((state.roomIndex || 0) + 1, stage.rooms?.length || 1);
+  const boss = index.enemies.get(stage.bossEnemyId);
+  const chips = currentRoomChips(roomType, state, stage, boss);
+  return `
+    <section class="current-room-panel room-current-${roomType}">
+      <div class="current-room-core">
+        <span class="current-room-emblem room-${roomType}">${roomIcon(roomType)}</span>
+        <div class="current-room-copy">
+          <span class="route-kicker">현재 방</span>
+          <strong>${roomNumber}. ${roomLabel(roomType)}</strong>
+          <p>${currentRoomDetail(roomType, state, stage, boss)}</p>
+        </div>
+      </div>
+      <div class="current-room-chip-list">
+        ${chips.map((chip) => `<span class="current-room-chip chip-${chip.tone}"><b>${chip.label}</b>${chip.value ? `<em>${chip.value}</em>` : ""}</span>`).join("")}
+      </div>
+    </section>
+  `;
+}
+
+function currentRoomDetail(roomType, state, stage, boss) {
+  const enemies = Array.isArray(state.enemies) ? state.enemies : [];
+  if (roomType === "boss") return `${boss?.name || enemies[0]?.name || "보스"}의 페이즈 변화를 보며 마지막 보상을 향해 갑니다.`;
+  if (roomType === "elite") return "정예 몬스터는 더 거칠지만 보상도 큽니다. 손패 순서와 보호막을 먼저 확인하세요.";
+  if (roomType === "combat") return `${enemies.length || 1}마리 몬스터와 전투합니다. 의도와 예상 피해를 보고 카드 순서를 고릅니다.`;
+  if (roomType === "event") return `${state.pendingEvent?.name || "이벤트"} 선택지로 덱과 체력 흐름이 달라집니다.`;
+  if (roomType === "shop") return "별사탕으로 카드, 보석, 유물, 기운을 정비하는 방입니다.";
+  if (roomType === "reward") return "이번 전투의 보상 중 다음 빌드에 맞는 성장을 고릅니다.";
+  if (roomType === "rest") return "체력을 회복하고 다음 전투를 준비하는 쉼터입니다.";
+  return `${stage.name}의 다음 선택을 준비합니다.`;
+}
+
+function currentRoomChips(roomType, state, stage, boss) {
+  const chips = [
+    { tone: "note", label: "진행", value: `${Math.min((state.roomIndex || 0) + 1, stage.rooms?.length || 1)}/${stage.rooms?.length || 1}` }
+  ];
+  if (["combat", "elite", "boss"].includes(roomType)) {
+    chips.push({ tone: roomType === "boss" ? "danger" : "combat", label: "적", value: `${state.enemies?.length || 1}` });
+    chips.push({ tone: "flow", label: "턴", value: `${state.turn || 1}` });
+    chips.push({ tone: "guard", label: "보호막", value: `${state.player?.shield || 0}` });
+  }
+  if (roomType === "boss") chips.push({ tone: "danger", label: "보스", value: boss?.name || "결전" });
+  if (roomType === "elite") chips.push({ tone: "reward", label: "추가 보상", value: "높음" });
+  if (roomType === "event") chips.push({ tone: "reward", label: "선택지", value: `${state.pendingEvent?.choices?.length || 0}` });
+  if (["shop", "reward"].includes(roomType)) {
+    chips.push({ tone: "reward", label: "별사탕", value: `${state.player?.gold || 0}` });
+    chips.push({ tone: "flow", label: "선택", value: `${state.pendingReward?.options?.length || 0}` });
+  }
+  if (roomType === "rest") chips.push({ tone: "heal", label: "회복", value: "즉시" });
+  return chips;
 }
 
 function renderStageRoute(state, stage, index) {
