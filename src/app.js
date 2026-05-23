@@ -6,6 +6,7 @@ import { cardCost } from "./core/card-effects.js";
 import { cardRoleSummary } from "./core/card-roles.js";
 import { gemFitHints, gemRoleSummary } from "./core/gem-roles.js";
 import { buildFitHints, buildItemRoleSummary } from "./core/build-roles.js";
+import { eventChoiceRiskSummary, eventChoiceRoleSummary, eventChoiceSignalItems, eventRiskSpread, eventRoleSummary } from "./core/event-roles.js";
 import {
   canEquipGemToCard,
   ensureGemState,
@@ -438,6 +439,7 @@ function codexKinds() {
     { kind: "arcanas", label: "기운" },
     { kind: "characters", label: "캐릭터" },
     { kind: "stages", label: "스테이지" },
+    { kind: "events", label: "이벤트" },
     { kind: "enemies", label: "몬스터" }
   ];
 }
@@ -454,6 +456,7 @@ function codexEntries(index, profile, kind) {
     arcanas: index.data.arcanas,
     characters: index.data.characters,
     stages: index.data.stages,
+    events: index.data.events,
     enemies: index.data.enemies
   }[kind] || index.data.cards;
   return rows.map((item) => ({ item, unlocked: isCodexUnlocked(profile, kind, item, index) }));
@@ -466,11 +469,19 @@ function isCodexUnlocked(profile, kind, item, index) {
   if (kind === "arcanas") return profile.unlockedArcanas?.includes(item.id);
   if (kind === "characters") return profile.unlockedCharacters?.includes(item.id);
   if (kind === "stages") return profile.unlockedStages?.includes(item.id);
+  if (kind === "events") return isEventUnlocked(profile, item);
   if (kind === "enemies") {
     return index.data.stages
       .filter((stage) => profile.unlockedStages?.includes(stage.id))
       .some((stage) => [stage.bossEnemyId, ...(stage.enemyPool || []), ...(stage.elitePool || [])].includes(item.id));
   }
+  return false;
+}
+
+function isEventUnlocked(profile, event) {
+  const unlock = event.unlock || { type: "starter_pool" };
+  if (["starter", "starter_pool", "none"].includes(unlock.type)) return true;
+  if (unlock.type === "stage_clear") return profile.clearedStages?.includes(unlock.stageId);
   return false;
 }
 
@@ -485,6 +496,7 @@ function renderCodexEntry(entry, kind, index) {
   if (kind === "arcanas") return renderCodexBuildItem("arcana", item, entryClass, stateBadge);
   if (kind === "characters") return renderCodexCharacter(item, entryClass, stateBadge);
   if (kind === "stages") return renderCodexStage(item, entryClass, stateBadge, index);
+  if (kind === "events") return renderCodexEvent(item, entryClass, stateBadge);
   if (kind === "enemies") return renderCodexEnemy(item, entryClass, stateBadge);
   return "";
 }
@@ -529,6 +541,26 @@ function renderCodexBuildItem(kind, item, entryClass, stateBadge) {
         ${renderBuildRoleChip(item, kind)}
         <p>${kind === "relic" ? relicEffectSummary(item) : arcanaEffectSummary(item)}</p>
         ${renderBuildFitHints(item, kind)}
+      </div>
+    </article>
+  `;
+}
+
+function renderCodexEvent(event, entryClass, stateBadge) {
+  const role = eventRoleSummary(event);
+  const spread = eventRiskSpread(event);
+  return `
+    <article class="codex-entry codex-event ${entryClass}">
+      ${renderEventSceneGraphic(event, "codex")}
+      <div class="codex-copy">
+        <span><b>${stateBadge}</b> · ${eventTypeLabel(event.type)} · 위험 ${spread.highest.label}</span>
+        <strong>${event.name}</strong>
+        ${renderEventRoleChip(role)}
+        ${renderEventRiskChip(spread.highest, spread.maxLevel)}
+        <p>${event.text}</p>
+        <span class="event-choice-preview-list" aria-label="${event.name} 선택지 성향">
+          ${(event.choices || []).map((choice) => renderEventChoicePreview(choice)).join("")}
+        </span>
       </div>
     </article>
   `;
@@ -969,6 +1001,7 @@ function renderRoomComplete(state, index) {
   const completedRoomType = state.currentRoomType || stage?.rooms?.[state.roomIndex] || "combat";
   const nextRoomIndex = state.roomIndex + 1;
   const nextRoomType = stage?.rooms?.[nextRoomIndex] || null;
+  const pendingEventEnemy = state.status?.eventCombatEnemyId ? index.enemies.get(state.status.eventCombatEnemyId) : null;
   const progress = stage?.rooms?.length ? boundedPercent(nextRoomIndex, stage.rooms.length) : 100;
   const boss = stage ? index.enemies.get(stage.bossEnemyId) : null;
   return `
@@ -990,14 +1023,14 @@ function renderRoomComplete(state, index) {
           <strong>${roomCompleteSummary(completedRoomType, state)}</strong>
           <p>체력 ${player.hp ?? 0}/${player.maxHp ?? 0} · 별사탕 ${player.gold ?? 0} · 처치 ${metrics.enemiesDefeated || 0}</p>
         </article>
-        <article class="room-complete-card next-room-preview ${nextRoomType ? `room-${nextRoomType}` : "room-stage-clear"}">
-          <span>${nextRoomType ? "다음 방" : "다음 목표"}</span>
-          <strong>${nextRoomType ? roomLabel(nextRoomType) : "스테이지 결과"}</strong>
-          <p>${nextRoomDetail(nextRoomType, boss, stage)}</p>
+        <article class="room-complete-card next-room-preview ${pendingEventEnemy ? "room-combat pending-event-combat" : nextRoomType ? `room-${nextRoomType}` : "room-stage-clear"}">
+          <span>${pendingEventEnemy ? "추가 전투" : nextRoomType ? "다음 방" : "다음 목표"}</span>
+          <strong>${pendingEventEnemy ? pendingEventEnemy.name : nextRoomType ? roomLabel(nextRoomType) : "스테이지 결과"}</strong>
+          <p>${pendingEventEnemy ? `${rankLabel(pendingEventEnemy.rank)} 장난 전투 후 보상을 확인합니다.` : nextRoomDetail(nextRoomType, boss, stage)}</p>
         </article>
       </div>
       ${renderRoomCompleteFeedback(state)}
-      <button class="primary-btn room-advance-btn" data-action="advance">${nextRoomType ? "다음 방으로" : "결과 보기"}</button>
+      <button class="primary-btn room-advance-btn" data-action="advance">${pendingEventEnemy ? "추가 전투 시작" : nextRoomType ? "다음 방으로" : "결과 보기"}</button>
     </section>
   `;
 }
@@ -2399,22 +2432,23 @@ function renderEvent(state, index) {
   const event = state.pendingEvent;
   const eventTone = event.type || "choice";
   const scene = eventSceneKey(event);
+  const eventRole = eventRoleSummary(event);
+  const riskSpread = eventRiskSpread(event);
   return `
     <section class="choice-box market-box event-box market-tone-${eventTone} event-scene-tone-${scene}">
       <div class="choice-head event-head">
         <div class="event-copy">
           <span class="choice-kicker">${eventTypeLabel(eventTone)}</span>
           <strong>${event.name}</strong>
+          <span class="event-summary-row">
+            ${renderEventRoleChip(eventRole)}
+            ${renderEventRiskChip(riskSpread.highest, riskSpread.maxLevel)}
+            <span class="event-choice-count-chip"><b>선</b><em>선택지 ${event.choices?.length || 0}</em></span>
+          </span>
           <p>${event.text}</p>
         </div>
         <div class="event-visual-card" aria-hidden="true">
-          <span class="event-scene event-scene-${scene}">
-            <span class="event-scene-icon">${eventSceneIcon(scene)}</span>
-            <span class="event-shape main"></span>
-            <span class="event-shape aux"></span>
-            <span class="event-shape sparkle-one"></span>
-            <span class="event-shape sparkle-two"></span>
-          </span>
+          ${renderEventSceneGraphic(event, "panel")}
         </div>
         <div class="choice-wallet event-wallet">
           <span>별사탕 ${state.player.gold}</span>
@@ -2426,13 +2460,19 @@ function renderEvent(state, index) {
           const cost = adjustedRewardCost(state, index, choice.cost || {}, { source: event.type, reward: choice.reward || {} });
           const affordable = canPayCost(state, cost);
           const rewardKind = choiceRewardKind(choice.reward || {});
+          const choiceRole = eventChoiceRoleSummary(choice);
+          const choiceRisk = eventChoiceRiskSummary(choice, cost);
           return `
-          <button class="choice-btn market-choice event-choice event-choice-${rewardKind} ${affordable ? "" : "locked-choice"}" data-action="event-choice" data-choice-index="${choiceIndex}" ${affordable ? "" : "disabled"}>
+          <button class="choice-btn market-choice event-choice event-choice-${rewardKind} event-risk-${choiceRisk.key} ${affordable ? "" : "locked-choice"}" data-action="event-choice" data-choice-index="${choiceIndex}" ${affordable ? "" : "disabled"}>
             <span class="event-choice-topline">
               <span class="choice-reward-icon">${choiceRewardIcon(rewardKind)}</span>
               <span class="choice-cost ${affordable ? "can-pay" : "cannot-pay"}">${costLabel(cost)}</span>
             </span>
             <strong>${choice.label}</strong>
+            <span class="event-choice-traits">
+              ${renderEventRoleChip(choiceRole)}
+              ${renderEventRiskChip(choiceRisk)}
+            </span>
             <span class="choice-note">${affordable ? rewardLabel(choice.reward) : shortageLabel(state, cost)}</span>
             ${renderChoiceImpactList(eventChoiceImpactItems(choice, cost, state, index, affordable))}
             <span class="reward-preview-grid">
@@ -2443,6 +2483,60 @@ function renderEvent(state, index) {
         }).join("")}
       </div>
     </section>
+  `;
+}
+
+function renderEventSceneGraphic(event = {}, variant = "panel") {
+  const scene = eventSceneKey(event);
+  const role = eventRoleSummary(event);
+  return `
+    <span class="event-scene event-scene-${scene} event-scene-${variant}">
+      <span class="event-scene-icon">${eventSceneIcon(scene)}</span>
+      <span class="event-shape main"></span>
+      <span class="event-shape aux"></span>
+      <span class="event-shape sparkle-one"></span>
+      <span class="event-shape sparkle-two"></span>
+      <span class="event-scene-role-mark event-scene-role-${role.tone}">${role.icon}</span>
+    </span>
+  `;
+}
+
+function renderEventRoleChip(role) {
+  return `
+    <span class="event-role-chip event-role-${role.tone}" title="${role.label}">
+      <b>${role.icon}</b>
+      <em>${role.label}</em>
+    </span>
+  `;
+}
+
+function renderEventRiskChip(risk, levelOverride = risk.level) {
+  return `
+    <span class="event-risk-chip event-risk-chip-${risk.key}" title="${risk.label}">
+      <b>${risk.icon}</b>
+      <em>${risk.label}</em>
+      ${renderEventRiskMeter(levelOverride)}
+    </span>
+  `;
+}
+
+function renderEventRiskMeter(level = 0) {
+  return `
+    <span class="event-risk-meter" aria-hidden="true">
+      ${[1, 2, 3].map((step) => `<i class="${level >= step ? "active" : ""}"></i>`).join("")}
+    </span>
+  `;
+}
+
+function renderEventChoicePreview(choice) {
+  const role = eventChoiceRoleSummary(choice);
+  const risk = eventChoiceRiskSummary(choice);
+  return `
+    <span class="event-choice-preview event-choice-preview-${risk.key}">
+      <b>${role.icon}</b>
+      <em>${role.label}</em>
+      <small>${risk.label}</small>
+    </span>
   `;
 }
 
@@ -2568,6 +2662,10 @@ function roomIcon(roomType) {
   return ({ combat: "전", elite: "정", boss: "보", shop: "상", rest: "쉼", event: "이", reward: "★" })[roomType] || "?";
 }
 
+function rankLabel(rank) {
+  return ({ minion: "일반", normal: "일반", elite: "정예", boss: "보스" })[rank] || "일반";
+}
+
 function costLabel(cost = {}) {
   const parts = [];
   if (cost.gold) parts.push(`별사탕 ${cost.gold}`);
@@ -2609,6 +2707,7 @@ function renderChoiceImpactList(items = []) {
 
 function eventChoiceImpactItems(choice = {}, cost = {}, state, index, affordable = true) {
   return [
+    ...eventChoiceSignalItems(choice, cost),
     ...costImpactItems(cost, state, affordable),
     ...rewardImpactItems(choice.reward || {}, index),
     affordable ? null : { tone: "danger", icon: "!", label: "부족", value: shortageLabel(state, cost) }

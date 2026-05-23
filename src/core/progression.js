@@ -49,6 +49,12 @@ export function enterCurrentRoom(state, index) {
 
 export function advanceRoom(state, index) {
   if (!["room_complete", "reward"].includes(state.phase)) return false;
+  if (state.status?.eventCombatEnemyId) {
+    const enemyId = state.status.eventCombatEnemyId;
+    state.status.eventCombatEnemyId = null;
+    startCombat(state, index, "combat", { enemyIds: [enemyId], label: "이벤트 전투" });
+    return true;
+  }
   const stage = index.stages.get(state.stageId);
   state.roomIndex += 1;
   if (state.roomIndex >= stage.rooms.length) {

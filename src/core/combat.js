@@ -18,15 +18,17 @@ import {
 
 let enemyInstanceSeq = 1;
 
-export function startCombat(state, index, roomType = "combat") {
+export function startCombat(state, index, roomType = "combat", options = {}) {
   ensureGemState(state);
   const stage = index.stages.get(state.stageId);
-  const sourcePool = roomType === "boss"
+  const sourcePool = Array.isArray(options.enemyIds) && options.enemyIds.length > 0
+    ? options.enemyIds
+    : roomType === "boss"
     ? [stage.bossEnemyId]
     : roomType === "elite"
       ? stage.elitePool
       : stage.enemyPool;
-  const count = roomType === "combat" ? Math.min(2, sourcePool.length) : 1;
+  const count = options.enemyIds?.length || (roomType === "combat" ? Math.min(2, sourcePool.length) : 1);
   state.enemies = selectEnemyIds(sourcePool, count, state)
     .map((enemyId) => createEnemyInstance(index.enemies.get(enemyId), stage, roomType))
     .filter(Boolean);
@@ -45,7 +47,7 @@ export function startCombat(state, index, roomType = "combat") {
   state.metrics.enemyIntentsResolved = state.metrics.enemyIntentsResolved || 0;
   state.metrics.bossPhaseTriggers = state.metrics.bossPhaseTriggers || 0;
   applyBattleStartModifiers(state, index);
-  addLog(state, `${roomLabel(roomType)} 시작`);
+  addLog(state, `${options.label || roomLabel(roomType)} 시작`);
 }
 
 export function playCard(state, index, handIndex) {

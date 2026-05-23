@@ -88,7 +88,7 @@ if (moruEnabled > 0) {
 }
 
 async function assertNoCodexOverflow(label) {
-  const overflowItems = await page.locator(".codex-entry, .codex-copy, .card-art-codex, .card-role-chip, .gem-role-chip, .gem-fit-list, .build-role-chip, .build-fit-list, .codex-entry > .gem-icon, .codex-entry > .item-icon, .codex-portrait-slot, .codex-stage .stage-key-art, .codex-enemy .monster-portrait").evaluateAll((elements) => elements
+  const overflowItems = await page.locator(".codex-entry, .codex-copy, .card-art-codex, .card-role-chip, .gem-role-chip, .gem-fit-list, .build-role-chip, .build-fit-list, .event-role-chip, .event-risk-chip, .event-choice-preview-list, .event-scene-codex, .codex-entry > .gem-icon, .codex-entry > .item-icon, .codex-portrait-slot, .codex-stage .stage-key-art, .codex-enemy .monster-portrait").evaluateAll((elements) => elements
     .filter((element) => element.scrollWidth > element.clientWidth + 2 || element.scrollHeight > element.clientHeight + 2)
     .map((element) => element.className));
   if (overflowItems.length > 0) {
@@ -129,6 +129,11 @@ await assertCodexVisual("characters", ".codex-kind-characters .character-portrai
 const codexPassiveChipCount = await page.locator(".codex-kind-characters .character-passive-chip").count();
 if (codexPassiveChipCount < 46) throw new Error("캐릭터 도감 보조 패시브 칩 표시 실패");
 await assertCodexVisual("stages", ".codex-kind-stages .stage-key-art", 15, "스테이지");
+await assertCodexVisual("events", ".codex-kind-events .event-scene-codex", 10, "이벤트");
+const codexEventRoleCount = await page.locator(".codex-kind-events .event-role-chip").count();
+const codexEventRiskCount = await page.locator(".codex-kind-events .event-risk-chip").count();
+const codexEventChoicePreviewCount = await page.locator(".codex-kind-events .event-choice-preview").count();
+if (codexEventRoleCount < 10 || codexEventRiskCount < 10 || codexEventChoicePreviewCount < 30) throw new Error("이벤트 도감 역할/위험/선택지 표시 실패");
 await assertCodexVisual("enemies", ".codex-kind-enemies .monster-portrait", 60, "몬스터");
 await page.setViewportSize({ width: 390, height: 820 });
 await page.waitForTimeout(120);
@@ -610,6 +615,9 @@ await page.waitForSelector(".event-box", { timeout: 10000 });
 await page.waitForSelector(".event-scene", { timeout: 10000 });
 await page.waitForSelector(".choice-reward-icon", { timeout: 10000 });
 await page.waitForSelector(".event-choice .choice-impact-chip", { timeout: 10000 });
+await page.waitForSelector(".event-choice .event-role-chip", { timeout: 10000 });
+await page.waitForSelector(".event-choice .event-risk-chip", { timeout: 10000 });
+await page.waitForSelector(".event-summary-row .event-risk-chip", { timeout: 10000 });
 await page.waitForSelector(".event-choice .reward-preview-card", { timeout: 10000 });
 const eventText = await page.textContent(".event-box");
 if (!eventText?.includes("리본 분수") || !eventText.includes("카드를 강화한다")) throw new Error("이벤트 화면 핵심 문구 표시 실패");
@@ -618,7 +626,10 @@ const eventIconCount = await page.locator(".event-choice .choice-reward-icon").c
 if (eventChoiceCount < 3 || eventIconCount !== eventChoiceCount) throw new Error("이벤트 선택지 아이콘 표시 실패");
 const eventImpactChipCount = await page.locator(".event-choice .choice-impact-chip").count();
 if (eventImpactChipCount < eventChoiceCount) throw new Error("이벤트 선택지 효과 요약 칩 부족");
-const eventOverflowItems = await page.locator(".event-box, .event-head, .event-visual-card, .event-choice, .choice-reward-icon, .choice-impact-chip, .reward-preview-card, .build-role-chip, .build-fit-list").evaluateAll((elements) => elements
+const eventRoleChipCount = await page.locator(".event-choice .event-role-chip").count();
+const eventRiskChipCount = await page.locator(".event-choice .event-risk-chip").count();
+if (eventRoleChipCount < eventChoiceCount || eventRiskChipCount < eventChoiceCount) throw new Error("이벤트 선택지 역할/위험 칩 부족");
+const eventOverflowItems = await page.locator(".event-box, .event-head, .event-visual-card, .event-choice, .event-role-chip, .event-risk-chip, .event-choice-count-chip, .choice-reward-icon, .choice-impact-chip, .reward-preview-card, .build-role-chip, .build-fit-list").evaluateAll((elements) => elements
   .filter((element) => element.scrollWidth > element.clientWidth + 2 || element.scrollHeight > element.clientHeight + 2)
   .map((element) => element.className));
 if (eventOverflowItems.length > 0) {
@@ -630,6 +641,12 @@ await page.setViewportSize({ width: 390, height: 820 });
 await page.waitForTimeout(120);
 const eventMobileColumns = await page.locator(".market-list").evaluate((element) => getComputedStyle(element).gridTemplateColumns.split(" ").length);
 if (eventMobileColumns !== 1) throw new Error("모바일 이벤트 선택지 1열 반응형 확인 실패");
+const eventMobileOverflowItems = await page.locator(".event-box, .event-head, .event-visual-card, .event-choice, .event-role-chip, .event-risk-chip, .event-choice-count-chip, .choice-reward-icon, .choice-impact-chip, .reward-preview-card").evaluateAll((elements) => elements
+  .filter((element) => element.scrollWidth > element.clientWidth + 2 || element.scrollHeight > element.clientHeight + 2)
+  .map((element) => element.className));
+if (eventMobileOverflowItems.length > 0) {
+  throw new Error(`모바일 이벤트 UI 넘침: ${eventMobileOverflowItems.slice(0, 4).join(" | ")}`);
+}
 await page.screenshot({ path: "tmp/event-ui-mobile.png", fullPage: true });
 
 await page.setViewportSize({ width: 1366, height: 900 });

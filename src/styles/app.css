@@ -1121,6 +1121,11 @@ h1 {
   min-height: 164px;
 }
 
+.codex-event {
+  grid-template-columns: 96px minmax(0, 1fr);
+  min-height: 236px;
+}
+
 .codex-character {
   grid-template-columns: 116px minmax(0, 1fr);
 }
@@ -3828,6 +3833,8 @@ h1 {
 }
 
 .event-copy {
+  display: grid;
+  gap: 5px;
   min-width: 0;
 }
 
@@ -3869,6 +3876,56 @@ h1 {
   font-size: 14px;
   font-weight: 900;
   box-shadow: 0 5px 12px rgba(76, 70, 116, 0.12);
+}
+
+.event-scene-role-mark {
+  position: absolute;
+  z-index: 5;
+  right: 8px;
+  bottom: 8px;
+  display: grid;
+  width: 24px;
+  height: 24px;
+  place-items: center;
+  border: 2px solid rgba(255, 255, 255, 0.92);
+  border-radius: 9px;
+  background: #ff9cb1;
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 1000;
+  box-shadow: 0 5px 12px rgba(76, 70, 116, 0.14);
+}
+
+.event-scene-role-card,
+.event-scene-role-power { background: #ff9cb1; }
+.event-scene-role-gem { background: #67d9a5; }
+.event-scene-role-relic,
+.event-scene-role-gold { background: #e8aa2e; }
+.event-scene-role-heal { background: #64c987; }
+.event-scene-role-danger { background: #ff7f8f; }
+
+.event-scene-codex {
+  width: 76px;
+  height: 70px;
+  border-radius: 20px 20px 15px 15px;
+  justify-self: center;
+  align-self: center;
+}
+
+.event-scene-codex .event-scene-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 11px;
+  font-size: 12px;
+}
+
+.event-scene-codex .event-scene-role-mark {
+  width: 18px;
+  height: 18px;
+  right: 5px;
+  bottom: 5px;
+  border-radius: 7px;
+  font-size: 9px;
 }
 
 .event-shape {
@@ -3971,6 +4028,94 @@ h1 {
   font-weight: 900;
 }
 
+.event-summary-row,
+.event-choice-traits {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+.event-role-chip,
+.event-risk-chip,
+.event-choice-count-chip {
+  display: inline-grid;
+  grid-template-columns: 22px minmax(0, auto);
+  gap: 5px;
+  align-items: center;
+  max-width: 100%;
+  padding: 4px 7px 4px 4px;
+  border: 1px solid rgba(76, 79, 112, 0.08);
+  border-radius: 8px;
+  background: #ffffff;
+  color: #4f536d;
+  font-size: 10px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.event-risk-chip {
+  grid-template-columns: 22px minmax(0, auto) 32px;
+}
+
+.event-role-chip b,
+.event-risk-chip b,
+.event-choice-count-chip b {
+  display: inline-grid;
+  width: 22px;
+  height: 22px;
+  place-items: center;
+  border-radius: 7px;
+  background: #8b91a8;
+  color: #ffffff;
+  font-size: 10px;
+}
+
+.event-role-chip em,
+.event-risk-chip em,
+.event-choice-count-chip em {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-style: normal;
+}
+
+.event-role-card b,
+.event-role-power b { background: #ff9cb1; }
+.event-role-gem b { background: #67d9a5; }
+.event-role-relic b,
+.event-role-gold b { background: #e8aa2e; }
+.event-role-heal b,
+.event-role-safe b { background: #64c987; }
+.event-role-danger b { background: #ff7f8f; }
+.event-role-note b { background: #8b91a8; }
+
+.event-risk-chip-safe b { background: #64c987; }
+.event-risk-chip-trade b { background: #e8aa2e; }
+.event-risk-chip-strain b,
+.event-risk-chip-danger b { background: #ff7f8f; }
+
+.event-risk-meter {
+  display: inline-grid;
+  grid-template-columns: repeat(3, 8px);
+  gap: 3px;
+  align-items: center;
+}
+
+.event-risk-meter i {
+  display: block;
+  height: 8px;
+  border-radius: 999px;
+  background: #e4e7ef;
+}
+
+.event-risk-meter i.active {
+  background: currentColor;
+}
+
+.event-choice-count-chip b {
+  background: #75a7f7;
+}
+
 .choice-wallet {
   display: flex;
   flex-wrap: wrap;
@@ -4005,7 +4150,15 @@ h1 {
 
 .event-choice {
   gap: 8px;
-  min-height: 292px;
+  min-height: 336px;
+}
+
+.event-risk-danger {
+  border-color: rgba(255, 127, 143, 0.24);
+}
+
+.event-risk-strain {
+  border-color: rgba(255, 156, 177, 0.24);
 }
 
 .event-choice-topline {
@@ -4106,6 +4259,64 @@ h1 {
   font-weight: 900;
 }
 
+.event-choice-preview-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  max-width: 100%;
+}
+
+.event-choice-preview {
+  display: inline-flex;
+  gap: 5px;
+  align-items: center;
+  max-width: 100%;
+  padding: 4px 6px 4px 4px;
+  border-radius: 8px;
+  background: #edf8ff;
+  color: #425a70;
+  font-size: 10px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.event-choice-preview b {
+  display: inline-grid;
+  width: 20px;
+  height: 20px;
+  place-items: center;
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.event-choice-preview em,
+.event-choice-preview small {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-style: normal;
+}
+
+.event-choice-preview small {
+  color: currentColor;
+  opacity: 0.72;
+}
+
+.event-choice-preview-safe {
+  background: #e8f8f1;
+  color: #347159;
+}
+
+.event-choice-preview-trade {
+  background: #fff2c6;
+  color: #7c5d15;
+}
+
+.event-choice-preview-strain,
+.event-choice-preview-danger {
+  background: #ffe1e7;
+  color: #a33c50;
+}
+
 .choice-impact-chip > b {
   display: grid;
   width: 24px;
@@ -4157,6 +4368,11 @@ h1 {
 .impact-danger {
   background: #ffe1e7;
   color: #a33c50;
+}
+
+.pending-event-combat {
+  border-color: rgba(255, 127, 143, 0.28);
+  background: linear-gradient(180deg, #ffffff, #ffe8ee);
 }
 
 .locked-choice {
@@ -5849,6 +6065,7 @@ h1 {
   .codex-card,
   .codex-build,
   .codex-stage,
+  .codex-event,
   .codex-enemy {
     grid-template-columns: 84px minmax(0, 1fr);
     min-height: 136px;
@@ -5865,6 +6082,10 @@ h1 {
 
   .codex-stage {
     min-height: 164px;
+  }
+
+  .codex-event {
+    min-height: 244px;
   }
 
   .card-art-codex {

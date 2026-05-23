@@ -5,6 +5,7 @@ import { createGameIndex, assertRuntimeData } from "../src/core/data-loader.js";
 import { cardRoleAudit } from "../src/core/card-roles.js";
 import { gemAudit } from "../src/core/gem-roles.js";
 import { buildItemAudit } from "../src/core/build-roles.js";
+import { eventAudit } from "../src/core/event-roles.js";
 import { cleanseDisruption, playCard, endTurn } from "../src/core/combat.js";
 import { startRun, advanceRoom } from "../src/core/progression.js";
 import { applyEventChoice, applyRewardOption } from "../src/core/rewards.js";
@@ -47,6 +48,10 @@ const buildRoleAudit = buildItemAudit(data.relics, data.arcanas);
 if (buildRoleAudit.missingRoles.length > 0) throw new Error(`유물/기운 역할 미분류: ${buildRoleAudit.missingRoles.join(",")}`);
 if (buildRoleAudit.missingHints.length > 0) throw new Error(`유물/기운 추천 힌트 누락: ${buildRoleAudit.missingHints.join(",")}`);
 if (Object.keys(buildRoleAudit.roleCounts).length < 8) throw new Error("유물/기운 역할 분포 부족");
+const eventRoleAudit = eventAudit(data.events);
+if (eventRoleAudit.missingRoles.length > 0) throw new Error(`이벤트 역할 미분류: ${eventRoleAudit.missingRoles.join(",")}`);
+if (eventRoleAudit.missingNoUpfrontCost.length > 0) throw new Error(`이벤트 즉시 비용 없는 선택지 누락: ${eventRoleAudit.missingNoUpfrontCost.join(",")}`);
+if (Object.keys(eventRoleAudit.choiceRoleCounts).length < 6) throw new Error("이벤트 선택지 역할 분포 부족");
 
 let profile = createDefaultProfile(index);
 if (profile.unlockedStages.includes("stage_lavender_hall")) throw new Error("초기 스테이지 잠금 검증 실패");
@@ -98,6 +103,21 @@ const characterEnergyState = startRun(index, {
   profile
 });
 if (characterEnergyState.player.energy <= characterEnergyState.player.maxEnergy) throw new Error("캐릭터 전투 시작 기운 패시브 검증 실패");
+
+const eventCombatState = startRun(index, {
+  characterId: "char_haru",
+  stageId: "stage_sunny_gate",
+  seed: 20260605,
+  profile
+});
+eventCombatState.phase = "event";
+eventCombatState.currentRoomType = "event";
+eventCombatState.pendingEvent = structuredClone(index.events.get("event_bubble_shop"));
+eventCombatState.player.gold = 120;
+if (!applyEventChoice(eventCombatState, index, 2)) throw new Error("이벤트 추가 전투 선택 실패");
+if (eventCombatState.phase !== "room_complete" || eventCombatState.status.eventCombatEnemyId !== "enemy_cloud_buddy") throw new Error("이벤트 추가 전투 예약 실패");
+if (!advanceRoom(eventCombatState, index)) throw new Error("이벤트 추가 전투 진입 실패");
+if (eventCombatState.phase !== "combat" || eventCombatState.enemies[0]?.id !== "enemy_cloud_buddy") throw new Error("이벤트 추가 전투 적 배치 실패");
 
 const state = startRun(index, {
   characterId: "char_haru",
