@@ -7,6 +7,7 @@ import {
   canEquipGemToCard,
   ensureGemState,
   equipGemToCard,
+  equippedGemInstancesForCard,
   grantGem,
   normalizeCardSockets,
   openSocketForCard,
@@ -53,6 +54,14 @@ const typeLabels = {
   power: "지속",
   curse: "방해",
   temp: "임시"
+};
+
+const gemTypeLabels = {
+  all: "전체",
+  attack: "공격",
+  guard: "방어",
+  skill: "기술",
+  power: "지속"
 };
 
 function qs(selector) {
@@ -502,26 +511,40 @@ function renderBuildPanel(state, index) {
 
 function renderGemVault(state, index) {
   ensureGemState(state);
-  const uniqueDeckIds = [...new Set(state.deck)].slice(0, 8);
+  const filter = state.status.gemWorkbenchFilter || "all";
+  const uniqueDeckIds = [...new Set(state.deck)];
+  const filteredDeckIds = uniqueDeckIds
+    .filter((cardId) => filter === "all" || index.cards.get(cardId)?.type === filter)
+    .slice(0, 10);
+  const unequipped = unequippedGemInstances(state);
+  const equippedCount = state.inventory.gemBag.filter((gem) => gem.equippedCardId).length;
+  const socketChargeCount = (state.status.socketBonus || 0) + (state.status.gemWorkshopCharges || 0);
   return `
-    <section class="gem-vault">
+    <section class="gem-vault gem-workbench">
       <div class="panel-head compact-head">
-        <h2>보석 보관함</h2>
-        <span>${state.inventory.gemBag.length}개 보유</span>
+        <h2>보석 작업대</h2>
+        <span>${state.inventory.gemBag.length}개 보유 · ${equippedCount}개 장착</span>
+      </div>
+      <div class="workbench-toolbar" role="group" aria-label="카드 타입 필터">
+        ${Object.entries(gemTypeLabels).map(([type, label]) => `
+          <button class="filter-chip ${filter === type ? "active" : ""}" data-action="gem-filter" data-filter="${type}">${label}</button>
+        `).join("")}
+      </div>
+      <div class="socket-summary">
+        <span>빈 보석 ${unequipped.length}개</span>
+        <span>소켓 확장권 ${socketChargeCount}개</span>
+        <span>표시 카드 ${filteredDeckIds.length}/${uniqueDeckIds.length}장</span>
       </div>
       <div class="gem-vault-grid">
         <div class="gem-bag">
           <strong>미장착 보석</strong>
-          <div class="gem-chip-list">
-            ${unequippedGemInstances(state).length === 0 ? "<span class='muted'>미장착 보석 없음</span>" : unequippedGemInstances(state).map((instance) => {
-              const gem = index.gems.get(instance.gemId);
-              return `<span class="gem-chip" title="${gem.text}">${gem.name}</span>`;
-            }).join("")}
+          <div class="gem-card-list">
+            ${unequipped.length === 0 ? "<span class='muted'>미장착 보석 없음</span>" : unequipped.map((instance) => renderGemCard(index, instance)).join("")}
           </div>
           <button class="secondary-btn" data-action="debug-gem">보석 지급</button>
         </div>
         <div class="socket-list">
-          ${uniqueDeckIds.map((cardId) => renderSocketCard(state, index, cardId)).join("")}
+          ${filteredDeckIds.length === 0 ? "<span class='muted'>필터에 맞는 카드가 없습니다.</span>" : filteredDeckIds.map((cardId) => renderSocketCard(state, index, cardId)).join("")}
         </div>
       </div>
     </section>
@@ -532,18 +555,29 @@ function renderSocketCard(state, index, cardId) {
   const card = index.cards.get(cardId);
   const sockets = normalizeCardSockets(state, index, cardId);
   const capacity = socketCapacity(state, index, cardId);
+  const equippedGems = equippedGemInstancesForCard(state, index, cardId);
   const validGems = unequippedGemInstances(state).filter((instance) => {
     const gem = index.gems.get(instance.gemId);
     return gem && canEquipGemToCard(gem, card);
   }).slice(0, 4);
   const canOpenSocket = capacity < card.sockets.max && ((state.status.socketBonus || 0) > 0 || (state.status.gemWorkshopCharges || 0) > 0);
+  const currentCost = cardCost(card, state, index);
+  const upgraded = state.upgradedCards.includes(card.id);
   return `
-    <article class="socket-card" style="--card-accent:${accentFor(card.color)}">
-      <div>
-        <strong>${card.name}</strong>
-        <small>${typeLabels[card.type] || card.type} · 소켓 ${capacity}/${card.sockets.max}</small>
+    <article class="socket-card socket-card-${card.type}" style="--card-accent:${accentFor(card.color)}">
+      <div class="socket-card-preview">
+        <div class="socket-card-frame">
+          <span class="cost">${currentCost}</span>
+          <strong>${card.name}</strong>
+          <div class="socket-art">${card.illustration?.subject || card.name}</div>
+        </div>
+        <div class="socket-card-meta">
+          <strong>${typeLabels[card.type] || card.type} 카드 ${upgraded ? "· 강화됨" : ""}</strong>
+          <small>기본 비용 ${card.cost} · 현재 비용 ${currentCost} · 소켓 ${capacity}/${card.sockets.max}</small>
+          <p>${upgraded ? card.upgrade?.text || card.text : card.text}</p>
+        </div>
       </div>
-      <div class="socket-row">
+      <div class="socket-row" aria-label="${card.name} 소켓">
         ${sockets.map((instanceId, slotIndex) => {
           const instance = state.inventory.gemBag.find((gem) => gem.instanceId === instanceId);
           const gem = instance ? index.gems.get(instance.gemId) : null;
@@ -554,16 +588,70 @@ function renderSocketCard(state, index, cardId) {
           `;
         }).join("")}
       </div>
+      <div class="equipped-effect-list">
+        ${equippedGems.length === 0 ? "<span class='muted'>장착 효과 없음</span>" : equippedGems.map((instance) => {
+          const gem = index.gems.get(instance.gemId);
+          return `<span class="effect-chip">${gem.name} · ${gemEffectSummary(gem)}</span>`;
+        }).join("")}
+      </div>
       <div class="socket-actions">
         ${canOpenSocket ? `<button class="secondary-btn" data-action="open-socket" data-card-id="${card.id}">소켓 +1</button>` : ""}
         ${validGems.map((instance) => {
           const gem = index.gems.get(instance.gemId);
           const isFull = sockets.every(Boolean);
-          return `<button class="secondary-btn" data-action="equip-gem" data-card-id="${card.id}" data-gem-instance-id="${instance.instanceId}">${isFull ? "교체" : "장착"}: ${gem.name}</button>`;
+          return `
+            <button class="gem-option" data-action="equip-gem" data-card-id="${card.id}" data-gem-instance-id="${instance.instanceId}">
+              <span class="gem-icon ${gemVisualClass(gem)}"></span>
+              <strong>${isFull ? "교체" : "장착"} · ${gem.name}</strong>
+              <small>${gemEffectSummary(gem)}</small>
+            </button>
+          `;
         }).join("")}
+        ${validGems.length === 0 ? "<span class='muted'>장착 가능한 미사용 보석 없음</span>" : ""}
       </div>
     </article>
   `;
+}
+
+function renderGemCard(index, instance) {
+  const gem = index.gems.get(instance.gemId);
+  return `
+    <article class="gem-card" title="${gem.text}">
+      <span class="gem-icon ${gemVisualClass(gem)}"></span>
+      <div>
+        <strong>${gem.name}</strong>
+        <small>${gem.socketTypes.map((type) => gemTypeLabels[type] || type).join(" · ")}</small>
+        <em>${gemEffectSummary(gem)}</em>
+      </div>
+    </article>
+  `;
+}
+
+function gemEffectSummary(gem) {
+  const effect = gem.effects?.[0];
+  if (!effect) return gem.text;
+  if (effect.op === "modify_damage_percent") return `피해 +${effect.amount}%`;
+  if (effect.op === "modify_shield_percent") return `보호막 +${effect.amount}%`;
+  if (effect.op === "modify_cost") return `비용 ${effect.amount}`;
+  if (effect.op === "heal_on_play") return `사용 시 체력 ${effect.amount} 회복`;
+  if (effect.op === "apply_mark_on_play") return `사용 시 표식 ${effect.amount}`;
+  if (effect.op === "echo_basic_effect") return `기본 효과 ${Math.round(effect.ratio * 100)}% 메아리`;
+  if (effect.op === "splash_damage") return `주변 피해 ${Math.round(effect.ratio * 100)}%`;
+  if (effect.op === "preserve_chain") return "연쇄 유지";
+  if (effect.op === "bridge_next_color_bonus") return "다음 색 보너스 유지";
+  return gem.text;
+}
+
+function gemVisualClass(gem) {
+  const op = gem.effects?.[0]?.op || "";
+  if (op.includes("damage")) return "gem-red";
+  if (op.includes("shield")) return "gem-blue";
+  if (op.includes("cost")) return "gem-yellow";
+  if (op.includes("heal")) return "gem-green";
+  if (op.includes("mark")) return "gem-coral";
+  if (op.includes("echo")) return "gem-violet";
+  if (op.includes("chain") || op.includes("bridge")) return "gem-rainbow";
+  return "gem-white";
 }
 
 function renderEvent(state, index) {
@@ -620,6 +708,7 @@ function bindRunActions() {
       if (action === "equip-gem") equipGemToCard(state, index, button.dataset.gemInstanceId, button.dataset.cardId);
       if (action === "unequip-gem") unequipGem(state, button.dataset.gemInstanceId);
       if (action === "open-socket") openSocketForCard(state, index, button.dataset.cardId);
+      if (action === "gem-filter") state.status.gemWorkbenchFilter = button.dataset.filter;
       if (action === "debug-gem") grantGem(state, index.data.gems[state.inventory.gemBag.length % index.data.gems.length].id);
       if (action === "debug-relic") {
         const nextRelic = index.data.relics.find((relic) => !state.inventory.relics.includes(relic.id));

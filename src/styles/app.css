@@ -644,6 +644,46 @@ h1 {
   background: rgba(255, 255, 255, 0.62);
 }
 
+.gem-workbench {
+  border: 2px solid rgba(117, 154, 205, 0.2);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.78), rgba(237, 248, 255, 0.68)),
+    #ffffff;
+}
+
+.workbench-toolbar,
+.socket-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.filter-chip {
+  min-height: 36px;
+  padding: 0 12px;
+  border: 2px solid rgba(76, 79, 112, 0.12);
+  border-radius: 999px;
+  background: #ffffff;
+  color: #4f536d;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.filter-chip.active {
+  border-color: #7cccf7;
+  background: #e9f6ff;
+  color: #375b78;
+}
+
+.socket-summary span {
+  padding: 7px 10px;
+  border-radius: 999px;
+  background: #fff2c6;
+  color: #6f5a1f;
+  font-size: 13px;
+  font-weight: 900;
+}
+
 .build-panel {
   display: grid;
   gap: 12px;
@@ -678,8 +718,9 @@ h1 {
 
 .gem-vault-grid {
   display: grid;
-  grid-template-columns: minmax(220px, 0.35fr) minmax(0, 0.65fr);
+  grid-template-columns: minmax(260px, 0.34fr) minmax(0, 0.66fr);
   gap: 12px;
+  align-items: start;
 }
 
 .gem-bag,
@@ -689,6 +730,89 @@ h1 {
   padding: 12px;
   border-radius: 8px;
   background: #fffaf0;
+}
+
+.gem-bag {
+  align-content: start;
+}
+
+.gem-card-list {
+  display: grid;
+  gap: 8px;
+}
+
+.gem-card,
+.gem-option {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+  padding: 9px;
+  border: 2px solid rgba(76, 79, 112, 0.12);
+  border-radius: 8px;
+  background: #ffffff;
+  color: #383a56;
+  text-align: left;
+}
+
+.gem-card strong,
+.gem-option strong {
+  display: block;
+  overflow-wrap: anywhere;
+}
+
+.gem-card small,
+.gem-card em,
+.gem-option small {
+  display: block;
+  margin-top: 2px;
+  color: #666b85;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 800;
+  line-height: 1.35;
+}
+
+.gem-icon {
+  display: block;
+  width: 30px;
+  height: 30px;
+  border: 3px solid rgba(255, 255, 255, 0.9);
+  border-radius: 9px;
+  box-shadow: 0 4px 10px rgba(76, 70, 116, 0.18);
+  transform: rotate(45deg);
+}
+
+.gem-red {
+  background: linear-gradient(135deg, #ff7d7d, #ffd6a6);
+}
+
+.gem-blue {
+  background: linear-gradient(135deg, #72b8ff, #c5f1ff);
+}
+
+.gem-yellow {
+  background: linear-gradient(135deg, #ffd45f, #fff0a7);
+}
+
+.gem-green {
+  background: linear-gradient(135deg, #67d9a5, #d6ffe8);
+}
+
+.gem-coral {
+  background: linear-gradient(135deg, #ff8ea2, #ffc9d4);
+}
+
+.gem-violet {
+  background: linear-gradient(135deg, #a99cff, #e4ddff);
+}
+
+.gem-rainbow {
+  background: linear-gradient(135deg, #7cccf7, #ff9cb1 55%, #ffd36a);
+}
+
+.gem-white {
+  background: linear-gradient(135deg, #ffffff, #e9f6ff);
 }
 
 .gem-chip-list,
@@ -751,11 +875,62 @@ h1 {
   border: 2px solid var(--card-accent);
 }
 
+.socket-card-preview {
+  display: grid;
+  grid-template-columns: 128px minmax(0, 1fr);
+  gap: 12px;
+  align-items: stretch;
+}
+
+.socket-card-frame {
+  display: grid;
+  grid-template-rows: auto auto 1fr;
+  gap: 7px;
+  min-height: 170px;
+  padding: 10px;
+  border: 3px solid var(--card-accent);
+  border-radius: 8px;
+  background: #fffdf5;
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.8);
+}
+
+.socket-card-frame strong {
+  overflow-wrap: anywhere;
+  color: #383a56;
+}
+
+.socket-art {
+  display: grid;
+  min-height: 78px;
+  place-items: center;
+  padding: 8px;
+  border-radius: 8px;
+  background:
+    linear-gradient(145deg, rgba(255, 232, 163, 0.85), rgba(218, 242, 255, 0.9));
+  color: #4f536d;
+  font-size: 13px;
+  font-weight: 900;
+  line-height: 1.25;
+  text-align: center;
+}
+
+.socket-card-meta {
+  display: grid;
+  align-content: start;
+  gap: 6px;
+}
+
 .socket-card small {
   display: block;
   margin-top: 2px;
   color: #666b85;
   font-weight: 800;
+}
+
+.socket-card-meta p {
+  margin-bottom: 0;
+  color: #4f536d;
+  line-height: 1.45;
 }
 
 .socket-dot {
@@ -780,6 +955,32 @@ h1 {
   cursor: pointer;
 }
 
+.equipped-effect-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.effect-chip {
+  padding: 6px 9px;
+  border-radius: 999px;
+  background: #edf8ff;
+  color: #425a70;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.gem-option {
+  border-color: rgba(117, 154, 205, 0.26);
+  cursor: pointer;
+}
+
+.gem-option:hover,
+.gem-option:focus-visible {
+  border-color: var(--card-accent);
+  outline: none;
+}
+
 @media (max-width: 920px) {
   .hero,
   .workbench,
@@ -787,6 +988,7 @@ h1 {
   .build-grid,
   .profile-detail-grid,
   .gem-vault-grid,
+  .socket-card-preview,
   .profile-grid,
   .result-grid {
     grid-template-columns: 1fr;

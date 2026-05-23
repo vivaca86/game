@@ -72,7 +72,8 @@ await page.waitForSelector(".relic-chip", { timeout: 10000 });
 await page.click('[data-action="debug-arcana"]');
 await page.waitForFunction(() => document.querySelectorAll(".arcana-chip").length >= 2, null, { timeout: 10000 });
 await page.click('[data-action="debug-gem"]');
-await page.waitForSelector(".gem-chip", { timeout: 10000 });
+await page.waitForSelector(".gem-card", { timeout: 10000 });
+await page.waitForSelector(".gem-option", { timeout: 10000 });
 await page.locator('[data-action="equip-gem"]').first().click();
 await page.waitForSelector('[data-action="unequip-gem"]', { timeout: 10000 });
 await page.click('[data-action="save-run"]');
@@ -82,9 +83,11 @@ await page.click("#loadRunButton");
 await page.waitForSelector('[data-action="unequip-gem"]', { timeout: 10000 });
 await page.waitForSelector(".relic-chip", { timeout: 10000 });
 await page.waitForFunction(() => document.querySelectorAll(".arcana-chip").length >= 2, null, { timeout: 10000 });
+await page.waitForSelector(".socket-card-preview", { timeout: 10000 });
+await page.waitForSelector(".equipped-effect-list", { timeout: 10000 });
 
 const runText = await page.textContent("#runRoot");
-if (!runText?.includes("체력") || !runText.includes("기운") || !runText.includes("현재 빌드") || !runText.includes("보석 보관함")) {
+if (!runText?.includes("체력") || !runText.includes("기운") || !runText.includes("현재 빌드") || !runText.includes("보석 작업대")) {
   throw new Error("전투 상태 표시 확인 실패");
 }
 
