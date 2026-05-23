@@ -1,0 +1,51 @@
+{
+  "screens": {
+    "title": "햇살 미로단",
+    "stageSelect": "미로 입구",
+    "battle": "카드 전투",
+    "reward": "보상 선택",
+    "deck": "덱 보기",
+    "gemSocket": "보석 장착",
+    "town": "햇살 광장",
+    "settings": "설정"
+  },
+  "buttons": {
+    "startRun": "탐험 시작",
+    "continue": "계속",
+    "endTurn": "턴 종료",
+    "openDeck": "덱 보기",
+    "confirm": "확인",
+    "cancel": "취소",
+    "reroll": "다시 보기",
+    "skipReward": "보상 넘기기",
+    "returnTown": "광장으로"
+  },
+  "hud": {
+    "hp": "체력",
+    "shield": "보호막",
+    "energy": "기운",
+    "gold": "별사탕",
+    "floor": "층",
+    "room": "방",
+    "chain": "연쇄",
+    "drawPile": "뽑을 카드",
+    "discardPile": "버린 카드",
+    "exhaustPile": "사라진 카드"
+  },
+  "battle": {
+    "victory": "전투 승리",
+    "defeat": "탐험 실패",
+    "enemyIntentAttack": "공격 준비",
+    "enemyIntentGuard": "방어 준비",
+    "enemyIntentSpecial": "특수 행동",
+    "notEnoughEnergy": "기운이 부족합니다.",
+    "noValidTarget": "사용할 대상이 없습니다."
+  },
+  "reward": {
+    "chooseCard": "카드 한 장을 고르세요.",
+    "chooseGem": "보석 하나를 고르세요.",
+    "chooseRelic": "유물 하나를 고르세요.",
+    "gainGold": "별사탕을 얻었습니다.",
+    "upgradeCard": "카드를 강화했습니다."
+  }
+}

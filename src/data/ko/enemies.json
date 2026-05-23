@@ -1,0 +1,89 @@
+[
+  {
+    "id": "enemy_cloud_slime",
+    "name": "몽실 슬라임",
+    "rank": "normal",
+    "family": "구름",
+    "maxHp": 22,
+    "block": 0,
+    "intents": [
+      { "type": "attack", "amount": 5, "label": "말랑 박치기" },
+      { "type": "guard", "amount": 4, "label": "몸 부풀리기" }
+    ],
+    "rewards": { "gold": [8, 12], "xp": 3 }
+  },
+  {
+    "id": "enemy_paper_doll",
+    "name": "종이부적 인형",
+    "rank": "normal",
+    "family": "부적",
+    "maxHp": 28,
+    "block": 0,
+    "intents": [
+      { "type": "attack", "amount": 4, "label": "종이 톡" },
+      { "type": "debuff", "status": "mark", "amount": 1, "label": "표식 붙이기" }
+    ],
+    "rewards": { "gold": [9, 14], "xp": 4 }
+  },
+  {
+    "id": "enemy_sprout_knight",
+    "name": "새싹 기사",
+    "rank": "normal",
+    "family": "새싹",
+    "maxHp": 34,
+    "block": 3,
+    "intents": [
+      { "type": "attack", "amount": 7, "label": "잎사귀 찌르기" },
+      { "type": "guard", "amount": 6, "label": "방패 들기" }
+    ],
+    "rewards": { "gold": [11, 16], "xp": 5 }
+  },
+  {
+    "id": "enemy_lantern_puff",
+    "name": "등불 솜뭉치",
+    "rank": "elite",
+    "family": "등불",
+    "maxHp": 68,
+    "block": 6,
+    "intents": [
+      { "type": "attack", "amount": 10, "label": "반짝 돌진" },
+      { "type": "special", "effect": "add_burn", "amount": 2, "label": "따끈한 불씨" },
+      { "type": "guard", "amount": 9, "label": "불빛 감싸기" }
+    ],
+    "rewards": { "gold": [28, 36], "xp": 11, "relicChance": 0.35 }
+  },
+  {
+    "id": "boss_round_gatekeeper",
+    "name": "동글 문지기",
+    "rank": "boss",
+    "family": "문지기",
+    "maxHp": 140,
+    "block": 10,
+    "phaseRules": [
+      { "hpBelowRatio": 0.5, "addIntent": { "type": "special", "effect": "summon", "enemyId": "enemy_cloud_slime", "label": "친구 부르기" } }
+    ],
+    "intents": [
+      { "type": "attack", "amount": 14, "label": "문짝 쿵" },
+      { "type": "guard", "amount": 12, "label": "동그란 잠금" },
+      { "type": "special", "effect": "shuffle_junk", "cardId": "card_temp_dust", "amount": 1, "label": "먼지 카드" }
+    ],
+    "rewards": { "gold": [70, 90], "xp": 25, "relicChance": 1 }
+  },
+  {
+    "id": "boss_mint_garden_king",
+    "name": "민트정원 왕방울",
+    "rank": "boss",
+    "family": "방울",
+    "maxHp": 190,
+    "block": 12,
+    "phaseRules": [
+      { "hpBelowRatio": 0.35, "addIntent": { "type": "attack", "amount": 22, "label": "왕방울 굴리기" } }
+    ],
+    "intents": [
+      { "type": "attack", "amount": 16, "label": "방울 굴리기" },
+      { "type": "debuff", "status": "weak", "amount": 1, "label": "상쾌한 어지럼" },
+      { "type": "guard", "amount": 16, "label": "민트 껍질" }
+    ],
+    "rewards": { "gold": [90, 120], "xp": 32, "relicChance": 1 }
+  }
+]

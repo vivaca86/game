@@ -1,0 +1,13 @@
+{
+  "name": "bright-card-dungeon",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node tools/serve-static.mjs",
+    "build": "node tools/build-static.mjs",
+    "preview": "node tools/serve-static.mjs dist",
+    "data:validate": "node tools/validate-data.mjs",
+    "check": "npm run data:validate && npm run build"
+  }
+}

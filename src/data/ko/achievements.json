@@ -1,0 +1,58 @@
+[
+  {
+    "id": "ach_first_win",
+    "name": "첫 소풍 완료",
+    "description": "햇살 현관을 처음으로 클리어합니다.",
+    "trigger": { "op": "clear_stage", "stageId": "stage_sunny_gate" },
+    "reward": { "gold": 50 }
+  },
+  {
+    "id": "ach_first_elite",
+    "name": "반짝 강적",
+    "description": "정예 몬스터를 처음으로 물리칩니다.",
+    "trigger": { "op": "defeat_rank", "rank": "elite" },
+    "reward": { "unlockCardId": "card_star_candy" }
+  },
+  {
+    "id": "ach_chain_ten",
+    "name": "리본 열 고리",
+    "description": "한 전투에서 연쇄 10을 달성합니다.",
+    "trigger": { "op": "reach_chain", "amount": 10 },
+    "reward": { "unlockGemId": "gem_star_chain", "unlockArcanaId": "arcana_ribbon_firework" }
+  },
+  {
+    "id": "ach_gem_socket",
+    "name": "반짝 장착",
+    "description": "카드에 보석을 처음 장착합니다.",
+    "trigger": { "op": "socket_gem", "amount": 1 },
+    "reward": { "gold": 30 }
+  },
+  {
+    "id": "ach_clear_lavender",
+    "name": "라벤더 산책",
+    "description": "라벤더 복도를 클리어합니다.",
+    "trigger": { "op": "clear_stage", "stageId": "stage_lavender_hall" },
+    "reward": { "unlockCharacterId": "char_bomi" }
+  },
+  {
+    "id": "ach_collect_cards_20",
+    "name": "카드 수집가",
+    "description": "카드 도감 20장을 채웁니다.",
+    "trigger": { "op": "collect_cards", "amount": 20 },
+    "reward": { "metaUpgradeId": "meta_town_card_workshop" }
+  },
+  {
+    "id": "ach_collect_gems_10",
+    "name": "보석 주머니",
+    "description": "보석 10종을 발견합니다.",
+    "trigger": { "op": "collect_gems", "amount": 10 },
+    "reward": { "metaUpgradeId": "meta_town_gem_table" }
+  },
+  {
+    "id": "ach_boss_mint",
+    "name": "왕방울 안녕",
+    "description": "민트정원 왕방울을 물리칩니다.",
+    "trigger": { "op": "defeat_enemy", "enemyId": "boss_mint_garden_king" },
+    "reward": { "gold": 120 }
+  }
+]

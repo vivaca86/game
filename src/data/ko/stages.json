@@ -1,0 +1,41 @@
+[
+  {
+    "id": "stage_sunny_gate",
+    "name": "햇살 현관",
+    "order": 1,
+    "biome": "아이보리 성문",
+    "floorCount": 6,
+    "backgroundKey": "bright_gate",
+    "enemyPool": ["enemy_cloud_slime", "enemy_paper_doll"],
+    "elitePool": ["enemy_lantern_puff"],
+    "bossEnemyId": "boss_round_gatekeeper",
+    "rooms": ["combat", "combat", "event", "elite", "reward", "boss"],
+    "unlock": { "type": "starter" }
+  },
+  {
+    "id": "stage_lavender_hall",
+    "name": "라벤더 복도",
+    "order": 2,
+    "biome": "보랏빛 장난감 회랑",
+    "floorCount": 7,
+    "backgroundKey": "lavender_hall",
+    "enemyPool": ["enemy_paper_doll", "enemy_sprout_knight", "enemy_cloud_slime"],
+    "elitePool": ["enemy_lantern_puff"],
+    "bossEnemyId": "boss_round_gatekeeper",
+    "rooms": ["combat", "event", "combat", "shop", "elite", "reward", "boss"],
+    "unlock": { "type": "stage_clear", "stageId": "stage_sunny_gate" }
+  },
+  {
+    "id": "stage_mint_garden",
+    "name": "민트 정원",
+    "order": 3,
+    "biome": "상쾌한 온실 미로",
+    "floorCount": 8,
+    "backgroundKey": "mint_garden",
+    "enemyPool": ["enemy_sprout_knight", "enemy_lantern_puff", "enemy_cloud_slime"],
+    "elitePool": ["enemy_lantern_puff"],
+    "bossEnemyId": "boss_mint_garden_king",
+    "rooms": ["combat", "combat", "event", "elite", "shop", "event", "reward", "boss"],
+    "unlock": { "type": "stage_clear", "stageId": "stage_lavender_hall" }
+  }
+]

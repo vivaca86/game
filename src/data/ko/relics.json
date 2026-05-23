@@ -1,0 +1,42 @@
+[
+  {
+    "id": "relic_round_lantern",
+    "name": "동글 등불",
+    "rarity": "common",
+    "text": "전투 시작 시 보호막 4를 얻습니다.",
+    "effects": [{ "op": "shield_at_battle_start", "amount": 4 }],
+    "pool": "combat"
+  },
+  {
+    "id": "relic_candy_pouch",
+    "name": "별사탕 주머니",
+    "rarity": "common",
+    "text": "전투 보상 별사탕 +20%.",
+    "effects": [{ "op": "modify_gold_reward_percent", "amount": 20 }],
+    "pool": "reward"
+  },
+  {
+    "id": "relic_soft_compass",
+    "name": "말랑 나침반",
+    "rarity": "rare",
+    "text": "미니맵에서 다음 방의 종류 하나를 미리 봅니다.",
+    "effects": [{ "op": "reveal_next_room_type", "amount": 1 }],
+    "pool": "map"
+  },
+  {
+    "id": "relic_ribbon_box",
+    "name": "리본 보관함",
+    "rarity": "rare",
+    "text": "카드 보상 선택지가 1개 늘어납니다.",
+    "effects": [{ "op": "increase_card_reward_options", "amount": 1 }],
+    "pool": "reward"
+  },
+  {
+    "id": "relic_sun_cookie",
+    "name": "햇살 쿠키",
+    "rarity": "legendary",
+    "text": "각 전투에서 처음 쓰는 2비용 이상 카드의 비용이 0이 됩니다.",
+    "effects": [{ "op": "first_expensive_card_free_each_battle", "minCost": 2 }],
+    "pool": "combat"
+  }
+]

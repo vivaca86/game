@@ -1,0 +1,38 @@
+[
+  {
+    "id": "meta_town_candy_bank",
+    "name": "별사탕 저금통",
+    "category": "town",
+    "maxRank": 5,
+    "costs": [60, 120, 220, 360, 520],
+    "text": "탐험 시작 별사탕이 증가합니다.",
+    "effects": [{ "op": "starting_gold_per_rank", "amount": 15 }]
+  },
+  {
+    "id": "meta_town_card_workshop",
+    "name": "카드 공방",
+    "category": "town",
+    "maxRank": 4,
+    "costs": [90, 180, 330, 540],
+    "text": "카드 강화 선택지가 늘어납니다.",
+    "effects": [{ "op": "upgrade_choice_bonus_at_rank", "rank": 2, "amount": 1 }]
+  },
+  {
+    "id": "meta_town_gem_table",
+    "name": "보석 탁자",
+    "category": "town",
+    "maxRank": 4,
+    "costs": [100, 210, 380, 620],
+    "text": "보석 보상이 더 자주 등장합니다.",
+    "effects": [{ "op": "gem_reward_chance_per_rank", "amount": 4 }]
+  },
+  {
+    "id": "meta_town_picnic_board",
+    "name": "소풍 게시판",
+    "category": "town",
+    "maxRank": 3,
+    "costs": [150, 320, 700],
+    "text": "새 캐릭터와 도전 과제가 해금됩니다.",
+    "effects": [{ "op": "unlock_character_slots", "amount": 1 }]
+  }
+]

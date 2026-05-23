@@ -1,0 +1,56 @@
+[
+  {
+    "id": "gem_coral_edge",
+    "name": "산호날 보석",
+    "rarity": "common",
+    "socketTypes": ["attack"],
+    "text": "장착한 카드의 피해 +25%.",
+    "effects": [{ "op": "modify_damage_percent", "amount": 25 }],
+    "unlock": { "type": "starter_pool" }
+  },
+  {
+    "id": "gem_mint_breeze",
+    "name": "민트바람 보석",
+    "rarity": "common",
+    "socketTypes": ["skill", "guard"],
+    "text": "장착한 카드를 사용하면 체력 1 회복.",
+    "effects": [{ "op": "heal_on_play", "amount": 1 }],
+    "unlock": { "type": "starter_pool" }
+  },
+  {
+    "id": "gem_lavender_echo",
+    "name": "라벤더 메아리",
+    "rarity": "rare",
+    "socketTypes": ["attack", "skill", "guard"],
+    "text": "장착한 카드의 기본 효과가 35% 위력으로 한 번 더 발동.",
+    "effects": [{ "op": "echo_basic_effect", "ratio": 0.35 }],
+    "unlock": { "type": "stage_clear", "stageId": "stage_lavender_hall" }
+  },
+  {
+    "id": "gem_sky_discount",
+    "name": "하늘깃 보석",
+    "rarity": "rare",
+    "socketTypes": ["attack", "skill", "guard"],
+    "text": "장착한 카드의 비용 -1. 비용은 0 아래로 내려가지 않습니다.",
+    "effects": [{ "op": "modify_cost", "amount": -1, "min": 0 }],
+    "unlock": { "type": "event", "eventId": "event_bubble_shop" }
+  },
+  {
+    "id": "gem_peach_splash",
+    "name": "복숭아 파동석",
+    "rarity": "uncommon",
+    "socketTypes": ["attack"],
+    "text": "단일 피해 카드가 주변 적에게 30% 피해를 줍니다.",
+    "effects": [{ "op": "splash_damage", "ratio": 0.3 }],
+    "unlock": { "type": "stage_clear", "stageId": "stage_mint_garden" }
+  },
+  {
+    "id": "gem_star_chain",
+    "name": "별고리 보석",
+    "rarity": "legendary",
+    "socketTypes": ["attack", "skill", "guard"],
+    "text": "장착한 카드는 연쇄를 끊지 않습니다.",
+    "effects": [{ "op": "preserve_chain" }],
+    "unlock": { "type": "achievement", "achievementId": "ach_chain_ten" }
+  }
+]

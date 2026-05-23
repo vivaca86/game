@@ -1,0 +1,46 @@
+[
+  {
+    "id": "event_bubble_shop",
+    "name": "방울 상점",
+    "type": "shop",
+    "text": "투명한 방울 안에 보석과 카드가 둥둥 떠 있습니다.",
+    "choices": [
+      { "label": "보석을 산다", "cost": { "gold": 40 }, "reward": { "gemPool": ["gem_sky_discount", "gem_mint_breeze"] } },
+      { "label": "카드를 산다", "cost": { "gold": 30 }, "reward": { "cardPool": ["card_bubble_map", "card_paper_charm"] } },
+      { "label": "그냥 지나간다", "reward": {} }
+    ]
+  },
+  {
+    "id": "event_ribbon_fountain",
+    "name": "리본 분수",
+    "type": "choice",
+    "text": "분수에서 알록달록한 리본 물줄기가 솟아납니다.",
+    "choices": [
+      { "label": "카드를 강화한다", "cost": { "hp": 5 }, "reward": { "upgradeRandomCard": 1 } },
+      { "label": "체력을 회복한다", "reward": { "heal": 12 } },
+      { "label": "별사탕을 던진다", "cost": { "gold": 20 }, "reward": { "relicPool": ["relic_ribbon_box"] } }
+    ]
+  },
+  {
+    "id": "event_sleeping_gate",
+    "name": "졸린 문",
+    "type": "choice",
+    "text": "커다란 문이 꾸벅꾸벅 졸고 있습니다.",
+    "choices": [
+      { "label": "살짝 깨운다", "reward": { "combat": "enemy_cloud_slime", "gold": 25 } },
+      { "label": "조용히 지나간다", "reward": { "skipNextCombat": true } },
+      { "label": "문을 닦아준다", "reward": { "heal": 6, "gold": 10 } }
+    ]
+  },
+  {
+    "id": "event_gem_bench",
+    "name": "보석 작업대",
+    "type": "station",
+    "text": "작은 작업대가 카드의 빈 소켓을 반짝이게 합니다.",
+    "choices": [
+      { "label": "보석을 장착한다", "reward": { "openGemSocket": true } },
+      { "label": "소켓을 하나 늘린다", "cost": { "gold": 55 }, "reward": { "addSocketToRandomCard": 1 } },
+      { "label": "작업대를 접는다", "reward": {} }
+    ]
+  }
+]

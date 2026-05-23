@@ -1,0 +1,34 @@
+[
+  {
+    "id": "arcana_picnic_rhythm",
+    "name": "소풍 리듬",
+    "rarity": "common",
+    "text": "0, 1, 2, 3 비용 카드를 순서대로 내면 연쇄 보너스가 크게 증가합니다.",
+    "effects": [{ "op": "enable_cost_ladder_chain", "steps": [0, 1, 2, 3] }],
+    "unlock": { "type": "starter" }
+  },
+  {
+    "id": "arcana_bubble_luck",
+    "name": "방울 행운",
+    "rarity": "common",
+    "text": "보상에서 보석이 등장할 확률이 증가합니다.",
+    "effects": [{ "op": "modify_gem_reward_chance_percent", "amount": 15 }],
+    "unlock": { "type": "stage_clear", "stageId": "stage_sunny_gate" }
+  },
+  {
+    "id": "arcana_cloud_parade",
+    "name": "구름 행진",
+    "rarity": "rare",
+    "text": "방어 카드를 낼 때마다 무작위 적에게 피해 2.",
+    "effects": [{ "op": "damage_random_on_guard_play", "amount": 2 }],
+    "unlock": { "type": "stage_clear", "stageId": "stage_lavender_hall" }
+  },
+  {
+    "id": "arcana_ribbon_firework",
+    "name": "리본 불꽃놀이",
+    "rarity": "rare",
+    "text": "한 턴에 카드 5장을 내면 모든 적에게 피해 10.",
+    "effects": [{ "op": "damage_all_when_cards_played", "threshold": 5, "amount": 10 }],
+    "unlock": { "type": "achievement", "achievementId": "ach_chain_ten" }
+  }
+]

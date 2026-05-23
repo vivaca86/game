@@ -1,0 +1,74 @@
+[
+  {
+    "id": "char_haru",
+    "name": "하루",
+    "role": "햇살 탐험가",
+    "color": "coral",
+    "maxHp": 72,
+    "energy": 3,
+    "starterDeck": [
+      "card_sunbean_punch",
+      "card_sunbean_punch",
+      "card_cloud_cushion",
+      "card_cloud_cushion",
+      "card_mint_spark"
+    ],
+    "passiveText": "전투마다 처음 쓰는 공격 카드의 피해 +3.",
+    "passiveEffects": [{ "op": "first_attack_damage_bonus_each_battle", "amount": 3 }],
+    "unlock": { "type": "starter" }
+  },
+  {
+    "id": "char_moru",
+    "name": "모루",
+    "role": "구름 수호자",
+    "color": "sky",
+    "maxHp": 84,
+    "energy": 3,
+    "starterDeck": [
+      "card_cloud_cushion",
+      "card_cloud_cushion",
+      "card_sprout_guard",
+      "card_sunbean_punch",
+      "card_mint_spark"
+    ],
+    "passiveText": "전투 시작 시 보호막 6.",
+    "passiveEffects": [{ "op": "shield_at_battle_start", "amount": 6 }],
+    "unlock": { "type": "stage_clear", "stageId": "stage_sunny_gate" }
+  },
+  {
+    "id": "char_riri",
+    "name": "리리",
+    "role": "리본 마술사",
+    "color": "lavender",
+    "maxHp": 64,
+    "energy": 3,
+    "starterDeck": [
+      "card_mint_spark",
+      "card_mint_spark",
+      "card_paper_charm",
+      "card_ribbon_loop",
+      "card_cloud_cushion"
+    ],
+    "passiveText": "한 턴에 카드 4장을 내면 카드 1장을 뽑습니다.",
+    "passiveEffects": [{ "op": "draw_when_cards_played", "threshold": 4, "amount": 1 }],
+    "unlock": { "type": "achievement", "achievementId": "ach_chain_ten" }
+  },
+  {
+    "id": "char_bomi",
+    "name": "보미",
+    "role": "새싹 기사",
+    "color": "mint",
+    "maxHp": 78,
+    "energy": 3,
+    "starterDeck": [
+      "card_sprout_guard",
+      "card_cloud_cushion",
+      "card_sunbean_punch",
+      "card_peach_dash",
+      "card_bubble_map"
+    ],
+    "passiveText": "체력이 처음 절반 이하가 되면 체력 10 회복.",
+    "passiveEffects": [{ "op": "heal_once_when_hp_ratio_below", "ratio": 0.5, "amount": 10 }],
+    "unlock": { "type": "stage_clear", "stageId": "stage_lavender_hall" }
+  }
+]
