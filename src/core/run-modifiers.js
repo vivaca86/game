@@ -56,7 +56,11 @@ export function applyBattleStartModifiers(state, index) {
   ensureModifierState(state);
   state.status.firstExpensiveCardFreeAvailable = hasRelicEffect(state, index, "first_expensive_card_free_each_battle");
   state.status.firstAttackDamageBonusUsed = false;
+  state.status.characterFirstTypeDiscountUsed = false;
+  state.status.characterFirstGuardShieldUsed = false;
+  state.status.characterFirstSkillDamageUsed = false;
   state.status.characterChainEnergyTriggeredThisTurn = false;
+  state.status.characterChainShieldTriggeredThisTurn = false;
   state.status.relicChainPreserveCharges = sumRelicEffects(state, index, "preserve_chain_once", "amount");
   state.status.damageTakenThisCombat = 0;
   state.status.guardCardsPlayedThisCombat = 0;
@@ -78,6 +82,24 @@ export function applyBattleStartModifiers(state, index) {
     state.player.energy += energy;
     addLog(state, `전투 시작 기운 +${energy}`);
   }
+
+  const characterEnergy = sumCharacterEffects(state, index, "start_with_energy_each_battle", "amount");
+  if (characterEnergy > 0) {
+    state.player.energy = Math.min(state.player.maxEnergy + 3, state.player.energy + characterEnergy);
+    addLog(state, `패시브: 전투 시작 기운 +${characterEnergy}`);
+  }
+
+  for (const effect of characterEffects(state, index, "draw_at_battle_start")) {
+    const before = state.hand.length;
+    drawCards(state, effect.amount || 1);
+    const drawn = state.hand.length - before;
+    if (drawn > 0) addLog(state, `패시브: 시작 카드 ${drawn}장 뽑기`);
+  }
+
+  for (const effect of characterEffects(state, index, "mark_front_at_battle_start")) {
+    applyEnemyStatus(state.enemies[0], "mark", effect.amount || 1);
+    addLog(state, `패시브: 앞 적 표식 ${effect.amount || 1}`);
+  }
 }
 
 export function adjustedModifierCardCost(card, state, index, cost) {
@@ -87,6 +109,13 @@ export function adjustedModifierCardCost(card, state, index, cost) {
   const freeExpensive = relicEffects(state, index, "first_expensive_card_free_each_battle")
     .some((effect) => card.cost >= (effect.minCost || 1));
   if (state.status.firstExpensiveCardFreeAvailable && freeExpensive) nextCost = 0;
+  if (!state.status.characterFirstTypeDiscountUsed) {
+    for (const effect of characterEffects(state, index, "discount_first_card_type_each_battle")) {
+      if (!effect.cardType || effect.cardType === card.type) {
+        nextCost = Math.max(0, nextCost - (effect.amount || 1));
+      }
+    }
+  }
   return nextCost;
 }
 
@@ -101,6 +130,7 @@ export function consumeChainPreserve(state, index) {
 export function afterCardPlayedModifiers({ state, index, card, context, cost }) {
   ensureModifierState(state);
   consumeFirstExpensiveCardFree(state, index, card);
+  consumeCharacterFirstTypeDiscount(state, index, card);
   applyCostLadderArcana(state, index, cost);
   applyColorArcana(state, index, card);
   applyBattleRules(state, index, card);
@@ -108,6 +138,14 @@ export function afterCardPlayedModifiers({ state, index, card, context, cost }) 
 
   if (card.type === "guard") {
     state.status.guardCardsPlayedThisCombat = (state.status.guardCardsPlayedThisCombat || 0) + 1;
+    if (!state.status.characterFirstGuardShieldUsed) {
+      const shield = sumCharacterEffects(state, index, "shield_on_first_guard_each_battle", "amount");
+      if (shield > 0) {
+        state.status.characterFirstGuardShieldUsed = true;
+        state.player.shield += shield;
+        addLog(state, `패시브: 첫 방어 보호막 +${shield}`);
+      }
+    }
     for (const effect of arcanaEffects(state, index, "damage_random_on_guard_play")) {
       dealDirectDamage(state, index, state.rng.pick(state.enemies), effect.amount, "구름 행진", context);
     }
@@ -121,6 +159,14 @@ export function afterCardPlayedModifiers({ state, index, card, context, cost }) 
   if (card.type === "attack" && context.killedThisPlay) {
     for (const effect of arcanaEffects(state, index, "damage_all_on_attack_kill")) {
       [...state.enemies].forEach((enemy) => dealDirectDamage(state, index, enemy, effect.amount, "복숭아 팡파르", context));
+    }
+  }
+
+  if (card.type === "skill" && !state.status.characterFirstSkillDamageUsed) {
+    const damage = sumCharacterEffects(state, index, "damage_front_on_first_skill_each_battle", "amount");
+    if (damage > 0) {
+      state.status.characterFirstSkillDamageUsed = true;
+      dealDirectDamage(state, index, state.enemies[0], damage, "패시브", context);
     }
   }
 
@@ -177,6 +223,7 @@ export function resetTurnModifierState(state) {
   state.status.rainbowFinaleAppliedThisTurn = false;
   state.status.prismPathTriggeredThisTurn = false;
   state.status.characterChainEnergyTriggeredThisTurn = false;
+  state.status.characterChainShieldTriggeredThisTurn = false;
 }
 
 export function modifiedCharacterDamageAmount(card, state, index, amount) {
@@ -213,7 +260,19 @@ export function afterCombatCompleteModifiers(state, index, source = "combat") {
       addLog(state, `정예 보너스: 별사탕 ${eliteGold} 획득`);
     }
   }
+  if (state.player.hp / state.player.maxHp <= 0.7) {
+    for (const effect of characterEffects(state, index, "heal_after_combat_if_low")) {
+      if (state.player.hp / state.player.maxHp <= (effect.ratio || 0.7)) {
+        healPlayerFromModifier(state, index, effect.amount || 1, "패시브");
+      }
+    }
+  }
   if ((state.status.damageTakenThisCombat || 0) === 0) {
+    const perfectGold = sumCharacterEffects(state, index, "gain_gold_on_perfect_combat", "amount");
+    if (perfectGold > 0) {
+      state.player.gold += perfectGold;
+      addLog(state, `패시브 완벽 전투: 별사탕 ${perfectGold} 획득`);
+    }
     for (const effect of relicEffects(state, index, "gain_gold_on_perfect")) {
       state.player.gold += effect.amount;
       addLog(state, `반짝 접시: 별사탕 ${effect.amount} 획득`);
@@ -335,6 +394,28 @@ function applyCharacterCardPassives(state, index) {
       addLog(state, `패시브: 기운 +${effect.amount}`);
     }
   }
+  for (const effect of characterEffects(state, index, "gain_shield_on_chain")) {
+    if ((state.status.chain || 0) >= effect.threshold && !state.status.characterChainShieldTriggeredThisTurn) {
+      state.player.shield += effect.amount || 1;
+      state.status.characterChainShieldTriggeredThisTurn = true;
+      addLog(state, `패시브: 연쇄 보호막 +${effect.amount || 1}`);
+    }
+  }
+  for (const effect of characterEffects(state, index, "mark_front_when_cards_played")) {
+    if (state.metrics.cardsPlayedThisTurn === effect.threshold) {
+      applyEnemyStatus(state.enemies[0], "mark", effect.amount || 1);
+      addLog(state, `패시브: 앞 적 표식 ${effect.amount || 1}`);
+    }
+  }
+}
+
+function consumeCharacterFirstTypeDiscount(state, index, card) {
+  if (state.status.characterFirstTypeDiscountUsed) return;
+  const matched = characterEffects(state, index, "discount_first_card_type_each_battle")
+    .some((effect) => !effect.cardType || effect.cardType === card.type);
+  if (!matched) return;
+  state.status.characterFirstTypeDiscountUsed = true;
+  addLog(state, `패시브: 첫 ${card.type} 카드 비용 감소`);
 }
 
 function healPlayerFromModifier(state, index, amount, sourceName) {

@@ -72,7 +72,7 @@ await page.waitForSelector(".character-passive-chips", { timeout: 10000 });
 const starterCardIconCount = await page.locator(".starter-card-pill b").count();
 if (starterCardIconCount < 5) throw new Error("시작 카드 타입 아이콘 표시 실패");
 const setupPassiveChipCount = await page.locator(".character-preview-card .character-passive-chip").count();
-if (setupPassiveChipCount === 0) throw new Error("캐릭터 패시브 칩 표시 실패");
+if (setupPassiveChipCount < 2) throw new Error("캐릭터 보조 패시브 칩 표시 실패");
 const setupOverflowItems = await page.locator(".setup-preview-card, .character-portrait, .stage-key-art, .character-passive-chip, .starter-card-pill").evaluateAll((elements) => elements
   .filter((element) => element.scrollWidth > element.clientWidth + 2 || element.scrollHeight > element.clientHeight + 2)
   .map((element) => element.className));
@@ -112,7 +112,7 @@ await assertCodexVisual("relics", ".codex-kind-relics .item-icon-relic", 16, "�
 await assertCodexVisual("arcanas", ".codex-kind-arcanas .item-icon-arcana", 12, "기운");
 await assertCodexVisual("characters", ".codex-kind-characters .character-portrait", 20, "캐릭터");
 const codexPassiveChipCount = await page.locator(".codex-kind-characters .character-passive-chip").count();
-if (codexPassiveChipCount < 20) throw new Error("캐릭터 도감 패시브 칩 표시 실패");
+if (codexPassiveChipCount < 46) throw new Error("캐릭터 도감 보조 패시브 칩 표시 실패");
 await assertCodexVisual("stages", ".codex-kind-stages .stage-key-art", 15, "스테이지");
 await assertCodexVisual("enemies", ".codex-kind-enemies .monster-portrait", 60, "몬스터");
 await page.setViewportSize({ width: 390, height: 820 });

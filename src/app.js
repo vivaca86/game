@@ -326,10 +326,20 @@ function renderCharacterPassiveChips(character) {
 function characterPassiveChip(effect) {
   if (effect.op === "first_attack_damage_bonus_each_battle") return { tone: "attack", icon: "공", label: "첫 공격", value: `+${effect.amount}` };
   if (effect.op === "shield_at_battle_start") return { tone: "guard", icon: "막", label: "시작 보호막", value: `+${effect.amount}` };
+  if (effect.op === "shield_on_first_guard_each_battle") return { tone: "guard", icon: "막", label: "첫 방어", value: `+${effect.amount}` };
   if (effect.op === "draw_when_cards_played") return { tone: "flow", icon: "손", label: `${effect.threshold}장 연계`, value: `드로우 ${effect.amount}` };
+  if (effect.op === "draw_at_battle_start") return { tone: "flow", icon: "손", label: "전투 시작", value: `드로우 ${effect.amount}` };
   if (effect.op === "heal_once_when_hp_ratio_below") return { tone: "heal", icon: "회", label: "위기 회복", value: `${Math.round((effect.ratio || 0.5) * 100)}% · +${effect.amount}` };
+  if (effect.op === "heal_after_combat_if_low") return { tone: "heal", icon: "회", label: "전투 후 회복", value: `${Math.round((effect.ratio || 0.7) * 100)}% · +${effect.amount}` };
   if (effect.op === "gain_energy_on_chain") return { tone: "flow", icon: "연", label: `연쇄 ${effect.threshold}`, value: `기운 +${effect.amount}` };
+  if (effect.op === "gain_shield_on_chain") return { tone: "guard", icon: "연", label: `연쇄 ${effect.threshold}`, value: `보호막 +${effect.amount}` };
   if (effect.op === "bonus_gold_after_elite") return { tone: "reward", icon: "별", label: "정예 보너스", value: `+${effect.amount}` };
+  if (effect.op === "gain_gold_on_perfect_combat") return { tone: "reward", icon: "별", label: "완벽 전투", value: `+${effect.amount}` };
+  if (effect.op === "damage_front_on_first_skill_each_battle") return { tone: "attack", icon: "술", label: "첫 기술", value: `피해 ${effect.amount}` };
+  if (effect.op === "mark_front_at_battle_start") return { tone: "status", icon: "표", label: "시작 표식", value: `+${effect.amount}` };
+  if (effect.op === "mark_front_when_cards_played") return { tone: "status", icon: "표", label: `${effect.threshold}장 연계`, value: `표식 +${effect.amount}` };
+  if (effect.op === "discount_first_card_type_each_battle") return { tone: "flow", icon: "할", label: `첫 ${typeLabels[effect.cardType] || "카드"}`, value: `비용 -${effect.amount}` };
+  if (effect.op === "start_with_energy_each_battle") return { tone: "flow", icon: "기", label: "전투 시작", value: `기운 +${effect.amount}` };
   return { tone: "note", icon: "특", label: "패시브", value: effect.op || "효과" };
 }
 

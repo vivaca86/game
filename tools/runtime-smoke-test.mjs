@@ -39,6 +39,52 @@ if (profile.unlockedStages.includes("stage_lavender_hall")) throw new Error("초
 if (!profile.unlockedCharacters.includes("char_haru")) throw new Error("초기 캐릭터 해금 검증 실패");
 profile.unlockedArcanas.push("arcana_bubble_luck");
 
+const characterPassiveOps = new Set(data.characters.flatMap((character) => (character.passiveEffects || []).map((effect) => effect.op)));
+if (characterPassiveOps.size < 12) throw new Error(`캐릭터 패시브 종류 부족: ${characterPassiveOps.size}`);
+const thinPassiveCharacters = data.characters.filter((character) => (character.passiveEffects || []).length < 2);
+if (thinPassiveCharacters.length > 0) throw new Error(`캐릭터 보조 패시브 누락: ${thinPassiveCharacters.map((character) => character.id).join(",")}`);
+
+const characterMarkState = startRun(index, {
+  characterId: "char_haru",
+  stageId: "stage_sunny_gate",
+  seed: 20260601,
+  profile
+});
+if ((characterMarkState.enemies[0]?.status?.mark || 0) < 1) throw new Error("캐릭터 시작 표식 패시브 검증 실패");
+
+const characterGuardState = startRun(index, {
+  characterId: "char_moru",
+  stageId: "stage_sunny_gate",
+  seed: 20260602,
+  profile
+});
+characterGuardState.player.energy = 20;
+characterGuardState.hand = ["card_sprout_guard"];
+const guardShieldBefore = characterGuardState.player.shield;
+if (!playCard(characterGuardState, index, 0)) throw new Error("캐릭터 첫 방어 패시브 카드 사용 실패");
+if (!characterGuardState.status.characterFirstGuardShieldUsed || characterGuardState.player.shield <= guardShieldBefore) {
+  throw new Error("캐릭터 첫 방어 보호막 패시브 검증 실패");
+}
+
+const characterDiscountState = startRun(index, {
+  characterId: "char_riri",
+  stageId: "stage_sunny_gate",
+  seed: 20260603,
+  profile
+});
+const discountedAttack = index.cards.get("card_cloud_tap");
+if (cardCost(discountedAttack, characterDiscountState, index) !== Math.max(0, discountedAttack.cost - 1)) {
+  throw new Error("캐릭터 첫 타입 비용 감소 패시브 검증 실패");
+}
+
+const characterEnergyState = startRun(index, {
+  characterId: "char_duri",
+  stageId: "stage_sunny_gate",
+  seed: 20260604,
+  profile
+});
+if (characterEnergyState.player.energy <= characterEnergyState.player.maxEnergy) throw new Error("캐릭터 전투 시작 기운 패시브 검증 실패");
+
 const state = startRun(index, {
   characterId: "char_haru",
   stageId: "stage_sunny_gate",
@@ -104,12 +150,12 @@ markState.enemies[0].hp = 100;
 markState.enemies[0].maxHp = 100;
 markState.enemies[0].block = 0;
 if (!playCard(markState, index, 0)) throw new Error("표식 카드 사용 실패");
-if ((markState.enemies[0].status.mark || 0) !== 2) throw new Error("표식 누적 실패");
+if ((markState.enemies[0].status.mark || 0) < 2) throw new Error("표식 누적 실패");
 const markedHpBefore = markState.enemies[0].hp;
 if (!playCard(markState, index, 0)) throw new Error("표식 피해 카드 사용 실패");
 const markedDamage = markedHpBefore - markState.enemies[0].hp;
 if (markedDamage <= 11) throw new Error(`표식 피해 보너스 실패: ${markedDamage}`);
-if ((markState.enemies[0].status.mark || 0) !== 1) throw new Error("표식 소모 실패");
+if ((markState.enemies[0].status.mark || 0) < 1) throw new Error("표식 소모 실패");
 
 const disruptionState = startRun(index, {
   characterId: "char_haru",

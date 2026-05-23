@@ -711,6 +711,7 @@ h1 {
 .passive-flow b { background: #7b72d9; }
 .passive-heal b { background: #64c987; }
 .passive-reward b { background: #e8aa2e; }
+.passive-status b { background: #ef7aaf; }
 .passive-note b { background: #8b91a8; }
 
 .starter-card-pill {

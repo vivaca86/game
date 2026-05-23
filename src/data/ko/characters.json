@@ -18,6 +18,10 @@
       {
         "op": "first_attack_damage_bonus_each_battle",
         "amount": 3
+      },
+      {
+        "op": "mark_front_at_battle_start",
+        "amount": 1
       }
     ],
     "unlock": {
@@ -43,6 +47,10 @@
       {
         "op": "shield_at_battle_start",
         "amount": 4
+      },
+      {
+        "op": "shield_on_first_guard_each_battle",
+        "amount": 3
       }
     ],
     "unlock": {
@@ -68,6 +76,11 @@
       {
         "op": "draw_when_cards_played",
         "threshold": 6,
+        "amount": 1
+      },
+      {
+        "op": "discount_first_card_type_each_battle",
+        "cardType": "attack",
         "amount": 1
       }
     ],
@@ -96,6 +109,11 @@
         "op": "heal_once_when_hp_ratio_below",
         "amount": 6,
         "ratio": 0.5
+      },
+      {
+        "op": "heal_after_combat_if_low",
+        "amount": 4,
+        "ratio": 0.65
       }
     ],
     "unlock": {
@@ -123,6 +141,11 @@
         "op": "gain_energy_on_chain",
         "threshold": 4,
         "amount": 1
+      },
+      {
+        "op": "gain_shield_on_chain",
+        "threshold": 4,
+        "amount": 4
       }
     ],
     "unlock": {
@@ -149,6 +172,10 @@
       {
         "op": "bonus_gold_after_elite",
         "amount": 3
+      },
+      {
+        "op": "gain_gold_on_perfect_combat",
+        "amount": 6
       }
     ],
     "unlock": {
@@ -175,6 +202,10 @@
       {
         "op": "first_attack_damage_bonus_each_battle",
         "amount": 4
+      },
+      {
+        "op": "damage_front_on_first_skill_each_battle",
+        "amount": 5
       }
     ],
     "unlock": {
@@ -201,6 +232,10 @@
       {
         "op": "shield_at_battle_start",
         "amount": 5
+      },
+      {
+        "op": "start_with_energy_each_battle",
+        "amount": 1
       }
     ],
     "unlock": {
@@ -226,6 +261,11 @@
     "passiveEffects": [
       {
         "op": "draw_when_cards_played",
+        "threshold": 4,
+        "amount": 1
+      },
+      {
+        "op": "mark_front_when_cards_played",
         "threshold": 4,
         "amount": 1
       }
@@ -255,6 +295,10 @@
         "op": "heal_once_when_hp_ratio_below",
         "amount": 7,
         "ratio": 0.5
+      },
+      {
+        "op": "shield_on_first_guard_each_battle",
+        "amount": 4
       }
     ],
     "unlock": {
@@ -282,6 +326,11 @@
         "op": "gain_energy_on_chain",
         "threshold": 6,
         "amount": 1
+      },
+      {
+        "op": "mark_front_when_cards_played",
+        "threshold": 3,
+        "amount": 1
       }
     ],
     "unlock": {
@@ -308,6 +357,10 @@
       {
         "op": "bonus_gold_after_elite",
         "amount": 4
+      },
+      {
+        "op": "gain_gold_on_perfect_combat",
+        "amount": 7
       }
     ],
     "unlock": {
@@ -334,6 +387,10 @@
       {
         "op": "first_attack_damage_bonus_each_battle",
         "amount": 5
+      },
+      {
+        "op": "damage_front_on_first_skill_each_battle",
+        "amount": 6
       }
     ],
     "unlock": {
@@ -360,6 +417,10 @@
       {
         "op": "shield_at_battle_start",
         "amount": 6
+      },
+      {
+        "op": "shield_on_first_guard_each_battle",
+        "amount": 5
       }
     ],
     "unlock": {
@@ -386,6 +447,10 @@
       {
         "op": "draw_when_cards_played",
         "threshold": 6,
+        "amount": 1
+      },
+      {
+        "op": "start_with_energy_each_battle",
         "amount": 1
       }
     ],
@@ -414,6 +479,11 @@
         "op": "heal_once_when_hp_ratio_below",
         "amount": 3,
         "ratio": 0.5
+      },
+      {
+        "op": "heal_after_combat_if_low",
+        "amount": 5,
+        "ratio": 0.7
       }
     ],
     "unlock": {
@@ -441,6 +511,11 @@
         "op": "gain_energy_on_chain",
         "threshold": 4,
         "amount": 1
+      },
+      {
+        "op": "gain_shield_on_chain",
+        "threshold": 4,
+        "amount": 5
       }
     ],
     "unlock": {
@@ -467,6 +542,10 @@
       {
         "op": "bonus_gold_after_elite",
         "amount": 5
+      },
+      {
+        "op": "gain_gold_on_perfect_combat",
+        "amount": 8
       }
     ],
     "unlock": {
@@ -493,6 +572,10 @@
       {
         "op": "first_attack_damage_bonus_each_battle",
         "amount": 6
+      },
+      {
+        "op": "damage_front_on_first_skill_each_battle",
+        "amount": 7
       }
     ],
     "unlock": {
@@ -519,6 +602,10 @@
       {
         "op": "shield_at_battle_start",
         "amount": 7
+      },
+      {
+        "op": "shield_on_first_guard_each_battle",
+        "amount": 6
       }
     ],
     "unlock": {
@@ -546,6 +633,11 @@
         "op": "draw_when_cards_played",
         "threshold": 4,
         "amount": 1
+      },
+      {
+        "op": "mark_front_when_cards_played",
+        "threshold": 4,
+        "amount": 2
       }
     ],
     "unlock": {
@@ -573,6 +665,11 @@
         "op": "heal_once_when_hp_ratio_below",
         "amount": 4,
         "ratio": 0.5
+      },
+      {
+        "op": "heal_after_combat_if_low",
+        "amount": 6,
+        "ratio": 0.7
       }
     ],
     "unlock": {
@@ -600,6 +697,11 @@
         "op": "gain_energy_on_chain",
         "threshold": 6,
         "amount": 1
+      },
+      {
+        "op": "gain_shield_on_chain",
+        "threshold": 6,
+        "amount": 7
       }
     ],
     "unlock": {
