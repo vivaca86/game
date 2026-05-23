@@ -30,6 +30,7 @@ export function grantRelic(state, index, relicId) {
   const relic = index.relics.get(relicId);
   if (!relic || state.inventory.relics.includes(relicId)) return false;
   state.inventory.relics.push(relicId);
+  if (state.profileUnlocks?.relics && !state.profileUnlocks.relics.includes(relicId)) state.profileUnlocks.relics.push(relicId);
   addLog(state, `유물 획득: ${relic.name}`);
   return true;
 }
@@ -39,6 +40,7 @@ export function grantArcana(state, index, arcanaId) {
   const arcana = index.arcanas.get(arcanaId);
   if (!arcana || state.inventory.arcanas.includes(arcanaId)) return false;
   state.inventory.arcanas.push(arcanaId);
+  if (state.profileUnlocks?.arcanas && !state.profileUnlocks.arcanas.includes(arcanaId)) state.profileUnlocks.arcanas.push(arcanaId);
   addLog(state, `기운 획득: ${arcana.name}`);
   return true;
 }

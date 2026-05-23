@@ -86,4 +86,5 @@ export function addToDeck(state, cardId) {
   state.deck.push(cardId);
   state.discardPile.push(cardId);
   if (!state.inventory.unlockedCards.includes(cardId)) state.inventory.unlockedCards.push(cardId);
+  if (state.profileUnlocks?.cards && !state.profileUnlocks.cards.includes(cardId)) state.profileUnlocks.cards.push(cardId);
 }

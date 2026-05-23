@@ -24,6 +24,7 @@ export function grantGem(state, gemId) {
   const instance = createGemInstance(state, gemId);
   state.inventory.gemBag.push(instance);
   if (!state.inventory.gems.includes(gemId)) state.inventory.gems.push(gemId);
+  if (state.profileUnlocks?.gems && !state.profileUnlocks.gems.includes(gemId)) state.profileUnlocks.gems.push(gemId);
   state.status.gemWorkshopOpen = true;
   return instance;
 }

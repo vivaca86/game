@@ -6,10 +6,12 @@ import { createNewRun } from "./game-state.js";
 import { openReward } from "./rewards.js";
 import { ensureGemState } from "./gems.js";
 import { initializeRunModifiers, modifiedGoldReward, updateRevealedRoom } from "./run-modifiers.js";
+import { applyProfileToRun } from "./profile.js";
 
 export function startRun(index, options = {}) {
   const state = createNewRun(index, options);
   ensureGemState(state);
+  applyProfileToRun(state, index, options.profile);
   initializeRunModifiers(state, index);
   enterCurrentRoom(state, index);
   return state;

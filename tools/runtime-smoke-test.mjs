@@ -10,6 +10,7 @@ import { equipGemToCard, grantGem, openSocketForCard, socketCapacity } from "../
 import { createSaveSnapshot, restoreRunState } from "../src/core/persistence.js";
 import { createRewardOptions } from "../src/core/rewards.js";
 import { grantArcana, grantRelic } from "../src/core/run-modifiers.js";
+import { createDefaultProfile, finalizeRunProfile } from "../src/core/profile.js";
 
 const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const dataDir = path.join(rootDir, "src", "data", "ko");
@@ -33,10 +34,16 @@ const data = {
 const index = createGameIndex(data);
 assertRuntimeData(data, index);
 
+let profile = createDefaultProfile(index);
+if (profile.unlockedStages.includes("stage_lavender_hall")) throw new Error("초기 스테이지 잠금 검증 실패");
+if (!profile.unlockedCharacters.includes("char_haru")) throw new Error("초기 캐릭터 해금 검증 실패");
+profile.unlockedArcanas.push("arcana_bubble_luck");
+
 const state = startRun(index, {
   characterId: "char_haru",
   stageId: "stage_sunny_gate",
-  seed: 20260523
+  seed: 20260523,
+  profile
 });
 state.player.maxHp = 999;
 state.player.hp = 999;
@@ -106,12 +113,26 @@ if (state.inventory.unlockedCards.length <= 5) {
 if (state.inventory.achievements.length === 0) {
   throw new Error("업적 보상 연결 검증 실패");
 }
+const profileResult = finalizeRunProfile(state, index, profile);
+profile = profileResult.profile;
+if (!profile.clearedStages.includes("stage_sunny_gate")) throw new Error("프로필 스테이지 클리어 기록 실패");
+if (!profile.unlockedStages.includes("stage_lavender_hall")) throw new Error("프로필 다음 스테이지 해금 실패");
+if (!profile.unlockedCharacters.includes("char_riri")) throw new Error("프로필 스테이지 캐릭터 해금 실패");
+if (!state.resultSummary?.unlocks?.length) throw new Error("런 결과 신규 해금 요약 실패");
+const nextRun = startRun(index, {
+  characterId: "char_haru",
+  stageId: "stage_lavender_hall",
+  seed: 20260524,
+  profile
+});
+if (nextRun.stageId !== "stage_lavender_hall") throw new Error("해금 스테이지 새 런 시작 실패");
 const snapshot = createSaveSnapshot(state);
 const restored = restoreRunState(snapshot, index);
 if (!restored?.inventory?.gemBag?.length) throw new Error("저장 보석 보관함 복원 실패");
 if (!Object.keys(restored.cardSockets || {}).length) throw new Error("저장 장착 보석 복원 실패");
 if (!restored.inventory.relics.includes("relic_ribbon_box")) throw new Error("저장 유물 복원 실패");
 if (!restored.inventory.arcanas.includes("arcana_star_bakery")) throw new Error("저장 기운 복원 실패");
+if (!restored.resultSummary?.unlocks?.length) throw new Error("저장 런 결과 복원 실패");
 
 console.log("런타임 스모크 통과");
-console.log(`phase=${state.phase}, rooms=${state.metrics.roomsCleared}, cards=${state.inventory.unlockedCards.length}, gems=${state.inventory.gemBag.length}, achievements=${state.inventory.achievements.length}, gold=${state.player.gold}`);
+console.log(`phase=${state.phase}, rooms=${state.metrics.roomsCleared}, cards=${state.inventory.unlockedCards.length}, gems=${state.inventory.gemBag.length}, achievements=${state.inventory.achievements.length}, profileStages=${profile.unlockedStages.length}, gold=${state.player.gold}`);

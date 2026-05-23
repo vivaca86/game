@@ -41,10 +41,19 @@ page.on("console", (message) => {
 page.on("pageerror", (error) => errors.push(error.message));
 
 await page.goto("http://127.0.0.1:4173/", { waitUntil: "networkidle" });
+await page.evaluate(() => {
+  localStorage.removeItem("sunny_maze_run_v1");
+  localStorage.removeItem("sunny_maze_profile_v1");
+});
+await page.reload({ waitUntil: "networkidle" });
 await page.waitForSelector("#startRunButton", { timeout: 10000 });
 
 const title = await page.textContent("h1");
 if (title?.trim() !== "햇살 미로단") throw new Error(`제목 확인 실패: ${title}`);
+const setupText = await page.textContent("#gameRoot");
+if (!setupText?.includes("진행 상황") || !setupText.includes("다음 목표")) throw new Error("프로필 패널 표시 실패");
+const lockedStageOptions = await page.locator("#stageSelect option:disabled").count();
+if (lockedStageOptions === 0) throw new Error("잠긴 스테이지 표시 실패");
 
 await page.click("#startRunButton");
 await page.waitForSelector(".run-board", { timeout: 10000 });

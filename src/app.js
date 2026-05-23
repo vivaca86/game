@@ -16,6 +16,15 @@ import {
 } from "./core/gems.js";
 import { adjustedRewardCost, ensureModifierState, grantArcana, grantRelic } from "./core/run-modifiers.js";
 import { clearSavedRun, hasSavedRun, loadSavedRun, saveRun } from "./core/persistence.js";
+import {
+  applyProfileToRun,
+  availableIds,
+  clearProfile,
+  finalizeRunProfile,
+  isUnlocked,
+  loadProfile,
+  saveProfile
+} from "./core/profile.js";
 
 const labels = {
   cards: "카드",
@@ -100,15 +109,17 @@ function renderCards(cards) {
   `).join("");
 }
 
-function renderStages(stages, enemies) {
+function renderStages(stages, enemies, profile) {
   const enemyById = new Map(enemies.map((enemy) => [enemy.id, enemy]));
   qs("#stageList").innerHTML = stages.map((stage) => {
     const boss = enemyById.get(stage.bossEnemyId);
+    const unlocked = !profile || isUnlocked(profile, "unlockedStages", stage.id);
+    const cleared = profile?.clearedStages?.includes(stage.id);
     return `
-      <article class="stage-card">
+      <article class="stage-card ${unlocked ? "" : "locked"} ${cleared ? "cleared" : ""}">
         <span class="stage-order">${stage.order}</span>
         <div>
-          <strong>${stage.name}</strong>
+          <strong>${stage.name}${cleared ? " · 클리어" : unlocked ? "" : " · 잠김"}</strong>
           <p>${stage.biome}</p>
           <small>${stage.floorCount}개 방 · 보스 ${boss?.name || "미정"}</small>
         </div>
@@ -134,43 +145,97 @@ let runtime = null;
 async function main() {
   runtime = await loadGameData();
   const { data, index } = runtime;
+  runtime.profile = loadProfile(index);
   renderSummary(data);
   renderCards(data.cards);
-  renderStages(data.stages, data.enemies);
+  renderStages(data.stages, data.enemies, runtime.profile);
   renderGameSetup(index);
 }
 
 function renderGameSetup(index) {
   const root = qs("#gameRoot");
+  const profile = runtime.profile;
   root.innerHTML = `
+    ${renderProfilePanel(profile, index)}
     <div class="setup-grid">
       <label>캐릭터
         <select id="characterSelect">
-          ${index.data.characters.map((character) => `<option value="${character.id}">${character.name} · ${character.role}</option>`).join("")}
+          ${index.data.characters.map((character) => {
+            const unlocked = isUnlocked(profile, "unlockedCharacters", character.id);
+            return `<option value="${character.id}" ${unlocked ? "" : "disabled"}>${unlocked ? "" : "잠김 · "}${character.name} · ${character.role}</option>`;
+          }).join("")}
         </select>
       </label>
       <label>스테이지
         <select id="stageSelect">
-          ${index.data.stages.map((stage) => `<option value="${stage.id}">${stage.order}. ${stage.name}</option>`).join("")}
+          ${index.data.stages.map((stage) => {
+            const unlocked = isUnlocked(profile, "unlockedStages", stage.id);
+            const cleared = profile.clearedStages.includes(stage.id);
+            return `<option value="${stage.id}" ${unlocked ? "" : "disabled"}>${unlocked ? "" : "잠김 · "}${stage.order}. ${stage.name}${cleared ? " · 클리어" : ""}</option>`;
+          }).join("")}
         </select>
       </label>
       <button class="primary-btn" id="startRunButton">탐험 시작</button>
       <button class="secondary-btn" id="loadRunButton" ${hasSavedRun() ? "" : "disabled"}>저장 불러오기</button>
+      <button class="secondary-btn" id="clearProfileButton">진행 초기화</button>
     </div>
     <div id="runRoot"></div>
   `;
   qs("#startRunButton").addEventListener("click", () => {
     const characterId = qs("#characterSelect").value;
     const stageId = qs("#stageSelect").value;
-    runtime.state = startRun(index, { characterId, stageId, seed: 20260523 });
+    runtime.state = startRun(index, { characterId, stageId, seed: 20260523, profile: runtime.profile });
     saveRun(runtime.state);
     renderGameSetup(index);
     renderRun();
   });
   qs("#loadRunButton").addEventListener("click", () => {
     runtime.state = loadSavedRun(index);
+    if (runtime.state) applyProfileToRun(runtime.state, index, runtime.profile);
     renderRun();
   });
+  qs("#clearProfileButton").addEventListener("click", () => {
+    if (!confirm("진행 상황과 저장된 탐험을 초기화할까요?")) return;
+    clearProfile();
+    clearSavedRun();
+    runtime.profile = loadProfile(index);
+    runtime.state = null;
+    renderStages(runtime.data.stages, runtime.data.enemies, runtime.profile);
+    renderGameSetup(index);
+  });
+}
+
+function renderProfilePanel(profile, index) {
+  const nextStage = index.data.stages.find((stage) => isUnlocked(profile, "unlockedStages", stage.id) && !profile.clearedStages.includes(stage.id));
+  const counts = [
+    ["스테이지", profile.clearedStages.length, index.data.stages.length],
+    ["캐릭터", profile.unlockedCharacters.length, index.data.characters.length],
+    ["카드", profile.unlockedCards.length, index.data.cards.length],
+    ["보석", profile.unlockedGems.length, index.data.gems.length],
+    ["유물", profile.unlockedRelics.length, index.data.relics.length],
+    ["기운", profile.unlockedArcanas.length, index.data.arcanas.length],
+    ["업적", profile.achievements.length, index.data.achievements.length]
+  ];
+  return `
+    <section class="profile-panel">
+      <div class="panel-head compact-head">
+        <h2>진행 상황</h2>
+        <span>${profile.stats.wins}승 · ${profile.stats.totalRuns}회 탐험</span>
+      </div>
+      <div class="profile-grid">
+        ${counts.map(([label, current, total]) => `
+          <div class="profile-stat">
+            <span>${label}</span>
+            <strong>${current}/${total}</strong>
+          </div>
+        `).join("")}
+      </div>
+      <div class="profile-next">
+        <strong>다음 목표</strong>
+        <span>${nextStage ? `${nextStage.order}. ${nextStage.name} 클리어` : "모든 스테이지 클리어"}</span>
+      </div>
+    </section>
+  `;
 }
 
 function renderRun() {
@@ -184,6 +249,7 @@ function renderRun() {
   const stage = index.stages.get(state.stageId);
   ensureGemState(state);
   ensureModifierState(state);
+  syncCompletedRun(state, index);
   root.innerHTML = `
     <section class="run-board">
       <div class="run-status">
@@ -212,13 +278,21 @@ function renderRun() {
   bindRunActions();
 }
 
+function syncCompletedRun(state, index) {
+  if (!["stage_clear", "defeat"].includes(state.phase) || state.status.profileFinalized) return;
+  const result = finalizeRunProfile(state, index, runtime.profile);
+  runtime.profile = result.profile;
+  saveProfile(runtime.profile);
+  saveRun(state);
+  renderStages(runtime.data.stages, runtime.data.enemies, runtime.profile);
+}
+
 function renderPhase(state, index) {
   if (state.phase === "combat") return renderCombat(state, index);
   if (state.phase === "event") return renderEvent(state, index);
   if (state.phase === "reward") return renderReward(state);
   if (state.phase === "room_complete") return `<button class="primary-btn" data-action="advance">다음 방으로</button>`;
-  if (state.phase === "stage_clear") return `<div class="clear-box"><strong>스테이지 클리어</strong><button class="primary-btn" data-action="restart">다시 탐험</button></div>`;
-  if (state.phase === "defeat") return `<div class="clear-box"><strong>탐험 실패</strong><button class="primary-btn" data-action="restart">다시 탐험</button></div>`;
+  if (state.phase === "stage_clear" || state.phase === "defeat") return renderRunResult(state);
   return "";
 }
 
@@ -255,6 +329,37 @@ function renderCombat(state, index) {
       </section>
       <button class="secondary-btn" data-action="end-turn">턴 종료</button>
     </div>
+  `;
+}
+
+function renderRunResult(state) {
+  const summary = state.resultSummary;
+  const title = state.phase === "stage_clear" ? "스테이지 클리어" : "탐험 실패";
+  const unlocks = [...(summary?.unlocks || []), ...(summary?.achievements || []), ...(summary?.metaUpgrades || [])];
+  return `
+    <section class="result-panel">
+      <div class="result-head">
+        <div>
+          <strong>${title}</strong>
+          <span>${summary?.stageName || ""} · ${summary?.characterName || ""}</span>
+        </div>
+        <button class="primary-btn" data-action="restart">다시 탐험</button>
+      </div>
+      <div class="result-grid">
+        <div><span>클리어 방</span><strong>${summary?.roomsCleared ?? state.metrics.roomsCleared}</strong></div>
+        <div><span>처치</span><strong>${summary?.enemiesDefeated ?? state.metrics.enemiesDefeated}</strong></div>
+        <div><span>최대 연쇄</span><strong>${summary?.maxChain ?? state.metrics.maxChain}</strong></div>
+        <div><span>별사탕</span><strong>${summary?.gold ?? state.player.gold}</strong></div>
+        <div><span>덱</span><strong>${summary?.deckSize ?? state.deck.length}</strong></div>
+        <div><span>보석</span><strong>${summary?.gemCount ?? state.inventory.gemBag.length}</strong></div>
+      </div>
+      <div class="unlock-list">
+        <strong>새로 열린 것</strong>
+        <div class="build-chip-list">
+          ${unlocks.length === 0 ? "<span class='muted'>이번 탐험의 신규 해금 없음</span>" : unlocks.map((item) => `<span class="build-chip unlock-chip">${item.label} · ${item.name}</span>`).join("")}
+        </div>
+      </div>
+    </section>
   `;
 }
 
@@ -404,7 +509,7 @@ function bindRunActions() {
       if (action === "event-choice") applyEventChoice(state, index, Number(button.dataset.choiceIndex));
       if (action === "reroll") rerollReward(state, index);
       if (action === "advance") advanceRoom(state, index);
-      if (action === "restart") runtime.state = startRun(index, { characterId: state.characterId, stageId: state.stageId, seed: Date.now() });
+      if (action === "restart") runtime.state = startRun(index, { characterId: state.characterId, stageId: state.stageId, seed: Date.now(), profile: runtime.profile });
       if (action === "equip-gem") equipGemToCard(state, index, button.dataset.gemInstanceId, button.dataset.cardId);
       if (action === "unequip-gem") unequipGem(state, button.dataset.gemInstanceId);
       if (action === "open-socket") openSocketForCard(state, index, button.dataset.cardId);

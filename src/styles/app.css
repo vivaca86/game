@@ -304,9 +304,54 @@ h1 {
   margin-bottom: 18px;
 }
 
+.profile-panel,
+.setup-grid {
+  margin-bottom: 14px;
+}
+
+.profile-panel {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.68);
+}
+
+.profile-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.profile-stat,
+.profile-next {
+  padding: 10px;
+  border-radius: 8px;
+  background: #fffaf0;
+}
+
+.profile-stat {
+  display: grid;
+  gap: 4px;
+}
+
+.profile-stat span,
+.profile-next span {
+  color: #686c88;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.profile-next {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
 .setup-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) repeat(3, auto);
   gap: 12px;
   align-items: end;
 }
@@ -476,6 +521,56 @@ h1 {
   background: #edf8ff;
 }
 
+.result-panel {
+  display: grid;
+  gap: 14px;
+  padding: 16px;
+  border-radius: 8px;
+  background: #edf8ff;
+}
+
+.result-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.result-head strong {
+  display: block;
+  font-size: 24px;
+}
+
+.result-head span {
+  color: #5f6680;
+  font-weight: 800;
+}
+
+.result-grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.result-grid div {
+  display: grid;
+  gap: 4px;
+  padding: 10px;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.result-grid span {
+  color: #686c88;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.unlock-list {
+  display: grid;
+  gap: 8px;
+}
+
 .gem-vault {
   display: grid;
   gap: 12px;
@@ -564,6 +659,19 @@ h1 {
   color: #347159;
 }
 
+.unlock-chip {
+  background: #fff2c6;
+  color: #6f5a1f;
+}
+
+.stage-card.locked {
+  opacity: 0.48;
+}
+
+.stage-card.cleared {
+  background: #e8f8f1;
+}
+
 .muted {
   background: #ece7d6;
   color: #767891;
@@ -612,7 +720,9 @@ h1 {
   .workbench,
   .setup-grid,
   .build-grid,
-  .gem-vault-grid {
+  .gem-vault-grid,
+  .profile-grid,
+  .result-grid {
     grid-template-columns: 1fr;
   }
 

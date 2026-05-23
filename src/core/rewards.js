@@ -16,7 +16,7 @@ import {
 
 export function createRewardOptions(state, index, source = "combat") {
   const stage = index.stages.get(state.stageId);
-  const cardPool = index.data.cards.filter((card) => !["curse", "temp"].includes(card.type));
+  const cardPool = unlockedPool(state, index, "cards").filter((card) => !["curse", "temp"].includes(card.type));
   const cardOptionCount = cardRewardOptionCount(state, index, source, 3);
   const options = [];
   for (let i = 0; i < cardOptionCount; i += 1) {
@@ -48,7 +48,7 @@ export function createRewardOptions(state, index, source = "combat") {
   if (hasSpecialReward) {
     const gemOptions = gemRewardOptionCount(state, index, source, guaranteedSpecialReward || combatGemReward ? 1 : 0);
     for (let i = 0; i < gemOptions; i += 1) {
-      const gem = state.rng.pick(index.data.gems);
+      const gem = state.rng.pick(unlockedPool(state, index, "gems"));
       options.push({
         id: `gem:${gem.id}:${i}`,
         type: "gem",
@@ -58,7 +58,7 @@ export function createRewardOptions(state, index, source = "combat") {
         cost: source === "shop" ? adjustedRewardCost(state, index, { gold: 42 + stage.order * 5 }, { source, type: "gem" }) : null
       });
     }
-    const availableRelics = index.data.relics.filter((relic) => !state.inventory.relics.includes(relic.id));
+    const availableRelics = unlockedPool(state, index, "relics").filter((relic) => !state.inventory.relics.includes(relic.id));
     const relic = state.rng.pick(availableRelics);
     if (relic) {
       options.push({
@@ -70,7 +70,7 @@ export function createRewardOptions(state, index, source = "combat") {
         cost: source === "shop" ? adjustedRewardCost(state, index, { gold: 58 + stage.order * 7 }, { source, type: "relic" }) : null
       });
     }
-    const availableArcanas = index.data.arcanas.filter((arcana) => !state.inventory.arcanas.includes(arcana.id));
+    const availableArcanas = unlockedPool(state, index, "arcanas").filter((arcana) => !state.inventory.arcanas.includes(arcana.id));
     const arcana = state.rng.pick(availableArcanas);
     if (arcana && source !== "combat") {
       options.push({
@@ -84,6 +84,21 @@ export function createRewardOptions(state, index, source = "combat") {
     }
   }
   return options;
+}
+
+function unlockedPool(state, index, key) {
+  const runKeys = {
+    cards: "unlockedCards",
+    gems: "gems",
+    relics: "relics",
+    arcanas: "arcanas"
+  };
+  const ids = [...(state.profileUnlocks?.[key] || []), ...(state.inventory?.[runKeys[key]] || [])];
+  const rows = index.data[key] || [];
+  if (ids.length === 0) return rows;
+  const allowed = new Set(ids);
+  const filtered = rows.filter((item) => allowed.has(item.id));
+  return filtered.length > 0 ? filtered : rows;
 }
 
 export function openReward(state, index, source = "combat") {

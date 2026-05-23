@@ -27,6 +27,7 @@ export function createSaveSnapshot(state) {
     hand: [...state.hand],
     enemies: structuredClone(state.enemies),
     inventory: structuredClone(state.inventory),
+    profileUnlocks: structuredClone(state.profileUnlocks || {}),
     upgradedCards: [...state.upgradedCards],
     cardSockets: structuredClone(state.cardSockets),
     cardSocketBonuses: structuredClone(state.cardSocketBonuses),
@@ -36,6 +37,7 @@ export function createSaveSnapshot(state) {
     metrics: structuredClone(state.metrics),
     pendingReward: structuredClone(state.pendingReward),
     pendingEvent: structuredClone(state.pendingEvent),
+    resultSummary: structuredClone(state.resultSummary || null),
     log: [...state.log]
   };
 }
@@ -62,6 +64,7 @@ export function restoreRunState(snapshot, index) {
     hand: [...snapshot.hand],
     enemies: structuredClone(snapshot.enemies),
     inventory: structuredClone(snapshot.inventory),
+    profileUnlocks: structuredClone(snapshot.profileUnlocks || {}),
     upgradedCards: [...snapshot.upgradedCards],
     cardSockets: structuredClone(snapshot.cardSockets || {}),
     cardSocketBonuses: structuredClone(snapshot.cardSocketBonuses || {}),
@@ -71,6 +74,7 @@ export function restoreRunState(snapshot, index) {
     metrics: structuredClone(snapshot.metrics),
     pendingReward: structuredClone(snapshot.pendingReward),
     pendingEvent: structuredClone(snapshot.pendingEvent),
+    resultSummary: structuredClone(snapshot.resultSummary || null),
     log: [...(snapshot.log || [])]
   });
   ensureGemState(state);
