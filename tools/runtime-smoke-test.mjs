@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 import { createGameIndex, assertRuntimeData } from "../src/core/data-loader.js";
 import { cardRoleAudit } from "../src/core/card-roles.js";
 import { gemAudit } from "../src/core/gem-roles.js";
+import { buildItemAudit } from "../src/core/build-roles.js";
 import { cleanseDisruption, playCard, endTurn } from "../src/core/combat.js";
 import { startRun, advanceRoom } from "../src/core/progression.js";
 import { applyEventChoice, applyRewardOption } from "../src/core/rewards.js";
@@ -42,6 +43,10 @@ if (Object.keys(cardAudit.roleCounts).length < 10) throw new Error("카드 역�
 const gemRoleAudit = gemAudit(data.gems);
 if (gemRoleAudit.missingRoles.length > 0) throw new Error(`보석 역할 미분류: ${gemRoleAudit.missingRoles.join(",")}`);
 if (Object.keys(gemRoleAudit.roleCounts).length < 8) throw new Error("보석 역할 분포 부족");
+const buildRoleAudit = buildItemAudit(data.relics, data.arcanas);
+if (buildRoleAudit.missingRoles.length > 0) throw new Error(`유물/기운 역할 미분류: ${buildRoleAudit.missingRoles.join(",")}`);
+if (buildRoleAudit.missingHints.length > 0) throw new Error(`유물/기운 추천 힌트 누락: ${buildRoleAudit.missingHints.join(",")}`);
+if (Object.keys(buildRoleAudit.roleCounts).length < 8) throw new Error("유물/기운 역할 분포 부족");
 
 let profile = createDefaultProfile(index);
 if (profile.unlockedStages.includes("stage_lavender_hall")) throw new Error("초기 스테이지 잠금 검증 실패");

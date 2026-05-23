@@ -88,7 +88,7 @@ if (moruEnabled > 0) {
 }
 
 async function assertNoCodexOverflow(label) {
-  const overflowItems = await page.locator(".codex-entry, .codex-copy, .card-art-codex, .card-role-chip, .gem-role-chip, .gem-fit-list, .codex-entry > .gem-icon, .codex-entry > .item-icon, .codex-portrait-slot, .codex-stage .stage-key-art, .codex-enemy .monster-portrait").evaluateAll((elements) => elements
+  const overflowItems = await page.locator(".codex-entry, .codex-copy, .card-art-codex, .card-role-chip, .gem-role-chip, .gem-fit-list, .build-role-chip, .build-fit-list, .codex-entry > .gem-icon, .codex-entry > .item-icon, .codex-portrait-slot, .codex-stage .stage-key-art, .codex-enemy .monster-portrait").evaluateAll((elements) => elements
     .filter((element) => element.scrollWidth > element.clientWidth + 2 || element.scrollHeight > element.clientHeight + 2)
     .map((element) => element.className));
   if (overflowItems.length > 0) {
@@ -116,7 +116,15 @@ const codexGemRoleCount = await page.locator(".codex-kind-gems .gem-role-chip").
 const codexGemFitCount = await page.locator(".codex-kind-gems .gem-fit-list").count();
 if (codexGemRoleCount < 50 || codexGemFitCount < 50) throw new Error("보석 도감 역할/추천 칩 표시 실패");
 await assertCodexVisual("relics", ".codex-kind-relics .item-icon-relic", 16, "유물");
+const codexRelicRoleCount = await page.locator(".codex-kind-relics .build-role-chip").count();
+const codexRelicFitCount = await page.locator(".codex-kind-relics .build-fit-list").count();
+const codexRelicMarkCount = await page.locator(".codex-kind-relics .item-role-mark").count();
+if (codexRelicRoleCount < 16 || codexRelicFitCount < 16 || codexRelicMarkCount < 16) throw new Error("유물 도감 역할/추천/마크 표시 실패");
 await assertCodexVisual("arcanas", ".codex-kind-arcanas .item-icon-arcana", 12, "기운");
+const codexArcanaRoleCount = await page.locator(".codex-kind-arcanas .build-role-chip").count();
+const codexArcanaFitCount = await page.locator(".codex-kind-arcanas .build-fit-list").count();
+const codexArcanaMarkCount = await page.locator(".codex-kind-arcanas .item-role-mark").count();
+if (codexArcanaRoleCount < 12 || codexArcanaFitCount < 12 || codexArcanaMarkCount < 12) throw new Error("기운 도감 역할/추천/마크 표시 실패");
 await assertCodexVisual("characters", ".codex-kind-characters .character-portrait", 20, "캐릭터");
 const codexPassiveChipCount = await page.locator(".codex-kind-characters .character-passive-chip").count();
 if (codexPassiveChipCount < 46) throw new Error("캐릭터 도감 보조 패시브 칩 표시 실패");
@@ -473,7 +481,9 @@ const rewardCardArtCount = await page.locator(".market-box .reward-kind-card .ca
 if (rewardCardCount > 0 && rewardCardArtCount === 0) throw new Error("보상 카드 미리보기 일러스트 표시 실패");
 const rewardRelicOrArcanaCount = await page.locator(".market-box .reward-kind-relic, .market-box .reward-kind-arcana").count();
 const rewardItemIconCount = await page.locator(".market-box .reward-kind-relic .item-icon, .market-box .reward-kind-arcana .item-icon").count();
-if (rewardRelicOrArcanaCount > 0 && rewardItemIconCount === 0) throw new Error("유물/기운 보상 아이콘 표시 실패");
+const rewardBuildRoleCount = await page.locator(".market-box .reward-kind-relic .build-role-chip, .market-box .reward-kind-arcana .build-role-chip").count();
+const rewardBuildFitCount = await page.locator(".market-box .reward-kind-relic .build-fit-list, .market-box .reward-kind-arcana .build-fit-list").count();
+if (rewardRelicOrArcanaCount > 0 && (rewardItemIconCount === 0 || rewardBuildRoleCount === 0 || rewardBuildFitCount === 0)) throw new Error("유물/기운 보상 역할 미리보기 표시 실패");
 
 const marketText = await page.textContent(".market-box");
 if (!marketText?.includes("비용") || !marketText.includes("별사탕")) {
@@ -483,7 +493,7 @@ if (!marketText?.includes("비용") || !marketText.includes("별사탕")) {
 const marketImpactChipCount = await page.locator(".market-box .choice-impact-chip").count();
 if (marketImpactChipCount < 3) throw new Error("상점/보상 선택지 효과 요약 칩 부족");
 
-const overflowItems = await page.locator(".market-box, .market-choice, .choice-impact-chip, .reward-preview-card, .choice-wallet, .card-art-preview").evaluateAll((elements) => elements
+const overflowItems = await page.locator(".market-box, .market-choice, .choice-impact-chip, .reward-preview-card, .choice-wallet, .card-art-preview, .build-role-chip, .build-fit-list").evaluateAll((elements) => elements
   .filter((element) => element.scrollWidth > element.clientWidth + 2 || element.scrollHeight > element.clientHeight + 2)
   .map((element) => element.className));
 if (overflowItems.length > 0) {
@@ -608,7 +618,7 @@ const eventIconCount = await page.locator(".event-choice .choice-reward-icon").c
 if (eventChoiceCount < 3 || eventIconCount !== eventChoiceCount) throw new Error("이벤트 선택지 아이콘 표시 실패");
 const eventImpactChipCount = await page.locator(".event-choice .choice-impact-chip").count();
 if (eventImpactChipCount < eventChoiceCount) throw new Error("이벤트 선택지 효과 요약 칩 부족");
-const eventOverflowItems = await page.locator(".event-box, .event-head, .event-visual-card, .event-choice, .choice-reward-icon, .choice-impact-chip").evaluateAll((elements) => elements
+const eventOverflowItems = await page.locator(".event-box, .event-head, .event-visual-card, .event-choice, .choice-reward-icon, .choice-impact-chip, .reward-preview-card, .build-role-chip, .build-fit-list").evaluateAll((elements) => elements
   .filter((element) => element.scrollWidth > element.clientWidth + 2 || element.scrollHeight > element.clientHeight + 2)
   .map((element) => element.className));
 if (eventOverflowItems.length > 0) {

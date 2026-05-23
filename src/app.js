@@ -5,6 +5,7 @@ import { applyEventChoice, applyRewardOption, rerollReward } from "./core/reward
 import { cardCost } from "./core/card-effects.js";
 import { cardRoleSummary } from "./core/card-roles.js";
 import { gemFitHints, gemRoleSummary } from "./core/gem-roles.js";
+import { buildFitHints, buildItemRoleSummary } from "./core/build-roles.js";
 import {
   canEquipGemToCard,
   ensureGemState,
@@ -525,7 +526,9 @@ function renderCodexBuildItem(kind, item, entryClass, stateBadge) {
       <div class="codex-copy">
         <span><b>${stateBadge}</b> · ${kind === "relic" ? "유물" : "기운"} · ${rarityLabels[item.rarity] || item.rarity}</span>
         <strong>${item.name}</strong>
+        ${renderBuildRoleChip(item, kind)}
         <p>${kind === "relic" ? relicEffectSummary(item) : arcanaEffectSummary(item)}</p>
+        ${renderBuildFitHints(item, kind)}
       </div>
     </article>
   `;
@@ -2736,11 +2739,15 @@ function renderRewardPreviewItem(item) {
     : ["relic", "arcana"].includes(item.kind)
     ? renderItemIcon(item.kind, item.source)
     : `<span class="reward-icon reward-icon-${item.kind}" ${item.accent ? `style="--preview-accent:${item.accent}"` : ""}>${item.cost ?? rewardIconText(item.kind)}</span>`;
+  const buildMeta = ["relic", "arcana"].includes(item.kind) && item.source
+    ? `${renderBuildRoleChip(item.source, item.kind)}${renderBuildFitHints(item.source, item.kind, 2)}`
+    : "";
   return `
     <span class="reward-preview-card reward-kind-${item.kind}" ${item.accent ? `style="--preview-accent:${item.accent}"` : ""}>
       ${icon}
-      <span>
+      <span class="reward-preview-copy">
         <strong>${item.title}</strong>
+        ${buildMeta}
         <small>${item.detail}</small>
       </span>
     </span>
@@ -2752,21 +2759,44 @@ function renderBuildItemChip(kind, item) {
   return `
     <span class="build-chip ${kind}-chip ${kind}-chip-${item.rarity || "common"}" title="${item.text}">
       ${renderItemIcon(kind, item)}
-      <span>
+      <span class="build-chip-copy">
         <b>${item.name}</b>
+        ${renderBuildRoleChip(item, kind)}
         <em>${summary}</em>
+        ${renderBuildFitHints(item, kind, 2)}
       </span>
+    </span>
+  `;
+}
+
+function renderBuildRoleChip(item, kind) {
+  const role = buildItemRoleSummary(item, kind);
+  return `
+    <span class="build-role-chip build-role-${role.tone}" title="${role.label}">
+      <b>${role.icon}</b>
+      <em>${role.label}</em>
+    </span>
+  `;
+}
+
+function renderBuildFitHints(item, kind, limit = 3) {
+  const hints = buildFitHints(item, kind).slice(0, limit);
+  return `
+    <span class="build-fit-list" aria-label="${item.name} 추천 빌드">
+      ${hints.map((hint) => `<span>${hint}</span>`).join("")}
     </span>
   `;
 }
 
 function renderItemIcon(kind, item = {}) {
   const motif = kind === "relic" ? relicMotif(item) : arcanaMotif(item);
+  const role = buildItemRoleSummary(item, kind);
   return `
-    <span class="item-icon item-icon-${kind} ${kind}-motif-${motif} item-rarity-${item.rarity || "common"}" aria-hidden="true">
+    <span class="item-icon item-icon-${kind} ${kind}-motif-${motif} item-rarity-${item.rarity || "common"} item-role-${role.key}" aria-hidden="true">
       <span class="item-shape main"></span>
       <span class="item-shape mark-one"></span>
       <span class="item-shape mark-two"></span>
+      <span class="item-role-mark">${role.icon}</span>
     </span>
   `;
 }
@@ -2822,11 +2852,19 @@ function relicEffectSummary(relic) {
   if (effect.op === "shield_at_battle_start") return `전투 시작 보호막 ${effect.amount}`;
   if (effect.op === "modify_gold_reward_percent") return `별사탕 보상 +${effect.amount}%`;
   if (effect.op === "reveal_next_room_type") return `다음 방 ${effect.amount}개 보기`;
-  if (effect.op === "modify_reward_options") return `보상 선택지 +${effect.amount}`;
-  if (effect.op === "free_first_high_cost_card") return "첫 고비용 카드 무료";
-  if (effect.op === "retain_cards_between_turns") return `카드 ${effect.amount}장 보존`;
-  if (effect.op === "modify_shop_cost_percent") return `상점 비용 ${effect.amount}%`;
-  if (effect.op === "extra_card_reward_after_elite") return "정예 카드 보상 +1";
+  if (effect.op === "increase_card_reward_options") return `카드 보상 선택지 +${effect.amount}`;
+  if (effect.op === "first_expensive_card_free_each_battle") return `${effect.minCost || 2}비용 이상 첫 카드 무료`;
+  if (effect.op === "heal_after_combat") return `전투 후 체력 ${effect.amount} 회복`;
+  if (effect.op === "start_with_energy") return `전투 시작 기운 +${effect.amount}`;
+  if (effect.op === "increase_gem_reward_options") return `보석 보상 선택지 +${effect.amount}`;
+  if (effect.op === "reduce_shop_prices_percent") return `상점 가격 -${effect.amount}%`;
+  if (effect.op === "reroll_reward_free") return `보상 다시 보기 ${effect.amount}회 무료`;
+  if (effect.op === "upgrade_first_card_reward") return "첫 카드 보상 강화";
+  if (effect.op === "retain_one_card") return `턴 종료 손패 ${effect.amount}장 보존`;
+  if (effect.op === "add_card_after_elite") return `정예 카드 보상 +${effect.amount}`;
+  if (effect.op === "gain_gold_on_perfect") return `완벽 전투 별사탕 +${effect.amount}`;
+  if (effect.op === "preserve_chain_once") return `전투마다 연쇄 보존 ${effect.amount}회`;
+  if (effect.op === "boss_reward_bonus") return `보스 보상 +${effect.amount}`;
   return relic.text;
 }
 
@@ -2836,11 +2874,15 @@ function arcanaEffectSummary(arcana) {
   if (effect.op === "enable_cost_ladder_chain") return "비용 순서 연쇄";
   if (effect.op === "modify_gem_reward_chance_percent") return `보석 보상 +${effect.amount}%`;
   if (effect.op === "damage_random_on_guard_play") return `방어 시 피해 ${effect.amount}`;
+  if (effect.op === "damage_all_when_cards_played") return `카드 ${effect.threshold}장 사용 시 전체 피해 ${effect.amount}`;
   if (effect.op === "damage_all_on_attack_kill") return `처치 시 전체 피해 ${effect.amount}`;
-  if (effect.op === "heal_after_combat_if_low_hp") return "낮은 체력 전투 후 회복";
-  if (effect.op === "draw_when_cards_played") return `카드 ${effect.threshold}장 사용 시 드로우`;
-  if (effect.op === "reduce_first_skill_cost_each_turn") return "첫 기술 비용 감소";
-  if (effect.op === "preserve_chain_once_per_turn") return "연쇄 보존";
+  if (effect.op === "heal_when_guard_played_count") return `방어 ${effect.threshold}장마다 체력 ${effect.amount} 회복`;
+  if (effect.op === "gain_gold_on_zero_cost_play") return `0비용 카드마다 별사탕 +${effect.amount}`;
+  if (effect.op === "draw_on_four_colors") return `서로 다른 색 4장 사용 시 드로우 ${effect.amount}`;
+  if (effect.op === "carry_shield_percent") return `남은 보호막 ${effect.amount}% 유지`;
+  if (effect.op === "reduce_gem_cost_percent") return `보석 비용 -${effect.amount}%`;
+  if (effect.op === "mark_front_on_heal") return `회복 시 앞 적 표식 +${effect.amount}`;
+  if (effect.op === "discount_hand_when_cards_played") return `카드 ${effect.threshold}장 사용 시 손패 비용 -${effect.amount}`;
   return arcana.text;
 }
 

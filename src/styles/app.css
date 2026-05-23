@@ -4207,6 +4207,12 @@ h1 {
   display: block;
 }
 
+.reward-preview-copy {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
 .reward-preview-card strong {
   overflow-wrap: anywhere;
   color: #383a56;
@@ -4865,6 +4871,80 @@ h1 {
   line-height: 1.1;
 }
 
+.build-role-chip {
+  display: inline-grid;
+  grid-template-columns: 22px minmax(0, auto);
+  gap: 5px;
+  align-items: center;
+  justify-self: start;
+  max-width: 100%;
+  margin-top: 2px;
+  padding: 4px 7px 4px 4px;
+  border: 1px solid rgba(76, 79, 112, 0.08);
+  border-radius: 8px;
+  background: #ffffff;
+  color: #4f536d;
+  font-size: 10px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.build-role-chip b {
+  display: inline-grid;
+  width: 22px;
+  height: 22px;
+  place-items: center;
+  border-radius: 7px;
+  color: #ffffff;
+  font-size: 10px;
+}
+
+.build-role-chip em {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-style: normal;
+}
+
+.build-role-guard b { background: #55bdd5; }
+.build-role-flow b { background: #7b72d9; }
+.build-role-card b { background: #ff9cb1; }
+.build-role-gem b { background: #67d9a5; }
+.build-role-economy b { background: #e8aa2e; }
+.build-role-scout b { background: #75a7f7; }
+.build-role-heal b { background: #64c987; }
+.build-role-damage b { background: #ff7f8f; }
+.build-role-status b { background: #ef7aaf; }
+.build-role-reward b { background: #d6a44e; }
+.build-role-note b { background: #8b91a8; }
+
+.build-fit-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  max-width: 100%;
+  margin-top: 3px;
+}
+
+.build-fit-list span {
+  padding: 4px 6px;
+  border-radius: 999px;
+  background: #edf8ff;
+  color: #3d75a3;
+  font-size: 10px;
+  font-weight: 900;
+  line-height: 1.1;
+}
+
+.reward-preview-card .build-role-chip,
+.reward-preview-card .build-fit-list {
+  margin-top: 0;
+}
+
+.reward-preview-card .build-fit-list span {
+  padding: 3px 5px;
+  font-size: 9px;
+}
+
 .gem-icon {
   display: block;
   position: relative;
@@ -4996,6 +5076,12 @@ h1 {
   text-align: left;
 }
 
+.build-chip-copy {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
 .build-chip b,
 .build-chip em {
   display: block;
@@ -5013,6 +5099,19 @@ h1 {
   font-size: 11px;
   font-style: normal;
   line-height: 1.25;
+}
+
+.build-chip .build-role-chip b {
+  display: inline-grid;
+  color: #ffffff;
+  font-size: 10px;
+}
+
+.build-chip .build-role-chip em {
+  margin-top: 0;
+  color: inherit;
+  font-size: 10px;
+  line-height: 1;
 }
 
 .relic-chip {
@@ -5086,6 +5185,42 @@ h1 {
 .item-shape.mark-two {
   left: 6px;
   bottom: 6px;
+}
+
+.item-role-mark {
+  position: absolute;
+  z-index: 5;
+  right: 3px;
+  bottom: 3px;
+  display: grid;
+  width: 14px;
+  height: 14px;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  border-radius: 6px;
+  background: #8b91a8;
+  color: #ffffff;
+  font-size: 8px;
+  font-weight: 1000;
+  line-height: 1;
+  box-shadow: 0 2px 5px rgba(76, 70, 116, 0.14);
+}
+
+.item-role-guard .item-role-mark { background: #55bdd5; }
+.item-role-flow .item-role-mark { background: #7b72d9; }
+.item-role-card .item-role-mark { background: #ff9cb1; }
+.item-role-gem .item-role-mark { background: #67d9a5; }
+.item-role-economy .item-role-mark { background: #e8aa2e; }
+.item-role-scout .item-role-mark { background: #75a7f7; }
+.item-role-heal .item-role-mark { background: #64c987; }
+.item-role-damage .item-role-mark { background: #ff7f8f; }
+.item-role-status .item-role-mark { background: #ef7aaf; }
+.item-role-reward .item-role-mark { background: #d6a44e; }
+
+.codex-entry > .item-icon .item-role-mark {
+  width: 18px;
+  height: 18px;
+  font-size: 10px;
 }
 
 .relic-motif-lantern .main {
