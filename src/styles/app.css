@@ -911,6 +911,223 @@ h1 {
   background: linear-gradient(180deg, #dff4ff, #ffe8ee 48%, #fff2c6);
 }
 
+.codex-panel {
+  display: grid;
+  gap: 14px;
+  margin-bottom: 14px;
+  padding: 16px;
+  border: 2px solid rgba(76, 79, 112, 0.1);
+  border-radius: 8px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(255, 250, 240, 0.76)),
+    #ffffff;
+  box-shadow: 0 12px 28px rgba(76, 70, 116, 0.08);
+}
+
+.codex-panel .compact-head {
+  align-items: end;
+  margin-bottom: 0;
+}
+
+.codex-panel .compact-head > div:first-child {
+  display: grid;
+  gap: 6px;
+}
+
+.codex-controls {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.codex-controls label {
+  display: grid;
+  gap: 5px;
+  min-width: 128px;
+  color: #585d78;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.codex-controls select {
+  min-height: 38px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 8px;
+  background: #fffaf0;
+  color: #34374f;
+  font-weight: 900;
+}
+
+.codex-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 10px;
+  max-height: 620px;
+  overflow: auto;
+  padding-right: 4px;
+  scrollbar-color: #ffb6c8 #fffaf0;
+}
+
+.codex-entry {
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+  min-height: 146px;
+  padding: 10px;
+  border: 2px solid color-mix(in srgb, var(--card-accent, #7cccf7) 30%, rgba(76, 79, 112, 0.1));
+  border-radius: 8px;
+  background:
+    radial-gradient(circle at 12% 10%, rgba(255, 255, 255, 0.92) 0 18%, transparent 19%),
+    linear-gradient(180deg, #ffffff, #fffaf0);
+  box-shadow: 0 8px 18px rgba(76, 70, 116, 0.08);
+}
+
+.codex-entry.locked {
+  border-style: dashed;
+  background:
+    radial-gradient(circle at 12% 10%, rgba(255, 255, 255, 0.9) 0 18%, transparent 19%),
+    linear-gradient(180deg, #ffffff, #f6f0ff);
+}
+
+.codex-card {
+  grid-template-columns: 106px minmax(0, 1fr);
+  min-height: 156px;
+}
+
+.codex-build {
+  grid-template-columns: 68px minmax(0, 1fr);
+}
+
+.codex-stage {
+  grid-template-columns: 100px minmax(0, 1fr);
+  min-height: 164px;
+}
+
+.codex-character {
+  grid-template-columns: 116px minmax(0, 1fr);
+}
+
+.codex-enemy {
+  grid-template-columns: 72px minmax(0, 1fr);
+}
+
+.codex-copy {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+}
+
+.codex-copy span,
+.codex-copy p {
+  overflow-wrap: anywhere;
+}
+
+.codex-copy span {
+  color: #686c88;
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1.35;
+}
+
+.codex-copy span b {
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: #e8f8f1;
+  color: #347159;
+  font-size: 11px;
+}
+
+.codex-entry.locked .codex-copy span b {
+  background: #f2edff;
+  color: #6555a0;
+}
+
+.codex-copy strong {
+  overflow-wrap: anywhere;
+  color: #383a56;
+  font-size: 17px;
+  line-height: 1.18;
+}
+
+.codex-copy p {
+  margin: 0;
+  color: #555b76;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.42;
+}
+
+.codex-card .tag-row {
+  gap: 4px;
+}
+
+.codex-card .tag-row span {
+  padding: 4px 6px;
+  font-size: 10px;
+}
+
+.card-art-codex {
+  width: 100%;
+  min-height: 108px;
+  align-self: stretch;
+}
+
+.card-art-codex .card-art-shape.main {
+  top: 18px;
+  width: 38px;
+  height: 34px;
+}
+
+.card-art-codex .card-art-label {
+  padding: 5px;
+}
+
+.card-art-codex .card-art-label strong {
+  font-size: 11px;
+}
+
+.card-art-codex .card-art-label small {
+  font-size: 9px;
+}
+
+.codex-entry > .gem-icon,
+.codex-entry > .item-icon {
+  width: 56px;
+  height: 56px;
+  align-self: center;
+  justify-self: center;
+}
+
+.codex-portrait-slot {
+  display: grid;
+  min-height: 128px;
+  place-items: center;
+  overflow: hidden;
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at 26% 20%, rgba(255, 255, 255, 0.88) 0 12%, transparent 13%),
+    linear-gradient(160deg, color-mix(in srgb, var(--character-accent, #ff8ea2) 20%, #ffffff), #fff7db);
+}
+
+.codex-stage .stage-key-art {
+  width: 92px;
+  height: 112px;
+  border-radius: 21px;
+}
+
+.codex-enemy .monster-portrait {
+  width: 64px;
+  height: 64px;
+  border-radius: 18px;
+}
+
+.codex-stage .stage-room-strip {
+  margin-top: 2px;
+}
+
 .primary-btn,
 .secondary-btn {
   min-height: 44px;
@@ -3601,6 +3818,20 @@ h1 {
     justify-self: start;
   }
 
+  .codex-panel .compact-head {
+    display: grid;
+    justify-items: start;
+  }
+
+  .codex-controls {
+    justify-content: flex-start;
+  }
+
+  .codex-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    max-height: 680px;
+  }
+
   .dashboard-grid,
   .card-list,
   .forecast-main,
@@ -3623,7 +3854,8 @@ h1 {
   .enemy-row,
   .hand-row,
   .choice-list,
-  .market-list {
+  .market-list,
+  .codex-grid {
     grid-template-columns: 1fr;
   }
 
@@ -3691,5 +3923,59 @@ h1 {
 
   .starter-card-strip span {
     max-width: 100%;
+  }
+
+  .codex-panel {
+    padding: 12px;
+  }
+
+  .codex-controls {
+    width: 100%;
+  }
+
+  .codex-controls label {
+    min-width: min(100%, 134px);
+    flex: 1 1 128px;
+  }
+
+  .codex-grid {
+    max-height: 760px;
+  }
+
+  .codex-entry,
+  .codex-card,
+  .codex-build,
+  .codex-stage,
+  .codex-enemy {
+    grid-template-columns: 84px minmax(0, 1fr);
+    min-height: 136px;
+    padding: 9px;
+  }
+
+  .codex-card {
+    min-height: 164px;
+  }
+
+  .codex-stage {
+    min-height: 164px;
+  }
+
+  .card-art-codex {
+    min-height: 94px;
+  }
+
+  .codex-entry > .gem-icon,
+  .codex-entry > .item-icon {
+    width: 48px;
+    height: 48px;
+  }
+
+  .codex-portrait-slot {
+    min-height: 102px;
+  }
+
+  .codex-enemy .monster-portrait {
+    width: 50px;
+    height: 50px;
   }
 }

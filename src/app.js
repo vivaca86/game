@@ -183,6 +183,8 @@ async function main() {
 function renderGameSetup(index) {
   const root = qs("#gameRoot");
   const profile = runtime.profile;
+  runtime.codexKind = runtime.codexKind || "cards";
+  runtime.codexStatus = runtime.codexStatus || "unlocked";
   const selectedCharacterId = index.data.characters.find((character) => isUnlocked(profile, "unlockedCharacters", character.id))?.id || index.data.characters[0]?.id;
   const selectedStageId = index.data.stages.find((stage) => isUnlocked(profile, "unlockedStages", stage.id))?.id || index.data.stages[0]?.id;
   root.innerHTML = `
@@ -212,6 +214,9 @@ function renderGameSetup(index) {
     <div id="setupPreview" class="setup-preview">
       ${renderSetupPreview(index, profile, selectedCharacterId, selectedStageId)}
     </div>
+    <div id="codexPanel">
+      ${renderCodexPanel(index, profile, runtime.codexKind, runtime.codexStatus)}
+    </div>
     <div id="runRoot"></div>
   `;
   const refreshSetupPreview = () => {
@@ -219,6 +224,12 @@ function renderGameSetup(index) {
   };
   qs("#characterSelect").addEventListener("change", refreshSetupPreview);
   qs("#stageSelect").addEventListener("change", refreshSetupPreview);
+  qs("#codexPanel").addEventListener("change", (event) => {
+    if (!event.target.matches("#codexKindSelect, #codexStatusSelect")) return;
+    runtime.codexKind = qs("#codexKindSelect").value;
+    runtime.codexStatus = qs("#codexStatusSelect").value;
+    qs("#codexPanel").innerHTML = renderCodexPanel(index, profile, runtime.codexKind, runtime.codexStatus);
+  });
   qs("#startRunButton").addEventListener("click", () => {
     const characterId = qs("#characterSelect").value;
     const stageId = qs("#stageSelect").value;
@@ -267,13 +278,7 @@ function renderSetupPreview(index, profile, characterId, stageId) {
       </div>
     </section>
     <section class="setup-preview-card stage-preview-card">
-      <div class="stage-key-art stage-key-${stage.backgroundKey || "bright_gate"}">
-        <span class="stage-sun"></span>
-        <span class="stage-landmark"></span>
-        <span class="stage-path"></span>
-        <span class="stage-spark one"></span>
-        <span class="stage-spark two"></span>
-      </div>
+      ${renderStageKeyArt(stage)}
       <div class="setup-preview-copy">
         <span class="route-kicker">${cleared ? "클리어한 스테이지" : "도전 스테이지"}</span>
         <strong>${stage.order}. ${stage.name}</strong>
@@ -286,6 +291,18 @@ function renderSetupPreview(index, profile, characterId, stageId) {
         ${renderStageRoomStrip(stage)}
       </div>
     </section>
+  `;
+}
+
+function renderStageKeyArt(stage) {
+  return `
+    <div class="stage-key-art stage-key-${stage.backgroundKey || "bright_gate"}">
+      <span class="stage-sun"></span>
+      <span class="stage-landmark"></span>
+      <span class="stage-path"></span>
+      <span class="stage-spark one"></span>
+      <span class="stage-spark two"></span>
+    </div>
   `;
 }
 
@@ -315,6 +332,183 @@ function characterMotifClass(character) {
   if (/별|빛|기운|소풍/.test(text)) return "star";
   if (/구름|방울|하늘/.test(text)) return "cloud";
   return "sunny";
+}
+
+function renderCodexPanel(index, profile, kind = "cards", status = "unlocked") {
+  const config = codexConfig(kind);
+  const entries = codexEntries(index, profile, kind);
+  const filtered = entries.filter((entry) => status === "all" || (status === "unlocked" ? entry.unlocked : !entry.unlocked));
+  const unlockedCount = entries.filter((entry) => entry.unlocked).length;
+  const lockedCount = entries.length - unlockedCount;
+  return `
+    <section class="codex-panel">
+      <div class="panel-head compact-head">
+        <div>
+          <h2>콘텐츠 도감</h2>
+          <span>${config.label} ${filtered.length}/${entries.length} · 해금 ${unlockedCount} · 잠김 ${lockedCount}</span>
+        </div>
+        <div class="codex-controls">
+          <label>분류
+            <select id="codexKindSelect">
+              ${codexKinds().map((row) => `<option value="${row.kind}" ${row.kind === kind ? "selected" : ""}>${row.label}</option>`).join("")}
+            </select>
+          </label>
+          <label>상태
+            <select id="codexStatusSelect">
+              ${[
+                ["unlocked", "해금"],
+                ["all", "전체"],
+                ["locked", "잠김"]
+              ].map(([value, label]) => `<option value="${value}" ${value === status ? "selected" : ""}>${label}</option>`).join("")}
+            </select>
+          </label>
+        </div>
+      </div>
+      <div class="codex-grid codex-kind-${kind}" aria-label="${config.label} 도감 목록">
+        ${filtered.map((entry) => renderCodexEntry(entry, kind, index)).join("") || "<span class='muted'>표시할 항목 없음</span>"}
+      </div>
+    </section>
+  `;
+}
+
+function codexKinds() {
+  return [
+    { kind: "cards", label: "카드" },
+    { kind: "gems", label: "보석" },
+    { kind: "relics", label: "유물" },
+    { kind: "arcanas", label: "기운" },
+    { kind: "characters", label: "캐릭터" },
+    { kind: "stages", label: "스테이지" },
+    { kind: "enemies", label: "몬스터" }
+  ];
+}
+
+function codexConfig(kind) {
+  return codexKinds().find((row) => row.kind === kind) || codexKinds()[0];
+}
+
+function codexEntries(index, profile, kind) {
+  const rows = {
+    cards: index.data.cards,
+    gems: index.data.gems,
+    relics: index.data.relics,
+    arcanas: index.data.arcanas,
+    characters: index.data.characters,
+    stages: index.data.stages,
+    enemies: index.data.enemies
+  }[kind] || index.data.cards;
+  return rows.map((item) => ({ item, unlocked: isCodexUnlocked(profile, kind, item, index) }));
+}
+
+function isCodexUnlocked(profile, kind, item, index) {
+  if (kind === "cards") return profile.unlockedCards?.includes(item.id);
+  if (kind === "gems") return profile.unlockedGems?.includes(item.id);
+  if (kind === "relics") return profile.unlockedRelics?.includes(item.id);
+  if (kind === "arcanas") return profile.unlockedArcanas?.includes(item.id);
+  if (kind === "characters") return profile.unlockedCharacters?.includes(item.id);
+  if (kind === "stages") return profile.unlockedStages?.includes(item.id);
+  if (kind === "enemies") {
+    return index.data.stages
+      .filter((stage) => profile.unlockedStages?.includes(stage.id))
+      .some((stage) => [stage.bossEnemyId, ...(stage.enemyPool || []), ...(stage.elitePool || [])].includes(item.id));
+  }
+  return false;
+}
+
+function renderCodexEntry(entry, kind, index) {
+  const item = entry.item;
+  const stateClass = entry.unlocked ? "unlocked" : "locked";
+  const entryClass = `codex-entry-kind-${kind} ${stateClass}`;
+  const stateBadge = entry.unlocked ? "해금" : "잠김";
+  if (kind === "cards") return renderCodexCard(item, entryClass, stateBadge);
+  if (kind === "gems") return renderCodexGem(item, entryClass, stateBadge);
+  if (kind === "relics") return renderCodexBuildItem("relic", item, entryClass, stateBadge);
+  if (kind === "arcanas") return renderCodexBuildItem("arcana", item, entryClass, stateBadge);
+  if (kind === "characters") return renderCodexCharacter(item, entryClass, stateBadge);
+  if (kind === "stages") return renderCodexStage(item, entryClass, stateBadge, index);
+  if (kind === "enemies") return renderCodexEnemy(item, entryClass, stateBadge);
+  return "";
+}
+
+function renderCodexCard(card, entryClass, stateBadge) {
+  return `
+    <article class="codex-entry codex-card ${entryClass}" style="--card-accent:${accentFor(card.color)}">
+      ${renderCardArt(card, "codex")}
+      <div class="codex-copy">
+        <span><b>${stateBadge}</b> · ${typeLabels[card.type] || card.type} · ${rarityLabels[card.rarity] || card.rarity} · 비용 ${card.cost}</span>
+        <strong>${card.name}</strong>
+        <p>${card.text}</p>
+        <div class="tag-row">${(card.tags || []).map((tag) => `<span>${tag}</span>`).join("")}</div>
+      </div>
+    </article>
+  `;
+}
+
+function renderCodexGem(gem, entryClass, stateBadge) {
+  return `
+    <article class="codex-entry codex-build ${entryClass}">
+      <span class="gem-icon ${gemVisualClass(gem)}"></span>
+      <div class="codex-copy">
+        <span><b>${stateBadge}</b> · ${rarityLabels[gem.rarity] || gem.rarity} · ${gem.socketTypes?.map((type) => gemTypeLabels[type] || type).join(" · ") || "공용"}</span>
+        <strong>${gem.name}</strong>
+        <p>${gemEffectSummary(gem)}</p>
+      </div>
+    </article>
+  `;
+}
+
+function renderCodexBuildItem(kind, item, entryClass, stateBadge) {
+  return `
+    <article class="codex-entry codex-build ${entryClass}">
+      ${renderItemIcon(kind, item)}
+      <div class="codex-copy">
+        <span><b>${stateBadge}</b> · ${kind === "relic" ? "유물" : "기운"} · ${rarityLabels[item.rarity] || item.rarity}</span>
+        <strong>${item.name}</strong>
+        <p>${kind === "relic" ? relicEffectSummary(item) : arcanaEffectSummary(item)}</p>
+      </div>
+    </article>
+  `;
+}
+
+function renderCodexCharacter(character, entryClass, stateBadge) {
+  return `
+    <article class="codex-entry codex-character ${entryClass}" style="--character-accent:${accentFor(character.color)}">
+      <div class="codex-portrait-slot">${renderCharacterPortrait(character)}</div>
+      <div class="codex-copy">
+        <span><b>${stateBadge}</b> · ${character.role} · 체력 ${character.maxHp}</span>
+        <strong>${character.name}</strong>
+        <p>${character.passiveText}</p>
+      </div>
+    </article>
+  `;
+}
+
+function renderCodexStage(stage, entryClass, stateBadge, index) {
+  const boss = index.enemies.get(stage.bossEnemyId);
+  return `
+    <article class="codex-entry codex-stage ${entryClass}">
+      ${renderStageKeyArt(stage)}
+      <div class="codex-copy">
+        <span><b>${stateBadge}</b> · ${stage.order}. 스테이지 · ${stage.floorCount}개 방</span>
+        <strong>${stage.name}</strong>
+        <p>${stage.biome} · 보스 ${boss?.name || "미정"}</p>
+        ${renderStageRoomStrip(stage)}
+      </div>
+    </article>
+  `;
+}
+
+function renderCodexEnemy(enemy, entryClass, stateBadge) {
+  return `
+    <article class="codex-entry codex-enemy ${entryClass}">
+      ${renderMonsterPortrait(enemy)}
+      <div class="codex-copy">
+        <span><b>${stateBadge}</b> · ${enemyRankLabel(enemy.rank)} · ${enemy.family || "미로"}</span>
+        <strong>${enemy.name}</strong>
+        <p>체력 ${enemy.maxHp} · 방어 ${enemy.block || 0} · 의도 ${enemy.intents?.length || 0}종</p>
+      </div>
+    </article>
+  `;
 }
 
 function renderProfilePanel(profile, index) {

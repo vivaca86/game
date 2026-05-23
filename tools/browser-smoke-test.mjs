@@ -79,6 +79,44 @@ if (moruEnabled > 0) {
   await page.selectOption("#characterSelect", "char_moru");
   await page.waitForFunction(() => document.querySelector("#setupPreview")?.textContent?.includes("모루"), null, { timeout: 10000 });
 }
+
+async function assertNoCodexOverflow(label) {
+  const overflowItems = await page.locator(".codex-entry, .codex-copy, .card-art-codex, .codex-entry > .gem-icon, .codex-entry > .item-icon, .codex-portrait-slot, .codex-stage .stage-key-art, .codex-enemy .monster-portrait").evaluateAll((elements) => elements
+    .filter((element) => element.scrollWidth > element.clientWidth + 2 || element.scrollHeight > element.clientHeight + 2)
+    .map((element) => element.className));
+  if (overflowItems.length > 0) {
+    throw new Error(`${label} 도감 UI 넘침: ${overflowItems.slice(0, 4).join(" | ")}`);
+  }
+}
+
+async function assertCodexVisual(kind, visualSelector, expectedMin, label) {
+  await page.selectOption("#codexKindSelect", kind);
+  await page.waitForFunction(({ kind: selectedKind, expectedMin: min }) => document.querySelectorAll(`.codex-entry-kind-${selectedKind}`).length >= min, { kind, expectedMin }, { timeout: 10000 });
+  await page.waitForSelector(visualSelector, { timeout: 10000 });
+  const text = await page.textContent(".codex-panel");
+  if (!text?.includes("콘텐츠 도감") || !text.includes(label)) throw new Error(`${label} 도감 핵심 문구 표시 실패`);
+  await assertNoCodexOverflow(label);
+}
+
+await page.waitForSelector(".codex-panel", { timeout: 10000 });
+await page.selectOption("#codexStatusSelect", "all");
+await assertCodexVisual("cards", ".codex-kind-cards .card-art-codex", 100, "카드");
+await page.screenshot({ path: "tmp/codex-panel-desktop.png", fullPage: true });
+await assertCodexVisual("gems", '.codex-kind-gems .gem-icon[class*="gem-rarity-"]', 50, "보석");
+await assertCodexVisual("relics", ".codex-kind-relics .item-icon-relic", 16, "유물");
+await assertCodexVisual("arcanas", ".codex-kind-arcanas .item-icon-arcana", 12, "기운");
+await assertCodexVisual("characters", ".codex-kind-characters .character-portrait", 20, "캐릭터");
+await assertCodexVisual("stages", ".codex-kind-stages .stage-key-art", 15, "스테이지");
+await assertCodexVisual("enemies", ".codex-kind-enemies .monster-portrait", 60, "몬스터");
+await page.setViewportSize({ width: 390, height: 820 });
+await page.waitForTimeout(120);
+const codexMobileColumns = await page.locator(".codex-grid").evaluate((element) => getComputedStyle(element).gridTemplateColumns.split(" ").length);
+if (codexMobileColumns !== 1) throw new Error("모바일 콘텐츠 도감 1열 반응형 확인 실패");
+await assertNoCodexOverflow("모바일");
+await page.screenshot({ path: "tmp/codex-panel-mobile.png", fullPage: true });
+await page.setViewportSize({ width: 1366, height: 900 });
+await page.selectOption("#codexKindSelect", "cards");
+await page.selectOption("#codexStatusSelect", "unlocked");
 await page.screenshot({ path: "tmp/setup-preview-desktop.png", fullPage: true });
 
 await page.click("#startRunButton");
