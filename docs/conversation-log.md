@@ -94,3 +94,46 @@
 ### 사용자
 
 그것도 같이 적용해줘
+
+### Codex
+
+적용 완료했어.
+
+GitHub `game/main`에 올라간 내용:
+
+- [PROJECT_RULES.md](C:/a/game/PROJECT_RULES.md)
+  2번 규칙: 대화 원문 로그 관리
+  3번 규칙: 문제점과 해결 방안 로그 관리
+
+- [docs/conversation-log.md](C:/a/game/docs/conversation-log.md)
+  대화 내용을 요약이 아니라 원문 기록용으로 관리하는 파일
+
+- [docs/problem-resolution-log.md](C:/a/game/docs/problem-resolution-log.md)
+  문제점, 원인, 영향, 해결 방안, 재발 방지 기준을 따로 정리하는 파일
+
+커밋/푸시 완료:
+
+`d87fe0e Add conversation and problem logs`
+
+현재 `git status`도 깨끗해.
+그리고 지금은 작업을 위해 GitHub에서 저장소를 다시 받아온 상태라 로컬 `C:\a\game`은 존재해. 작업 종료 선언이 다시 나오기 전까지는 삭제하지 않는 게 규칙대로 맞아.
+
+### 사용자
+
+오케이 그럼 일단 오늘은 여기까지 하자
+
+### Codex
+
+오늘 작업 종료 선언으로 이해했습니다.
+
+규칙대로 로컬 정리/삭제 전에 한 번 더 확인할게.
+
+현재 작업 루트는 이 세션 기준 `C:\a`로 보이고, GitHub `game/main`에는 최신 커밋 `d87fe0e Add conversation and problem logs`까지 올라가 있습니다.
+
+`C:\a` 내부의 로컬 저장소 폴더, 임시 파일, 빌드 산출물, 로그, 캐시 등 작업 흔적을 삭제해도 될까요?
+
+진행하려면 **“진행해”**라고 말해줘.
+
+### 사용자
+
+진행해
