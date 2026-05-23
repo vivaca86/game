@@ -5,6 +5,7 @@ import { addLog } from "./game-state.js";
 import { createNewRun } from "./game-state.js";
 import { openReward } from "./rewards.js";
 import { ensureGemState } from "./gems.js";
+import { BALANCE, stageClearGold } from "./balance.js";
 import { initializeRunModifiers, modifiedGoldReward, updateRevealedRoom } from "./run-modifiers.js";
 import { applyProfileToRun } from "./profile.js";
 
@@ -38,7 +39,7 @@ export function enterCurrentRoom(state, index) {
     return state;
   }
   if (roomType === "rest") {
-    healPlayer(state, Math.ceil(state.player.maxHp * 0.2), index);
+    healPlayer(state, Math.ceil(state.player.maxHp * BALANCE.rewards.restHealRate), index);
     state.phase = "room_complete";
     return state;
   }
@@ -52,7 +53,7 @@ export function advanceRoom(state, index) {
   state.roomIndex += 1;
   if (state.roomIndex >= stage.rooms.length) {
     state.phase = "stage_clear";
-    if (stage.clearRewards?.gold) state.player.gold += modifiedGoldReward(state, index, stage.clearRewards.gold);
+    if (stage.clearRewards?.gold) state.player.gold += modifiedGoldReward(state, index, stageClearGold(stage.clearRewards.gold));
     if (stage.clearRewards?.unlockStageId && !state.inventory.unlockedStages.includes(stage.clearRewards.unlockStageId)) {
       state.inventory.unlockedStages.push(stage.clearRewards.unlockStageId);
     }

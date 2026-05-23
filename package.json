@@ -11,6 +11,7 @@
     "data:generate:content": "node tools/generate-full-content-data.mjs",
     "data:validate": "node tools/validate-data.mjs",
     "runtime:smoke": "node tools/runtime-smoke-test.mjs",
+    "balance:simulate": "node tools/balance-simulation.mjs",
     "browser:smoke": "node tools/browser-smoke-test.mjs",
     "check": "node tools/validate-data.mjs && node tools/runtime-smoke-test.mjs && node tools/build-static.mjs"
   }

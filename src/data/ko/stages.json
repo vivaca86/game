@@ -4,7 +4,7 @@
     "name": "햇살 현관",
     "order": 1,
     "biome": "아이보리 성문",
-    "floorCount": 6,
+    "floorCount": 7,
     "backgroundKey": "bright_gate",
     "enemyPool": [
       "enemy_cloud_buddy",
@@ -21,6 +21,7 @@
       "event",
       "elite",
       "reward",
+      "rest",
       "boss"
     ],
     "clearRewards": {
@@ -36,7 +37,7 @@
     "name": "라벤더 복도",
     "order": 2,
     "biome": "보랏빛 장난감 회랑",
-    "floorCount": 6,
+    "floorCount": 7,
     "backgroundKey": "lavender_hall",
     "enemyPool": [
       "enemy_paper_buddy",
@@ -53,6 +54,7 @@
       "event",
       "elite",
       "reward",
+      "rest",
       "boss"
     ],
     "clearRewards": {
@@ -86,6 +88,7 @@
       "event",
       "elite",
       "reward",
+      "rest",
       "boss"
     ],
     "clearRewards": {
@@ -119,6 +122,7 @@
       "event",
       "elite",
       "reward",
+      "rest",
       "boss"
     ],
     "clearRewards": {
@@ -135,7 +139,7 @@
     "name": "구름 지붕길",
     "order": 5,
     "biome": "하늘색 기와 지붕",
-    "floorCount": 8,
+    "floorCount": 7,
     "backgroundKey": "cloud_rooftop",
     "enemyPool": [
       "enemy_candy_buddy",
@@ -152,6 +156,7 @@
       "event",
       "elite",
       "reward",
+      "rest",
       "boss"
     ],
     "clearRewards": {
@@ -168,7 +173,7 @@
     "name": "리본 정거장",
     "order": 6,
     "biome": "리본 기차 승강장",
-    "floorCount": 8,
+    "floorCount": 9,
     "backgroundKey": "ribbon_station",
     "enemyPool": [
       "enemy_ribbon_buddy",
@@ -187,6 +192,7 @@
       "elite",
       "event",
       "reward",
+      "rest",
       "boss"
     ],
     "clearRewards": {
@@ -222,6 +228,7 @@
       "elite",
       "event",
       "reward",
+      "rest",
       "boss"
     ],
     "clearRewards": {
@@ -257,6 +264,7 @@
       "elite",
       "event",
       "reward",
+      "rest",
       "boss"
     ],
     "clearRewards": {
@@ -273,7 +281,7 @@
     "name": "달빛 다락",
     "order": 9,
     "biome": "졸린 장난감 다락",
-    "floorCount": 10,
+    "floorCount": 9,
     "backgroundKey": "moon_attic",
     "enemyPool": [
       "enemy_prism_buddy",
@@ -292,6 +300,7 @@
       "elite",
       "event",
       "reward",
+      "rest",
       "boss"
     ],
     "clearRewards": {
@@ -324,9 +333,11 @@
       "event",
       "combat",
       "shop",
+      "rest",
       "elite",
       "event",
       "reward",
+      "rest",
       "boss"
     ],
     "clearRewards": {
@@ -343,7 +354,7 @@
     "name": "방울 항구",
     "order": 11,
     "biome": "비눗방울 부두",
-    "floorCount": 11,
+    "floorCount": 10,
     "backgroundKey": "bubble_port",
     "enemyPool": [
       "enemy_peach_buddy",
@@ -359,9 +370,11 @@
       "event",
       "combat",
       "shop",
+      "rest",
       "elite",
       "event",
       "reward",
+      "rest",
       "boss"
     ],
     "clearRewards": {
@@ -378,7 +391,7 @@
     "name": "말랑 극장",
     "order": 12,
     "biome": "봉제 인형 무대",
-    "floorCount": 11,
+    "floorCount": 10,
     "backgroundKey": "plush_theater",
     "enemyPool": [
       "enemy_toy_buddy",
@@ -394,9 +407,11 @@
       "event",
       "combat",
       "shop",
+      "rest",
       "elite",
       "event",
       "reward",
+      "rest",
       "boss"
     ],
     "clearRewards": {
@@ -413,7 +428,7 @@
     "name": "아침 관측소",
     "order": 13,
     "biome": "햇살 망원경 탑",
-    "floorCount": 12,
+    "floorCount": 10,
     "backgroundKey": "morning_observatory",
     "enemyPool": [
       "enemy_leaf_buddy",
@@ -429,9 +444,11 @@
       "event",
       "combat",
       "shop",
+      "rest",
       "elite",
       "event",
       "reward",
+      "rest",
       "boss"
     ],
     "clearRewards": {
@@ -448,7 +465,7 @@
     "name": "꿈빛 오락실",
     "order": 14,
     "biome": "파스텔 놀이기계 거리",
-    "floorCount": 12,
+    "floorCount": 10,
     "backgroundKey": "dream_arcade",
     "enemyPool": [
       "enemy_star_buddy",
@@ -464,9 +481,11 @@
       "event",
       "combat",
       "shop",
+      "rest",
       "elite",
       "event",
       "reward",
+      "rest",
       "boss"
     ],
     "clearRewards": {
@@ -483,7 +502,7 @@
     "name": "무지개 성채",
     "order": 15,
     "biome": "일곱 빛깔 마지막 성",
-    "floorCount": 13,
+    "floorCount": 10,
     "backgroundKey": "rainbow_keep",
     "enemyPool": [
       "enemy_cookie_buddy",
@@ -499,9 +518,11 @@
       "event",
       "combat",
       "shop",
+      "rest",
       "elite",
       "event",
       "reward",
+      "rest",
       "boss"
     ],
     "clearRewards": {

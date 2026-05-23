@@ -6,7 +6,7 @@ import {
   modifiedDamageAmount,
   modifiedShieldAmount
 } from "./gems.js";
-import { adjustedModifierCardCost, afterPlayerHealed, consumeChainPreserve } from "./run-modifiers.js";
+import { adjustedModifierCardCost, afterPlayerHealed, consumeChainPreserve, modifiedCharacterDamageAmount } from "./run-modifiers.js";
 
 export function cardCost(card, state, index = null) {
   const discount = state.status.nextCardDiscount || 0;
@@ -171,7 +171,8 @@ function gainShield(state, index, card, amount) {
 
 function damageEnemy(enemy, amount, state, index, card, context) {
   if (!enemy || amount <= 0) return;
-  const modifiedAmount = context?.gemEchoed ? amount : modifiedDamageAmount(card, state, index, amount);
+  const characterAmount = modifiedCharacterDamageAmount(card, state, index, amount);
+  const modifiedAmount = context?.gemEchoed ? characterAmount : modifiedDamageAmount(card, state, index, characterAmount);
   const weakAmount = state.status.playerWeak > 0 ? Math.max(1, Math.ceil(modifiedAmount * 0.75)) : modifiedAmount;
   const finalAmount = weakAmount;
   const markBonus = enemy.status?.mark ? Math.ceil(finalAmount * 0.2) : 0;

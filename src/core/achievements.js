@@ -1,6 +1,7 @@
 import { addLog } from "./game-state.js";
 import { grantGem } from "./gems.js";
 import { grantArcana, grantRelic } from "./run-modifiers.js";
+import { achievementGoldReward } from "./balance.js";
 
 export function checkAchievements(state, index, eventName, payload = {}) {
   const newlyUnlocked = [];
@@ -36,11 +37,15 @@ function matchesTrigger(trigger, eventName, payload, state) {
 }
 
 function applyAchievementReward(state, index, reward = {}) {
-  if (reward.gold) state.player.gold += reward.gold;
+  if (reward.gold) state.player.gold += achievementGoldReward(reward.gold);
   if (reward.unlockCardId && !state.inventory.unlockedCards.includes(reward.unlockCardId)) state.inventory.unlockedCards.push(reward.unlockCardId);
   if (reward.unlockGemId && !state.inventory.gems.includes(reward.unlockGemId)) grantGem(state, reward.unlockGemId);
   if (reward.unlockRelicId && !state.inventory.relics.includes(reward.unlockRelicId)) grantRelic(state, index, reward.unlockRelicId);
   if (reward.unlockArcanaId && !state.inventory.arcanas.includes(reward.unlockArcanaId)) grantArcana(state, index, reward.unlockArcanaId);
   if (reward.unlockCharacterId && !state.inventory.unlockedCharacters.includes(reward.unlockCharacterId)) state.inventory.unlockedCharacters.push(reward.unlockCharacterId);
-  if (reward.metaUpgradeId) state.inventory.lastMetaReward = reward.metaUpgradeId;
+  if (reward.metaUpgradeId) {
+    state.inventory.lastMetaReward = reward.metaUpgradeId;
+    state.inventory.metaUpgrades = state.inventory.metaUpgrades || [];
+    if (!state.inventory.metaUpgrades.includes(reward.metaUpgradeId)) state.inventory.metaUpgrades.push(reward.metaUpgradeId);
+  }
 }

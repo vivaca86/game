@@ -2,6 +2,7 @@ import { checkAchievements } from "./achievements.js";
 import { addLog, addToDeck } from "./game-state.js";
 import { healPlayer } from "./card-effects.js";
 import { grantGem } from "./gems.js";
+import { rewardGoldRange, shopCost } from "./balance.js";
 import {
   adjustedRewardCost,
   cardRewardOptionCount,
@@ -29,11 +30,12 @@ export function createRewardOptions(state, index, source = "combat") {
       description: upgraded ? `${card.text} · 강화 예정` : card.text,
       cardId: card.id,
       upgraded,
-      cost: source === "shop" ? adjustedRewardCost(state, index, { gold: 28 + stage.order * 4 }, { source, type: "card" }) : null
+      cost: source === "shop" ? adjustedRewardCost(state, index, { gold: shopCost("card", stage.order) }, { source, type: "card" }) : null
     });
   }
   if (source !== "shop") {
-    const goldAmount = modifiedGoldReward(state, index, state.rng.int(18, 35 + stage.order * 4));
+    const goldRange = rewardGoldRange(stage.order);
+    const goldAmount = modifiedGoldReward(state, index, state.rng.int(goldRange.min, goldRange.max));
     options.push({
       id: `gold:${source}`,
       type: "gold",
@@ -55,7 +57,7 @@ export function createRewardOptions(state, index, source = "combat") {
         title: gem.name,
         description: gem.text,
         gemId: gem.id,
-        cost: source === "shop" ? adjustedRewardCost(state, index, { gold: 42 + stage.order * 5 }, { source, type: "gem" }) : null
+        cost: source === "shop" ? adjustedRewardCost(state, index, { gold: shopCost("gem", stage.order) }, { source, type: "gem" }) : null
       });
     }
     const availableRelics = unlockedPool(state, index, "relics").filter((relic) => !state.inventory.relics.includes(relic.id));
@@ -67,7 +69,7 @@ export function createRewardOptions(state, index, source = "combat") {
         title: relic.name,
         description: relic.text,
         relicId: relic.id,
-        cost: source === "shop" ? adjustedRewardCost(state, index, { gold: 58 + stage.order * 7 }, { source, type: "relic" }) : null
+        cost: source === "shop" ? adjustedRewardCost(state, index, { gold: shopCost("relic", stage.order) }, { source, type: "relic" }) : null
       });
     }
     const availableArcanas = unlockedPool(state, index, "arcanas").filter((arcana) => !state.inventory.arcanas.includes(arcana.id));
@@ -79,7 +81,7 @@ export function createRewardOptions(state, index, source = "combat") {
         title: arcana.name,
         description: arcana.text,
         arcanaId: arcana.id,
-        cost: source === "shop" ? adjustedRewardCost(state, index, { gold: 70 + stage.order * 8 }, { source, type: "arcana" }) : null
+        cost: source === "shop" ? adjustedRewardCost(state, index, { gold: shopCost("arcana", stage.order) }, { source, type: "arcana" }) : null
       });
     }
   }

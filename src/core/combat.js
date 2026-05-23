@@ -3,9 +3,11 @@ import { applyCardEffects, cardCost } from "./card-effects.js";
 import { addLog, drawCards } from "./game-state.js";
 import { openReward } from "./rewards.js";
 import { ensureGemState } from "./gems.js";
+import { bossPhaseBlock, enemyAttackBonus, enemyBlockBonus, enemyIntentAmount, enemyMaxHp } from "./balance.js";
 import {
   afterCardPlayedModifiers,
   afterCombatCompleteModifiers,
+  afterPlayerDamagedModifiers,
   applyBattleStartModifiers,
   consumeChainPreserve,
   discardHandWithModifiers,
@@ -102,6 +104,7 @@ export function endTurn(state, index) {
   state.player.shield = nextTurnShieldWithModifiers(state, index, remainingShield, state.status.retainShield || 0);
   state.player.hp = Math.max(0, state.player.hp - damage);
   state.status.damageTakenThisCombat = (state.status.damageTakenThisCombat || 0) + damage;
+  afterPlayerDamagedModifiers(state, index, damage);
   addLog(state, damage > 0 ? `피해 ${damage} 받음` : "공격을 막았습니다.");
 
   discardHandWithModifiers(state, index);
@@ -154,7 +157,7 @@ function completeCombat(state, index) {
     checkAchievements(state, index, "defeat_enemy", { enemyId: stage.bossEnemyId });
     checkAchievements(state, index, "clear_stage", { stageId: state.stageId });
   }
-  afterCombatCompleteModifiers(state, index);
+  afterCombatCompleteModifiers(state, index, source);
   openReward(state, index, source);
 }
 
@@ -172,12 +175,12 @@ function createEnemyInstance(enemy, stage, roomType = "combat") {
   if (!enemy) return null;
   const stageOrder = stage?.order || 1;
   const rankBonus = enemy.rank === "boss" ? 2 : enemy.rank === "elite" ? 1 : 0;
-  const hpBonus = Math.max(0, stageOrder - 1) * (enemy.rank === "boss" ? 6 : enemy.rank === "elite" ? 4 : 2);
-  const blockBonus = Math.floor((stageOrder + rankBonus) / 4);
+  const maxHp = enemyMaxHp(enemy.maxHp, enemy.rank, stageOrder);
+  const blockBonus = enemyBlockBonus(stageOrder, rankBonus);
   return {
     ...structuredClone(enemy),
-    maxHp: enemy.maxHp + hpBonus,
-    hp: enemy.maxHp + hpBonus,
+    maxHp,
+    hp: maxHp,
     block: (enemy.block || 0) + blockBonus,
     instanceId: `enemy_${enemyInstanceSeq++}`,
     status: {},
@@ -188,12 +191,12 @@ function createEnemyInstance(enemy, stage, roomType = "combat") {
 }
 
 function buildEnemyIntents(enemy, stageOrder, roomType) {
-  const attackBonus = Math.floor((stageOrder - 1) / 3) + (roomType === "boss" ? 1 : 0);
-  const blockBonus = Math.floor((stageOrder - 1) / 4);
+  const attackBonus = enemyAttackBonus(stageOrder, roomType);
+  const blockBonus = enemyBlockBonus(stageOrder - 1);
   const baseIntents = enemy.intents.map((intent) => {
     const next = { ...intent };
-    if (next.type === "attack" || next.effect === "pierce_attack") next.amount = (next.amount || 0) + attackBonus;
-    if (next.type === "guard" || next.effect === "fortify_all") next.amount = (next.amount || 0) + blockBonus;
+    if (next.type === "attack" || next.effect === "pierce_attack") next.amount = enemyIntentAmount(enemy.rank, "attack", (next.amount || 0) + attackBonus, stageOrder);
+    if (next.type === "guard" || next.effect === "fortify_all") next.amount = enemyIntentAmount(enemy.rank, "guard", (next.amount || 0) + blockBonus, stageOrder);
     return next;
   });
   const extra = extraIntentFor(enemy, stageOrder, roomType);
@@ -331,7 +334,7 @@ function applyEnemyPhaseRules(state, index) {
       } else if (rule.addIntent) {
         resolveSpecialIntent(state, index, enemy, rule.addIntent, { normalDamage: 0, piercingDamage: 0 });
       }
-      enemy.block = (enemy.block || 0) + Math.max(4, (stage?.order || 1) * 2);
+      enemy.block = (enemy.block || 0) + bossPhaseBlock(stage?.order || 1);
       addLog(state, `${enemy.name}: 페이즈 변화`);
     });
   }

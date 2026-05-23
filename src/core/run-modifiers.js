@@ -1,8 +1,10 @@
 import { addLog, drawCards } from "./game-state.js";
+import { BALANCE } from "./balance.js";
 
 export function ensureModifierState(state) {
   state.inventory.relics = Array.isArray(state.inventory.relics) ? state.inventory.relics : [];
   state.inventory.arcanas = Array.isArray(state.inventory.arcanas) ? state.inventory.arcanas : [];
+  state.inventory.metaUpgrades = Array.isArray(state.inventory.metaUpgrades) ? state.inventory.metaUpgrades : [];
   state.status = state.status || {};
 }
 
@@ -10,6 +12,11 @@ export function initializeRunModifiers(state, index) {
   ensureModifierState(state);
   for (const arcana of index.data.arcanas.filter((item) => item.unlock?.type === "starter")) {
     if (!state.inventory.arcanas.includes(arcana.id)) state.inventory.arcanas.push(arcana.id);
+  }
+  const startingGold = sumMetaEffects(state, index, "starting_gold_per_rank", "amount");
+  if (startingGold > 0) {
+    state.player.gold += startingGold;
+    addLog(state, `마을 준비금: 별사탕 ${startingGold} 획득`);
   }
   updateRevealedRoom(state, index);
 }
@@ -48,6 +55,8 @@ export function grantArcana(state, index, arcanaId) {
 export function applyBattleStartModifiers(state, index) {
   ensureModifierState(state);
   state.status.firstExpensiveCardFreeAvailable = hasRelicEffect(state, index, "first_expensive_card_free_each_battle");
+  state.status.firstAttackDamageBonusUsed = false;
+  state.status.characterChainEnergyTriggeredThisTurn = false;
   state.status.relicChainPreserveCharges = sumRelicEffects(state, index, "preserve_chain_once", "amount");
   state.status.damageTakenThisCombat = 0;
   state.status.guardCardsPlayedThisCombat = 0;
@@ -57,7 +66,8 @@ export function applyBattleStartModifiers(state, index) {
   state.status.rainbowFinaleAppliedThisTurn = false;
   state.status.prismPathTriggeredThisTurn = false;
 
-  const shield = sumRelicEffects(state, index, "shield_at_battle_start", "amount");
+  const shield = sumRelicEffects(state, index, "shield_at_battle_start", "amount")
+    + sumCharacterEffects(state, index, "shield_at_battle_start", "amount");
   if (shield > 0) {
     state.player.shield += shield;
     addLog(state, `유물 보호막 ${shield} 획득`);
@@ -93,6 +103,7 @@ export function afterCardPlayedModifiers({ state, index, card, context, cost }) 
   consumeFirstExpensiveCardFree(state, index, card);
   applyCostLadderArcana(state, index, cost);
   applyColorArcana(state, index, card);
+  applyCharacterCardPassives(state, index);
 
   if (card.type === "guard") {
     state.status.guardCardsPlayedThisCombat = (state.status.guardCardsPlayedThisCombat || 0) + 1;
@@ -132,6 +143,8 @@ export function afterCardPlayedModifiers({ state, index, card, context, cost }) 
       addLog(state, `무지개 피날레: 이번 턴 비용 -${effect.amount}`);
     }
   }
+  state.status.firstAttackDamageBonusCardId = null;
+  state.status.firstAttackDamageBonusAmount = 0;
 }
 
 export function afterPlayerHealed(state, index, amount) {
@@ -162,11 +175,42 @@ export function resetTurnModifierState(state) {
   state.status.handCostDiscount = 0;
   state.status.rainbowFinaleAppliedThisTurn = false;
   state.status.prismPathTriggeredThisTurn = false;
+  state.status.characterChainEnergyTriggeredThisTurn = false;
 }
 
-export function afterCombatCompleteModifiers(state, index) {
+export function modifiedCharacterDamageAmount(card, state, index, amount) {
+  if (!index || card?.type !== "attack") return amount;
+  if (state.status.firstAttackDamageBonusCardId === card.id) return amount + (state.status.firstAttackDamageBonusAmount || 0);
+  if (state.status.firstAttackDamageBonusUsed) return amount;
+  const bonus = sumCharacterEffects(state, index, "first_attack_damage_bonus_each_battle", "amount");
+  if (bonus <= 0) return amount;
+  state.status.firstAttackDamageBonusUsed = true;
+  state.status.firstAttackDamageBonusCardId = card.id;
+  state.status.firstAttackDamageBonusAmount = bonus;
+  addLog(state, `패시브: 첫 공격 피해 +${bonus}`);
+  return amount + bonus;
+}
+
+export function afterPlayerDamagedModifiers(state, index, damage) {
+  if (!index || damage <= 0 || state.status.characterLowHpHealUsed) return;
+  for (const effect of characterEffects(state, index, "heal_once_when_hp_ratio_below")) {
+    if (state.player.hp / state.player.maxHp > effect.ratio) continue;
+    state.status.characterLowHpHealUsed = true;
+    healPlayerFromModifier(state, index, effect.amount, "패시브");
+    return;
+  }
+}
+
+export function afterCombatCompleteModifiers(state, index, source = "combat") {
   for (const effect of relicEffects(state, index, "heal_after_combat")) {
     healPlayerFromModifier(state, index, effect.amount, "민트 보온병");
+  }
+  if (source === "elite") {
+    const eliteGold = sumCharacterEffects(state, index, "bonus_gold_after_elite", "amount");
+    if (eliteGold > 0) {
+      state.player.gold += eliteGold;
+      addLog(state, `정예 보너스: 별사탕 ${eliteGold} 획득`);
+    }
   }
   if ((state.status.damageTakenThisCombat || 0) === 0) {
     for (const effect of relicEffects(state, index, "gain_gold_on_perfect")) {
@@ -179,6 +223,7 @@ export function afterCombatCompleteModifiers(state, index) {
 export function cardRewardOptionCount(state, index, source, baseCount) {
   let count = baseCount + (state.status.nextCardRewardBonus || 0);
   count += sumRelicEffects(state, index, "increase_card_reward_options", "amount");
+  count += sumMetaEffects(state, index, "upgrade_choice_bonus_at_rank", "amount");
   if (source === "elite") count += sumRelicEffects(state, index, "add_card_after_elite", "amount");
   if (source === "boss") count += sumRelicEffects(state, index, "boss_reward_bonus", "amount");
   state.status.nextCardRewardBonus = 0;
@@ -212,7 +257,9 @@ export function adjustedRewardCost(state, index, cost = {}, context = {}) {
 }
 
 export function shouldAddCombatGemReward(state, index) {
-  const chance = 10 + sumArcanaEffects(state, index, "modify_gem_reward_chance_percent", "amount");
+  const chance = BALANCE.rewards.combatGemChancePercent
+    + sumArcanaEffects(state, index, "modify_gem_reward_chance_percent", "amount")
+    + sumMetaEffects(state, index, "gem_reward_chance_per_rank", "amount");
   return state.rng.next() * 100 < chance;
 }
 
@@ -261,6 +308,22 @@ function applyColorArcana(state, index, card) {
   }
 }
 
+function applyCharacterCardPassives(state, index) {
+  for (const effect of characterEffects(state, index, "draw_when_cards_played")) {
+    if (state.metrics.cardsPlayedThisTurn === effect.threshold) {
+      drawCards(state, effect.amount);
+      addLog(state, `패시브: 카드 ${effect.amount}장 뽑기`);
+    }
+  }
+  for (const effect of characterEffects(state, index, "gain_energy_on_chain")) {
+    if ((state.status.chain || 0) >= effect.threshold && !state.status.characterChainEnergyTriggeredThisTurn) {
+      state.player.energy = Math.min(state.player.maxEnergy + 3, state.player.energy + effect.amount);
+      state.status.characterChainEnergyTriggeredThisTurn = true;
+      addLog(state, `패시브: 기운 +${effect.amount}`);
+    }
+  }
+}
+
 function healPlayerFromModifier(state, index, amount, sourceName) {
   const before = state.player.hp;
   state.player.hp = Math.min(state.player.maxHp, state.player.hp + amount);
@@ -305,6 +368,15 @@ function hasRelicEffect(state, index, op) {
   return relicEffects(state, index, op).length > 0;
 }
 
+function characterEffects(state, index, op) {
+  const character = index.characters.get(state.characterId);
+  return (character?.passiveEffects || []).filter((effect) => effect.op === op);
+}
+
+function sumCharacterEffects(state, index, op, key) {
+  return characterEffects(state, index, op).reduce((sum, effect) => sum + (effect[key] || 0), 0);
+}
+
 function relicEffects(state, index, op) {
   ensureModifierState(state);
   return state.inventory.relics
@@ -329,4 +401,35 @@ function sumRelicEffects(state, index, op, key) {
 
 function sumArcanaEffects(state, index, op, key) {
   return arcanaEffects(state, index, op).reduce((sum, effect) => sum + (effect[key] || 0), 0);
+}
+
+function sumMetaEffects(state, index, op, key) {
+  return metaEffects(state, index, op).reduce((sum, effect) => sum + metaEffectValue(effect, key), 0);
+}
+
+function metaEffects(state, index, op) {
+  ensureModifierState(state);
+  return index.data.metaUpgrades
+    .flatMap((upgrade) => {
+      const rank = metaUpgradeRank(state, index, upgrade.id);
+      if (rank <= 0) return [];
+      return (upgrade.effects || [])
+        .filter((effect) => effect.op === op && (!effect.rank || rank >= effect.rank))
+        .map((effect) => ({ ...effect, rank }));
+    });
+}
+
+function metaUpgradeRank(state, index, metaId) {
+  const upgrade = index.metaUpgrades.get(metaId);
+  const maxRank = upgrade?.maxRank || 1;
+  const achievementRank = index.data.achievements
+    .filter((achievement) => achievement.reward?.metaUpgradeId === metaId && state.inventory.achievements?.includes(achievement.id))
+    .length;
+  const fallbackRank = state.inventory.metaUpgrades?.includes(metaId) ? 1 : 0;
+  return Math.min(maxRank, Math.max(achievementRank, fallbackRank));
+}
+
+function metaEffectValue(effect, key) {
+  const value = effect[key] || 0;
+  return effect.op.endsWith("_per_rank") ? value * effect.rank : value;
 }
