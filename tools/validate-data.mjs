@@ -72,6 +72,21 @@ const allowedCardEffectOps = new Set([
   "retain_shield_next_turn"
 ]);
 
+const allowedAchievementTriggerOps = new Set([
+  "clear_rooms_in_stage",
+  "clear_stage",
+  "collect_arcanas",
+  "collect_cards",
+  "collect_gems",
+  "collect_relics",
+  "complete_event",
+  "defeat_enemy",
+  "defeat_enemy_count",
+  "defeat_rank",
+  "reach_chain",
+  "unlock_character"
+]);
+
 const errors = [];
 const warnings = [];
 
@@ -334,6 +349,7 @@ events.forEach((event) => {
 achievements.forEach((achievement) => {
   const trigger = achievement.trigger || {};
   const reward = achievement.reward || {};
+  if (!allowedAchievementTriggerOps.has(trigger.op)) fail(`achievements.json:${achievement.id}: unsupported trigger "${trigger.op}"`);
   if (!achievement.name || !hangulPattern.test(achievement.name)) fail(`achievements.json:${achievement.id}: 한글 업적명이 필요합니다.`);
   if (!achievement.description || !hangulPattern.test(achievement.description)) fail(`achievements.json:${achievement.id}: 한글 업적 설명이 필요합니다.`);
   assertRefs(stageIds, trigger.stageId ? [trigger.stageId] : [], `achievements.json:${achievement.id}.trigger.stageId`);

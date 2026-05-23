@@ -207,6 +207,8 @@ function renderGameSetup(index) {
 
 function renderProfilePanel(profile, index) {
   const nextStage = index.data.stages.find((stage) => isUnlocked(profile, "unlockedStages", stage.id) && !profile.clearedStages.includes(stage.id));
+  const nextAchievements = nextAchievementGoals(profile, index).slice(0, 3);
+  const nextUnlocks = nextUnlockGoals(profile, index).slice(0, 4);
   const counts = [
     ["스테이지", profile.clearedStages.length, index.data.stages.length],
     ["캐릭터", profile.unlockedCharacters.length, index.data.characters.length],
@@ -234,8 +236,101 @@ function renderProfilePanel(profile, index) {
         <strong>다음 목표</strong>
         <span>${nextStage ? `${nextStage.order}. ${nextStage.name} 클리어` : "모든 스테이지 클리어"}</span>
       </div>
+      <div class="profile-detail-grid">
+        <div class="goal-list">
+          <strong>다가오는 업적</strong>
+          ${nextAchievements.map((item) => `
+            <article class="goal-card">
+              <span>${item.name}</span>
+              <small>${item.progressLabel}</small>
+              <em>${item.rewardLabel}</em>
+            </article>
+          `).join("") || "<span class='muted'>남은 업적 없음</span>"}
+        </div>
+        <div class="goal-list">
+          <strong>다음 해금</strong>
+          ${nextUnlocks.map((item) => `
+            <article class="goal-card unlock-goal">
+              <span>${item.name}</span>
+              <small>${item.label}</small>
+            </article>
+          `).join("") || "<span class='muted'>남은 해금 없음</span>"}
+        </div>
+      </div>
     </section>
   `;
+}
+
+function nextAchievementGoals(profile, index) {
+  return index.data.achievements
+    .filter((achievement) => !profile.achievements.includes(achievement.id))
+    .map((achievement) => ({
+      ...achievement,
+      progress: achievementProgress(profile, achievement.trigger || {}),
+      rewardLabel: achievementRewardLabel(achievement.reward || {}, index)
+    }))
+    .filter((achievement) => achievement.progress.total > 0)
+    .sort((a, b) => b.progress.ratio - a.progress.ratio || a.id.localeCompare(b.id))
+    .map((achievement) => ({
+      name: achievement.name,
+      progressLabel: `${achievement.progress.current}/${achievement.progress.total} · ${achievement.description}`,
+      rewardLabel: achievement.rewardLabel
+    }));
+}
+
+function achievementProgress(profile, trigger) {
+  if (trigger.op === "clear_stage") return progressValue(profile.clearedStages.includes(trigger.stageId) ? 1 : 0, 1);
+  if (trigger.op === "unlock_character") return progressValue(profile.unlockedCharacters.includes(trigger.characterId) ? 1 : 0, 1);
+  if (trigger.op === "collect_cards") return progressValue(profile.unlockedCards.length, trigger.amount);
+  if (trigger.op === "collect_gems") return progressValue(profile.unlockedGems.length, trigger.amount);
+  if (trigger.op === "collect_relics") return progressValue(profile.unlockedRelics.length, trigger.amount);
+  if (trigger.op === "collect_arcanas") return progressValue(profile.unlockedArcanas.length, trigger.amount);
+  return progressValue(0, 1);
+}
+
+function progressValue(current, total) {
+  const safeTotal = Math.max(1, total || 1);
+  return {
+    current: Math.min(current || 0, safeTotal),
+    total: safeTotal,
+    ratio: Math.min(1, (current || 0) / safeTotal)
+  };
+}
+
+function achievementRewardLabel(reward, index) {
+  if (reward.unlockCharacterId) return `캐릭터 · ${index.characters.get(reward.unlockCharacterId)?.name || reward.unlockCharacterId}`;
+  if (reward.unlockCardId) return `카드 · ${index.cards.get(reward.unlockCardId)?.name || reward.unlockCardId}`;
+  if (reward.unlockGemId) return `보석 · ${index.gems.get(reward.unlockGemId)?.name || reward.unlockGemId}`;
+  if (reward.unlockRelicId) return `유물 · ${index.relics.get(reward.unlockRelicId)?.name || reward.unlockRelicId}`;
+  if (reward.unlockArcanaId) return `기운 · ${index.arcanas.get(reward.unlockArcanaId)?.name || reward.unlockArcanaId}`;
+  if (reward.metaUpgradeId) return `마을 · ${index.metaUpgrades.get(reward.metaUpgradeId)?.name || reward.metaUpgradeId}`;
+  if (reward.gold) return `별사탕 ${reward.gold}`;
+  return "보상 없음";
+}
+
+function nextUnlockGoals(profile, index) {
+  const rows = [
+    ...index.data.stages
+      .filter((stage) => !profile.unlockedStages.includes(stage.id))
+      .map((stage) => ({ name: `${stage.order}. ${stage.name}`, label: unlockRequirementLabel(stage.unlock, index) })),
+    ...index.data.characters
+      .filter((character) => !profile.unlockedCharacters.includes(character.id))
+      .map((character) => ({ name: character.name, label: unlockRequirementLabel(character.unlock, index) })),
+    ...index.data.cards
+      .filter((card) => !profile.unlockedCards.includes(card.id))
+      .map((card) => ({ name: card.name, label: unlockRequirementLabel(card.unlock, index) })),
+    ...index.data.gems
+      .filter((gem) => !profile.unlockedGems.includes(gem.id))
+      .map((gem) => ({ name: gem.name, label: unlockRequirementLabel(gem.unlock, index) }))
+  ];
+  return rows.filter((row) => row.label !== "기본 해금");
+}
+
+function unlockRequirementLabel(unlock = {}, index) {
+  if (unlock.type === "stage_clear") return `${index.stages.get(unlock.stageId)?.name || unlock.stageId} 클리어`;
+  if (unlock.type === "achievement") return `${index.achievements.get(unlock.achievementId)?.name || unlock.achievementId} 달성`;
+  if (unlock.type === "pool") return `${index.stages.get(unlock.stageId)?.name || unlock.stageId} 이후 보상 풀`;
+  return "기본 해금";
 }
 
 function renderRun() {

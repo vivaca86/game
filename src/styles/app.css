@@ -349,6 +349,56 @@ h1 {
   gap: 12px;
 }
 
+.profile-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.goal-list {
+  display: grid;
+  gap: 8px;
+  padding: 10px;
+  border-radius: 8px;
+  background: #fffaf0;
+}
+
+.goal-list > strong {
+  color: #3f435e;
+}
+
+.goal-card {
+  display: grid;
+  gap: 4px;
+  padding: 9px;
+  border: 2px solid rgba(76, 79, 112, 0.12);
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.goal-card span {
+  overflow-wrap: anywhere;
+  color: #383a56;
+  font-weight: 900;
+}
+
+.goal-card small,
+.goal-card em {
+  color: #686c88;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 800;
+  line-height: 1.35;
+}
+
+.goal-card em {
+  color: #f06f75;
+}
+
+.unlock-goal em {
+  color: #4f6880;
+}
+
 .setup-grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) repeat(3, auto);
@@ -735,6 +785,7 @@ h1 {
   .workbench,
   .setup-grid,
   .build-grid,
+  .profile-detail-grid,
   .gem-vault-grid,
   .profile-grid,
   .result-grid {

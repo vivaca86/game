@@ -5,13 +5,18 @@ import { achievementGoldReward } from "./balance.js";
 
 export function checkAchievements(state, index, eventName, payload = {}) {
   const newlyUnlocked = [];
-  for (const achievement of index.data.achievements) {
-    if (state.inventory.achievements.includes(achievement.id)) continue;
-    if (!matchesTrigger(achievement.trigger, eventName, payload, state)) continue;
-    state.inventory.achievements.push(achievement.id);
-    applyAchievementReward(state, index, achievement.reward);
-    newlyUnlocked.push(achievement);
-    addLog(state, `업적 달성: ${achievement.name}`);
+  let changed = true;
+  while (changed) {
+    changed = false;
+    for (const achievement of index.data.achievements) {
+      if (state.inventory.achievements.includes(achievement.id)) continue;
+      if (!matchesTrigger(achievement.trigger, eventName, payload, state)) continue;
+      state.inventory.achievements.push(achievement.id);
+      applyAchievementReward(state, index, achievement.reward);
+      newlyUnlocked.push(achievement);
+      changed = true;
+      addLog(state, `업적 달성: ${achievement.name}`);
+    }
   }
   return newlyUnlocked;
 }
@@ -30,6 +35,9 @@ function matchesTrigger(trigger, eventName, payload, state) {
   if (trigger.op === "collect_relics") return state.inventory.relics.length >= trigger.amount;
   if (trigger.op === "collect_arcanas") return state.inventory.arcanas.length >= trigger.amount;
   if (trigger.op === "complete_event") return eventName === "complete_event" && trigger.eventId === payload.eventId;
+  if (trigger.op === "unlock_character") {
+    return eventName === "unlock_character" && trigger.characterId === payload.characterId;
+  }
   if (trigger.op === "clear_rooms_in_stage") {
     return eventName === "room_clear" && trigger.stageId === payload.stageId && state.metrics.roomsCleared >= trigger.amount;
   }

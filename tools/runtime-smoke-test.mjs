@@ -121,6 +121,9 @@ if (!profile.clearedStages.includes("stage_sunny_gate")) throw new Error("프로
 if (!profile.unlockedStages.includes("stage_lavender_hall")) throw new Error("프로필 다음 스테이지 해금 실패");
 if (!profile.unlockedCharacters.includes("char_riri")) throw new Error("프로필 스테이지 캐릭터 해금 실패");
 if (!state.resultSummary?.unlocks?.length) throw new Error("런 결과 신규 해금 요약 실패");
+if (!profile.achievements.includes("ach_character_01")) throw new Error("캐릭터 해금 업적 기록 실패");
+if (!profile.unlockedCharacters.includes("char_duri")) throw new Error("캐릭터 해금 업적 보상 실패");
+if (!profile.unlockedGems.includes("gem_sprout_edge")) throw new Error("연쇄 캐릭터 업적 보상 실패");
 const nextRun = startRun(index, {
   characterId: "char_haru",
   stageId: "stage_lavender_hall",

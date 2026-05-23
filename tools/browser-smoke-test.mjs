@@ -52,6 +52,8 @@ const title = await page.textContent("h1");
 if (title?.trim() !== "햇살 미로단") throw new Error(`제목 확인 실패: ${title}`);
 const setupText = await page.textContent("#gameRoot");
 if (!setupText?.includes("진행 상황") || !setupText.includes("다음 목표")) throw new Error("프로필 패널 표시 실패");
+const profileGoalCards = await page.locator(".goal-card").count();
+if (profileGoalCards === 0) throw new Error("프로필 목표 카드 표시 실패");
 const lockedStageOptions = await page.locator("#stageSelect option:disabled").count();
 if (lockedStageOptions === 0) throw new Error("잠긴 스테이지 표시 실패");
 

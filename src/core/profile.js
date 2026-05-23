@@ -96,6 +96,7 @@ export function finalizeRunProfile(state, index, profile) {
   mergeRunUnlocks(nextProfile, state);
   applyAchievementRewardsToProfile(nextProfile, index);
   applyStageUnlocksToProfile(nextProfile, index);
+  applyProfileMilestoneAchievements(nextProfile, index);
 
   nextProfile.stats.totalRuns += 1;
   if (won) nextProfile.stats.wins += 1;
@@ -173,14 +174,42 @@ function mergeRunUnlocks(profile, state) {
 function applyAchievementRewardsToProfile(profile, index) {
   for (const achievement of index.data.achievements) {
     if (!profile.achievements.includes(achievement.id)) continue;
-    const reward = achievement.reward || {};
-    if (reward.unlockCardId) addUnique(profile.unlockedCards, reward.unlockCardId);
-    if (reward.unlockGemId) addUnique(profile.unlockedGems, reward.unlockGemId);
-    if (reward.unlockRelicId) addUnique(profile.unlockedRelics, reward.unlockRelicId);
-    if (reward.unlockArcanaId) addUnique(profile.unlockedArcanas, reward.unlockArcanaId);
-    if (reward.unlockCharacterId) addUnique(profile.unlockedCharacters, reward.unlockCharacterId);
-    if (reward.metaUpgradeId) addUnique(profile.metaUpgrades, reward.metaUpgradeId);
+    applyAchievementRewardToProfile(profile, achievement.reward || {});
   }
+}
+
+function applyProfileMilestoneAchievements(profile, index) {
+  let changed = true;
+  while (changed) {
+    changed = false;
+    for (const achievement of index.data.achievements) {
+      if (profile.achievements.includes(achievement.id)) continue;
+      if (!profileMatchesTrigger(profile, achievement.trigger)) continue;
+      addUnique(profile.achievements, achievement.id);
+      applyAchievementRewardToProfile(profile, achievement.reward || {});
+      changed = true;
+    }
+    if (changed) applyStageUnlocksToProfile(profile, index);
+  }
+}
+
+function applyAchievementRewardToProfile(profile, reward = {}) {
+  if (reward.unlockCardId) addUnique(profile.unlockedCards, reward.unlockCardId);
+  if (reward.unlockGemId) addUnique(profile.unlockedGems, reward.unlockGemId);
+  if (reward.unlockRelicId) addUnique(profile.unlockedRelics, reward.unlockRelicId);
+  if (reward.unlockArcanaId) addUnique(profile.unlockedArcanas, reward.unlockArcanaId);
+  if (reward.unlockCharacterId) addUnique(profile.unlockedCharacters, reward.unlockCharacterId);
+  if (reward.metaUpgradeId) addUnique(profile.metaUpgrades, reward.metaUpgradeId);
+}
+
+function profileMatchesTrigger(profile, trigger = {}) {
+  if (trigger.op === "clear_stage") return profile.clearedStages.includes(trigger.stageId);
+  if (trigger.op === "unlock_character") return profile.unlockedCharacters.includes(trigger.characterId);
+  if (trigger.op === "collect_cards") return profile.unlockedCards.length >= trigger.amount;
+  if (trigger.op === "collect_gems") return profile.unlockedGems.length >= trigger.amount;
+  if (trigger.op === "collect_relics") return profile.unlockedRelics.length >= trigger.amount;
+  if (trigger.op === "collect_arcanas") return profile.unlockedArcanas.length >= trigger.amount;
+  return false;
 }
 
 function applyStageUnlocksToProfile(profile, index) {
