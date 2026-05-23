@@ -43,6 +43,35 @@ const humanTextKeys = new Set([
   "palette"
 ]);
 
+const allowedCardEffectOps = new Set([
+  "add_battle_rule",
+  "apply_mark",
+  "damage_all",
+  "damage_bonus_if_cards_played_at_least",
+  "damage_bonus_if_chain_at_least",
+  "damage_bonus_if_hand_at_most",
+  "damage_bonus_vs_marked",
+  "damage_front",
+  "damage_random",
+  "discount_next_card",
+  "draw",
+  "draw_if_kill",
+  "enable_reflect_damage",
+  "exhaust_self",
+  "gain_energy",
+  "gain_shield",
+  "heal_if_hp_ratio_below",
+  "increase_next_card_cost",
+  "increase_next_card_reward_options",
+  "lose_energy",
+  "prepare_socket_bonus",
+  "reduce_next_attack",
+  "repeat_previous_basic_effect",
+  "repeat_previous_basic_effect_if_cost_at_most",
+  "reset_chain",
+  "retain_shield_next_turn"
+]);
+
 const errors = [];
 const warnings = [];
 
@@ -110,6 +139,22 @@ function assertRefs(ids, refs, label) {
   });
 }
 
+function inspectCardEffects(effects, label) {
+  if (!Array.isArray(effects) || effects.length === 0) {
+    fail(`${label}: effects가 필요합니다.`);
+    return;
+  }
+  effects.forEach((effect, index) => {
+    if (!effect || typeof effect !== "object") {
+      fail(`${label}[${index}]: 효과는 객체여야 합니다.`);
+      return;
+    }
+    if (!allowedCardEffectOps.has(effect.op)) {
+      fail(`${label}[${index}]: 알 수 없는 카드 효과 op "${effect.op}"`);
+    }
+  });
+}
+
 async function loadJson(fileName) {
   const source = await readFile(path.join(dataDir, fileName), "utf8");
   try {
@@ -159,15 +204,32 @@ cards.forEach((card) => {
   if (!["attack", "guard", "skill", "power", "curse", "temp"].includes(card.type)) {
     fail(`cards.json:${card.id}: 알 수 없는 카드 타입 "${card.type}"`);
   }
+  if (!card.name || !hangulPattern.test(card.name)) {
+    fail(`cards.json:${card.id}: 한글 카드명이 필요합니다.`);
+  }
+  if (!card.text || !hangulPattern.test(card.text)) {
+    fail(`cards.json:${card.id}: 한글 효과 설명이 필요합니다.`);
+  }
+  if (!Array.isArray(card.tags) || card.tags.length === 0) {
+    fail(`cards.json:${card.id}: tags가 필요합니다.`);
+  }
+  if (!card.frame || typeof card.frame !== "string") {
+    fail(`cards.json:${card.id}: 카드 프레임 키가 필요합니다.`);
+  }
   if (!Number.isInteger(card.cost) || card.cost < 0) {
     fail(`cards.json:${card.id}: cost는 0 이상의 정수여야 합니다.`);
   }
-  if (!card.sockets || card.sockets.base > card.sockets.max) {
+  if (!card.sockets || !Number.isInteger(card.sockets.base) || !Number.isInteger(card.sockets.max) || card.sockets.base > card.sockets.max) {
     fail(`cards.json:${card.id}: 소켓 base/max 구조가 잘못되었습니다.`);
   }
-  if (!Array.isArray(card.effects) || card.effects.length === 0) {
-    fail(`cards.json:${card.id}: effects가 필요합니다.`);
+  if (!card.illustration?.subject || !card.illustration?.mood) {
+    fail(`cards.json:${card.id}: 일러스트 방향 subject/mood가 필요합니다.`);
   }
+  inspectCardEffects(card.effects, `cards.json:${card.id}.effects`);
+  inspectCardEffects(card.upgrade?.effects, `cards.json:${card.id}.upgrade.effects`);
+  const unlock = card.unlock || {};
+  assertRefs(stageIds, unlock.stageId ? [unlock.stageId] : [], `cards.json:${card.id}.unlock.stageId`);
+  assertRefs(achievementIds, unlock.achievementId ? [unlock.achievementId] : [], `cards.json:${card.id}.unlock.achievementId`);
 });
 
 characters.forEach((character) => {
@@ -203,6 +265,9 @@ achievements.forEach((achievement) => {
 });
 
 const targets = data["content-targets.json"]?.targets || {};
+if (targets.cards && cards.length !== targets.cards) {
+  fail(`cards: 현재 ${cards.length}개 / 목표 ${targets.cards}개. 카드 단계는 풀 규모와 정확히 일치해야 합니다.`);
+}
 [
   ["cards", cards.length],
   ["gems", gems.length],
@@ -214,7 +279,7 @@ const targets = data["content-targets.json"]?.targets || {};
   ["events", events.length],
   ["achievements", achievements.length]
 ].forEach(([key, count]) => {
-  if (targets[key] && count < targets[key]) {
+  if (key !== "cards" && targets[key] && count < targets[key]) {
     warn(`${key}: 현재 ${count}개 / 목표 ${targets[key]}개`);
   }
 });

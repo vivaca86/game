@@ -18,8 +18,8 @@
     "events": 10,
     "achievements": 161
   },
-  "seedCounts": {
-    "cards": 12,
+  "currentCounts": {
+    "cards": 113,
     "gems": 6,
     "characters": 4,
     "stages": 3,
