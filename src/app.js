@@ -856,8 +856,66 @@ function renderActionFeedback(state) {
           </span>
         `).join("")}
       </div>
+      ${renderFeedbackPulseRail(feedback)}
     </section>
   `;
+}
+
+function renderFeedbackPulseRail(feedback) {
+  const items = feedbackPulseItems(feedback);
+  if (items.length === 0) return "";
+  return `
+    <div class="feedback-pulse-rail" aria-label="${escapeHtml(feedback.title)} 결과 흐름">
+      ${items.map((item, itemIndex) => `
+        <span class="feedback-pulse-step pulse-${item.tone}">
+          <b>${escapeHtml(item.icon)}</b>
+          <span>
+            <em>${escapeHtml(item.label)}</em>
+            <strong>${escapeHtml(item.value)}</strong>
+          </span>
+          ${itemIndex < items.length - 1 ? `<i aria-hidden="true"></i>` : ""}
+        </span>
+      `).join("")}
+    </div>
+  `;
+}
+
+function feedbackPulseItems(feedback) {
+  if (!feedback || !["card", "enemy", "cleanse"].includes(feedback.kind)) return [];
+  if (feedback.kind === "card") {
+    const targetCount = feedback.targetEvents?.length || feedback.targetInstanceIds?.length || 0;
+    const result = feedback.metrics?.find((metric) => ["피해", "처치", "보호막", "드로우", "기운", "회복", "표식"].includes(metric.label));
+    return [
+      { tone: feedback.tone || "note", icon: feedback.icon || "카", label: "카드", value: feedback.subject || "사용" },
+      { tone: targetCount > 0 ? "damage" : "guard", icon: targetCount > 0 ? "대" : "자", label: targetCount > 0 ? "대상" : "자신", value: targetCount > 0 ? `${targetCount}곳` : "플레이어" },
+      { tone: feedbackPulseTone(result?.label), icon: "결", label: "결과", value: result ? `${result.label} ${result.value}` : "효과 적용" }
+    ];
+  }
+  if (feedback.kind === "enemy") {
+    const damageMetric = feedback.metrics?.find((metric) => metric.label === "피해");
+    const guardMetric = feedback.metrics?.find((metric) => metric.label === "차단");
+    return [
+      { tone: "danger", icon: "적", label: "적 차례", value: feedback.subject || "의도 처리" },
+      { tone: guardMetric ? "guard" : "note", icon: "막", label: "차단", value: guardMetric ? `${guardMetric.value}` : "0" },
+      { tone: damageMetric ? "damage" : "guard", icon: damageMetric ? "피" : "안", label: "결과", value: damageMetric ? `피해 ${damageMetric.value}` : "피해 없음" }
+    ];
+  }
+  if (feedback.kind === "cleanse") {
+    return [
+      { tone: "trick", icon: "방", label: "방해", value: feedback.subject || "카드" },
+      { tone: "flow", icon: "기", label: "비용", value: feedback.detail?.match(/기운 \d+/)?.[0] || "기운 사용" },
+      { tone: "guard", icon: "정", label: "결과", value: "전투 제외" }
+    ];
+  }
+  return [];
+}
+
+function feedbackPulseTone(label = "") {
+  if (label.includes("피해") || label.includes("처치") || label.includes("표식")) return "damage";
+  if (label.includes("보호막") || label.includes("차단")) return "guard";
+  if (label.includes("회복")) return "heal";
+  if (label.includes("드로우") || label.includes("기운")) return "flow";
+  return "note";
 }
 
 function feedbackMetricClass(label = "") {
@@ -1123,7 +1181,24 @@ function renderCombatImpactStrip(state) {
           </span>
         `).join("")}
       </div>
+      ${renderCombatImpactPath(feedback)}
     </section>
+  `;
+}
+
+function renderCombatImpactPath(feedback) {
+  const items = feedbackPulseItems(feedback);
+  if (items.length === 0) return "";
+  return `
+    <div class="combat-impact-path" aria-label="${escapeHtml(feedback.title)} 전투 결과 흐름">
+      ${items.map((item) => `
+        <span class="combat-impact-node node-${item.tone}">
+          <b>${escapeHtml(item.icon)}</b>
+          <em>${escapeHtml(item.label)}</em>
+          <strong>${escapeHtml(item.value)}</strong>
+        </span>
+      `).join("")}
+    </div>
   `;
 }
 

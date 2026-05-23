@@ -1360,6 +1360,107 @@ h1 {
   min-width: 0;
 }
 
+.feedback-pulse-rail {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 7px;
+  padding-top: 4px;
+}
+
+.feedback-pulse-step {
+  position: relative;
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+  gap: 7px;
+  align-items: center;
+  min-width: 0;
+  min-height: 42px;
+  padding: 7px;
+  border-radius: 8px;
+  background: #edf8ff;
+  color: #425a70;
+  box-shadow: inset 0 0 0 1px rgba(76, 79, 112, 0.05);
+}
+
+.feedback-pulse-step > b {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.82);
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.feedback-pulse-step span,
+.feedback-pulse-step em,
+.feedback-pulse-step strong {
+  display: block;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.feedback-pulse-step em {
+  color: currentColor;
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 900;
+  opacity: 0.72;
+}
+
+.feedback-pulse-step strong {
+  color: currentColor;
+  font-size: 12px;
+  line-height: 1.16;
+}
+
+.feedback-pulse-step i {
+  position: absolute;
+  right: 5px;
+  top: 50%;
+  z-index: 1;
+  width: 11px;
+  height: 5px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, currentColor, rgba(255, 255, 255, 0));
+  opacity: 0.32;
+  transform: translateY(-50%);
+}
+
+.pulse-damage,
+.pulse-danger {
+  background: #ffe1e7;
+  color: #a33c50;
+}
+
+.pulse-guard,
+.pulse-heal {
+  background: #e8f8f1;
+  color: #347159;
+}
+
+.pulse-flow {
+  background: #e9f6ff;
+  color: #4f6880;
+}
+
+.pulse-gem,
+.pulse-reward {
+  background: #fff2c6;
+  color: #7c5d15;
+}
+
+.pulse-trick,
+.pulse-note,
+.pulse-temp,
+.pulse-curse,
+.pulse-power {
+  background: #f2edff;
+  color: #6555a0;
+}
+
 .feedback-stat {
   display: grid;
   min-width: 58px;
@@ -2159,6 +2260,92 @@ h1 {
 
 .combat-impact-list {
   justify-content: flex-start;
+}
+
+.combat-impact-path {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.combat-impact-node {
+  display: grid;
+  grid-template-columns: 26px minmax(0, 1fr);
+  gap: 6px;
+  align-items: center;
+  min-width: 0;
+  min-height: 44px;
+  padding: 6px;
+  border-radius: 8px;
+  background: #edf8ff;
+  color: #425a70;
+  box-shadow: inset 0 0 0 1px rgba(76, 79, 112, 0.05);
+}
+
+.combat-impact-node b {
+  grid-row: span 2;
+  display: grid;
+  width: 26px;
+  height: 26px;
+  place-items: center;
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.82);
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.combat-impact-node em,
+.combat-impact-node strong {
+  display: block;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.combat-impact-node em {
+  color: currentColor;
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 900;
+  opacity: 0.72;
+}
+
+.combat-impact-node strong {
+  color: currentColor;
+  font-size: 12px;
+  line-height: 1.16;
+}
+
+.node-damage,
+.node-danger {
+  background: #ffe1e7;
+  color: #a33c50;
+}
+
+.node-guard,
+.node-heal {
+  background: #e8f8f1;
+  color: #347159;
+}
+
+.node-flow {
+  background: #e9f6ff;
+  color: #4f6880;
+}
+
+.node-gem,
+.node-reward {
+  background: #fff2c6;
+  color: #7c5d15;
+}
+
+.node-trick,
+.node-note,
+.node-temp,
+.node-curse,
+.node-power {
+  background: #f2edff;
+  color: #6555a0;
 }
 
 .combat-impact-chip,
@@ -6446,6 +6633,15 @@ h1 {
 
   .turn-outcome-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .feedback-pulse-rail,
+  .combat-impact-path {
+    grid-template-columns: 1fr;
+  }
+
+  .feedback-pulse-step i {
+    display: none;
   }
 
   .stage-route-head strong {
