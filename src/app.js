@@ -396,7 +396,7 @@ function syncCompletedRun(state, index) {
 function renderPhase(state, index) {
   if (state.phase === "combat") return renderCombat(state, index);
   if (state.phase === "event") return renderEvent(state, index);
-  if (state.phase === "reward") return renderReward(state);
+  if (state.phase === "reward") return renderReward(state, index);
   if (state.phase === "room_complete") return `<button class="primary-btn" data-action="advance">다음 방으로</button>`;
   if (state.phase === "stage_clear" || state.phase === "defeat") return renderRunResult(state);
   return "";
@@ -656,40 +656,73 @@ function gemVisualClass(gem) {
 
 function renderEvent(state, index) {
   const event = state.pendingEvent;
+  const eventTone = event.type || "choice";
   return `
-    <div class="choice-box">
-      <strong>${event.name}</strong>
-      <p>${event.text}</p>
-      <div class="choice-list">
+    <section class="choice-box market-box market-tone-${eventTone}">
+      <div class="choice-head">
+        <div>
+          <span class="choice-kicker">${eventTypeLabel(eventTone)}</span>
+          <strong>${event.name}</strong>
+          <p>${event.text}</p>
+        </div>
+        <div class="choice-wallet">
+          <span>별사탕 ${state.player.gold}</span>
+          <span>체력 ${state.player.hp}/${state.player.maxHp}</span>
+        </div>
+      </div>
+      <div class="choice-list market-list">
         ${event.choices.map((choice, choiceIndex) => {
           const cost = adjustedRewardCost(state, index, choice.cost || {}, { source: event.type, reward: choice.reward || {} });
+          const affordable = canPayCost(state, cost);
           return `
-          <button class="choice-btn" data-action="event-choice" data-choice-index="${choiceIndex}" ${canPayCost(state, cost) ? "" : "disabled"}>
+          <button class="choice-btn market-choice ${affordable ? "" : "locked-choice"}" data-action="event-choice" data-choice-index="${choiceIndex}" ${affordable ? "" : "disabled"}>
+            <span class="choice-cost ${affordable ? "can-pay" : "cannot-pay"}">${costLabel(cost)}</span>
             <strong>${choice.label}</strong>
-            <span>${costLabel(cost)} ${rewardLabel(choice.reward)}</span>
+            <span class="choice-note">${affordable ? rewardLabel(choice.reward) : shortageLabel(state, cost)}</span>
+            <span class="reward-preview-grid">
+              ${rewardPreviewItems(choice.reward || {}, index).map(renderRewardPreviewItem).join("")}
+            </span>
           </button>
         `;
         }).join("")}
       </div>
-    </div>
+    </section>
   `;
 }
 
-function renderReward(state) {
+function renderReward(state, index) {
   const reward = state.pendingReward;
+  const source = reward.source || "reward";
   return `
-    <div class="choice-box">
-      <strong>보상 선택</strong>
-      <div class="choice-list">
-        ${reward.options.map((option) => `
-          <button class="choice-btn" data-action="reward-choice" data-reward-id="${option.id}" ${option.cost && !canPayCost(state, option.cost) ? "disabled" : ""}>
-            <strong>${option.title}</strong>
-            <span>${option.cost ? `${costLabel(option.cost)} · ` : ""}${option.description}</span>
-          </button>
-        `).join("")}
+    <section class="choice-box market-box market-source-${source}">
+      <div class="choice-head">
+        <div>
+          <span class="choice-kicker">${rewardSourceLabel(source)}</span>
+          <strong>${source === "shop" ? "상점 선택" : "보상 선택"}</strong>
+          <p>${source === "shop" ? "현재 별사탕으로 필요한 성장 요소를 고릅니다." : "이번 방의 보상 중 하나를 선택합니다."}</p>
+        </div>
+        <div class="choice-wallet">
+          <span>별사탕 ${state.player.gold}</span>
+          <span>다시 보기 ${reward.rerolls}</span>
+        </div>
       </div>
-      <button class="secondary-btn" data-action="reroll" ${reward.rerolls <= 0 ? "disabled" : ""}>다시 보기 ${reward.rerolls}</button>
-    </div>
+      <div class="choice-list market-list">
+        ${reward.options.map((option) => {
+          const affordable = !option.cost || canPayCost(state, option.cost);
+          return `
+          <button class="choice-btn market-choice reward-${option.type} ${affordable ? "" : "locked-choice"}" data-action="reward-choice" data-reward-id="${option.id}" ${affordable ? "" : "disabled"}>
+            <span class="choice-cost ${affordable ? "can-pay" : "cannot-pay"}">${option.cost ? costLabel(option.cost) : "비용 없음"}</span>
+            <strong>${option.title}</strong>
+            <span class="choice-note">${affordable ? option.description : shortageLabel(state, option.cost)}</span>
+            <span class="reward-preview-grid">
+              ${rewardOptionPreviewItems(option, index).map(renderRewardPreviewItem).join("")}
+            </span>
+          </button>
+        `;
+        }).join("")}
+      </div>
+      <button class="secondary-btn reroll-btn" data-action="reroll" ${reward.rerolls <= 0 ? "disabled" : ""}>다시 보기 ${reward.rerolls}</button>
+    </section>
   `;
 }
 
@@ -734,8 +767,10 @@ function phaseLabel(phase) {
 }
 
 function costLabel(cost = {}) {
-  if (cost.gold) return `비용 별사탕 ${cost.gold}`;
-  if (cost.hp) return `비용 체력 ${cost.hp}`;
+  const parts = [];
+  if (cost.gold) parts.push(`별사탕 ${cost.gold}`);
+  if (cost.hp) parts.push(`체력 ${cost.hp}`);
+  if (parts.length) return `비용 ${parts.join(" · ")}`;
   return "비용 없음";
 }
 
@@ -746,13 +781,101 @@ function canPayCost(state, cost = {}) {
 }
 
 function rewardLabel(reward = {}) {
-  if (reward.cardPool) return "· 카드 보상";
-  if (reward.gemPool) return "· 보석 보상";
-  if (reward.relicPool) return "· 유물 보상";
-  if (reward.arcanaPool) return "· 기운 보상";
-  if (reward.heal) return `· 체력 ${reward.heal} 회복`;
-  if (reward.combat) return "· 전투 보상";
-  return "";
+  return rewardPreviewItems(reward, runtime.index)
+    .map((item) => item.short)
+    .filter(Boolean)
+    .join(" · ") || "보상 없음";
+}
+
+function shortageLabel(state, cost = {}) {
+  if (cost.gold && state.player.gold < cost.gold) return `별사탕 ${cost.gold - state.player.gold} 부족`;
+  if (cost.hp && state.player.hp <= cost.hp) return "체력이 부족합니다";
+  return "선택할 수 없습니다";
+}
+
+function eventTypeLabel(type) {
+  return ({ shop: "상점", station: "작업대", rest: "쉼터", choice: "이벤트" })[type] || "이벤트";
+}
+
+function rewardSourceLabel(source) {
+  return ({ combat: "전투 보상", elite: "정예 보상", boss: "보스 보상", reward: "특별 보상", shop: "상점" })[source] || "보상";
+}
+
+function rewardPreviewItems(reward = {}, index) {
+  const items = [];
+  if (reward.cardPool?.length) {
+    reward.cardPool.forEach((id) => {
+      const card = index.cards.get(id);
+      if (card) items.push({ kind: "card", title: card.name, detail: card.text, short: "카드", accent: accentFor(card.color), cost: card.cost });
+    });
+  }
+  if (reward.gemPool?.length) {
+    reward.gemPool.forEach((id) => {
+      const gem = index.gems.get(id);
+      if (gem) items.push({ kind: "gem", title: gem.name, detail: gemEffectSummary(gem), short: "보석", visual: gemVisualClass(gem) });
+    });
+  }
+  if (reward.relicPool?.length) {
+    reward.relicPool.forEach((id) => {
+      const relic = index.relics.get(id);
+      if (relic) items.push({ kind: "relic", title: relic.name, detail: relic.text, short: "유물" });
+    });
+  }
+  if (reward.arcanaPool?.length) {
+    reward.arcanaPool.forEach((id) => {
+      const arcana = index.arcanas.get(id);
+      if (arcana) items.push({ kind: "arcana", title: arcana.name, detail: arcana.text, short: "기운" });
+    });
+  }
+  if (reward.upgradeRandomCard) items.push({ kind: "upgrade", title: "카드 강화", detail: "덱의 카드 1장을 강화합니다.", short: "강화" });
+  if (reward.heal) items.push({ kind: "heal", title: "체력 회복", detail: `체력 ${reward.heal} 회복`, short: "회복" });
+  if (reward.gold) items.push({ kind: "gold", title: "별사탕", detail: `${reward.gold}개 획득`, short: "별사탕" });
+  if (reward.openGemSocket) items.push({ kind: "socket", title: "소켓 확장", detail: "보석 작업대 충전 +1", short: "소켓" });
+  if (reward.combat) {
+    const enemy = index.enemies.get(reward.combat);
+    items.push({ kind: "combat", title: enemy?.name || "전투", detail: "전투 후 보상을 얻습니다.", short: "전투" });
+  }
+  return items;
+}
+
+function rewardOptionPreviewItems(option, index) {
+  if (option.type === "card") {
+    const card = index.cards.get(option.cardId);
+    return card ? [{ kind: "card", title: card.name, detail: option.description, short: "카드", accent: accentFor(card.color), cost: card.cost }] : [];
+  }
+  if (option.type === "gem") {
+    const gem = index.gems.get(option.gemId);
+    return gem ? [{ kind: "gem", title: gem.name, detail: gemEffectSummary(gem), short: "보석", visual: gemVisualClass(gem) }] : [];
+  }
+  if (option.type === "relic") {
+    const relic = index.relics.get(option.relicId);
+    return relic ? [{ kind: "relic", title: relic.name, detail: relic.text, short: "유물" }] : [];
+  }
+  if (option.type === "arcana") {
+    const arcana = index.arcanas.get(option.arcanaId);
+    return arcana ? [{ kind: "arcana", title: arcana.name, detail: arcana.text, short: "기운" }] : [];
+  }
+  if (option.type === "gold") return [{ kind: "gold", title: "별사탕", detail: `${option.amount}개 획득`, short: "별사탕" }];
+  return [{ kind: option.type, title: option.title, detail: option.description, short: option.type }];
+}
+
+function renderRewardPreviewItem(item) {
+  const icon = item.kind === "gem"
+    ? `<span class="gem-icon ${item.visual}"></span>`
+    : `<span class="reward-icon reward-icon-${item.kind}" ${item.accent ? `style="--preview-accent:${item.accent}"` : ""}>${item.cost ?? rewardIconText(item.kind)}</span>`;
+  return `
+    <span class="reward-preview-card reward-kind-${item.kind}" ${item.accent ? `style="--preview-accent:${item.accent}"` : ""}>
+      ${icon}
+      <span>
+        <strong>${item.title}</strong>
+        <small>${item.detail}</small>
+      </span>
+    </span>
+  `;
+}
+
+function rewardIconText(kind) {
+  return ({ card: "카", relic: "유", arcana: "기", gold: "★", heal: "＋", upgrade: "↑", socket: "◇", combat: "!" })[kind] || "·";
 }
 
 function escapeHtml(value) {

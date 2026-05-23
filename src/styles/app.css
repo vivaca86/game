@@ -565,7 +565,252 @@ h1 {
   background: #fff7db;
 }
 
-.choice-btn span {
+.market-box {
+  border: 2px solid rgba(76, 79, 112, 0.12);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.86), rgba(255, 247, 219, 0.88)),
+    #fff7db;
+}
+
+.market-source-shop,
+.market-tone-shop {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(237, 248, 255, 0.85)),
+    #edf8ff;
+}
+
+.market-source-combat,
+.market-source-reward {
+  border-color: rgba(255, 142, 162, 0.24);
+}
+
+.market-source-elite,
+.market-source-boss {
+  border-color: rgba(124, 204, 247, 0.34);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(232, 248, 241, 0.86)),
+    #e8f8f1;
+}
+
+.market-tone-station {
+  border-color: rgba(161, 132, 255, 0.3);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(244, 239, 255, 0.86)),
+    #f4efff;
+}
+
+.market-tone-rest {
+  border-color: rgba(109, 190, 143, 0.28);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(232, 248, 241, 0.86)),
+    #e8f8f1;
+}
+
+.choice-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: start;
+}
+
+.choice-head strong {
+  display: block;
+  font-size: 24px;
+}
+
+.choice-head p {
+  max-width: 680px;
+  margin: 6px 0 0;
+  color: #5f6680;
+  line-height: 1.5;
+}
+
+.choice-kicker {
+  display: inline-flex;
+  margin-bottom: 6px;
+  padding: 5px 9px;
+  border-radius: 999px;
+  background: #fff2c6;
+  color: #7c5d15;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.choice-wallet {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 6px;
+  min-width: 190px;
+}
+
+.choice-wallet span,
+.choice-cost {
+  padding: 6px 9px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.choice-wallet span {
+  background: #e9f6ff;
+  color: #4f6880;
+}
+
+.market-list {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.market-choice {
+  align-content: start;
+  min-height: 260px;
+  border: 2px solid rgba(76, 79, 112, 0.12);
+  box-shadow: 0 10px 22px rgba(75, 70, 105, 0.1);
+}
+
+.market-choice:hover:not(:disabled),
+.market-choice:focus-visible:not(:disabled) {
+  border-color: #7cccf7;
+  outline: none;
+}
+
+.market-choice strong {
+  overflow-wrap: anywhere;
+  font-size: 18px;
+}
+
+.choice-cost.can-pay {
+  width: fit-content;
+  background: #e8f8f1;
+  color: #347159;
+}
+
+.choice-cost.cannot-pay {
+  width: fit-content;
+  background: #ffe1e7;
+  color: #a33c50;
+}
+
+.choice-note {
+  color: #646a86;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.35;
+}
+
+.locked-choice {
+  background: #f2f0e8;
+}
+
+.reward-preview-grid {
+  display: grid;
+  gap: 7px;
+  margin-top: 4px;
+}
+
+.reward-preview-card {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  gap: 9px;
+  align-items: center;
+  padding: 8px;
+  border: 2px solid rgba(76, 79, 112, 0.1);
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.reward-kind-card {
+  background: linear-gradient(90deg, color-mix(in srgb, var(--preview-accent, #ff8ea2) 18%, #ffffff), #ffffff 58%);
+}
+
+.reward-kind-gem {
+  background: linear-gradient(90deg, #edf8ff, #ffffff 58%);
+}
+
+.reward-kind-relic {
+  background: linear-gradient(90deg, #fff7db, #ffffff 58%);
+}
+
+.reward-kind-arcana,
+.reward-kind-heal {
+  background: linear-gradient(90deg, #e8f8f1, #ffffff 58%);
+}
+
+.reward-kind-combat {
+  background: linear-gradient(90deg, #ffeef2, #ffffff 58%);
+}
+
+.reward-preview-card strong,
+.reward-preview-card small {
+  display: block;
+}
+
+.reward-preview-card strong {
+  overflow-wrap: anywhere;
+  color: #383a56;
+}
+
+.reward-preview-card small {
+  margin-top: 2px;
+  color: #666b85;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.35;
+}
+
+.reward-icon {
+  display: grid;
+  width: 32px;
+  height: 32px;
+  place-items: center;
+  border-radius: 9px;
+  background: #fff2c6;
+  color: #4f536d;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.reward-icon-card {
+  background: var(--preview-accent, #ff8ea2);
+  color: #ffffff;
+}
+
+.reward-icon-relic {
+  background: #fff2c6;
+  color: #7c5d15;
+}
+
+.reward-icon-arcana {
+  background: #e8f8f1;
+  color: #347159;
+}
+
+.reward-icon-gold {
+  background: #ffd45f;
+  color: #5f4711;
+}
+
+.reward-icon-heal {
+  background: #d6ffe8;
+  color: #347159;
+}
+
+.reward-icon-upgrade,
+.reward-icon-socket {
+  background: #edf8ff;
+  color: #4f6880;
+}
+
+.reward-icon-combat {
+  background: #ffe1e7;
+  color: #a33c50;
+}
+
+.reroll-btn {
+  width: fit-content;
+}
+
+.choice-btn > span {
   color: #646a86;
   line-height: 1.4;
 }
@@ -989,16 +1234,26 @@ h1 {
   .profile-detail-grid,
   .gem-vault-grid,
   .socket-card-preview,
+  .choice-head,
   .profile-grid,
   .result-grid {
     grid-template-columns: 1fr;
+  }
+
+  .choice-head {
+    display: grid;
+  }
+
+  .choice-wallet {
+    justify-content: flex-start;
   }
 
   .dashboard-grid,
   .card-list,
   .enemy-row,
   .hand-row,
-  .choice-list {
+  .choice-list,
+  .market-list {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
@@ -1013,7 +1268,8 @@ h1 {
   .card-list,
   .enemy-row,
   .hand-row,
-  .choice-list {
+  .choice-list,
+  .market-list {
     grid-template-columns: 1fr;
   }
 

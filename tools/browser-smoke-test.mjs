@@ -91,6 +91,50 @@ if (!runText?.includes("체력") || !runText.includes("기운") || !runText.incl
   throw new Error("전투 상태 표시 확인 실패");
 }
 
+async function clickFirstIfExists(selector) {
+  const locator = page.locator(selector);
+  if ((await locator.count()) === 0) return false;
+  await locator.first().click();
+  await page.waitForTimeout(60);
+  return true;
+}
+
+async function advanceUntilMarketBox() {
+  for (let step = 0; step < 160; step += 1) {
+    if ((await page.locator(".market-box").count()) > 0) return;
+    if ((await page.locator(".result-panel").count()) > 0) break;
+    if (await clickFirstIfExists(".play-card:not(:disabled)")) continue;
+    if (await clickFirstIfExists('[data-action="end-turn"]')) continue;
+    if (await clickFirstIfExists('[data-action="advance"]')) continue;
+    await page.waitForTimeout(80);
+  }
+  throw new Error("상점/이벤트/보상 화면 진입 실패");
+}
+
+await advanceUntilMarketBox();
+await page.waitForSelector(".market-box .choice-wallet", { timeout: 10000 });
+await page.waitForSelector(".market-box .choice-cost", { timeout: 10000 });
+await page.waitForSelector(".market-box .reward-preview-card", { timeout: 10000 });
+
+const marketText = await page.textContent(".market-box");
+if (!marketText?.includes("비용") || !marketText.includes("별사탕")) {
+  throw new Error("상점/이벤트/보상 비용 표시 확인 실패");
+}
+
+const overflowItems = await page.locator(".market-box, .market-choice, .reward-preview-card, .choice-wallet").evaluateAll((elements) => elements
+  .filter((element) => element.scrollWidth > element.clientWidth + 2 || element.scrollHeight > element.clientHeight + 2)
+  .map((element) => element.className));
+if (overflowItems.length > 0) {
+  throw new Error(`상점/이벤트/보상 UI 넘침: ${overflowItems.slice(0, 4).join(" | ")}`);
+}
+
+await page.screenshot({ path: "tmp/market-ui-desktop.png", fullPage: true });
+await page.setViewportSize({ width: 390, height: 820 });
+await page.waitForTimeout(120);
+const mobileColumns = await page.locator(".market-list").evaluate((element) => getComputedStyle(element).gridTemplateColumns.split(" ").length);
+if (mobileColumns !== 1) throw new Error("모바일 상점/보상 선택지 1열 반응형 확인 실패");
+await page.screenshot({ path: "tmp/market-ui-mobile.png", fullPage: true });
+
 if (errors.length > 0) {
   throw new Error(`브라우저 콘솔 오류: ${errors.join(" | ")}`);
 }
