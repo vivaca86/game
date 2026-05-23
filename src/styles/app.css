@@ -2856,6 +2856,91 @@ h1 {
   color: #a33c50;
 }
 
+.hand-gem-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  min-width: 0;
+}
+
+.hand-gem-chip {
+  display: inline-grid;
+  grid-template-columns: 20px minmax(0, 1fr);
+  gap: 5px;
+  align-items: center;
+  max-width: 100%;
+  padding: 4px 6px 4px 5px;
+  border: 1px solid rgba(255, 255, 255, 0.86);
+  border-radius: 8px;
+  background: #edf8ff;
+  color: #4f6880;
+  font-size: 10px;
+  font-weight: 900;
+  box-shadow: inset 0 0 0 1px rgba(76, 79, 112, 0.05);
+}
+
+.hand-gem-chip .gem-icon {
+  width: 18px;
+  height: 18px;
+  align-self: center;
+  justify-self: center;
+  border-width: 2px;
+  border-radius: 6px;
+  transform: rotate(45deg) scale(0.86);
+}
+
+.hand-gem-chip .gem-icon::before {
+  inset: 3px;
+  border-width: 1px;
+}
+
+.hand-gem-chip .gem-icon::after {
+  top: 3px;
+  left: 3px;
+  width: 5px;
+  height: 5px;
+}
+
+.hand-gem-copy,
+.hand-gem-copy b,
+.hand-gem-copy em {
+  min-width: 0;
+}
+
+.hand-gem-copy b,
+.hand-gem-copy em {
+  display: block;
+  overflow-wrap: anywhere;
+  line-height: 1.15;
+}
+
+.hand-gem-copy b {
+  font-size: 10px;
+}
+
+.hand-gem-copy em {
+  margin-top: 1px;
+  font-size: 11px;
+  font-style: normal;
+}
+
+.hand-gem-damage,
+.hand-gem-status {
+  background: #ffe1e7;
+  color: #a33c50;
+}
+
+.hand-gem-guard,
+.hand-gem-heal {
+  background: #e8f8f1;
+  color: #347159;
+}
+
+.hand-gem-note {
+  background: #f2edff;
+  color: #6555a0;
+}
+
 .card-art {
   display: grid;
   position: relative;

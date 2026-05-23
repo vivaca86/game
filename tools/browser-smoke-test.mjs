@@ -135,6 +135,23 @@ await page.evaluate(() => {
   const snapshot = JSON.parse(raw);
   const hand = Array.isArray(snapshot.hand) ? snapshot.hand.filter((cardId) => !["card_temp_dust", "card_sunbean_punch", "card_peach_dash", "card_ribbon_loop"].includes(cardId)) : [];
   snapshot.hand = ["card_temp_dust", "card_sunbean_punch", "card_peach_dash", "card_ribbon_loop", ...hand].slice(0, 5);
+  const existingGemBag = Array.isArray(snapshot.inventory?.gemBag)
+    ? snapshot.inventory.gemBag.filter((gem) => !["smoke_gem_damage", "smoke_gem_cost"].includes(gem.instanceId))
+    : [];
+  snapshot.inventory = {
+    ...(snapshot.inventory || {}),
+    gems: [...new Set([...(snapshot.inventory?.gems || []), "gem_coral_edge", "gem_sky_discount"])],
+    gemBag: [
+      ...existingGemBag,
+      { instanceId: "smoke_gem_cost", gemId: "gem_sky_discount", equippedCardId: "card_sunbean_punch", equippedSlot: 0 },
+      { instanceId: "smoke_gem_damage", gemId: "gem_coral_edge", equippedCardId: "card_peach_dash", equippedSlot: 0 }
+    ]
+  };
+  snapshot.cardSockets = {
+    ...(snapshot.cardSockets || {}),
+    card_sunbean_punch: ["smoke_gem_cost"],
+    card_peach_dash: ["smoke_gem_damage"]
+  };
   snapshot.player = { ...(snapshot.player || {}), energy: 2, shield: 8 };
   snapshot.status = {
     ...(snapshot.status || {}),
@@ -171,6 +188,8 @@ await page.waitForSelector(".enemy-status-chip.status-mark", { timeout: 10000 })
 await page.waitForSelector(".enemy-status-chip.status-weak", { timeout: 10000 });
 await page.waitForSelector(".play-card .card-ready-chip.ready", { timeout: 10000 });
 await page.waitForSelector(".play-card .card-ready-chip.blocked", { timeout: 10000 });
+await page.waitForSelector(".play-card .hand-gem-list", { timeout: 10000 });
+await page.waitForSelector(".play-card .hand-gem-chip .gem-icon", { timeout: 10000 });
 await page.waitForSelector(".play-card .card-preview-list", { timeout: 10000 });
 await page.waitForSelector(".play-card .card-preview-chip.preview-damage", { timeout: 10000 });
 await page.waitForSelector(".play-card .card-preview-chip.preview-danger", { timeout: 10000 });
@@ -225,6 +244,9 @@ const handText = await page.textContent(".hand-row");
 if (!handText?.includes("사용 가능") || !handText.includes("기운 1 부족") || !handText.includes("약화 반영") || !handText.includes("처치 드로우")) {
   throw new Error("손패 카드 효과 미리보기 표시 실패");
 }
+if (!handText.includes("보석 피해") || !handText.includes("+25%") || !handText.includes("보석 비용") || !handText.includes("현재 0")) {
+  throw new Error("손패 장착 보석 효과 표시 실패");
+}
 const intentNodeCount = await page.locator(".intent-node").count();
 if (intentNodeCount < 2) throw new Error("몬스터 의도 타임라인 표시 실패");
 const monsterFaceParts = await page.locator(".monster-face, .monster-eye, .monster-mouth").count();
@@ -243,12 +265,13 @@ await page.waitForSelector(".play-card .card-art-hand", { timeout: 10000 });
 await page.waitForSelector(".arcana-chip", { timeout: 10000 });
 const enemyText = await page.textContent(".enemy-card");
 if (!enemyText?.includes("이번") || !enemyText.includes("형")) throw new Error("적 역할/의도 표시 실패");
-const combatOverflowItems = await page.locator(".combat-forecast, .combat-status-card, .status-card-copy, .enemy-status-chip, .disruption-control, .enemy-card, .intent-card, .intent-node, .monster-portrait, .play-card, .card-art, .card-preview-chip").evaluateAll((elements) => elements
+const combatOverflowItems = await page.locator(".combat-forecast, .combat-status-card, .status-card-copy, .enemy-status-chip, .disruption-control, .enemy-card, .intent-card, .intent-node, .monster-portrait, .play-card, .card-art, .hand-gem-chip, .card-preview-chip").evaluateAll((elements) => elements
   .filter((element) => element.scrollWidth > element.clientWidth + 2 || element.scrollHeight > element.clientHeight + 2)
   .map((element) => element.className));
 if (combatOverflowItems.length > 0) {
   throw new Error(`전투 UI 넘침: ${combatOverflowItems.slice(0, 4).join(" | ")}`);
 }
+await page.locator(".hand-row").screenshot({ path: "tmp/hand-gem-effects-desktop.png" });
 await page.screenshot({ path: "tmp/combat-ui-desktop.png", fullPage: true });
 await page.setViewportSize({ width: 390, height: 820 });
 await page.waitForTimeout(120);
@@ -265,13 +288,14 @@ if (deckMobileOverflow.length > 0) {
 await page.locator(".deck-overview").screenshot({ path: "tmp/deck-overview-mobile.png" });
 const combatStatusMobileColumns = await page.locator(".combat-status-board").evaluate((element) => getComputedStyle(element).gridTemplateColumns.split(" ").length);
 if (combatStatusMobileColumns !== 1) throw new Error("모바일 전투 상태판 1열 반응형 확인 실패");
-const combatStatusMobileOverflow = await page.locator(".current-room-panel, .current-room-core, .current-room-chip, .combat-status-card, .status-card-copy, .enemy-status-chip, .card-preview-chip").evaluateAll((elements) => elements
+const combatStatusMobileOverflow = await page.locator(".current-room-panel, .current-room-core, .current-room-chip, .combat-status-card, .status-card-copy, .enemy-status-chip, .hand-gem-chip, .card-preview-chip").evaluateAll((elements) => elements
   .filter((element) => element.scrollWidth > element.clientWidth + 2 || element.scrollHeight > element.clientHeight + 2)
   .map((element) => element.className));
 if (combatStatusMobileOverflow.length > 0) {
   throw new Error(`모바일 전투 상태판 넘침: ${combatStatusMobileOverflow.slice(0, 4).join(" | ")}`);
 }
 await page.locator(".current-room-panel").screenshot({ path: "tmp/current-room-panel-mobile.png" });
+await page.locator(".hand-row").screenshot({ path: "tmp/hand-gem-effects-mobile.png" });
 await page.screenshot({ path: "tmp/combat-status-mobile.png", fullPage: true });
 await page.setViewportSize({ width: 1366, height: 900 });
 

@@ -57,7 +57,13 @@ export function equipGemToCard(state, index, gemInstanceId, cardId) {
   const emptyIndex = sockets.findIndex((value) => !value);
   const slotIndex = emptyIndex >= 0 ? emptyIndex : 0;
   const replacedGemInstanceId = sockets[slotIndex];
-  if (replacedGemInstanceId) unequipGem(state, replacedGemInstanceId);
+  if (replacedGemInstanceId) {
+    const replacedGemInstance = state.inventory.gemBag.find((gem) => gem.instanceId === replacedGemInstanceId);
+    if (replacedGemInstance) {
+      replacedGemInstance.equippedCardId = null;
+      replacedGemInstance.equippedSlot = null;
+    }
+  }
   sockets[slotIndex] = gemInstance.instanceId;
   gemInstance.equippedCardId = cardId;
   gemInstance.equippedSlot = slotIndex;

@@ -1008,6 +1008,9 @@ function renderHandCard(card, handIndex, state, index) {
   const cost = cardCost(card, state, index);
   const canPlay = cost <= state.player.energy;
   const previews = cardEffectPreviewChips(card, state, index);
+  const equippedGems = equippedGemInstancesForCard(state, index, card.id)
+    .map((instance) => ({ instance, gem: index.gems.get(instance.gemId) }))
+    .filter((item) => item.gem);
   return `
     <button class="play-card card-type-${card.type} ${canPlay ? "playable" : "unplayable"}" data-action="play-card" data-hand-index="${handIndex}" style="--card-accent:${accentFor(card.color)}" ${canPlay ? "" : "disabled"}>
       <span class="cost">${cost}</span>
@@ -1016,6 +1019,7 @@ function renderHandCard(card, handIndex, state, index) {
       <small>${typeLabels[card.type] || card.type}</small>
       ${renderCardArt(card, "hand")}
       <p>${card.text}</p>
+      ${renderHandGemEffects(equippedGems, card, state, index, cost)}
       <span class="card-preview-list" aria-label="${card.name} 효과 미리보기">
         ${previews.map(renderCardPreviewChip).join("") || `<span class="card-preview-chip preview-note"><b>효</b><em>특수 효과</em></span>`}
       </span>
@@ -1025,6 +1029,50 @@ function renderHandCard(card, handIndex, state, index) {
 
 function renderCardPreviewChip(chip) {
   return `<span class="card-preview-chip preview-${chip.tone}"><b>${chip.icon}</b><em>${chip.label}</em></span>`;
+}
+
+function renderHandGemEffects(equippedGems, card, state, index, currentCost) {
+  const items = equippedGems.flatMap(({ gem }) =>
+    handGemEffectItems(gem, card, state, index, currentCost).map((item) => ({ ...item, gem }))
+  );
+  if (items.length === 0) return "";
+  const visibleItems = items.slice(0, 3);
+  const hiddenCount = items.length - visibleItems.length;
+  return `
+    <span class="hand-gem-list" aria-label="${card.name} 장착 보석 효과">
+      ${visibleItems.map(renderHandGemChip).join("")}
+      ${hiddenCount > 0 ? `
+        <span class="hand-gem-chip hand-gem-note" title="추가 장착 보석 ${hiddenCount}개">
+          <span class="gem-icon gem-white gem-rarity-common gem-socket-any"></span>
+          <span class="hand-gem-copy"><b>보석</b><em>+${hiddenCount}개</em></span>
+        </span>
+      ` : ""}
+    </span>
+  `;
+}
+
+function renderHandGemChip(item) {
+  return `
+    <span class="hand-gem-chip hand-gem-${item.tone}" title="${item.gem.name} · ${gemEffectSummary(item.gem)}">
+      <span class="gem-icon ${gemVisualClass(item.gem)}"></span>
+      <span class="hand-gem-copy"><b>${item.label}</b><em>${item.value}</em></span>
+    </span>
+  `;
+}
+
+function handGemEffectItems(gem, card, state, index, currentCost) {
+  const effect = gem.effects?.[0];
+  if (!effect) return [{ tone: "note", label: "보석", value: gem.name }];
+  if (effect.op === "modify_damage_percent") return [{ tone: "damage", label: "보석 피해", value: `+${effect.amount}%` }];
+  if (effect.op === "modify_shield_percent") return [{ tone: "guard", label: "보석 보호", value: `+${effect.amount}%` }];
+  if (effect.op === "modify_cost") return [{ tone: "flow", label: "보석 비용", value: `${effect.amount} · 현재 ${currentCost}` }];
+  if (effect.op === "heal_on_play") return [{ tone: "heal", label: "보석 회복", value: `+${effect.amount}` }];
+  if (effect.op === "apply_mark_on_play") return [{ tone: "status", label: "보석 표식", value: `+${effect.amount}` }];
+  if (effect.op === "echo_basic_effect") return [{ tone: "flow", label: "보석 메아리", value: `${Math.round(effect.ratio * 100)}%` }];
+  if (effect.op === "splash_damage") return [{ tone: "damage", label: "보석 주변", value: `${Math.round(effect.ratio * 100)}%` }];
+  if (effect.op === "preserve_chain") return [{ tone: "flow", label: "보석 연쇄", value: "유지" }];
+  if (effect.op === "bridge_next_color_bonus") return [{ tone: "flow", label: "다음 색", value: "연결" }];
+  return [{ tone: "note", label: "보석", value: gemEffectSummary(gem) }];
 }
 
 function cardEffectPreviewChips(card, state, index) {
