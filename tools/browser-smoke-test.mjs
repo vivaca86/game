@@ -718,13 +718,15 @@ await page.click("#loadRunButton");
 await page.waitForSelector(".enemy-card.enemy-rank-boss", { timeout: 10000 });
 await page.waitForSelector(".boss-phase-panel", { timeout: 10000 });
 await page.waitForSelector(".boss-phase-head", { timeout: 10000 });
+await page.waitForSelector(".boss-phase-summary-chip", { timeout: 10000 });
 await page.waitForSelector(".boss-phase-meter b", { timeout: 10000 });
+await page.waitForSelector(".boss-phase-step i span", { timeout: 10000 });
 await page.waitForSelector(".monster-rank-crown", { timeout: 10000 });
 const bossPhaseText = await page.textContent(".boss-phase-panel");
-if (!bossPhaseText?.includes("곧 발동") || !bossPhaseText.includes("장벽 +") || !bossPhaseText.includes("페이즈") || !bossPhaseText.includes("체력")) throw new Error("보스 페이즈 예고 표시 실패");
+if (!bossPhaseText?.includes("곧 발동") || !bossPhaseText.includes("장벽 +") || !bossPhaseText.includes("페이즈") || !bossPhaseText.includes("체력") || !bossPhaseText.includes("다음") || !bossPhaseText.includes("남은 체력")) throw new Error("보스 페이즈 예고 표시 실패");
 const bossVisualParts = await page.locator(".enemy-rank-boss .monster-face, .enemy-rank-boss .monster-rank-crown, .enemy-rank-boss .monster-eye").count();
 if (bossVisualParts < 4) throw new Error("보스 마스코트 초상 구성 실패");
-const bossOverflowItems = await page.locator(".enemy-rank-boss, .enemy-pattern-chip, .boss-phase-panel, .boss-phase-head, .boss-phase-step, .monster-portrait").evaluateAll((elements) => elements
+const bossOverflowItems = await page.locator(".enemy-rank-boss, .enemy-pattern-chip, .boss-phase-panel, .boss-phase-head, .boss-phase-summary-chip, .boss-phase-step, .monster-portrait").evaluateAll((elements) => elements
   .filter((element) => element.scrollWidth > element.clientWidth + 2 || element.scrollHeight > element.clientHeight + 2)
   .map((element) => element.className));
 if (bossOverflowItems.length > 0) {
@@ -732,6 +734,16 @@ if (bossOverflowItems.length > 0) {
 }
 await page.locator(".enemy-rank-boss").screenshot({ path: "tmp/boss-pattern-card-desktop.png" });
 await page.screenshot({ path: "tmp/boss-phase-desktop.png", fullPage: true });
+await page.setViewportSize({ width: 390, height: 820 });
+await page.waitForTimeout(120);
+const bossMobileOverflowItems = await page.locator(".enemy-rank-boss, .enemy-pattern-chip, .intent-effect-chip, .boss-phase-panel, .boss-phase-head, .boss-phase-summary-chip, .boss-phase-step, .monster-portrait").evaluateAll((elements) => elements
+  .filter((element) => element.scrollWidth > element.clientWidth + 2 || element.scrollHeight > element.clientHeight + 2)
+  .map((element) => element.className));
+if (bossMobileOverflowItems.length > 0) {
+  throw new Error(`모바일 보스 패턴 UI 넘침: ${bossMobileOverflowItems.slice(0, 4).join(" | ")}`);
+}
+await page.locator(".enemy-rank-boss").screenshot({ path: "tmp/boss-pattern-card-mobile.png" });
+await page.setViewportSize({ width: 1366, height: 900 });
 
 await page.evaluate(() => {
   const raw = localStorage.getItem("sunny_maze_run_v1");

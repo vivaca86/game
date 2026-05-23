@@ -1962,26 +1962,47 @@ function renderBossPhasePanel(enemy, state, index) {
   const ratio = enemy.maxHp > 0 ? enemy.hp / enemy.maxHp : 1;
   const triggeredCount = enemy.phaseRulesTriggered?.length || 0;
   const hpPercent = boundedPercent(enemy.hp, enemy.maxHp);
+  const nextRule = nextBossPhaseRule(enemy);
+  const nextThreshold = nextRule ? Math.round((nextRule.rule.hpBelowRatio || 0) * 100) : null;
+  const gapToNext = nextRule ? Math.max(0, hpPercent - nextThreshold) : 0;
+  const panelTone = nextRule ? (gapToNext <= 8 ? "armed" : "ready") : "clear";
   return `
-    <div class="boss-phase-panel" aria-label="${enemy.name} 보스 변화">
+    <div class="boss-phase-panel boss-phase-${panelTone}" aria-label="${enemy.name} 보스 변화">
       <div class="boss-phase-head">
-        <span>페이즈 ${triggeredCount}/${enemy.phaseRules.length}</span>
-        <strong>체력 ${hpPercent}%</strong>
+        <div>
+          <span>페이즈 ${triggeredCount}/${enemy.phaseRules.length}</span>
+          <strong>${nextRule ? `다음 ${nextThreshold}%` : "변화 완료"}</strong>
+        </div>
+        <em>${nextRule ? `남은 체력 ${gapToNext}%p` : "모든 변화 발동"}</em>
+      </div>
+      <div class="boss-phase-summary">
+        <span class="boss-phase-summary-chip phase-hp"><b>체</b><em>현재 ${hpPercent}%</em></span>
+        <span class="boss-phase-summary-chip phase-shield"><b>장</b><em>장벽 +${shield}</em></span>
+        <span class="boss-phase-summary-chip phase-effect"><b>효</b><em>${nextRule ? phaseRuleDetail(nextRule.rule) : "추가 변화 없음"}</em></span>
       </div>
       <i class="boss-phase-meter"><b style="width:${hpPercent}%"></b></i>
       ${enemy.phaseRules.map((rule, ruleIndex) => {
         const threshold = Math.round((rule.hpBelowRatio || 0) * 100);
         const triggered = enemy.phaseRulesTriggered?.includes(ruleIndex);
         const armed = !triggered && ratio <= (rule.hpBelowRatio || 0);
+        const distance = triggered ? 100 : Math.max(0, Math.min(100, 100 - Math.max(0, hpPercent - threshold)));
         return `
-          <span class="boss-phase-step ${triggered ? "triggered" : armed ? "armed" : ""}">
+          <span class="boss-phase-step ${triggered ? "triggered" : armed ? "armed" : ""}" style="--phase-distance:${distance}%">
             <b>${triggered ? "발동 완료" : armed ? "곧 발동" : `${threshold}% 이하`}</b>
             <em>${phaseRuleDetail(rule)} · 장벽 +${shield}</em>
+            <i><span></span></i>
           </span>
         `;
       }).join("")}
     </div>
   `;
+}
+
+function nextBossPhaseRule(enemy) {
+  return (enemy.phaseRules || [])
+    .map((rule, ruleIndex) => ({ rule, ruleIndex }))
+    .filter((item) => !enemy.phaseRulesTriggered?.includes(item.ruleIndex))
+    .sort((left, right) => (right.rule.hpBelowRatio || 0) - (left.rule.hpBelowRatio || 0))[0] || null;
 }
 
 function renderIntentTimeline(enemy, turn) {
