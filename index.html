@@ -26,6 +26,14 @@
 
     <section class="dashboard-grid" id="summaryGrid" aria-label="콘텐츠 현황"></section>
 
+    <section class="panel game-panel">
+      <div class="panel-head">
+        <h2>데이터 기반 탐험</h2>
+        <span>전투 연결</span>
+      </div>
+      <div id="gameRoot"></div>
+    </section>
+
     <section class="workbench">
       <div class="panel">
         <div class="panel-head">
@@ -46,14 +54,15 @@
 
     <section class="panel roadmap-panel">
       <div class="panel-head">
-        <h2>다음 구현 순서</h2>
-        <span>개발 대기</span>
+        <h2>연결된 시스템</h2>
+        <span>1차 런타임</span>
       </div>
       <ol class="roadmap">
-        <li>전투 코어가 한글 카드 데이터를 읽도록 연결</li>
-        <li>카드 효과 엔진과 보석 소켓 규칙 연결</li>
-        <li>방 진행, 보상 선택, 보스 클리어 루프 연결</li>
-        <li>캐릭터, 유물, 기운, 마을 성장 확장</li>
+        <li>풀 한글 데이터를 로딩하고 ID 인덱스로 참조한다.</li>
+        <li>캐릭터와 스테이지를 선택해 탐험을 시작한다.</li>
+        <li>손패, 기운, 비용, 카드 효과, 적 의도를 처리한다.</li>
+        <li>일반전, 이벤트, 정예, 보상, 보스 방을 순서대로 진행한다.</li>
+        <li>카드, 보석, 유물, 별사탕 보상과 업적 보상을 연결한다.</li>
       </ol>
     </section>
   </main>

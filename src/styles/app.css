@@ -300,14 +300,187 @@ h1 {
   line-height: 1.5;
 }
 
+.game-panel {
+  margin-bottom: 18px;
+}
+
+.setup-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: end;
+}
+
+.setup-grid label {
+  display: grid;
+  gap: 6px;
+  color: #585d78;
+  font-weight: 800;
+}
+
+.setup-grid select,
+.primary-btn,
+.secondary-btn,
+.choice-btn,
+.play-card {
+  border: 0;
+  border-radius: 8px;
+}
+
+.setup-grid select {
+  width: 100%;
+  min-height: 44px;
+  padding: 0 12px;
+  background: #fffaf0;
+  color: #34374f;
+  font-weight: 800;
+}
+
+.primary-btn,
+.secondary-btn {
+  min-height: 44px;
+  padding: 0 16px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.primary-btn {
+  background: #ff8ea2;
+  color: #ffffff;
+}
+
+.secondary-btn {
+  background: #e9f6ff;
+  color: #4f6880;
+}
+
+.run-board {
+  display: grid;
+  gap: 14px;
+  margin-top: 16px;
+}
+
+.run-status {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.run-status span,
+.run-status strong,
+.log-list span {
+  padding: 7px 10px;
+  border-radius: 999px;
+  background: #fff2c6;
+}
+
+.combat-grid,
+.choice-box {
+  display: grid;
+  gap: 14px;
+}
+
+.enemy-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.enemy-card {
+  display: grid;
+  gap: 6px;
+  padding: 14px;
+  border-radius: 8px;
+  background: #edf8ff;
+}
+
+.hp-line {
+  height: 10px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #d7e6ef;
+}
+
+.hp-line i {
+  display: block;
+  height: 100%;
+  background: #ff8ea2;
+}
+
+.hand-row,
+.choice-list {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.play-card,
+.choice-btn {
+  display: grid;
+  gap: 6px;
+  padding: 12px;
+  text-align: left;
+  background: #fffaf0;
+  color: #383a56;
+  box-shadow: 0 8px 18px rgba(75, 70, 105, 0.1);
+  cursor: pointer;
+}
+
+.play-card {
+  min-height: 190px;
+  border: 3px solid var(--card-accent);
+}
+
+.play-card:disabled,
+.secondary-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.play-card p {
+  margin-bottom: 0;
+  line-height: 1.4;
+}
+
+.choice-box {
+  padding: 16px;
+  border-radius: 8px;
+  background: #fff7db;
+}
+
+.choice-btn span {
+  color: #646a86;
+  line-height: 1.4;
+}
+
+.log-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.clear-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px;
+  border-radius: 8px;
+  background: #edf8ff;
+}
+
 @media (max-width: 920px) {
   .hero,
-  .workbench {
+  .workbench,
+  .setup-grid {
     grid-template-columns: 1fr;
   }
 
   .dashboard-grid,
-  .card-list {
+  .card-list,
+  .enemy-row,
+  .hand-row,
+  .choice-list {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
@@ -319,7 +492,10 @@ h1 {
   }
 
   .dashboard-grid,
-  .card-list {
+  .card-list,
+  .enemy-row,
+  .hand-row,
+  .choice-list {
     grid-template-columns: 1fr;
   }
 

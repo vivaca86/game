@@ -10,6 +10,8 @@
     "data:generate:cards": "node tools/generate-full-card-data.mjs",
     "data:generate:content": "node tools/generate-full-content-data.mjs",
     "data:validate": "node tools/validate-data.mjs",
-    "check": "npm run data:validate && npm run build"
+    "runtime:smoke": "node tools/runtime-smoke-test.mjs",
+    "browser:smoke": "node tools/browser-smoke-test.mjs",
+    "check": "node tools/validate-data.mjs && node tools/runtime-smoke-test.mjs && node tools/build-static.mjs"
   }
 }
