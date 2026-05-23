@@ -468,22 +468,12 @@ function renderPhase(state, index) {
 }
 
 function renderCombat(state, index) {
+  const forecast = combatForecast(state);
   return `
     <div class="combat-grid">
+      ${renderCombatForecast(state, forecast)}
       <section class="enemy-row">
-        ${state.enemies.map((enemy) => {
-          const intent = nextIntent(enemy, state.turn);
-          return `
-            <article class="enemy-card">
-              <strong>${enemy.name}</strong>
-              <span>${enemy.rank === "boss" ? "보스" : enemy.rank === "elite" ? "정예" : "일반"} · ${enemy.role || "기본형"}</span>
-              <div class="hp-line"><i style="width:${Math.max(0, Math.round((enemy.hp / enemy.maxHp) * 100))}%"></i></div>
-              <small>체력 ${enemy.hp}/${enemy.maxHp} · 방어 ${enemy.block || 0}</small>
-              <small>의도: ${intent.label} · ${intentDetail(intent)}</small>
-              ${renderEnemyStatus(enemy)}
-            </article>
-          `;
-        }).join("")}
+        ${state.enemies.map((enemy) => renderEnemyCard(enemy, state)).join("")}
       </section>
       <section class="hand-row">
         ${state.hand.map((cardId, handIndex) => {
@@ -504,11 +494,172 @@ function renderCombat(state, index) {
   `;
 }
 
+function renderCombatForecast(state, forecast) {
+  return `
+    <section class="combat-forecast intent-${forecast.tone}">
+      <div class="forecast-main">
+        <div>
+          <span class="route-kicker">이번 턴 예고</span>
+          <strong>${forecast.totalDamage > 0 ? `예상 피해 ${forecast.totalDamage}` : "피해 없음"}</strong>
+          <p>${forecast.detail}</p>
+        </div>
+        <div class="forecast-meter">
+          <span>보호막 ${state.player.shield}</span>
+          <strong>${forecast.blocked} 차단</strong>
+        </div>
+      </div>
+      <div class="forecast-chip-list">
+        ${combatStatusChips(state, forecast).map((chip) => `<span class="forecast-chip ${chip.tone}">${chip.label}</span>`).join("")}
+      </div>
+    </section>
+  `;
+}
+
+function renderEnemyCard(enemy, state) {
+  const intent = nextIntent(enemy, state.turn);
+  const tone = intentTone(intent);
+  return `
+    <article class="enemy-card enemy-rank-${enemy.rank} intent-${tone}">
+      <div class="enemy-head">
+        <span class="monster-portrait rank-${enemy.rank}">
+          <i>${enemyIcon(enemy)}</i>
+        </span>
+        <div>
+          <strong>${enemy.name}</strong>
+          <span>${enemyRankLabel(enemy.rank)} · ${enemy.role || "기본형"} · ${enemy.family || "미로"}</span>
+        </div>
+      </div>
+      <div class="hp-line"><i style="width:${Math.max(0, Math.round((enemy.hp / enemy.maxHp) * 100))}%"></i></div>
+      <div class="enemy-stat-row">
+        <span>체력 ${enemy.hp}/${enemy.maxHp}</span>
+        <span>방어 ${enemy.block || 0}</span>
+      </div>
+      <div class="intent-card intent-${tone}">
+        <span class="intent-icon">${intentIcon(intent)}</span>
+        <div>
+          <strong>${intent?.label || "대기"}</strong>
+          <small>${intentDetail(intent)}</small>
+        </div>
+      </div>
+      ${renderIntentTimeline(enemy, state.turn)}
+      ${renderEnemyStatus(enemy)}
+    </article>
+  `;
+}
+
+function renderIntentTimeline(enemy, turn) {
+  const count = Math.min(4, enemy.intents.length);
+  return `
+    <div class="intent-timeline" aria-label="${enemy.name} 의도 순서">
+      ${Array.from({ length: count }, (_, offset) => {
+        const intent = nextIntent(enemy, turn + offset);
+        return `
+          <span class="intent-node intent-${intentTone(intent)} ${offset === 0 ? "current" : ""}" title="${intent?.label || "대기"} · ${intentDetail(intent)}">
+            <b>${offset === 0 ? "이번" : `+${offset}`}</b>
+            <em>${intentIcon(intent)}</em>
+          </span>
+        `;
+      }).join("")}
+    </div>
+  `;
+}
+
 function renderEnemyStatus(enemy) {
   const entries = Object.entries(enemy.status || {}).filter(([, value]) => value > 0);
   if (entries.length === 0) return "";
-  const labels = { mark: "표식", weak: "약화" };
-  return `<div class="enemy-status">${entries.map(([key, value]) => `<span>${labels[key] || key} ${value}</span>`).join("")}</div>`;
+  return `<div class="enemy-status">${entries.map(([key, value]) => `<span class="status-${key}">${statusLabel(key)} ${value}</span>`).join("")}</div>`;
+}
+
+function combatForecast(state) {
+  const incoming = { normalDamage: 0, piercingDamage: 0 };
+  const effects = [];
+  state.enemies.forEach((enemy) => {
+    const intent = nextIntent(enemy, state.turn);
+    if (!intent) return;
+    if (intent.type === "attack") incoming.normalDamage += intent.amount || 0;
+    if (intent.effect === "pierce_attack") incoming.piercingDamage += intent.amount || 0;
+    if (intent.type === "guard") effects.push(`${enemy.name} 방어 ${intent.amount || 0}`);
+    if (intent.type === "debuff") effects.push(`${statusLabel(intent.status)} ${intent.amount || 1}`);
+    if (intent.effect === "fortify_all") effects.push(`전체 방어 ${intent.amount || 0}`);
+    if (intent.effect === "heal_self") effects.push(`회복 ${intent.amount || 0}`);
+    if (intent.effect === "add_temp_card") effects.push(`방해 카드 ${intent.amount || 1}장`);
+    if (intent.effect === "reduce_energy") effects.push(`다음 턴 기운 -${intent.amount || 1}`);
+    if (intent.effect === "chain_down") effects.push(`연쇄 -${intent.amount || 1}`);
+    if (intent.effect === "summon") effects.push("친구 호출");
+  });
+  const markBonus = state.status.playerMarked > 0 ? Math.ceil(incoming.normalDamage * Math.min(0.5, state.status.playerMarked * 0.15)) : 0;
+  const reduced = Math.max(0, incoming.normalDamage + markBonus - (state.status.damageReduction || 0));
+  const blocked = Math.min(state.player.shield, reduced);
+  const normalAfterBlock = Math.max(0, reduced - blocked);
+  const totalDamage = normalAfterBlock + incoming.piercingDamage;
+  const damageParts = [
+    incoming.normalDamage > 0 ? `일반 ${incoming.normalDamage}` : null,
+    markBonus > 0 ? `표식 추가 ${markBonus}` : null,
+    state.status.damageReduction > 0 ? `감소 ${state.status.damageReduction}` : null,
+    incoming.piercingDamage > 0 ? `관통 ${incoming.piercingDamage}` : null
+  ].filter(Boolean);
+  return {
+    ...incoming,
+    markBonus,
+    blocked,
+    totalDamage,
+    effects,
+    tone: totalDamage > 0 ? "attack" : effects.length > 0 ? "trick" : "guard",
+    detail: [...damageParts, ...effects].join(" · ") || "적이 공격 대신 정비합니다."
+  };
+}
+
+function combatStatusChips(state, forecast) {
+  const chips = [
+    { label: `연쇄 ${state.status.chain || 0}`, tone: "chain" },
+    { label: `손패 ${state.hand.length}`, tone: "hand" },
+    { label: `기운 ${state.player.energy}/${state.player.maxEnergy}`, tone: "energy" }
+  ];
+  if (forecast.normalDamage > 0) chips.push({ label: `일반 피해 ${forecast.normalDamage}`, tone: "attack" });
+  if (forecast.piercingDamage > 0) chips.push({ label: `관통 ${forecast.piercingDamage}`, tone: "pierce" });
+  if (state.status.playerMarked > 0) chips.push({ label: `표식 ${state.status.playerMarked}`, tone: "danger" });
+  if (state.status.playerWeak > 0) chips.push({ label: `약화 ${state.status.playerWeak}`, tone: "danger" });
+  if (state.status.damageReduction > 0) chips.push({ label: `피해 감소 ${state.status.damageReduction}`, tone: "guard" });
+  if (state.status.retainShield > 0) chips.push({ label: `보호막 유지 ${state.status.retainShield}`, tone: "guard" });
+  if (state.status.nextTurnEnergyPenalty > 0) chips.push({ label: `다음 기운 -${state.status.nextTurnEnergyPenalty}`, tone: "danger" });
+  return chips;
+}
+
+function intentTone(intent) {
+  if (!intent) return "guard";
+  if (intent.type === "attack" || intent.effect === "pierce_attack") return "attack";
+  if (intent.type === "guard" || intent.effect === "fortify_all" || intent.effect === "heal_self") return "guard";
+  if (intent.effect === "summon") return "summon";
+  return "trick";
+}
+
+function intentIcon(intent) {
+  if (!intent) return "·";
+  if (intent.type === "attack") return "공";
+  if (intent.type === "guard") return "방";
+  if (intent.type === "debuff") return "상";
+  if (intent.effect === "pierce_attack") return "관";
+  if (intent.effect === "fortify_all") return "방";
+  if (intent.effect === "heal_self") return "회";
+  if (intent.effect === "summon") return "호";
+  if (intent.effect === "add_temp_card") return "방";
+  if (intent.effect === "reduce_energy") return "기";
+  if (intent.effect === "chain_down") return "연";
+  return "특";
+}
+
+function enemyIcon(enemy) {
+  if (enemy.rank === "boss") return "왕";
+  if (enemy.rank === "elite") return "정";
+  return (enemy.family || enemy.name || "몬").slice(0, 1);
+}
+
+function enemyRankLabel(rank) {
+  return rank === "boss" ? "보스" : rank === "elite" ? "정예" : "일반";
+}
+
+function statusLabel(status) {
+  return ({ mark: "표식", weak: "약화" })[status] || status;
 }
 
 function renderRunResult(state) {

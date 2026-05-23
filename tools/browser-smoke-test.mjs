@@ -64,10 +64,20 @@ await page.waitForSelector(".run-board", { timeout: 10000 });
 await page.waitForSelector(".stage-route-panel", { timeout: 10000 });
 await page.waitForSelector(".route-node.active", { timeout: 10000 });
 await page.waitForSelector(".route-node.room-boss", { timeout: 10000 });
+await page.waitForSelector(".combat-forecast", { timeout: 10000 });
+await page.waitForSelector(".monster-portrait", { timeout: 10000 });
+await page.waitForSelector(".intent-card", { timeout: 10000 });
+await page.waitForSelector(".intent-timeline .intent-node.current", { timeout: 10000 });
 const routeText = await page.textContent(".stage-route-panel");
 if (!routeText?.includes("스테이지 경로") || !routeText.includes("현재 방") || !routeText.includes("보스")) {
   throw new Error("스테이지 경로판 표시 실패");
 }
+const combatForecastText = await page.textContent(".combat-forecast");
+if (!combatForecastText?.includes("이번 턴 예고") || (!combatForecastText.includes("예상 피해") && !combatForecastText.includes("피해 없음"))) {
+  throw new Error("전투 예고판 표시 실패");
+}
+const intentNodeCount = await page.locator(".intent-node").count();
+if (intentNodeCount < 2) throw new Error("몬스터 의도 타임라인 표시 실패");
 const routeNodeCount = await page.locator(".route-node").count();
 if (routeNodeCount < 7) throw new Error(`스테이지 경로 노드 부족: ${routeNodeCount}`);
 const routeOverflowItems = await page.locator(".stage-route-panel, .route-node, .route-next-card").evaluateAll((elements) => elements
@@ -80,7 +90,14 @@ await page.screenshot({ path: "tmp/stage-route-desktop.png", fullPage: true });
 await page.waitForSelector(".play-card", { timeout: 10000 });
 await page.waitForSelector(".arcana-chip", { timeout: 10000 });
 const enemyText = await page.textContent(".enemy-card");
-if (!enemyText?.includes("의도") || !enemyText.includes("형")) throw new Error("적 역할/의도 표시 실패");
+if (!enemyText?.includes("이번") || !enemyText.includes("형")) throw new Error("적 역할/의도 표시 실패");
+const combatOverflowItems = await page.locator(".combat-forecast, .enemy-card, .intent-card, .intent-node, .monster-portrait").evaluateAll((elements) => elements
+  .filter((element) => element.scrollWidth > element.clientWidth + 2 || element.scrollHeight > element.clientHeight + 2)
+  .map((element) => element.className));
+if (combatOverflowItems.length > 0) {
+  throw new Error(`전투 UI 넘침: ${combatOverflowItems.slice(0, 4).join(" | ")}`);
+}
+await page.screenshot({ path: "tmp/combat-ui-desktop.png", fullPage: true });
 
 const enabledCards = await page.locator(".play-card:not(:disabled)").count();
 if (enabledCards === 0) throw new Error("사용 가능한 카드가 없습니다.");
