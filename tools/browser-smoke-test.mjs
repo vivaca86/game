@@ -243,6 +243,46 @@ await page.screenshot({ path: "tmp/market-ui-mobile.png", fullPage: true });
 await page.setViewportSize({ width: 1366, height: 900 });
 await page.evaluate(async () => {
   const raw = localStorage.getItem("sunny_maze_run_v1");
+  if (!raw) throw new Error("이벤트 검증용 저장 스냅샷 없음");
+  const snapshot = JSON.parse(raw);
+  const events = await fetch("/src/data/ko/events.json").then((response) => response.json());
+  const event = events.find((item) => item.id === "event_ribbon_fountain") || events[0];
+  if (!event) throw new Error("이벤트 검증용 데이터 없음");
+  snapshot.phase = "event";
+  snapshot.currentRoomType = "event";
+  snapshot.pendingReward = null;
+  snapshot.pendingEvent = structuredClone(event);
+  snapshot.player = { ...(snapshot.player || {}), hp: 54, maxHp: 64, gold: 82 };
+  localStorage.setItem("sunny_maze_run_v1", JSON.stringify(snapshot));
+});
+await page.reload({ waitUntil: "networkidle" });
+await page.waitForSelector("#loadRunButton:not(:disabled)", { timeout: 10000 });
+await page.click("#loadRunButton");
+await page.waitForSelector(".event-box", { timeout: 10000 });
+await page.waitForSelector(".event-scene", { timeout: 10000 });
+await page.waitForSelector(".choice-reward-icon", { timeout: 10000 });
+await page.waitForSelector(".event-choice .reward-preview-card", { timeout: 10000 });
+const eventText = await page.textContent(".event-box");
+if (!eventText?.includes("리본 분수") || !eventText.includes("카드를 강화한다")) throw new Error("이벤트 화면 핵심 문구 표시 실패");
+const eventChoiceCount = await page.locator(".event-choice").count();
+const eventIconCount = await page.locator(".event-choice .choice-reward-icon").count();
+if (eventChoiceCount < 3 || eventIconCount !== eventChoiceCount) throw new Error("이벤트 선택지 아이콘 표시 실패");
+const eventOverflowItems = await page.locator(".event-box, .event-head, .event-visual-card, .event-choice, .choice-reward-icon").evaluateAll((elements) => elements
+  .filter((element) => element.scrollWidth > element.clientWidth + 2 || element.scrollHeight > element.clientHeight + 2)
+  .map((element) => element.className));
+if (eventOverflowItems.length > 0) {
+  throw new Error(`이벤트 UI 넘침: ${eventOverflowItems.slice(0, 4).join(" | ")}`);
+}
+await page.screenshot({ path: "tmp/event-ui-desktop.png", fullPage: true });
+await page.setViewportSize({ width: 390, height: 820 });
+await page.waitForTimeout(120);
+const eventMobileColumns = await page.locator(".market-list").evaluate((element) => getComputedStyle(element).gridTemplateColumns.split(" ").length);
+if (eventMobileColumns !== 1) throw new Error("모바일 이벤트 선택지 1열 반응형 확인 실패");
+await page.screenshot({ path: "tmp/event-ui-mobile.png", fullPage: true });
+
+await page.setViewportSize({ width: 1366, height: 900 });
+await page.evaluate(async () => {
+  const raw = localStorage.getItem("sunny_maze_run_v1");
   if (!raw) throw new Error("보스 검증용 저장 스냅샷 없음");
   const snapshot = JSON.parse(raw);
   const [stages, enemies] = await Promise.all([

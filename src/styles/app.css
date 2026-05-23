@@ -2140,6 +2140,149 @@ h1 {
   line-height: 1.5;
 }
 
+.event-box {
+  gap: 14px;
+}
+
+.event-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 156px auto;
+  align-items: center;
+}
+
+.event-copy {
+  min-width: 0;
+}
+
+.event-visual-card {
+  display: grid;
+  min-height: 112px;
+  place-items: center;
+  border: 2px solid rgba(76, 79, 112, 0.08);
+  border-radius: 8px;
+  background:
+    radial-gradient(circle at 28% 22%, rgba(255, 255, 255, 0.9) 0 12%, transparent 13%),
+    linear-gradient(145deg, #edf8ff, #fffaf0);
+}
+
+.event-scene {
+  display: grid;
+  position: relative;
+  overflow: hidden;
+  width: 124px;
+  height: 88px;
+  place-items: center;
+  border: 3px solid rgba(255, 255, 255, 0.92);
+  border-radius: 24px 24px 18px 18px;
+  background:
+    radial-gradient(circle at 24% 24%, rgba(255, 255, 255, 0.88) 0 10%, transparent 11%),
+    linear-gradient(145deg, #7cccf7, #fffaf0);
+  box-shadow: 0 10px 22px rgba(76, 70, 116, 0.14);
+}
+
+.event-scene-icon {
+  z-index: 3;
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.82);
+  color: #4f6880;
+  font-size: 14px;
+  font-weight: 900;
+  box-shadow: 0 5px 12px rgba(76, 70, 116, 0.12);
+}
+
+.event-shape {
+  position: absolute;
+  display: block;
+  pointer-events: none;
+}
+
+.event-shape.main {
+  bottom: 12px;
+  left: 18px;
+  width: 42px;
+  height: 28px;
+  border-radius: 18px 18px 10px 10px;
+  background: rgba(255, 255, 255, 0.58);
+}
+
+.event-shape.aux {
+  right: 18px;
+  bottom: 16px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.event-shape.sparkle-one,
+.event-shape.sparkle-two {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.72);
+  transform: rotate(45deg);
+}
+
+.event-shape.sparkle-one {
+  top: 16px;
+  left: 20px;
+}
+
+.event-shape.sparkle-two {
+  right: 22px;
+  top: 20px;
+}
+
+.event-scene-bubble {
+  background:
+    radial-gradient(circle at 25% 24%, rgba(255, 255, 255, 0.9) 0 10%, transparent 11%),
+    radial-gradient(circle at 72% 58%, rgba(255, 255, 255, 0.42) 0 18%, transparent 19%),
+    linear-gradient(145deg, #7cccf7, #e8f8f1);
+}
+
+.event-scene-ribbon {
+  background:
+    radial-gradient(circle at 28% 22%, rgba(255, 255, 255, 0.88) 0 10%, transparent 11%),
+    linear-gradient(145deg, #ff8ea2, #fff2c6);
+}
+
+.event-scene-gate {
+  border-radius: 28px 28px 14px 14px;
+  background:
+    radial-gradient(circle at 28% 22%, rgba(255, 255, 255, 0.88) 0 10%, transparent 11%),
+    linear-gradient(145deg, #a99cff, #edf8ff);
+}
+
+.event-scene-gem,
+.event-scene-class {
+  background:
+    radial-gradient(circle at 28% 22%, rgba(255, 255, 255, 0.88) 0 10%, transparent 11%),
+    linear-gradient(145deg, #67d9a5, #edf8ff);
+}
+
+.event-scene-mail,
+.event-scene-picnic {
+  background:
+    radial-gradient(circle at 28% 22%, rgba(255, 255, 255, 0.88) 0 10%, transparent 11%),
+    linear-gradient(145deg, #ffd45f, #ffe8ee);
+}
+
+.event-scene-star,
+.event-scene-rainbow {
+  background:
+    linear-gradient(135deg, #7cccf7, #ff9cb1 56%, #ffd45f);
+}
+
+.event-scene-friend {
+  background:
+    radial-gradient(circle at 28% 22%, rgba(255, 255, 255, 0.88) 0 10%, transparent 11%),
+    linear-gradient(145deg, #ffe8ee, #f2edff);
+}
+
 .choice-kicker {
   display: inline-flex;
   margin-bottom: 6px;
@@ -2181,6 +2324,58 @@ h1 {
   min-height: 260px;
   border: 2px solid rgba(76, 79, 112, 0.12);
   box-shadow: 0 10px 22px rgba(75, 70, 105, 0.1);
+}
+
+.event-choice {
+  gap: 8px;
+  min-height: 292px;
+}
+
+.event-choice-topline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.choice-reward-icon {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 2px solid rgba(255, 255, 255, 0.9);
+  border-radius: 12px;
+  background: #edf8ff;
+  color: #4f6880;
+  font-size: 13px;
+  font-weight: 900;
+  box-shadow: 0 5px 12px rgba(76, 70, 116, 0.12);
+}
+
+.event-choice-card .choice-reward-icon,
+.event-choice-gold .choice-reward-icon,
+.event-choice-upgrade .choice-reward-icon {
+  background: #fff2c6;
+  color: #7c5d15;
+}
+
+.event-choice-gem .choice-reward-icon,
+.event-choice-heal .choice-reward-icon,
+.event-choice-arcana .choice-reward-icon,
+.event-choice-socket .choice-reward-icon {
+  background: #e8f8f1;
+  color: #347159;
+}
+
+.event-choice-relic .choice-reward-icon {
+  background: #fff7db;
+  color: #7c5d15;
+}
+
+.event-choice-combat .choice-reward-icon {
+  background: #ffe8ee;
+  color: #a33c50;
 }
 
 .market-choice:hover:not(:disabled),
@@ -3169,6 +3364,14 @@ h1 {
 
   .choice-wallet {
     justify-content: flex-start;
+  }
+
+  .event-head {
+    grid-template-columns: 1fr;
+  }
+
+  .event-visual-card {
+    justify-items: start;
   }
 
   .result-head {

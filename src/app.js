@@ -1228,15 +1228,25 @@ function gemVisualClass(gem) {
 function renderEvent(state, index) {
   const event = state.pendingEvent;
   const eventTone = event.type || "choice";
+  const scene = eventSceneKey(event);
   return `
-    <section class="choice-box market-box market-tone-${eventTone}">
-      <div class="choice-head">
-        <div>
+    <section class="choice-box market-box event-box market-tone-${eventTone} event-scene-tone-${scene}">
+      <div class="choice-head event-head">
+        <div class="event-copy">
           <span class="choice-kicker">${eventTypeLabel(eventTone)}</span>
           <strong>${event.name}</strong>
           <p>${event.text}</p>
         </div>
-        <div class="choice-wallet">
+        <div class="event-visual-card" aria-hidden="true">
+          <span class="event-scene event-scene-${scene}">
+            <span class="event-scene-icon">${eventSceneIcon(scene)}</span>
+            <span class="event-shape main"></span>
+            <span class="event-shape aux"></span>
+            <span class="event-shape sparkle-one"></span>
+            <span class="event-shape sparkle-two"></span>
+          </span>
+        </div>
+        <div class="choice-wallet event-wallet">
           <span>별사탕 ${state.player.gold}</span>
           <span>체력 ${state.player.hp}/${state.player.maxHp}</span>
         </div>
@@ -1245,9 +1255,13 @@ function renderEvent(state, index) {
         ${event.choices.map((choice, choiceIndex) => {
           const cost = adjustedRewardCost(state, index, choice.cost || {}, { source: event.type, reward: choice.reward || {} });
           const affordable = canPayCost(state, cost);
+          const rewardKind = choiceRewardKind(choice.reward || {});
           return `
-          <button class="choice-btn market-choice ${affordable ? "" : "locked-choice"}" data-action="event-choice" data-choice-index="${choiceIndex}" ${affordable ? "" : "disabled"}>
-            <span class="choice-cost ${affordable ? "can-pay" : "cannot-pay"}">${costLabel(cost)}</span>
+          <button class="choice-btn market-choice event-choice event-choice-${rewardKind} ${affordable ? "" : "locked-choice"}" data-action="event-choice" data-choice-index="${choiceIndex}" ${affordable ? "" : "disabled"}>
+            <span class="event-choice-topline">
+              <span class="choice-reward-icon">${choiceRewardIcon(rewardKind)}</span>
+              <span class="choice-cost ${affordable ? "can-pay" : "cannot-pay"}">${costLabel(cost)}</span>
+            </span>
             <strong>${choice.label}</strong>
             <span class="choice-note">${affordable ? rewardLabel(choice.reward) : shortageLabel(state, cost)}</span>
             <span class="reward-preview-grid">
@@ -1259,6 +1273,42 @@ function renderEvent(state, index) {
       </div>
     </section>
   `;
+}
+
+function eventSceneKey(event = {}) {
+  const text = `${event.id || ""} ${event.name || ""} ${event.text || ""}`;
+  if (/bubble|방울/.test(text)) return "bubble";
+  if (/ribbon|리본|분수/.test(text)) return "ribbon";
+  if (/gate|문/.test(text)) return "gate";
+  if (/gem|보석|작업대/.test(text)) return "gem";
+  if (/mail|우체통|초대장/.test(text)) return "mail";
+  if (/picnic|소풍/.test(text)) return "picnic";
+  if (/lottery|복권|별/.test(text)) return "star";
+  if (/class|교실/.test(text)) return "class";
+  if (/lost|아이/.test(text)) return "friend";
+  if (/rainbow|무지개/.test(text)) return "rainbow";
+  return "choice";
+}
+
+function eventSceneIcon(scene) {
+  return ({ bubble: "방", ribbon: "리", gate: "문", gem: "젬", mail: "우", picnic: "소", star: "별", class: "교", friend: "친", rainbow: "빛", choice: "이" })[scene] || "이";
+}
+
+function choiceRewardKind(reward = {}) {
+  if (reward.combat) return "combat";
+  if (reward.cardPool?.length) return "card";
+  if (reward.gemPool?.length) return "gem";
+  if (reward.relicPool?.length) return "relic";
+  if (reward.arcanaPool?.length) return "arcana";
+  if (reward.upgradeRandomCard) return "upgrade";
+  if (reward.heal) return "heal";
+  if (reward.gold) return "gold";
+  if (reward.openGemSocket) return "socket";
+  return "choice";
+}
+
+function choiceRewardIcon(kind) {
+  return ({ card: "카", gem: "보", relic: "유", arcana: "기", upgrade: "↑", heal: "＋", gold: "★", combat: "전", socket: "◇", choice: "?" })[kind] || "?";
 }
 
 function renderReward(state, index) {
