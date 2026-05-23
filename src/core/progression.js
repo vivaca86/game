@@ -4,9 +4,11 @@ import { healPlayer } from "./card-effects.js";
 import { addLog } from "./game-state.js";
 import { createNewRun } from "./game-state.js";
 import { openReward } from "./rewards.js";
+import { ensureGemState } from "./gems.js";
 
 export function startRun(index, options = {}) {
   const state = createNewRun(index, options);
+  ensureGemState(state);
   enterCurrentRoom(state, index);
   return state;
 }

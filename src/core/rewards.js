@@ -1,6 +1,7 @@
 import { checkAchievements } from "./achievements.js";
 import { addLog, addToDeck } from "./game-state.js";
 import { healPlayer } from "./card-effects.js";
+import { grantGem } from "./gems.js";
 
 export function createRewardOptions(state, index, source = "combat") {
   const stage = index.stages.get(state.stageId);
@@ -66,7 +67,7 @@ export function applyRewardOption(state, index, optionId) {
     addLog(state, `별사탕 ${option.amount} 획득`);
   }
   if (option.type === "gem") {
-    state.inventory.gems.push(option.gemId);
+    grantGem(state, option.gemId);
     addLog(state, `보석 획득: ${index.gems.get(option.gemId).name}`);
     checkAchievements(state, index, "collect_gems");
   }
@@ -87,6 +88,11 @@ export function applyEventChoice(state, index, choiceIndex) {
   if (!choice) return false;
   payCost(state, choice.cost || {});
   grantRewardPayload(state, index, choice.reward || {});
+  if (event.id === "event_gem_bench") {
+    state.status.gemWorkshopOpen = true;
+    state.status.gemWorkshopCharges = (state.status.gemWorkshopCharges || 0) + 1;
+    addLog(state, "보석 작업대가 열렸습니다.");
+  }
   checkAchievements(state, index, "complete_event", { eventId: event.id });
   state.pendingEvent = null;
   state.phase = "room_complete";
@@ -103,13 +109,17 @@ function grantRewardPayload(state, index, reward) {
   if (reward.gold) state.player.gold += reward.gold;
   if (reward.heal) healPlayer(state, reward.heal);
   if (reward.cardPool?.length) addToDeck(state, state.rng.pick(reward.cardPool));
-  if (reward.gemPool?.length) state.inventory.gems.push(state.rng.pick(reward.gemPool));
+  if (reward.gemPool?.length) grantGem(state, state.rng.pick(reward.gemPool));
   if (reward.relicPool?.length) state.inventory.relics.push(state.rng.pick(reward.relicPool));
   if (reward.upgradeRandomCard) {
     const cardId = state.rng.pick(state.deck);
     if (cardId && !state.upgradedCards.includes(cardId)) state.upgradedCards.push(cardId);
   }
-  if (reward.openGemSocket) state.status.openedGemSocket = true;
+  if (reward.openGemSocket) {
+    state.status.openedGemSocket = true;
+    state.status.gemWorkshopOpen = true;
+    state.status.gemWorkshopCharges = (state.status.gemWorkshopCharges || 0) + 1;
+  }
   if (reward.combat) {
     const enemy = index.enemies.get(reward.combat);
     if (enemy) state.status.eventCombatEnemyId = enemy.id;

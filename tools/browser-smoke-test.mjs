@@ -53,9 +53,18 @@ await page.waitForSelector(".play-card", { timeout: 10000 });
 const enabledCards = await page.locator(".play-card:not(:disabled)").count();
 if (enabledCards === 0) throw new Error("사용 가능한 카드가 없습니다.");
 await page.locator(".play-card:not(:disabled)").first().click();
+await page.click('[data-action="debug-gem"]');
+await page.waitForSelector(".gem-chip", { timeout: 10000 });
+await page.locator('[data-action="equip-gem"]').first().click();
+await page.waitForSelector('[data-action="unequip-gem"]', { timeout: 10000 });
+await page.click('[data-action="save-run"]');
+await page.reload({ waitUntil: "networkidle" });
+await page.waitForSelector("#loadRunButton:not(:disabled)", { timeout: 10000 });
+await page.click("#loadRunButton");
+await page.waitForSelector('[data-action="unequip-gem"]', { timeout: 10000 });
 
 const runText = await page.textContent("#runRoot");
-if (!runText?.includes("체력") || !runText.includes("기운")) {
+if (!runText?.includes("체력") || !runText.includes("기운") || !runText.includes("보석 보관함")) {
   throw new Error("전투 상태 표시 확인 실패");
 }
 

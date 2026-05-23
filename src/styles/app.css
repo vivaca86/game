@@ -366,6 +366,12 @@ h1 {
   gap: 8px;
 }
 
+.run-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
 .run-status span,
 .run-status strong,
 .log-list span {
@@ -469,10 +475,103 @@ h1 {
   background: #edf8ff;
 }
 
+.gem-vault {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.62);
+}
+
+.compact-head {
+  margin-bottom: 0;
+}
+
+.gem-vault-grid {
+  display: grid;
+  grid-template-columns: minmax(220px, 0.35fr) minmax(0, 0.65fr);
+  gap: 12px;
+}
+
+.gem-bag,
+.socket-card {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  border-radius: 8px;
+  background: #fffaf0;
+}
+
+.gem-chip-list,
+.socket-row,
+.socket-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.gem-chip,
+.socket-dot,
+.muted {
+  padding: 6px 9px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.gem-chip {
+  background: #f2edff;
+  color: #6555a0;
+}
+
+.muted {
+  background: #ece7d6;
+  color: #767891;
+}
+
+.socket-list {
+  display: grid;
+  gap: 10px;
+}
+
+.socket-card {
+  border: 2px solid var(--card-accent);
+}
+
+.socket-card small {
+  display: block;
+  margin-top: 2px;
+  color: #666b85;
+  font-weight: 800;
+}
+
+.socket-dot {
+  min-height: 34px;
+  border: 2px dashed rgba(76, 79, 112, 0.2);
+  background: #ffffff;
+  color: #767891;
+}
+
+.socket-dot.filled {
+  border-style: solid;
+  background: #edf8ff;
+  color: #425a70;
+}
+
+.socket-dot button {
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
 @media (max-width: 920px) {
   .hero,
   .workbench,
-  .setup-grid {
+  .setup-grid,
+  .gem-vault-grid {
     grid-template-columns: 1fr;
   }
 

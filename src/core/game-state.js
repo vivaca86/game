@@ -30,6 +30,7 @@ export function createNewRun(index, options = {}) {
     enemies: [],
     inventory: {
       gems: [],
+      gemBag: [],
       relics: [],
       arcanas: [],
       unlockedCards: [...new Set(startingDeck)],
@@ -38,6 +39,9 @@ export function createNewRun(index, options = {}) {
       achievements: []
     },
     upgradedCards: [],
+    cardSockets: {},
+    cardSocketBonuses: {},
+    nextGemInstanceId: 1,
     battleRules: [],
     status: {},
     metrics: {

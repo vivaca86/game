@@ -2,10 +2,12 @@ import { checkAchievements } from "./achievements.js";
 import { applyCardEffects, cardCost } from "./card-effects.js";
 import { addLog, discardHand, drawCards } from "./game-state.js";
 import { openReward } from "./rewards.js";
+import { ensureGemState } from "./gems.js";
 
 let enemyInstanceSeq = 1;
 
 export function startCombat(state, index, roomType = "combat") {
+  ensureGemState(state);
   const stage = index.stages.get(state.stageId);
   const sourcePool = roomType === "boss"
     ? [stage.bossEnemyId]
@@ -29,7 +31,7 @@ export function playCard(state, index, handIndex) {
   const cardId = state.hand[handIndex];
   const card = index.cards.get(cardId);
   if (!card) return false;
-  const cost = cardCost(card, state);
+  const cost = cardCost(card, state, index);
   if (cost > state.player.energy) {
     addLog(state, "기운이 부족합니다.");
     return false;
@@ -85,6 +87,8 @@ export function endTurn(state, index) {
   state.status.damageReduction = 0;
   state.status.retainShield = 0;
   state.metrics.cardsPlayedThisTurn = 0;
+  if (state.status.preserveNextChain) state.status.preserveNextChain = false;
+  else state.status.chain = 0;
   drawCards(state, 5);
 
   if (state.player.hp <= 0) {

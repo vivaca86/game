@@ -3,6 +3,18 @@ import { nextIntent, playCard, endTurn } from "./core/combat.js";
 import { advanceRoom, startRun } from "./core/progression.js";
 import { applyEventChoice, applyRewardOption, rerollReward } from "./core/rewards.js";
 import { cardCost } from "./core/card-effects.js";
+import {
+  canEquipGemToCard,
+  ensureGemState,
+  equipGemToCard,
+  grantGem,
+  normalizeCardSockets,
+  openSocketForCard,
+  socketCapacity,
+  unequipGem,
+  unequippedGemInstances
+} from "./core/gems.js";
+import { clearSavedRun, hasSavedRun, loadSavedRun, saveRun } from "./core/persistence.js";
 
 const labels = {
   cards: "카드",
@@ -142,6 +154,7 @@ function renderGameSetup(index) {
         </select>
       </label>
       <button class="primary-btn" id="startRunButton">탐험 시작</button>
+      <button class="secondary-btn" id="loadRunButton" ${hasSavedRun() ? "" : "disabled"}>저장 불러오기</button>
     </div>
     <div id="runRoot"></div>
   `;
@@ -149,6 +162,12 @@ function renderGameSetup(index) {
     const characterId = qs("#characterSelect").value;
     const stageId = qs("#stageSelect").value;
     runtime.state = startRun(index, { characterId, stageId, seed: 20260523 });
+    saveRun(runtime.state);
+    renderGameSetup(index);
+    renderRun();
+  });
+  qs("#loadRunButton").addEventListener("click", () => {
+    runtime.state = loadSavedRun(index);
     renderRun();
   });
 }
@@ -162,6 +181,7 @@ function renderRun() {
   }
   const character = index.characters.get(state.characterId);
   const stage = index.stages.get(state.stageId);
+  ensureGemState(state);
   root.innerHTML = `
     <section class="run-board">
       <div class="run-status">
@@ -171,8 +191,15 @@ function renderRun() {
         <span>보호막 ${state.player.shield}</span>
         <span>기운 ${state.player.energy}/${state.player.maxEnergy}</span>
         <span>별사탕 ${state.player.gold}</span>
+        <span>보석 ${state.inventory.gemBag.length}개</span>
+        <span>장착 ${state.inventory.gemBag.filter((gem) => gem.equippedCardId).length}개</span>
+      </div>
+      <div class="run-actions">
+        <button class="secondary-btn" data-action="save-run">저장</button>
+        <button class="secondary-btn" data-action="clear-save">저장 삭제</button>
       </div>
       ${renderPhase(state, index)}
+      ${renderGemVault(state, index)}
       <div class="log-list">${state.log.map((log) => `<span>${escapeHtml(log)}</span>`).join("")}</div>
     </section>
   `;
@@ -209,7 +236,7 @@ function renderCombat(state, index) {
       <section class="hand-row">
         ${state.hand.map((cardId, handIndex) => {
           const card = index.cards.get(cardId);
-          const cost = cardCost(card, state);
+          const cost = cardCost(card, state, index);
           return `
             <button class="play-card" data-action="play-card" data-hand-index="${handIndex}" style="--card-accent:${accentFor(card.color)}" ${cost > state.player.energy ? "disabled" : ""}>
               <span class="cost">${cost}</span>
@@ -222,6 +249,72 @@ function renderCombat(state, index) {
       </section>
       <button class="secondary-btn" data-action="end-turn">턴 종료</button>
     </div>
+  `;
+}
+
+function renderGemVault(state, index) {
+  ensureGemState(state);
+  const uniqueDeckIds = [...new Set(state.deck)].slice(0, 8);
+  return `
+    <section class="gem-vault">
+      <div class="panel-head compact-head">
+        <h2>보석 보관함</h2>
+        <span>${state.inventory.gemBag.length}개 보유</span>
+      </div>
+      <div class="gem-vault-grid">
+        <div class="gem-bag">
+          <strong>미장착 보석</strong>
+          <div class="gem-chip-list">
+            ${unequippedGemInstances(state).length === 0 ? "<span class='muted'>미장착 보석 없음</span>" : unequippedGemInstances(state).map((instance) => {
+              const gem = index.gems.get(instance.gemId);
+              return `<span class="gem-chip" title="${gem.text}">${gem.name}</span>`;
+            }).join("")}
+          </div>
+          <button class="secondary-btn" data-action="debug-gem">보석 지급</button>
+        </div>
+        <div class="socket-list">
+          ${uniqueDeckIds.map((cardId) => renderSocketCard(state, index, cardId)).join("")}
+        </div>
+      </div>
+    </section>
+  `;
+}
+
+function renderSocketCard(state, index, cardId) {
+  const card = index.cards.get(cardId);
+  const sockets = normalizeCardSockets(state, index, cardId);
+  const capacity = socketCapacity(state, index, cardId);
+  const validGems = unequippedGemInstances(state).filter((instance) => {
+    const gem = index.gems.get(instance.gemId);
+    return gem && canEquipGemToCard(gem, card);
+  }).slice(0, 4);
+  const canOpenSocket = capacity < card.sockets.max && ((state.status.socketBonus || 0) > 0 || (state.status.gemWorkshopCharges || 0) > 0);
+  return `
+    <article class="socket-card" style="--card-accent:${accentFor(card.color)}">
+      <div>
+        <strong>${card.name}</strong>
+        <small>${typeLabels[card.type] || card.type} · 소켓 ${capacity}/${card.sockets.max}</small>
+      </div>
+      <div class="socket-row">
+        ${sockets.map((instanceId, slotIndex) => {
+          const instance = state.inventory.gemBag.find((gem) => gem.instanceId === instanceId);
+          const gem = instance ? index.gems.get(instance.gemId) : null;
+          return `
+            <span class="socket-dot ${gem ? "filled" : ""}">
+              ${gem ? `<button data-action="unequip-gem" data-gem-instance-id="${instance.instanceId}" title="해제">${gem.name}</button>` : `빈 소켓 ${slotIndex + 1}`}
+            </span>
+          `;
+        }).join("")}
+      </div>
+      <div class="socket-actions">
+        ${canOpenSocket ? `<button class="secondary-btn" data-action="open-socket" data-card-id="${card.id}">소켓 +1</button>` : ""}
+        ${validGems.map((instance) => {
+          const gem = index.gems.get(instance.gemId);
+          const isFull = sockets.every(Boolean);
+          return `<button class="secondary-btn" data-action="equip-gem" data-card-id="${card.id}" data-gem-instance-id="${instance.instanceId}">${isFull ? "교체" : "장착"}: ${gem.name}</button>`;
+        }).join("")}
+      </div>
+    </article>
   `;
 }
 
@@ -273,6 +366,16 @@ function bindRunActions() {
       if (action === "reroll") rerollReward(state, index);
       if (action === "advance") advanceRoom(state, index);
       if (action === "restart") runtime.state = startRun(index, { characterId: state.characterId, stageId: state.stageId, seed: Date.now() });
+      if (action === "equip-gem") equipGemToCard(state, index, button.dataset.gemInstanceId, button.dataset.cardId);
+      if (action === "unequip-gem") unequipGem(state, button.dataset.gemInstanceId);
+      if (action === "open-socket") openSocketForCard(state, index, button.dataset.cardId);
+      if (action === "debug-gem") grantGem(state, index.data.gems[state.inventory.gemBag.length % index.data.gems.length].id);
+      if (action === "save-run") saveRun(state);
+      if (action === "clear-save") {
+        clearSavedRun();
+      } else {
+        saveRun(runtime.state);
+      }
       renderRun();
     });
   });

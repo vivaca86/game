@@ -1,4 +1,5 @@
 import { addLog } from "./game-state.js";
+import { grantGem } from "./gems.js";
 
 export function checkAchievements(state, index, eventName, payload = {}) {
   const newlyUnlocked = [];
@@ -33,7 +34,7 @@ function matchesTrigger(trigger, eventName, payload, state) {
 function applyAchievementReward(state, reward = {}) {
   if (reward.gold) state.player.gold += reward.gold;
   if (reward.unlockCardId && !state.inventory.unlockedCards.includes(reward.unlockCardId)) state.inventory.unlockedCards.push(reward.unlockCardId);
-  if (reward.unlockGemId && !state.inventory.gems.includes(reward.unlockGemId)) state.inventory.gems.push(reward.unlockGemId);
+  if (reward.unlockGemId && !state.inventory.gems.includes(reward.unlockGemId)) grantGem(state, reward.unlockGemId);
   if (reward.unlockRelicId && !state.inventory.relics.includes(reward.unlockRelicId)) state.inventory.relics.push(reward.unlockRelicId);
   if (reward.unlockArcanaId && !state.inventory.arcanas.includes(reward.unlockArcanaId)) state.inventory.arcanas.push(reward.unlockArcanaId);
   if (reward.unlockCharacterId && !state.inventory.unlockedCharacters.includes(reward.unlockCharacterId)) state.inventory.unlockedCharacters.push(reward.unlockCharacterId);

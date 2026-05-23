@@ -6,6 +6,8 @@ import { playCard, endTurn } from "../src/core/combat.js";
 import { startRun, advanceRoom } from "../src/core/progression.js";
 import { applyEventChoice, applyRewardOption } from "../src/core/rewards.js";
 import { cardCost } from "../src/core/card-effects.js";
+import { equipGemToCard, grantGem, openSocketForCard, socketCapacity } from "../src/core/gems.js";
+import { createSaveSnapshot, restoreRunState } from "../src/core/persistence.js";
 
 const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const dataDir = path.join(rootDir, "src", "data", "ko");
@@ -37,13 +39,33 @@ const state = startRun(index, {
 state.player.maxHp = 999;
 state.player.hp = 999;
 
+const firstCardId = state.deck[0];
+const firstCard = index.cards.get(firstCardId);
+const discountGem = grantGem(state, "gem_sky_discount");
+const equipResult = equipGemToCard(state, index, discountGem.instanceId, firstCardId);
+if (!equipResult.ok) throw new Error("보석 장착 검증 실패");
+if (socketCapacity(state, index, firstCardId) < 1) throw new Error("카드 소켓 검증 실패");
+if (cardCost(firstCard, state, index) > Math.max(0, firstCard.cost - 1)) throw new Error("보석 비용 감소 검증 실패");
+
+const socketTestCardId = state.deck.find((cardId) => {
+  const card = index.cards.get(cardId);
+  return socketCapacity(state, index, cardId) < card.sockets.max;
+});
+if (!socketTestCardId) throw new Error("소켓 확장 대상 검증 실패");
+const beforeSocketCapacity = socketCapacity(state, index, socketTestCardId);
+if (openSocketForCard(state, index, socketTestCardId)) throw new Error("소켓 충전 없는 확장 차단 검증 실패");
+state.status.gemWorkshopCharges = 1;
+if (!openSocketForCard(state, index, socketTestCardId)) throw new Error("소켓 확장 검증 실패");
+if (socketCapacity(state, index, socketTestCardId) !== beforeSocketCapacity + 1) throw new Error("소켓 수 증가 검증 실패");
+if ((state.status.gemWorkshopCharges || 0) !== 0) throw new Error("소켓 충전 소비 검증 실패");
+
 let safety = 0;
 while (state.phase !== "stage_clear" && state.phase !== "defeat" && safety < 240) {
   safety += 1;
   if (state.phase === "combat") {
     const playableIndex = state.hand.findIndex((cardId) => {
       const card = index.cards.get(cardId);
-      return card && cardCost(card, state) <= state.player.energy;
+      return card && cardCost(card, state, index) <= state.player.energy;
     });
     if (playableIndex >= 0) playCard(state, index, playableIndex);
     else endTurn(state, index);
@@ -75,6 +97,10 @@ if (state.inventory.unlockedCards.length <= 5) {
 if (state.inventory.achievements.length === 0) {
   throw new Error("업적 보상 연결 검증 실패");
 }
+const snapshot = createSaveSnapshot(state);
+const restored = restoreRunState(snapshot, index);
+if (!restored?.inventory?.gemBag?.length) throw new Error("저장 보석 보관함 복원 실패");
+if (!Object.keys(restored.cardSockets || {}).length) throw new Error("저장 장착 보석 복원 실패");
 
 console.log("런타임 스모크 통과");
-console.log(`phase=${state.phase}, rooms=${state.metrics.roomsCleared}, cards=${state.inventory.unlockedCards.length}, achievements=${state.inventory.achievements.length}, gold=${state.player.gold}`);
+console.log(`phase=${state.phase}, rooms=${state.metrics.roomsCleared}, cards=${state.inventory.unlockedCards.length}, gems=${state.inventory.gemBag.length}, achievements=${state.inventory.achievements.length}, gold=${state.player.gold}`);
