@@ -595,7 +595,9 @@ function renderIntentTimeline(enemy, turn) {
 function renderEnemyStatus(enemy) {
   const entries = Object.entries(enemy.status || {}).filter(([, value]) => value > 0);
   if (entries.length === 0) return "";
-  return `<div class="enemy-status">${entries.map(([key, value]) => `<span class="status-${key}">${statusLabel(key)} ${value}</span>`).join("")}</div>`;
+  return `<div class="enemy-status">${entries.map(([key, value]) => `
+    <span class="status-${key}" title="${statusDetail(key, value)}">${statusLabel(key)} ${value}${statusInlineDetail(key, value)}</span>
+  `).join("")}</div>`;
 }
 
 function combatForecast(state) {
@@ -690,6 +692,22 @@ function enemyRankLabel(rank) {
 
 function statusLabel(status) {
   return ({ mark: "표식", weak: "약화" })[status] || status;
+}
+
+function statusInlineDetail(status, value) {
+  if (status === "mark") return ` · 피해 +${markDamagePercent(value)}%`;
+  if (status === "weak") return " · 피해 감소";
+  return "";
+}
+
+function statusDetail(status, value) {
+  if (status === "mark") return `다음 피해를 ${markDamagePercent(value)}% 더 받고 표식 1을 소모합니다.`;
+  if (status === "weak") return "주는 피해가 줄어듭니다.";
+  return `${statusLabel(status)} ${value}`;
+}
+
+function markDamagePercent(value) {
+  return Math.round(Math.min(0.6, Math.max(0, value || 0) * 0.15) * 100);
 }
 
 function renderRunResult(state) {

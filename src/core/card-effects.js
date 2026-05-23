@@ -22,6 +22,7 @@ export function applyCardEffects({ card, state, index, context, effects = card.e
   }
   if (!context.repeated && !context.gemEchoed && effects === card.effects) {
     applyGemAfterCardPlayed({ card, state, index, context });
+    consumeMarkedTargets(state, context);
   }
 }
 
@@ -140,6 +141,7 @@ function applyGemAfterCardPlayed({ card, state, index, context }) {
   }
   for (const effect of gemEffectsForCard(state, index, card.id, "echo_basic_effect")) {
     const echoedEffects = createScaledGemEchoEffects(card.effects, effect.ratio);
+    context.markedEnemyInstanceIds = context.markedEnemyInstanceIds || [];
     applyCardEffects({
       card,
       state,
@@ -156,7 +158,8 @@ function repeatPreviousEffect({ state, index, context, maxCost }) {
   const card = index.cards.get(previous.id);
   if (!card) return;
   const effects = card.effects.filter((effect) => !effect.op.startsWith("repeat_") && effect.op !== "exhaust_self");
-  applyCardEffects({ card, state, index, context: { ...context, repeated: true }, effects });
+  context.markedEnemyInstanceIds = context.markedEnemyInstanceIds || [];
+  applyCardEffects({ card, state, index, context: { ...context, repeated: true, markedEnemyInstanceIds: context.markedEnemyInstanceIds }, effects });
 }
 
 function frontEnemy(state) {
@@ -175,12 +178,16 @@ function damageEnemy(enemy, amount, state, index, card, context) {
   const modifiedAmount = context?.gemEchoed ? characterAmount : modifiedDamageAmount(card, state, index, characterAmount);
   const weakAmount = state.status.playerWeak > 0 ? Math.max(1, Math.ceil(modifiedAmount * 0.75)) : modifiedAmount;
   const finalAmount = weakAmount;
-  const markBonus = enemy.status?.mark ? Math.ceil(finalAmount * 0.2) : 0;
+  const markBonus = enemy.status?.mark ? Math.ceil(finalAmount * markDamageRatio(enemy.status.mark)) : 0;
   let incoming = finalAmount + markBonus;
   const blocked = Math.min(enemy.block || 0, incoming);
   enemy.block = Math.max(0, (enemy.block || 0) - blocked);
   incoming -= blocked;
   enemy.hp = Math.max(0, enemy.hp - incoming);
+  if (markBonus > 0 && incoming > 0) {
+    context.markedEnemyInstanceIds = context.markedEnemyInstanceIds || [];
+    if (!context.markedEnemyInstanceIds.includes(enemy.instanceId)) context.markedEnemyInstanceIds.push(enemy.instanceId);
+  }
   addLog(state, `${card.name}: ${enemy.name}에게 피해 ${incoming}`);
   if (enemy.hp <= 0) {
     context.killedThisPlay = true;
@@ -208,4 +215,20 @@ function applyStatus(enemy, status, amount) {
   if (!enemy) return;
   enemy.status = enemy.status || {};
   enemy.status[status] = (enemy.status[status] || 0) + amount;
+}
+
+function markDamageRatio(stacks) {
+  return Math.min(0.6, Math.max(0, stacks || 0) * 0.15);
+}
+
+function consumeMarkedTargets(state, context) {
+  const markedIds = [...new Set(context.markedEnemyInstanceIds || [])];
+  if (markedIds.length === 0) return;
+  for (const instanceId of markedIds) {
+    const enemy = state.enemies.find((target) => target.instanceId === instanceId);
+    if (!enemy?.status?.mark) continue;
+    enemy.status.mark = Math.max(0, enemy.status.mark - 1);
+    if (enemy.status.mark === 0) delete enemy.status.mark;
+  }
+  context.markedEnemyInstanceIds = [];
 }

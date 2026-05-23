@@ -90,6 +90,27 @@ endTurn(reflectState, index);
 if (reflectState.enemies[0]?.hp >= reflectEnemyHpBefore) throw new Error("반사 피해 적용 실패");
 if ((reflectState.status.reflectRatio || 0) !== 0) throw new Error("반사 상태 턴 종료 초기화 실패");
 
+const markState = startRun(index, {
+  characterId: "char_haru",
+  stageId: "stage_sunny_gate",
+  seed: 20260527,
+  profile
+});
+markState.player.maxHp = 999;
+markState.player.hp = 999;
+markState.player.energy = 20;
+markState.hand = ["card_paper_charm", "card_sunbean_punch"];
+markState.enemies[0].hp = 100;
+markState.enemies[0].maxHp = 100;
+markState.enemies[0].block = 0;
+if (!playCard(markState, index, 0)) throw new Error("표식 카드 사용 실패");
+if ((markState.enemies[0].status.mark || 0) !== 2) throw new Error("표식 누적 실패");
+const markedHpBefore = markState.enemies[0].hp;
+if (!playCard(markState, index, 0)) throw new Error("표식 피해 카드 사용 실패");
+const markedDamage = markedHpBefore - markState.enemies[0].hp;
+if (markedDamage <= 11) throw new Error(`표식 피해 보너스 실패: ${markedDamage}`);
+if ((markState.enemies[0].status.mark || 0) !== 1) throw new Error("표식 소모 실패");
+
 const firstCardId = state.deck[0];
 const firstCard = index.cards.get(firstCardId);
 const discountGem = grantGem(state, "gem_sky_discount");

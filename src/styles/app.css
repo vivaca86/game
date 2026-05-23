@@ -932,6 +932,7 @@ h1 {
   color: #6f5a1f;
   font-size: 12px;
   font-weight: 800;
+  overflow-wrap: anywhere;
 }
 
 .enemy-status .status-mark {
