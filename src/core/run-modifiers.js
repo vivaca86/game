@@ -103,6 +103,7 @@ export function afterCardPlayedModifiers({ state, index, card, context, cost }) 
   consumeFirstExpensiveCardFree(state, index, card);
   applyCostLadderArcana(state, index, cost);
   applyColorArcana(state, index, card);
+  applyBattleRules(state, index, card);
   applyCharacterCardPassives(state, index);
 
   if (card.type === "guard") {
@@ -305,6 +306,18 @@ function applyColorArcana(state, index, card) {
       state.status.prismPathTriggeredThisTurn = true;
       addLog(state, `프리즘 산책길: 카드 ${effect.amount}장 뽑기`);
     }
+  }
+}
+
+function applyBattleRules(state, index, card) {
+  const rules = (state.battleRules || []).filter((rule) => rule.rule === "shield_on_color_play" && rule.color === card.color);
+  for (const rule of rules) {
+    const amount = rule.amount || 0;
+    if (amount <= 0) continue;
+    state.player.shield += amount;
+    state.status.battleRuleTriggers = (state.status.battleRuleTriggers || 0) + 1;
+    const sourceName = index.cards.get(rule.sourceCardId)?.name || "약속";
+    addLog(state, `${sourceName}: ${card.name} 보호막 ${amount}`);
   }
 }
 

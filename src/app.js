@@ -64,6 +64,15 @@ const gemTypeLabels = {
   power: "지속"
 };
 
+const colorLabels = {
+  coral: "산호",
+  sky: "구름",
+  mint: "민트",
+  peach: "복숭아",
+  lavender: "라벤더",
+  yellow: "아침"
+};
+
 function qs(selector) {
   return document.querySelector(selector);
 }
@@ -471,7 +480,7 @@ function renderCombat(state, index) {
   const forecast = combatForecast(state);
   return `
     <div class="combat-grid">
-      ${renderCombatForecast(state, forecast)}
+      ${renderCombatForecast(state, index, forecast)}
       <section class="enemy-row">
         ${state.enemies.map((enemy) => renderEnemyCard(enemy, state)).join("")}
       </section>
@@ -494,7 +503,7 @@ function renderCombat(state, index) {
   `;
 }
 
-function renderCombatForecast(state, forecast) {
+function renderCombatForecast(state, index, forecast) {
   return `
     <section class="combat-forecast intent-${forecast.tone}">
       <div class="forecast-main">
@@ -511,7 +520,26 @@ function renderCombatForecast(state, forecast) {
       <div class="forecast-chip-list">
         ${combatStatusChips(state, forecast).map((chip) => `<span class="forecast-chip ${chip.tone}">${chip.label}</span>`).join("")}
       </div>
+      ${renderBattleRules(state, index)}
     </section>
+  `;
+}
+
+function renderBattleRules(state, index) {
+  const rules = (state.battleRules || []).filter((rule) => rule.rule === "shield_on_color_play");
+  if (rules.length === 0) return "";
+  return `
+    <div class="battle-rule-list">
+      ${rules.map((rule) => {
+        const source = index.cards.get(rule.sourceCardId);
+        return `
+          <span class="battle-rule-chip" style="--rule-accent:${accentFor(rule.color)}">
+            <b>${source?.name || "약속"}</b>
+            <em>${colorLabels[rule.color] || rule.color} 카드 · 보호막 ${rule.amount || 0}</em>
+          </span>
+        `;
+      }).join("")}
+    </div>
   `;
 }
 
@@ -621,6 +649,8 @@ function combatStatusChips(state, forecast) {
   if (state.status.playerWeak > 0) chips.push({ label: `약화 ${state.status.playerWeak}`, tone: "danger" });
   if (state.status.damageReduction > 0) chips.push({ label: `피해 감소 ${state.status.damageReduction}`, tone: "guard" });
   if (state.status.retainShield > 0) chips.push({ label: `보호막 유지 ${state.status.retainShield}`, tone: "guard" });
+  if (state.status.reflectRatio > 0 && forecast.totalDamage > 0) chips.push({ label: `반사 ${Math.ceil(forecast.totalDamage * state.status.reflectRatio)}`, tone: "guard" });
+  if (state.status.battleRuleTriggers > 0) chips.push({ label: `약속 발동 ${state.status.battleRuleTriggers}`, tone: "guard" });
   if (state.status.nextTurnEnergyPenalty > 0) chips.push({ label: `다음 기운 -${state.status.nextTurnEnergyPenalty}`, tone: "danger" });
   return chips;
 }

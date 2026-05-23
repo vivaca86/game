@@ -31,9 +31,12 @@ export function startCombat(state, index, roomType = "combat") {
     .filter(Boolean);
   state.phase = "combat";
   state.currentRoomType = roomType;
+  state.battleRules = [];
   state.turn = 1;
   state.status.chain = 0;
   state.status.previousCard = null;
+  state.status.battleRuleTriggers = 0;
+  state.status.reflectRatio = 0;
   state.player.shield = 0;
   state.player.energy = state.player.maxEnergy;
   state.metrics.cardsPlayedThisTurn = 0;
@@ -105,6 +108,10 @@ export function endTurn(state, index) {
   state.player.hp = Math.max(0, state.player.hp - damage);
   state.status.damageTakenThisCombat = (state.status.damageTakenThisCombat || 0) + damage;
   afterPlayerDamagedModifiers(state, index, damage);
+  if (damage > 0 && state.status.reflectRatio > 0) {
+    reflectDamage(state, index, Math.ceil(damage * state.status.reflectRatio));
+  }
+  state.status.reflectRatio = 0;
   addLog(state, damage > 0 ? `피해 ${damage} 받음` : "공격을 막았습니다.");
 
   discardHandWithModifiers(state, index);
@@ -123,6 +130,10 @@ export function endTurn(state, index) {
   if (state.player.hp <= 0) {
     state.phase = "defeat";
     addLog(state, "탐험 실패");
+    return true;
+  }
+  if (state.enemies.length === 0) {
+    completeCombat(state, index);
   }
   return true;
 }
@@ -350,6 +361,31 @@ function summonEnemy(state, index, enemyId, sourceName) {
   state.enemies.push(summoned);
   addLog(state, `${sourceName}: ${summoned.name} 호출`);
   return true;
+}
+
+function reflectDamage(state, index, amount) {
+  if (amount <= 0) return;
+  const enemy = state.enemies[0];
+  if (!enemy) return;
+  let incoming = amount;
+  const blocked = Math.min(enemy.block || 0, incoming);
+  enemy.block = Math.max(0, (enemy.block || 0) - blocked);
+  incoming -= blocked;
+  if (incoming <= 0) {
+    addLog(state, `동글 거울막: ${enemy.name} 방어 흔들기`);
+    return;
+  }
+  enemy.hp = Math.max(0, enemy.hp - incoming);
+  addLog(state, `동글 거울막: ${enemy.name}에게 반사 피해 ${incoming}`);
+  if (enemy.hp > 0) return;
+  state.metrics.enemiesDefeated += 1;
+  state.metrics.defeatedEnemyCounts = state.metrics.defeatedEnemyCounts || {};
+  state.metrics.defeatedEnemyCounts[enemy.id] = (state.metrics.defeatedEnemyCounts[enemy.id] || 0) + 1;
+  if (enemy.rank === "elite") state.metrics.elitesDefeated += 1;
+  checkAchievements(state, index, "defeat_enemy", { enemyId: enemy.id });
+  checkAchievements(state, index, "defeat_enemy_count", { enemyId: enemy.id });
+  checkAchievements(state, index, "defeat_rank", { rank: enemy.rank });
+  state.enemies = state.enemies.filter((target) => target.instanceId !== enemy.instanceId);
 }
 
 function roomLabel(roomType) {

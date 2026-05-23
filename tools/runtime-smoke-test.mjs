@@ -48,6 +48,48 @@ const state = startRun(index, {
 state.player.maxHp = 999;
 state.player.hp = 999;
 
+const interactionState = startRun(index, {
+  characterId: "char_haru",
+  stageId: "stage_sunny_gate",
+  seed: 20260525,
+  profile
+});
+interactionState.player.maxHp = 999;
+interactionState.player.hp = 999;
+interactionState.player.energy = 20;
+const promiseCard = index.cards.get("card_morning_promise");
+const matchingColorCard = data.cards.find((card) => card.color === promiseCard.color && card.id !== promiseCard.id && !["curse", "temp"].includes(card.type));
+interactionState.hand = [promiseCard.id, matchingColorCard.id];
+const ruleShieldBefore = interactionState.player.shield;
+if (!playCard(interactionState, index, 0)) throw new Error("전투 규칙 카드 사용 실패");
+if (!interactionState.battleRules.some((rule) => rule.rule === "shield_on_color_play")) throw new Error("전투 규칙 등록 실패");
+if (interactionState.player.shield <= ruleShieldBefore) throw new Error("전투 규칙 즉시 발동 실패");
+const shieldAfterPromise = interactionState.player.shield;
+if (!playCard(interactionState, index, 0)) throw new Error("전투 규칙 후속 카드 사용 실패");
+if (interactionState.player.shield <= shieldAfterPromise) throw new Error("전투 규칙 후속 발동 실패");
+if ((interactionState.status.battleRuleTriggers || 0) < 2) throw new Error("전투 규칙 발동 횟수 기록 실패");
+
+const reflectState = startRun(index, {
+  characterId: "char_haru",
+  stageId: "stage_sunny_gate",
+  seed: 20260526,
+  profile
+});
+reflectState.player.maxHp = 999;
+reflectState.player.hp = 999;
+reflectState.player.energy = 20;
+reflectState.hand = ["card_round_mirror"];
+reflectState.enemies[0].hp = 120;
+reflectState.enemies[0].maxHp = 120;
+reflectState.enemies[0].block = 0;
+reflectState.enemies[0].intents = [{ type: "attack", amount: 30, label: "테스트 공격" }];
+const reflectEnemyHpBefore = reflectState.enemies[0].hp;
+if (!playCard(reflectState, index, 0)) throw new Error("반사 카드 사용 실패");
+if ((reflectState.status.reflectRatio || 0) <= 0) throw new Error("반사 상태 등록 실패");
+endTurn(reflectState, index);
+if (reflectState.enemies[0]?.hp >= reflectEnemyHpBefore) throw new Error("반사 피해 적용 실패");
+if ((reflectState.status.reflectRatio || 0) !== 0) throw new Error("반사 상태 턴 종료 초기화 실패");
+
 const firstCardId = state.deck[0];
 const firstCard = index.cards.get(firstCardId);
 const discountGem = grantGem(state, "gem_sky_discount");
