@@ -64,6 +64,8 @@ const setupRoomChips = await page.locator(".stage-room-strip .room-mini").count(
 if (setupRoomChips === 0) throw new Error("스테이지 방 구성 칩 표시 실패");
 const sampleCardArtCount = await page.locator(".sample-card .card-art-sample").count();
 if (sampleCardArtCount < 3) throw new Error("카드 샘플 일러스트 표시 실패");
+const sampleCardRoleCount = await page.locator(".sample-card .card-role-chip").count();
+if (sampleCardRoleCount < 3) throw new Error("카드 샘플 역할 칩 표시 실패");
 await page.waitForSelector(".setup-preview", { timeout: 10000 });
 await page.waitForSelector(".character-portrait", { timeout: 10000 });
 await page.waitForSelector(".stage-key-art", { timeout: 10000 });
@@ -86,7 +88,7 @@ if (moruEnabled > 0) {
 }
 
 async function assertNoCodexOverflow(label) {
-  const overflowItems = await page.locator(".codex-entry, .codex-copy, .card-art-codex, .codex-entry > .gem-icon, .codex-entry > .item-icon, .codex-portrait-slot, .codex-stage .stage-key-art, .codex-enemy .monster-portrait").evaluateAll((elements) => elements
+  const overflowItems = await page.locator(".codex-entry, .codex-copy, .card-art-codex, .card-role-chip, .codex-entry > .gem-icon, .codex-entry > .item-icon, .codex-portrait-slot, .codex-stage .stage-key-art, .codex-enemy .monster-portrait").evaluateAll((elements) => elements
     .filter((element) => element.scrollWidth > element.clientWidth + 2 || element.scrollHeight > element.clientHeight + 2)
     .map((element) => element.className));
   if (overflowItems.length > 0) {
@@ -106,6 +108,8 @@ async function assertCodexVisual(kind, visualSelector, expectedMin, label) {
 await page.waitForSelector(".codex-panel", { timeout: 10000 });
 await page.selectOption("#codexStatusSelect", "all");
 await assertCodexVisual("cards", ".codex-kind-cards .card-art-codex", 100, "카드");
+const codexCardRoleCount = await page.locator(".codex-kind-cards .card-role-chip").count();
+if (codexCardRoleCount < 100) throw new Error("카드 도감 역할 칩 표시 실패");
 await page.screenshot({ path: "tmp/codex-panel-desktop.png", fullPage: true });
 await assertCodexVisual("gems", '.codex-kind-gems .gem-icon[class*="gem-rarity-"]', 50, "보석");
 await assertCodexVisual("relics", ".codex-kind-relics .item-icon-relic", 16, "유물");
@@ -280,11 +284,13 @@ if (routeOverflowItems.length > 0) {
 await page.screenshot({ path: "tmp/stage-route-desktop.png", fullPage: true });
 await page.waitForSelector(".play-card", { timeout: 10000 });
 await page.waitForSelector(".play-card .card-art-hand", { timeout: 10000 });
+await page.waitForSelector(".play-card .card-role-chip", { timeout: 10000 });
+await page.waitForSelector(".play-card .card-art-role-mark", { timeout: 10000 });
 await page.waitForSelector(".arcana-chip", { timeout: 10000 });
 const enemyText = await page.textContent(".enemy-card");
 if (!enemyText?.includes("이번") || !enemyText.includes("형")) throw new Error("적 역할/의도 표시 실패");
 if (!enemyText.includes("역할") || !enemyText.includes("패턴") || !enemyText.includes("위협")) throw new Error("몬스터 역할/패턴 칩 표시 실패");
-const combatOverflowItems = await page.locator(".combat-forecast, .combat-status-card, .status-card-copy, .enemy-pattern-chip, .enemy-status-chip, .disruption-control, .enemy-card, .intent-card, .intent-node, .monster-portrait, .play-card, .card-art, .card-cue-chip, .hand-gem-chip, .card-preview-chip").evaluateAll((elements) => elements
+const combatOverflowItems = await page.locator(".combat-forecast, .combat-status-card, .status-card-copy, .enemy-pattern-chip, .enemy-status-chip, .disruption-control, .enemy-card, .intent-card, .intent-node, .monster-portrait, .play-card, .card-art, .card-role-chip, .card-art-role-mark, .card-cue-chip, .hand-gem-chip, .card-preview-chip").evaluateAll((elements) => elements
   .filter((element) => element.scrollWidth > element.clientWidth + 2 || element.scrollHeight > element.clientHeight + 2)
   .map((element) => element.className));
 if (combatOverflowItems.length > 0) {

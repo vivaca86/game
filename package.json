@@ -10,9 +10,10 @@
     "data:generate:cards": "node tools/generate-full-card-data.mjs",
     "data:generate:content": "node tools/generate-full-content-data.mjs",
     "data:validate": "node tools/validate-data.mjs",
+    "cards:audit": "node tools/card-balance-audit.mjs",
     "runtime:smoke": "node tools/runtime-smoke-test.mjs",
     "balance:simulate": "node tools/balance-simulation.mjs",
     "browser:smoke": "node tools/browser-smoke-test.mjs",
-    "check": "node tools/validate-data.mjs && node tools/runtime-smoke-test.mjs && node tools/build-static.mjs"
+    "check": "node tools/validate-data.mjs && node tools/card-balance-audit.mjs && node tools/runtime-smoke-test.mjs && node tools/build-static.mjs"
   }
 }

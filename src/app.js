@@ -3,6 +3,7 @@ import { cleanseDisruption, disruptionCleanseCost, intentDetail, nextIntent, pla
 import { advanceRoom, startRun } from "./core/progression.js";
 import { applyEventChoice, applyRewardOption, rerollReward } from "./core/rewards.js";
 import { cardCost } from "./core/card-effects.js";
+import { cardRoleSummary } from "./core/card-roles.js";
 import {
   canEquipGemToCard,
   ensureGemState,
@@ -120,6 +121,7 @@ function renderCards(cards) {
         </div>
       </div>
       ${renderCardArt(card, "sample")}
+      ${renderCardRoleChip(card)}
       <p>${card.text}</p>
       <div class="tag-row">
         ${card.tags.map((tag) => `<span>${tag}</span>`).join("")}
@@ -492,6 +494,7 @@ function renderCodexCard(card, entryClass, stateBadge) {
       <div class="codex-copy">
         <span><b>${stateBadge}</b> · ${typeLabels[card.type] || card.type} · ${rarityLabels[card.rarity] || card.rarity} · 비용 ${card.cost}</span>
         <strong>${card.name}</strong>
+        ${renderCardRoleChip(card)}
         <p>${card.text}</p>
         <div class="tag-row">${(card.tags || []).map((tag) => `<span>${tag}</span>`).join("")}</div>
       </div>
@@ -1128,6 +1131,7 @@ function renderHandCard(card, handIndex, state, index) {
       <strong>${card.name}</strong>
       <small>${typeLabels[card.type] || card.type}</small>
       ${renderCardArt(card, "hand")}
+      ${renderCardRoleChip(card)}
       <p>${card.text}</p>
       ${renderCardPlayCue(card, state, cost, canPlay, previews, equippedGems)}
       ${renderHandGemEffects(equippedGems, card, state, index, cost)}
@@ -1135,6 +1139,16 @@ function renderHandCard(card, handIndex, state, index) {
         ${previews.map(renderCardPreviewChip).join("") || `<span class="card-preview-chip preview-note"><b>효</b><em>특수 효과</em></span>`}
       </span>
     </button>
+  `;
+}
+
+function renderCardRoleChip(card) {
+  const role = cardRoleSummary(card);
+  return `
+    <span class="card-role-chip card-role-${role.tone}" title="${role.label}">
+      <b>${role.icon}</b>
+      <em>${role.label}</em>
+    </span>
   `;
 }
 
@@ -2734,13 +2748,15 @@ function renderCardArt(card, variant = "sample") {
   const subject = card.illustration?.subject || card.name;
   const mood = card.illustration?.mood || "";
   const motif = cardArtMotif(card);
+  const role = cardRoleSummary(card);
   return `
-    <span class="card-art card-art-${variant} motif-${motif} card-art-type-${card.type}" style="--card-accent:${accentFor(card.color)}" aria-label="${escapeHtml(subject)}">
+    <span class="card-art card-art-${variant} motif-${motif} card-art-type-${card.type} card-role-key-${role.key}" style="--card-accent:${accentFor(card.color)}" aria-label="${escapeHtml(subject)}">
       <span class="card-art-glow"></span>
       <span class="card-art-shape main"></span>
       <span class="card-art-shape aux"></span>
       <span class="card-art-shape trail-one"></span>
       <span class="card-art-shape trail-two"></span>
+      <span class="card-art-role-mark">${role.icon}</span>
       <span class="card-art-label">
         <strong>${escapeHtml(shortCardSubject(subject))}</strong>
         ${mood ? `<small>${escapeHtml(mood)}</small>` : ""}

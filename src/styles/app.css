@@ -236,6 +236,48 @@ h1 {
   color: #6b5ca8;
 }
 
+.card-role-chip {
+  display: inline-grid;
+  grid-template-columns: 22px minmax(0, auto);
+  gap: 5px;
+  align-items: center;
+  justify-self: start;
+  max-width: 100%;
+  padding: 5px 8px 5px 5px;
+  border: 1px solid rgba(76, 79, 112, 0.08);
+  border-radius: 8px;
+  background: #ffffff;
+  color: #4f536d;
+  font-size: 11px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.card-role-chip b {
+  display: inline-grid;
+  width: 22px;
+  height: 22px;
+  place-items: center;
+  border-radius: 7px;
+  color: #ffffff;
+  font-size: 11px;
+}
+
+.card-role-chip em {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-style: normal;
+}
+
+.card-role-damage b { background: #ff7f8f; }
+.card-role-guard b { background: #55bdd5; }
+.card-role-flow b { background: #7b72d9; }
+.card-role-status b { background: #ef7aaf; }
+.card-role-reward b { background: #e8aa2e; }
+.card-role-heal b { background: #64c987; }
+.card-role-danger b { background: #9c678f; }
+.card-role-note b { background: #8b91a8; }
+
 .stage-list {
   display: grid;
   gap: 12px;
@@ -1066,7 +1108,7 @@ h1 {
 
 .codex-card {
   grid-template-columns: 106px minmax(0, 1fr);
-  min-height: 156px;
+  min-height: 184px;
 }
 
 .codex-build {
@@ -1138,6 +1180,17 @@ h1 {
 
 .codex-card .tag-row span {
   padding: 4px 6px;
+  font-size: 10px;
+}
+
+.codex-card .card-role-chip {
+  padding: 4px 7px 4px 4px;
+  font-size: 10px;
+}
+
+.codex-card .card-role-chip b {
+  width: 20px;
+  height: 20px;
   font-size: 10px;
 }
 
@@ -3413,6 +3466,23 @@ h1 {
   line-height: 1.2;
   text-align: center;
   backdrop-filter: blur(3px);
+}
+
+.card-art-role-mark {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  border: 2px solid rgba(255, 255, 255, 0.9);
+  border-radius: 9px;
+  background: color-mix(in srgb, var(--card-accent, #7cccf7) 70%, #ffffff);
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 1000;
+  box-shadow: 0 6px 14px rgba(76, 70, 116, 0.16);
 }
 
 .card-art-label strong,
