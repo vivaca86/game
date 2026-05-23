@@ -294,7 +294,7 @@
     "bossEnemyId": "boss_moon_attic",
     "rooms": [
       "combat",
-      "event",
+      "rest",
       "combat",
       "shop",
       "elite",
