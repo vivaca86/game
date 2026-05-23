@@ -211,6 +211,8 @@ await page.waitForSelector(".combat-status-card.status-card-mark", { timeout: 10
 await page.waitForSelector(".combat-status-card.status-card-weak", { timeout: 10000 });
 await page.waitForSelector(".combat-status-card.status-card-reflect", { timeout: 10000 });
 await page.waitForSelector(".combat-status-card .status-card-meter b", { timeout: 10000 });
+await page.waitForSelector(".turn-outcome-panel", { timeout: 10000 });
+await page.waitForSelector(".turn-outcome-card", { timeout: 10000 });
 await page.waitForSelector(".enemy-pattern-row", { timeout: 10000 });
 await page.waitForSelector(".enemy-pattern-chip", { timeout: 10000 });
 await page.waitForSelector(".enemy-status-chip.status-mark", { timeout: 10000 });
@@ -275,6 +277,9 @@ if (!combatForecastText?.includes("이번 턴 예고") || (!combatForecastText.i
 if (!combatForecastText.includes("상태판") || !combatForecastText.includes("표식") || !combatForecastText.includes("반사")) {
   throw new Error("전투 상태판 핵심 상태 표시 실패");
 }
+if (!combatForecastText.includes("턴 종료 예측") || !combatForecastText.includes("체력") || !combatForecastText.includes("다음 기운") || !combatForecastText.includes("연쇄")) {
+  throw new Error("턴 종료 예측 패널 표시 실패");
+}
 const handText = await page.textContent(".hand-row");
 if (!handText?.includes("사용 가능") || !handText.includes("기운 1 부족") || !handText.includes("약화 반영") || !handText.includes("처치 드로우")) {
   throw new Error("손패 카드 효과 미리보기 표시 실패");
@@ -306,13 +311,14 @@ await page.waitForSelector(".arcana-chip", { timeout: 10000 });
 const enemyText = await page.textContent(".enemy-card");
 if (!enemyText?.includes("이번") || !enemyText.includes("형")) throw new Error("적 역할/의도 표시 실패");
 if (!enemyText.includes("역할") || !enemyText.includes("패턴") || !enemyText.includes("위협")) throw new Error("몬스터 역할/패턴 칩 표시 실패");
-const combatOverflowItems = await page.locator(".combat-forecast, .combat-status-card, .status-card-copy, .enemy-pattern-chip, .enemy-status-chip, .disruption-control, .enemy-card, .intent-card, .intent-node, .monster-portrait, .play-card, .card-art, .card-role-chip, .card-art-role-mark, .card-cue-chip, .hand-gem-chip, .card-preview-chip").evaluateAll((elements) => elements
+const combatOverflowItems = await page.locator(".combat-forecast, .turn-outcome-panel, .turn-outcome-card, .combat-status-card, .status-card-copy, .enemy-pattern-chip, .enemy-status-chip, .disruption-control, .enemy-card, .intent-card, .intent-node, .monster-portrait, .play-card, .card-art, .card-role-chip, .card-art-role-mark, .card-cue-chip, .hand-gem-chip, .card-preview-chip").evaluateAll((elements) => elements
   .filter((element) => element.scrollWidth > element.clientWidth + 2 || element.scrollHeight > element.clientHeight + 2)
   .map((element) => element.className));
 if (combatOverflowItems.length > 0) {
   throw new Error(`전투 UI 넘침: ${combatOverflowItems.slice(0, 4).join(" | ")}`);
 }
 await page.locator(".enemy-row").screenshot({ path: "tmp/enemy-pattern-cards-desktop.png" });
+await page.locator(".turn-outcome-panel").screenshot({ path: "tmp/turn-outcome-panel-desktop.png" });
 await page.locator(".hand-row").screenshot({ path: "tmp/card-use-cue-desktop.png" });
 await page.locator(".hand-row").screenshot({ path: "tmp/hand-gem-effects-desktop.png" });
 await page.screenshot({ path: "tmp/combat-ui-desktop.png", fullPage: true });
@@ -331,13 +337,14 @@ if (deckMobileOverflow.length > 0) {
 await page.locator(".deck-overview").screenshot({ path: "tmp/deck-overview-mobile.png" });
 const combatStatusMobileColumns = await page.locator(".combat-status-board").evaluate((element) => getComputedStyle(element).gridTemplateColumns.split(" ").length);
 if (combatStatusMobileColumns !== 1) throw new Error("모바일 전투 상태판 1열 반응형 확인 실패");
-const combatStatusMobileOverflow = await page.locator(".current-room-panel, .current-room-core, .current-room-chip, .combat-status-card, .status-card-copy, .enemy-pattern-chip, .enemy-status-chip, .card-cue-chip, .hand-gem-chip, .card-preview-chip").evaluateAll((elements) => elements
+const combatStatusMobileOverflow = await page.locator(".current-room-panel, .current-room-core, .current-room-chip, .turn-outcome-panel, .turn-outcome-card, .combat-status-card, .status-card-copy, .enemy-pattern-chip, .enemy-status-chip, .card-cue-chip, .hand-gem-chip, .card-preview-chip").evaluateAll((elements) => elements
   .filter((element) => element.scrollWidth > element.clientWidth + 2 || element.scrollHeight > element.clientHeight + 2)
   .map((element) => element.className));
 if (combatStatusMobileOverflow.length > 0) {
   throw new Error(`모바일 전투 상태판 넘침: ${combatStatusMobileOverflow.slice(0, 4).join(" | ")}`);
 }
 await page.locator(".current-room-panel").screenshot({ path: "tmp/current-room-panel-mobile.png" });
+await page.locator(".turn-outcome-panel").screenshot({ path: "tmp/turn-outcome-panel-mobile.png" });
 await page.locator(".enemy-row").screenshot({ path: "tmp/enemy-pattern-cards-mobile.png" });
 await page.locator(".hand-row").screenshot({ path: "tmp/card-use-cue-mobile.png" });
 await page.locator(".hand-row").screenshot({ path: "tmp/hand-gem-effects-mobile.png" });

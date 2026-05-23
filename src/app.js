@@ -22,7 +22,7 @@ import {
   unequipGem,
   unequippedGemInstances
 } from "./core/gems.js";
-import { adjustedRewardCost, ensureModifierState, grantArcana, grantRelic, modifiedCharacterDamageAmount } from "./core/run-modifiers.js";
+import { adjustedRewardCost, ensureModifierState, grantArcana, grantRelic, modifiedCharacterDamageAmount, nextTurnShieldWithModifiers } from "./core/run-modifiers.js";
 import { bossPhaseBlock } from "./core/balance.js";
 import { clearSavedRun, hasSavedRun, loadSavedRun, saveRun } from "./core/persistence.js";
 import {
@@ -1493,10 +1493,113 @@ function renderCombatForecast(state, index, forecast) {
       <div class="forecast-chip-list">
         ${combatStatusChips(state, index, forecast).map((chip) => `<span class="forecast-chip ${chip.tone}">${chip.label}</span>`).join("")}
       </div>
+      ${renderTurnOutcomePanel(state, index, forecast)}
       ${renderCombatStatusBoard(state, index, forecast)}
       ${renderBattleRules(state, index)}
     </section>
   `;
+}
+
+function renderTurnOutcomePanel(state, index, forecast) {
+  const outcome = turnOutcomeSummary(state, index, forecast);
+  return `
+    <div class="turn-outcome-panel outcome-${outcome.tone}" aria-label="턴 종료 예측">
+      <div class="turn-outcome-head">
+        <span>턴 종료 예측</span>
+        <strong>${outcome.title}</strong>
+        <em>${outcome.detail}</em>
+      </div>
+      <div class="turn-outcome-grid">
+        ${outcome.items.map((item) => `
+          <span class="turn-outcome-card outcome-card-${item.tone}">
+            <b>${item.icon}</b>
+            <span>
+              <em>${item.label}</em>
+              <strong>${escapeHtml(item.before)} → ${escapeHtml(item.after)}</strong>
+              <small>${item.note}</small>
+            </span>
+          </span>
+        `).join("")}
+      </div>
+    </div>
+  `;
+}
+
+function turnOutcomeSummary(state, index, forecast) {
+  const projected = forecast.projected || {};
+  const hpAfter = Math.max(0, state.player.hp - forecast.totalDamage);
+  const hpRatioAfter = hpAfter / Math.max(1, state.player.maxHp);
+  const remainingShield = Math.max(0, state.player.shield - forecast.blocked);
+  const nextShield = nextTurnShieldWithModifiers(state, index, remainingShield, state.status.retainShield || 0);
+  const nextEnergyPenalty = projected.energyPenalty || 0;
+  const nextEnergy = Math.max(1, state.player.maxEnergy - nextEnergyPenalty);
+  const chainBefore = state.status.chain || 0;
+  const chainAfterIntent = Math.max(0, chainBefore - (projected.chainLoss || 0));
+  const chainPreserved = Boolean(state.status.preserveNextChain || (state.status.relicChainPreserveCharges || 0) > 0);
+  const chainAfter = chainPreserved ? chainAfterIntent : 0;
+  const pressureCount = [
+    forecast.totalDamage > 0,
+    forecast.piercingDamage > 0,
+    projected.tempCards > 0,
+    projected.markGain > 0,
+    projected.weakGain > 0,
+    projected.chainLoss > 0,
+    projected.nextCardCostIncrease > 0,
+    projected.summonCount > 0
+  ].filter(Boolean).length;
+  const tone = hpAfter <= 0 ? "danger" : hpRatioAfter <= 0.35 || pressureCount >= 3 ? "strain" : forecast.totalDamage > 0 || pressureCount > 0 ? "watch" : "safe";
+  const title = {
+    danger: "위험한 턴",
+    strain: "주의 필요",
+    watch: "대응 가능",
+    safe: "안전한 턴"
+  }[tone];
+  const detailParts = [
+    forecast.totalDamage > 0 ? `체력 -${forecast.totalDamage}` : "체력 피해 없음",
+    forecast.blocked > 0 ? `보호막 ${forecast.blocked} 차단` : null,
+    forecast.piercingDamage > 0 ? `관통 ${forecast.piercingDamage}` : null,
+    projected.nextCardCostIncrease > 0 ? `다음 비용 +${projected.nextCardCostIncrease}` : null,
+    projected.tempCards > 0 ? `방해 ${projected.tempCards}장` : null
+  ].filter(Boolean);
+  return {
+    tone,
+    title,
+    detail: detailParts.join(" · "),
+    items: [
+      {
+        tone: hpAfter <= 0 || hpRatioAfter <= 0.35 ? "danger" : forecast.totalDamage > 0 ? "health" : "safe",
+        icon: "체",
+        label: "체력",
+        before: state.player.hp,
+        after: hpAfter,
+        note: forecast.markBonus > 0 ? `표식 +${forecast.markBonus}` : "피해 반영"
+      },
+      {
+        tone: forecast.blocked > 0 || nextShield > 0 ? "guard" : "note",
+        icon: "막",
+        label: "보호막",
+        before: state.player.shield,
+        after: nextShield,
+        note: forecast.blocked > 0 ? `${forecast.blocked} 차단` : "보존 없음"
+      },
+      {
+        tone: nextEnergyPenalty > 0 ? "danger" : "flow",
+        icon: "기",
+        label: "다음 기운",
+        before: `${state.player.energy}/${state.player.maxEnergy}`,
+        after: `${nextEnergy}/${state.player.maxEnergy}`,
+        note: nextEnergyPenalty > 0 ? `기운 -${nextEnergyPenalty}` : "정상 회복"
+      },
+      {
+        tone: projected.chainLoss > 0 || (!chainPreserved && chainBefore > 0) ? "danger" : chainBefore > 0 ? "flow" : "note",
+        icon: "연",
+        label: "연쇄",
+        before: chainBefore,
+        after: chainAfter,
+        note: projected.chainLoss > 0 ? `방해 -${projected.chainLoss}` : chainPreserved ? "보존" : "턴 종료 초기화"
+      }
+    ]
+  };
 }
 
 function renderCombatStatusBoard(state, index, forecast) {
@@ -1868,21 +1971,56 @@ function renderEnemyStatus(enemy) {
 function combatForecast(state) {
   const incoming = { normalDamage: 0, piercingDamage: 0 };
   const effects = [];
+  const projected = {
+    energyPenalty: state.status.nextTurnEnergyPenalty || 0,
+    chainLoss: 0,
+    nextCardCostIncrease: state.status.nextCardCostIncrease || 0,
+    tempCards: 0,
+    markGain: 0,
+    weakGain: 0,
+    summonCount: 0,
+    enemyGuard: 0,
+    enemyHeal: 0
+  };
   state.enemies.forEach((enemy) => {
     const intent = nextIntent(enemy, state.turn);
     if (!intent) return;
     if (intent.type === "attack") incoming.normalDamage += intent.amount || 0;
     if (intent.effect === "pierce_attack") incoming.piercingDamage += intent.amount || 0;
-    if (intent.type === "guard") effects.push(`${enemy.name} 방어 ${intent.amount || 0}`);
-    if (intent.type === "debuff") effects.push(`${statusLabel(intent.status)} ${intent.amount || 1}`);
-    if (intent.effect === "fortify_all") effects.push(`전체 방어 ${intent.amount || 0}`);
-    if (intent.effect === "heal_self") effects.push(`회복 ${intent.amount || 0}`);
-    if (intent.effect === "add_temp_card") effects.push(`방해 카드 ${intent.amount || 1}장`);
-    if (intent.effect === "reduce_energy") effects.push(`다음 턴 기운 -${intent.amount || 1}`);
+    if (intent.type === "guard") {
+      projected.enemyGuard += intent.amount || 0;
+      effects.push(`${enemy.name} 방어 ${intent.amount || 0}`);
+    }
+    if (intent.type === "debuff") {
+      if (intent.status === "mark") projected.markGain += intent.amount || 1;
+      if (intent.status === "weak") projected.weakGain += intent.amount || 1;
+      effects.push(`${statusLabel(intent.status)} ${intent.amount || 1}`);
+    }
+    if (intent.effect === "fortify_all") {
+      projected.enemyGuard += intent.amount || 0;
+      effects.push(`전체 방어 ${intent.amount || 0}`);
+    }
+    if (intent.effect === "heal_self") {
+      projected.enemyHeal += intent.amount || 0;
+      effects.push(`회복 ${intent.amount || 0}`);
+    }
+    if (intent.effect === "add_temp_card") {
+      projected.tempCards += intent.amount || 1;
+      effects.push(`방해 카드 ${intent.amount || 1}장`);
+    }
+    if (intent.effect === "reduce_energy") {
+      projected.energyPenalty = Math.max(projected.energyPenalty, intent.amount || 1);
+      effects.push(`다음 턴 기운 -${intent.amount || 1}`);
+    }
     if (intent.effect === "chain_down") {
+      projected.chainLoss += intent.amount || 1;
+      if (intent.costIncrease) projected.nextCardCostIncrease = Math.max(projected.nextCardCostIncrease, intent.costIncrease);
       effects.push(intent.costIncrease ? `연쇄 -${intent.amount || 1}, 다음 비용 +${intent.costIncrease}` : `연쇄 -${intent.amount || 1}`);
     }
-    if (intent.effect === "summon") effects.push("친구 호출");
+    if (intent.effect === "summon") {
+      projected.summonCount += 1;
+      effects.push("친구 호출");
+    }
   });
   const markBonus = state.status.playerMarked > 0 ? Math.ceil(incoming.normalDamage * Math.min(0.5, state.status.playerMarked * 0.15)) : 0;
   const reduced = Math.max(0, incoming.normalDamage + markBonus - (state.status.damageReduction || 0));
@@ -1901,6 +2039,7 @@ function combatForecast(state) {
     blocked,
     totalDamage,
     effects,
+    projected,
     tone: totalDamage > 0 ? "attack" : effects.length > 0 ? "trick" : "guard",
     detail: [...damageParts, ...effects].join(" · ") || "적이 공격 대신 정비합니다."
   };
@@ -1923,8 +2062,10 @@ function combatStatusChips(state, index, forecast) {
   const disruptionCount = state.hand.filter((cardId) => ["curse", "temp"].includes(index.cards.get(cardId)?.type)).length;
   if (disruptionCount > 0) chips.push({ label: `방해 ${disruptionCount}`, tone: "danger" });
   if (state.status.disruptionsCleared > 0) chips.push({ label: `정리 ${state.status.disruptionsCleared}`, tone: "guard" });
-  if (state.status.nextTurnEnergyPenalty > 0) chips.push({ label: `다음 기운 -${state.status.nextTurnEnergyPenalty}`, tone: "danger" });
-  if (state.status.nextCardCostIncrease > 0) chips.push({ label: `다음 비용 +${state.status.nextCardCostIncrease}`, tone: "danger" });
+  if ((forecast.projected?.energyPenalty || 0) > 0) chips.push({ label: `다음 기운 -${forecast.projected.energyPenalty}`, tone: "danger" });
+  if ((forecast.projected?.nextCardCostIncrease || 0) > 0) chips.push({ label: `다음 비용 +${forecast.projected.nextCardCostIncrease}`, tone: "danger" });
+  if ((forecast.projected?.chainLoss || 0) > 0) chips.push({ label: `연쇄 방해 -${forecast.projected.chainLoss}`, tone: "danger" });
+  if ((forecast.projected?.tempCards || 0) > 0) chips.push({ label: `방해 카드 +${forecast.projected.tempCards}`, tone: "danger" });
   return chips;
 }
 
