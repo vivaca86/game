@@ -512,6 +512,8 @@ await page.waitForSelector(".market-box .choice-cost", { timeout: 10000 });
 await page.waitForSelector(".market-box .choice-impact-chip", { timeout: 10000 });
 await page.waitForSelector(".market-box .reward-fit-panel", { timeout: 10000 });
 await page.waitForSelector(".market-box .reward-fit-chip", { timeout: 10000 });
+await page.waitForSelector(".market-box .selection-flow-rail", { timeout: 10000 });
+await page.waitForSelector(".market-box .selection-flow-step", { timeout: 10000 });
 await page.waitForSelector(".market-box .reward-preview-card", { timeout: 10000 });
 const rewardCardCount = await page.locator(".market-box .reward-kind-card").count();
 const rewardCardArtCount = await page.locator(".market-box .reward-kind-card .card-art-preview").count();
@@ -532,8 +534,12 @@ if (marketImpactChipCount < 3) throw new Error("상점/보상 선택지 효과 �
 const rewardFitPanelCount = await page.locator(".market-box .reward-fit-panel").count();
 const rewardFitChipCount = await page.locator(".market-box .reward-fit-chip").count();
 if (rewardFitPanelCount < 3 || rewardFitChipCount < 6) throw new Error("상점/보상 추천 신호 칩 부족");
+const marketFlowRailCount = await page.locator(".market-box .selection-flow-rail").count();
+const marketFlowStepCount = await page.locator(".market-box .selection-flow-step").count();
+if (marketFlowRailCount < 3 || marketFlowStepCount < 9) throw new Error("상점/보상 선택 결과 흐름 레일 부족");
+if (!marketText.includes("획득") || !marketText.includes("반영")) throw new Error("상점/보상 선택 결과 흐름 문구 표시 실패");
 
-const overflowItems = await page.locator(".market-box, .market-choice, .choice-impact-chip, .reward-fit-panel, .reward-fit-chip, .reward-preview-card, .choice-wallet, .card-art-preview, .build-role-chip, .build-fit-list").evaluateAll((elements) => elements
+const overflowItems = await page.locator(".market-box, .market-choice, .choice-impact-chip, .selection-flow-rail, .selection-flow-step, .reward-fit-panel, .reward-fit-chip, .reward-preview-card, .choice-wallet, .card-art-preview, .build-role-chip, .build-fit-list").evaluateAll((elements) => elements
   .filter((element) => element.scrollWidth > element.clientWidth + 2 || element.scrollHeight > element.clientHeight + 2)
   .map((element) => element.className));
 if (overflowItems.length > 0) {
@@ -541,6 +547,7 @@ if (overflowItems.length > 0) {
 }
 
 await page.locator(".market-choice").first().screenshot({ path: "tmp/choice-impact-market-card.png" });
+await page.locator(".market-choice .selection-flow-rail").first().screenshot({ path: "tmp/choice-flow-market-rail.png" });
 await page.screenshot({ path: "tmp/market-ui-desktop.png", fullPage: true });
 await page.setViewportSize({ width: 390, height: 820 });
 await page.waitForTimeout(120);
@@ -548,12 +555,13 @@ const mobileColumns = await page.locator(".market-list").evaluate((element) => g
 if (mobileColumns !== 1) throw new Error("모바일 상점/보상 선택지 1열 반응형 확인 실패");
 const mobileRouteColumns = await page.locator(".route-node-list").evaluate((element) => getComputedStyle(element).gridTemplateColumns.split(" ").length);
 if (mobileRouteColumns !== 2) throw new Error("모바일 스테이지 경로 2열 반응형 확인 실패");
-const mobileMarketOverflow = await page.locator(".market-box, .market-choice, .choice-impact-chip, .reward-fit-panel, .reward-fit-chip, .reward-preview-card, .choice-wallet, .card-art-preview, .build-role-chip, .build-fit-list").evaluateAll((elements) => elements
+const mobileMarketOverflow = await page.locator(".market-box, .market-choice, .choice-impact-chip, .selection-flow-rail, .selection-flow-step, .reward-fit-panel, .reward-fit-chip, .reward-preview-card, .choice-wallet, .card-art-preview, .build-role-chip, .build-fit-list").evaluateAll((elements) => elements
   .filter((element) => element.scrollWidth > element.clientWidth + 2 || element.scrollHeight > element.clientHeight + 2)
   .map((element) => element.className));
 if (mobileMarketOverflow.length > 0) {
   throw new Error(`모바일 상점/이벤트/보상 UI 넘침: ${mobileMarketOverflow.slice(0, 4).join(" | ")}`);
 }
+await page.locator(".market-choice .selection-flow-rail").first().screenshot({ path: "tmp/choice-flow-market-rail-mobile.png" });
 await page.screenshot({ path: "tmp/market-ui-mobile.png", fullPage: true });
 
 await page.setViewportSize({ width: 1366, height: 900 });
@@ -658,6 +666,8 @@ await page.waitForSelector(".choice-reward-icon", { timeout: 10000 });
 await page.waitForSelector(".event-choice .choice-impact-chip", { timeout: 10000 });
 await page.waitForSelector(".event-choice .event-role-chip", { timeout: 10000 });
 await page.waitForSelector(".event-choice .event-risk-chip", { timeout: 10000 });
+await page.waitForSelector(".event-choice .selection-flow-rail", { timeout: 10000 });
+await page.waitForSelector(".event-choice .selection-flow-step", { timeout: 10000 });
 await page.waitForSelector(".event-summary-row .event-risk-chip", { timeout: 10000 });
 await page.waitForSelector(".event-choice .reward-preview-card", { timeout: 10000 });
 const eventText = await page.textContent(".event-box");
@@ -670,24 +680,30 @@ if (eventImpactChipCount < eventChoiceCount) throw new Error("이벤트 선택�
 const eventRoleChipCount = await page.locator(".event-choice .event-role-chip").count();
 const eventRiskChipCount = await page.locator(".event-choice .event-risk-chip").count();
 if (eventRoleChipCount < eventChoiceCount || eventRiskChipCount < eventChoiceCount) throw new Error("이벤트 선택지 역할/위험 칩 부족");
-const eventOverflowItems = await page.locator(".event-box, .event-head, .event-visual-card, .event-choice, .event-role-chip, .event-risk-chip, .event-choice-count-chip, .choice-reward-icon, .choice-impact-chip, .reward-preview-card, .build-role-chip, .build-fit-list").evaluateAll((elements) => elements
+const eventFlowRailCount = await page.locator(".event-choice .selection-flow-rail").count();
+const eventFlowStepCount = await page.locator(".event-choice .selection-flow-step").count();
+if (eventFlowRailCount < eventChoiceCount || eventFlowStepCount < eventChoiceCount * 3) throw new Error("이벤트 선택 결과 흐름 레일 부족");
+if (!eventText.includes("선택") || !eventText.includes("결과")) throw new Error("이벤트 선택 결과 흐름 문구 표시 실패");
+const eventOverflowItems = await page.locator(".event-box, .event-head, .event-visual-card, .event-choice, .event-role-chip, .event-risk-chip, .event-choice-count-chip, .choice-reward-icon, .choice-impact-chip, .selection-flow-rail, .selection-flow-step, .reward-preview-card, .build-role-chip, .build-fit-list").evaluateAll((elements) => elements
   .filter((element) => element.scrollWidth > element.clientWidth + 2 || element.scrollHeight > element.clientHeight + 2)
   .map((element) => element.className));
 if (eventOverflowItems.length > 0) {
   throw new Error(`이벤트 UI 넘침: ${eventOverflowItems.slice(0, 4).join(" | ")}`);
 }
 await page.locator(".event-choice").first().screenshot({ path: "tmp/choice-impact-event-card.png" });
+await page.locator(".event-choice .selection-flow-rail").first().screenshot({ path: "tmp/choice-flow-event-rail.png" });
 await page.screenshot({ path: "tmp/event-ui-desktop.png", fullPage: true });
 await page.setViewportSize({ width: 390, height: 820 });
 await page.waitForTimeout(120);
 const eventMobileColumns = await page.locator(".market-list").evaluate((element) => getComputedStyle(element).gridTemplateColumns.split(" ").length);
 if (eventMobileColumns !== 1) throw new Error("모바일 이벤트 선택지 1열 반응형 확인 실패");
-const eventMobileOverflowItems = await page.locator(".event-box, .event-head, .event-visual-card, .event-choice, .event-role-chip, .event-risk-chip, .event-choice-count-chip, .choice-reward-icon, .choice-impact-chip, .reward-preview-card").evaluateAll((elements) => elements
+const eventMobileOverflowItems = await page.locator(".event-box, .event-head, .event-visual-card, .event-choice, .event-role-chip, .event-risk-chip, .event-choice-count-chip, .choice-reward-icon, .choice-impact-chip, .selection-flow-rail, .selection-flow-step, .reward-preview-card").evaluateAll((elements) => elements
   .filter((element) => element.scrollWidth > element.clientWidth + 2 || element.scrollHeight > element.clientHeight + 2)
   .map((element) => element.className));
 if (eventMobileOverflowItems.length > 0) {
   throw new Error(`모바일 이벤트 UI 넘침: ${eventMobileOverflowItems.slice(0, 4).join(" | ")}`);
 }
+await page.locator(".event-choice .selection-flow-rail").first().screenshot({ path: "tmp/choice-flow-event-rail-mobile.png" });
 await page.screenshot({ path: "tmp/event-ui-mobile.png", fullPage: true });
 
 await page.setViewportSize({ width: 1366, height: 900 });

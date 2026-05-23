@@ -2760,6 +2760,7 @@ function renderEvent(state, index) {
             </span>
             <span class="choice-note">${affordable ? rewardLabel(choice.reward) : shortageLabel(state, cost)}</span>
             ${renderChoiceImpactList(eventChoiceImpactItems(choice, cost, state, index, affordable))}
+            ${renderChoiceFlowRail(eventChoiceFlowItems(choice, cost, state, index, affordable, choiceRisk))}
             <span class="reward-preview-grid">
               ${rewardPreviewItems(choice.reward || {}, index).map(renderRewardPreviewItem).join("")}
             </span>
@@ -2888,6 +2889,7 @@ function renderReward(state, index) {
             <span class="choice-note">${affordable ? option.description : shortageLabel(state, option.cost)}</span>
             ${renderRewardInsight(insight)}
             ${renderChoiceImpactList(rewardOptionImpactItems(option, state, index, affordable))}
+            ${renderChoiceFlowRail(rewardOptionFlowItems(option, state, index, affordable))}
             <span class="reward-preview-grid">
               ${rewardOptionPreviewItems(option, index).map(renderRewardPreviewItem).join("")}
             </span>
@@ -2918,6 +2920,25 @@ function renderRewardInsight(insight) {
           </span>
         `).join("")}
       </span>
+    </span>
+  `;
+}
+
+function renderChoiceFlowRail(items = []) {
+  const visibleItems = items.filter(Boolean).slice(0, 3);
+  if (visibleItems.length === 0) return "";
+  return `
+    <span class="selection-flow-rail" aria-label="선택 결과 흐름">
+      ${visibleItems.map((item, itemIndex) => `
+        <span class="selection-flow-step flow-${item.tone || "note"}">
+          <b>${escapeHtml(item.icon || "·")}</b>
+          <span>
+            <em>${escapeHtml(item.label)}</em>
+            <strong>${escapeHtml(item.value)}</strong>
+          </span>
+          ${itemIndex < visibleItems.length - 1 ? `<i aria-hidden="true"></i>` : ""}
+        </span>
+      `).join("")}
     </span>
   `;
 }
@@ -3031,6 +3052,48 @@ function rewardOptionImpactItems(option = {}, state, index, affordable = true) {
     option.upgraded ? { tone: "power", icon: "강", label: "강화", value: "획득 즉시" } : null,
     affordable ? null : { tone: "danger", icon: "!", label: "부족", value: shortageLabel(state, option.cost || {}) }
   ];
+}
+
+function eventChoiceFlowItems(choice = {}, cost = {}, state, index, affordable = true, risk = eventChoiceRiskSummary(choice, cost)) {
+  const rewardKind = choiceRewardKind(choice.reward || {});
+  return [
+    { tone: affordable ? "safe" : "danger", icon: affordable ? "선" : "잠", label: "선택", value: affordable ? "가능" : shortageLabel(state, cost) },
+    { tone: cost.gold || cost.hp ? "cost" : risk.key, icon: cost.gold || cost.hp ? "비" : risk.icon, label: cost.gold || cost.hp ? "비용" : "위험", value: cost.gold || cost.hp ? costLabel(cost).replace(/^비용\s*/, "") : risk.label },
+    { tone: rewardKind, icon: choiceRewardIcon(rewardKind), label: "결과", value: rewardLabel(choice.reward || {}) }
+  ];
+}
+
+function rewardOptionFlowItems(option = {}, state, index, affordable = true) {
+  const rewardKind = option.type || "reward";
+  return [
+    { tone: affordable ? "safe" : "danger", icon: affordable ? "준" : "잠", label: "준비", value: affordable ? "선택 가능" : shortageLabel(state, option.cost || {}) },
+    { tone: rewardKind, icon: choiceRewardIcon(rewardKind), label: "획득", value: rewardOptionFlowValue(option, index) },
+    { tone: rewardOptionApplyTone(option), icon: "반", label: "반영", value: rewardOptionApplyLabel(option) }
+  ];
+}
+
+function rewardOptionFlowValue(option = {}, index) {
+  const preview = rewardOptionPreviewItems(option, index)[0];
+  if (preview?.title) return preview.title;
+  if (option.amount) return `${option.amount}`;
+  return option.title || "보상";
+}
+
+function rewardOptionApplyTone(option = {}) {
+  if (option.type === "card") return "card";
+  if (option.type === "gem") return "gem";
+  if (["relic", "arcana"].includes(option.type)) return option.type;
+  if (option.type === "gold") return "gold";
+  return "safe";
+}
+
+function rewardOptionApplyLabel(option = {}) {
+  if (option.type === "card") return option.upgraded ? "강화 덱" : "덱";
+  if (option.type === "gem") return "보석함";
+  if (option.type === "relic") return "현재 빌드";
+  if (option.type === "arcana") return "기운 슬롯";
+  if (option.type === "gold") return "지갑";
+  return "탐험";
 }
 
 function rewardFromOption(option = {}) {
