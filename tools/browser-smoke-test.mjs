@@ -358,6 +358,64 @@ await page.screenshot({ path: "tmp/market-ui-mobile.png", fullPage: true });
 await page.setViewportSize({ width: 1366, height: 900 });
 await page.evaluate(async () => {
   const raw = localStorage.getItem("sunny_maze_run_v1");
+  if (!raw) throw new Error("방 완료 검증용 저장 데이터가 없음");
+  const snapshot = JSON.parse(raw);
+  const stages = await fetch("/src/data/ko/stages.json").then((response) => response.json());
+  const stage = stages.find((item) => item.id === snapshot.stageId) || stages[0];
+  if (!stage || !Array.isArray(stage.rooms) || stage.rooms.length < 2) throw new Error("방 완료 검증용 스테이지 데이터가 없음");
+  const roomIndex = Math.min(1, Math.max(0, stage.rooms.length - 2));
+  snapshot.phase = "room_complete";
+  snapshot.stageId = stage.id;
+  snapshot.roomIndex = roomIndex;
+  snapshot.currentRoomType = stage.rooms[roomIndex] || "combat";
+  snapshot.pendingReward = null;
+  snapshot.pendingEvent = null;
+  snapshot.enemies = [];
+  snapshot.metrics = {
+    ...(snapshot.metrics || {}),
+    roomsCleared: roomIndex + 1,
+    enemiesDefeated: 4,
+    maxChain: 5
+  };
+  snapshot.player = { ...(snapshot.player || {}), hp: 48, maxHp: 64, gold: 96 };
+  localStorage.setItem("sunny_maze_run_v1", JSON.stringify(snapshot));
+});
+await page.reload({ waitUntil: "networkidle" });
+await page.waitForSelector("#loadRunButton:not(:disabled)", { timeout: 10000 });
+await page.click("#loadRunButton");
+await page.waitForSelector(".room-complete-panel", { timeout: 10000 });
+await page.waitForSelector(".room-complete-emblem", { timeout: 10000 });
+await page.waitForSelector(".room-complete-card", { timeout: 10000 });
+await page.waitForSelector(".next-room-preview", { timeout: 10000 });
+await page.waitForSelector(".room-advance-btn", { timeout: 10000 });
+const roomCompleteText = await page.textContent(".room-complete-panel");
+if (!roomCompleteText?.includes("방 완료") || !roomCompleteText.includes("이번 방 성과") || !roomCompleteText.includes("다음 방")) {
+  throw new Error("방 완료 전환 패널 핵심 문구 표시 실패");
+}
+const roomCompleteProgressWidth = await page.locator(".room-complete-meter i").evaluate((element) => parseFloat(getComputedStyle(element).width));
+if (!(roomCompleteProgressWidth > 0)) throw new Error("방 완료 진행 바 표시 실패");
+const roomCompleteOverflowItems = await page.locator(".room-complete-panel, .room-complete-head, .room-complete-emblem, .room-complete-card, .next-room-preview, .room-advance-btn").evaluateAll((elements) => elements
+  .filter((element) => element.scrollWidth > element.clientWidth + 2 || element.scrollHeight > element.clientHeight + 2)
+  .map((element) => element.className));
+if (roomCompleteOverflowItems.length > 0) {
+  throw new Error(`방 완료 전환 UI 넘침: ${roomCompleteOverflowItems.slice(0, 4).join(" | ")}`);
+}
+await page.screenshot({ path: "tmp/room-complete-desktop.png", fullPage: true });
+await page.setViewportSize({ width: 390, height: 820 });
+await page.waitForTimeout(120);
+const roomCompleteMobileColumns = await page.locator(".room-complete-grid").evaluate((element) => getComputedStyle(element).gridTemplateColumns.split(" ").length);
+if (roomCompleteMobileColumns !== 1) throw new Error("모바일 방 완료 카드 1열 반응형 확인 실패");
+const roomCompleteMobileOverflow = await page.locator(".room-complete-panel, .room-complete-head, .room-complete-emblem, .room-complete-card, .next-room-preview, .room-advance-btn").evaluateAll((elements) => elements
+  .filter((element) => element.scrollWidth > element.clientWidth + 2 || element.scrollHeight > element.clientHeight + 2)
+  .map((element) => element.className));
+if (roomCompleteMobileOverflow.length > 0) {
+  throw new Error(`모바일 방 완료 전환 UI 넘침: ${roomCompleteMobileOverflow.slice(0, 4).join(" | ")}`);
+}
+await page.screenshot({ path: "tmp/room-complete-mobile.png", fullPage: true });
+
+await page.setViewportSize({ width: 1366, height: 900 });
+await page.evaluate(async () => {
+  const raw = localStorage.getItem("sunny_maze_run_v1");
   if (!raw) throw new Error("이벤트 검증용 저장 스냅샷 없음");
   const snapshot = JSON.parse(raw);
   const events = await fetch("/src/data/ko/events.json").then((response) => response.json());

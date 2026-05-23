@@ -838,9 +838,69 @@ function renderPhase(state, index) {
   if (state.phase === "combat") return renderCombat(state, index);
   if (state.phase === "event") return renderEvent(state, index);
   if (state.phase === "reward") return renderReward(state, index);
-  if (state.phase === "room_complete") return `<button class="primary-btn" data-action="advance">다음 방으로</button>`;
+  if (state.phase === "room_complete") return renderRoomComplete(state, index);
   if (state.phase === "stage_clear" || state.phase === "defeat") return renderRunResult(state);
   return "";
+}
+
+function renderRoomComplete(state, index) {
+  const stage = index.stages.get(state.stageId);
+  const player = state.player || {};
+  const metrics = state.metrics || {};
+  const completedRoomType = state.currentRoomType || stage?.rooms?.[state.roomIndex] || "combat";
+  const nextRoomIndex = state.roomIndex + 1;
+  const nextRoomType = stage?.rooms?.[nextRoomIndex] || null;
+  const progress = stage?.rooms?.length ? boundedPercent(nextRoomIndex, stage.rooms.length) : 100;
+  const boss = stage ? index.enemies.get(stage.bossEnemyId) : null;
+  return `
+    <section class="room-complete-panel room-complete-${completedRoomType}">
+      <div class="room-complete-head">
+        <span class="room-complete-emblem room-${completedRoomType}">${roomIcon(completedRoomType)}</span>
+        <div>
+          <span class="route-kicker">방 완료</span>
+          <strong>${roomLabel(completedRoomType)} 완료</strong>
+          <p>${stage?.name || "스테이지"} · ${Math.min(nextRoomIndex, stage?.rooms?.length || nextRoomIndex)}/${stage?.rooms?.length || nextRoomIndex}개 방 진행</p>
+        </div>
+      </div>
+      <div class="room-complete-meter" aria-label="다음 방 진행률">
+        <i style="width:${progress}%"></i>
+      </div>
+      <div class="room-complete-grid">
+        <article class="room-complete-card">
+          <span>이번 방 성과</span>
+          <strong>${roomCompleteSummary(completedRoomType, state)}</strong>
+          <p>체력 ${player.hp ?? 0}/${player.maxHp ?? 0} · 별사탕 ${player.gold ?? 0} · 처치 ${metrics.enemiesDefeated || 0}</p>
+        </article>
+        <article class="room-complete-card next-room-preview ${nextRoomType ? `room-${nextRoomType}` : "room-stage-clear"}">
+          <span>${nextRoomType ? "다음 방" : "다음 목표"}</span>
+          <strong>${nextRoomType ? roomLabel(nextRoomType) : "스테이지 결과"}</strong>
+          <p>${nextRoomDetail(nextRoomType, boss, stage)}</p>
+        </article>
+      </div>
+      <button class="primary-btn room-advance-btn" data-action="advance">${nextRoomType ? "다음 방으로" : "결과 보기"}</button>
+    </section>
+  `;
+}
+
+function roomCompleteSummary(roomType, state) {
+  const metrics = state.metrics || {};
+  if (["combat", "elite", "boss"].includes(roomType)) return `전투 승리 · 최대 연쇄 ${metrics.maxChain || 0}`;
+  if (roomType === "event") return "이벤트 선택 완료";
+  if (roomType === "rest") return "쉼터 회복 완료";
+  if (roomType === "shop") return "상점 정비 완료";
+  if (roomType === "reward") return "보상 선택 완료";
+  return "탐험 진행";
+}
+
+function nextRoomDetail(roomType, boss, stage) {
+  if (!roomType) return `${stage?.clearRewards?.gold || 0} 별사탕 보상 정산`;
+  if (roomType === "boss") return `보스 ${boss?.name || "미정"}와 결전`;
+  if (roomType === "elite") return "강한 몬스터와 추가 보상";
+  if (roomType === "event") return "선택지에 따라 성장";
+  if (roomType === "shop") return "별사탕으로 보상 구매";
+  if (roomType === "rest") return "체력 회복과 숨 고르기";
+  if (roomType === "reward") return "추가 보상 선택";
+  return "일반 몬스터 전투";
 }
 
 function renderCombat(state, index) {
