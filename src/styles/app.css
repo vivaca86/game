@@ -529,6 +529,21 @@ h1 {
   color: #347159;
 }
 
+.unlock-kind-achievement .unlock-icon {
+  background: #fff2c6;
+  color: #7c5d15;
+}
+
+.unlock-kind-town .unlock-icon {
+  background: #ffe8ee;
+  color: #a33c50;
+}
+
+.unlock-kind-unlock .unlock-icon {
+  background: #edf8ff;
+  color: #4f6880;
+}
+
 .goal-progress-meter {
   grid-column: 1 / -1;
   display: block;
@@ -2334,10 +2349,26 @@ h1 {
 
 .result-panel {
   display: grid;
-  gap: 14px;
-  padding: 16px;
+  gap: 16px;
+  padding: 18px;
   border-radius: 8px;
-  background: #edf8ff;
+  border: 2px solid rgba(76, 79, 112, 0.08);
+  background:
+    radial-gradient(circle at 12% 10%, rgba(255, 255, 255, 0.88) 0 11%, transparent 12%),
+    linear-gradient(135deg, #edf8ff, #fffaf0 58%, #ffe8ee);
+  box-shadow: 0 14px 32px rgba(76, 70, 116, 0.08);
+}
+
+.result-panel-victory {
+  background:
+    radial-gradient(circle at 12% 10%, rgba(255, 255, 255, 0.9) 0 11%, transparent 12%),
+    linear-gradient(135deg, #e8f8f1, #fffaf0 56%, #fff2c6);
+}
+
+.result-panel-defeat {
+  background:
+    radial-gradient(circle at 12% 10%, rgba(255, 255, 255, 0.9) 0 11%, transparent 12%),
+    linear-gradient(135deg, #f2edff, #edf8ff 56%, #ffe8ee);
 }
 
 .result-head {
@@ -2347,39 +2378,181 @@ h1 {
   gap: 16px;
 }
 
-.result-head strong {
+.result-title-wrap {
+  display: grid;
+  grid-template-columns: 58px minmax(0, 1fr);
+  gap: 12px;
+  align-items: center;
+  min-width: 0;
+}
+
+.result-title {
+  min-width: 0;
+}
+
+.result-emblem {
+  display: grid;
+  width: 58px;
+  height: 58px;
+  place-items: center;
+  border: 3px solid rgba(255, 255, 255, 0.92);
+  border-radius: 18px;
+  background:
+    radial-gradient(circle at 32% 25%, rgba(255, 255, 255, 0.9) 0 12%, transparent 13%),
+    linear-gradient(145deg, #ffd45f, #ff8ea2);
+  color: #ffffff;
+  font-size: 28px;
+  font-weight: 900;
+  box-shadow: 0 10px 20px rgba(76, 70, 116, 0.14);
+}
+
+.result-panel-defeat .result-emblem {
+  background:
+    radial-gradient(circle at 32% 25%, rgba(255, 255, 255, 0.9) 0 12%, transparent 13%),
+    linear-gradient(145deg, #a99cff, #7cccf7);
+}
+
+.result-title strong {
   display: block;
+  overflow-wrap: anywhere;
   font-size: 24px;
 }
 
-.result-head span {
+.result-title span {
+  display: block;
+  overflow-wrap: anywhere;
   color: #5f6680;
   font-weight: 800;
 }
 
 .result-grid {
   display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
-  gap: 8px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
 }
 
-.result-grid div {
+.result-stat {
   display: grid;
-  gap: 4px;
+  grid-template-columns: 34px minmax(0, 1fr);
+  gap: 8px;
+  align-items: center;
+  min-width: 0;
   padding: 10px;
+  border: 2px solid rgba(76, 79, 112, 0.08);
   border-radius: 8px;
   background: #ffffff;
 }
 
-.result-grid span {
+.result-stat-icon {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border-radius: 12px;
+  background: #edf8ff;
+  color: #4f6880;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.result-stat-defeat .result-stat-icon {
+  background: #ffe8ee;
+  color: #a33c50;
+}
+
+.result-stat-chain .result-stat-icon,
+.result-stat-intent .result-stat-icon {
+  background: #f2edff;
+  color: #6555a0;
+}
+
+.result-stat-gold .result-stat-icon,
+.result-stat-boss .result-stat-icon {
+  background: #fff2c6;
+  color: #7c5d15;
+}
+
+.result-stat-gem .result-stat-icon {
+  background: #e8f8f1;
+  color: #347159;
+}
+
+.result-stat-copy {
+  display: grid;
+  min-width: 0;
+}
+
+.result-stat-copy em {
   color: #686c88;
   font-size: 13px;
+  font-style: normal;
   font-weight: 800;
+}
+
+.result-stat-copy strong {
+  overflow-wrap: anywhere;
+  font-size: 21px;
+  line-height: 1.05;
+}
+
+.result-stat-copy small {
+  color: #7c8299;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.result-stat-meter {
+  grid-column: 1 / -1;
+  display: block;
+  height: 6px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #edf8ff;
+}
+
+.result-stat-meter b {
+  display: block;
+  width: var(--result-progress, 8%);
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #7cccf7, #67d9a5, #ffd45f);
 }
 
 .unlock-list {
   display: grid;
   gap: 8px;
+}
+
+.result-unlock-list {
+  padding: 12px;
+  border: 2px solid rgba(76, 79, 112, 0.08);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.68);
+}
+
+.unlock-list-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.unlock-list-head span {
+  color: #686c88;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.result-unlock-chip-list {
+  gap: 8px;
+}
+
+.result-unlock-chip {
+  background: #ffffff;
+}
+
+.result-unlock-icon {
+  align-self: center;
 }
 
 .gem-vault {
@@ -2996,6 +3169,14 @@ h1 {
 
   .choice-wallet {
     justify-content: flex-start;
+  }
+
+  .result-head {
+    display: grid;
+  }
+
+  .result-head .primary-btn {
+    justify-self: start;
   }
 
   .dashboard-grid,

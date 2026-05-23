@@ -294,6 +294,90 @@ if (bossOverflowItems.length > 0) {
 }
 await page.screenshot({ path: "tmp/boss-phase-desktop.png", fullPage: true });
 
+await page.evaluate(() => {
+  const raw = localStorage.getItem("sunny_maze_run_v1");
+  if (!raw) throw new Error("결과 화면 검증용 저장 스냅샷 없음");
+  const snapshot = JSON.parse(raw);
+  snapshot.phase = "stage_clear";
+  snapshot.metrics = {
+    ...(snapshot.metrics || {}),
+    roomsCleared: 9,
+    enemiesDefeated: 12,
+    maxChain: 6,
+    enemyIntentsResolved: 14,
+    bossPhaseTriggers: 2
+  };
+  snapshot.status = { ...(snapshot.status || {}), profileFinalized: true };
+  snapshot.player = { ...(snapshot.player || {}), gold: 126 };
+  snapshot.deck = Array.isArray(snapshot.deck) && snapshot.deck.length > 0 ? snapshot.deck : ["card_sunbean_punch", "card_cloud_guard"];
+  snapshot.inventory = {
+    ...(snapshot.inventory || {}),
+    gemBag: [
+      { instanceId: "result_gem_1", gemId: "gem_coral_edge" },
+      { instanceId: "result_gem_2", gemId: "gem_mint_breeze" },
+      { instanceId: "result_gem_3", gemId: "gem_lavender_echo" }
+    ]
+  };
+  snapshot.resultSummary = {
+    won: true,
+    stageName: "햇살 현관",
+    characterName: "하루",
+    roomsCleared: 9,
+    enemiesDefeated: 12,
+    maxChain: 6,
+    enemyIntentsResolved: 14,
+    bossPhaseTriggers: 2,
+    gold: 126,
+    deckSize: snapshot.deck.length,
+    gemCount: 3,
+    unlocks: [
+      { label: "스테이지", name: "라벤더 복도" },
+      { label: "카드", name: "별사탕 충전" },
+      { label: "보석", name: "민트 방울" }
+    ],
+    achievements: [{ label: "업적", name: "첫 소풍 완료" }],
+    metaUpgrades: [{ label: "마을", name: "작은 공방" }]
+  };
+  localStorage.setItem("sunny_maze_run_v1", JSON.stringify(snapshot));
+});
+await page.reload({ waitUntil: "networkidle" });
+await page.waitForSelector("#loadRunButton:not(:disabled)", { timeout: 10000 });
+await page.click("#loadRunButton");
+try {
+  await page.waitForSelector(".result-panel", { timeout: 10000 });
+} catch (error) {
+  const rootText = await page.textContent("#runRoot").catch(() => "");
+  throw new Error(`결과 화면 진입 실패: ${rootText?.slice(0, 240) || "runRoot 비어 있음"} | ${errors.join(" | ") || error.message}`);
+}
+const resultPanelClass = await page.locator(".result-panel").first().getAttribute("class");
+if (!resultPanelClass?.includes("result-panel-victory")) throw new Error(`결과 화면 클리어 톤 클래스 실패: ${resultPanelClass}`);
+await page.waitForSelector(".result-emblem", { timeout: 10000 });
+await page.waitForSelector(".result-stat-icon", { timeout: 10000 });
+await page.waitForSelector(".result-stat-meter", { timeout: 10000 });
+await page.waitForSelector(".result-unlock-chip", { timeout: 10000 });
+await page.waitForSelector(".result-unlock-chip .unlock-icon", { timeout: 10000 });
+const resultText = await page.textContent(".result-panel");
+if (!resultText?.includes("스테이지 클리어") || !resultText.includes("새로 열린 것") || !resultText.includes("라벤더 복도")) {
+  throw new Error("결과 화면 핵심 문구 표시 실패");
+}
+const resultStatCount = await page.locator(".result-stat").count();
+if (resultStatCount !== 8) throw new Error(`결과 화면 통계 카드 수 실패: ${resultStatCount}`);
+const resultUnlockCount = await page.locator(".result-unlock-chip").count();
+if (resultUnlockCount < 5) throw new Error(`결과 화면 해금 칩 수 실패: ${resultUnlockCount}`);
+const resultOverflowItems = await page.locator(".result-panel, .result-stat, .result-title-wrap, .result-unlock-chip").evaluateAll((elements) => elements
+  .filter((element) => element.scrollWidth > element.clientWidth + 2 || element.scrollHeight > element.clientHeight + 2)
+  .map((element) => element.className));
+if (resultOverflowItems.length > 0) {
+  throw new Error(`결과 화면 UI 넘침: ${resultOverflowItems.slice(0, 4).join(" | ")}`);
+}
+await page.screenshot({ path: "tmp/result-panel-desktop.png", fullPage: true });
+await page.setViewportSize({ width: 390, height: 820 });
+await page.waitForTimeout(120);
+const resultMobileColumns = await page.locator(".result-grid").evaluate((element) => getComputedStyle(element).gridTemplateColumns.split(" ").length);
+if (resultMobileColumns !== 1) throw new Error("모바일 결과 통계 1열 반응형 확인 실패");
+await page.screenshot({ path: "tmp/result-panel-mobile.png", fullPage: true });
+await page.setViewportSize({ width: 1366, height: 900 });
+
 if (errors.length > 0) {
   throw new Error(`브라우저 콘솔 오류: ${errors.join(" | ")}`);
 }

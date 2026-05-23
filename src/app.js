@@ -486,7 +486,7 @@ function achievementBadgeText(type) {
 }
 
 function unlockIconText(kind) {
-  return ({ stage: "길", character: "친", card: "카", gem: "보", relic: "유", arcana: "기" })[kind] || "열";
+  return ({ stage: "길", character: "친", card: "카", gem: "보", relic: "유", arcana: "기", achievement: "★", town: "마" })[kind] || "열";
 }
 
 function profileStatIcon(key) {
@@ -954,36 +954,98 @@ function markDamagePercent(value) {
 }
 
 function renderRunResult(state) {
-  const summary = state.resultSummary;
-  const title = state.phase === "stage_clear" ? "스테이지 클리어" : "탐험 실패";
-  const unlocks = [...(summary?.unlocks || []), ...(summary?.achievements || []), ...(summary?.metaUpgrades || [])];
+  const summary = state.resultSummary || {};
+  const won = summary.won ?? (state.phase === "stage_clear");
+  const title = won ? "스테이지 클리어" : "탐험 실패";
+  const subtitle = [summary.stageName, summary.characterName].filter(Boolean).join(" · ") || "탐험 기록";
+  const unlocks = [...(summary.unlocks || []), ...(summary.achievements || []), ...(summary.metaUpgrades || [])];
+  const stats = [
+    { key: "rooms", icon: "방", label: "클리어 방", value: summary.roomsCleared ?? state.metrics?.roomsCleared ?? 0, detail: "탐험 진행" },
+    { key: "defeat", icon: "전", label: "처치", value: summary.enemiesDefeated ?? state.metrics?.enemiesDefeated ?? 0, detail: "전투 성과" },
+    { key: "chain", icon: "연", label: "최대 연쇄", value: summary.maxChain ?? state.metrics?.maxChain ?? 0, detail: "카드 흐름" },
+    { key: "intent", icon: "의", label: "적 의도", value: summary.enemyIntentsResolved ?? state.metrics?.enemyIntentsResolved ?? 0, detail: "대응 성공" },
+    { key: "boss", icon: "보", label: "보스 변화", value: summary.bossPhaseTriggers ?? state.metrics?.bossPhaseTriggers ?? 0, detail: "페이즈 대응" },
+    { key: "gold", icon: "별", label: "별사탕", value: summary.gold ?? state.player?.gold ?? 0, detail: "획득 재화" },
+    { key: "deck", icon: "덱", label: "덱", value: summary.deckSize ?? state.deck?.length ?? 0, detail: "최종 카드" },
+    { key: "gem", icon: "젬", label: "보석", value: summary.gemCount ?? state.inventory?.gemBag?.length ?? 0, detail: "보관함" }
+  ];
   return `
-    <section class="result-panel">
+    <section class="result-panel result-panel-${won ? "victory" : "defeat"}">
       <div class="result-head">
-        <div>
-          <strong>${title}</strong>
-          <span>${summary?.stageName || ""} · ${summary?.characterName || ""}</span>
+        <div class="result-title-wrap">
+          <span class="result-emblem" aria-hidden="true">${won ? "★" : "!"}</span>
+          <div class="result-title">
+            <strong>${title}</strong>
+            <span>${escapeHtml(subtitle)}</span>
+          </div>
         </div>
         <button class="primary-btn" data-action="restart">다시 탐험</button>
       </div>
       <div class="result-grid">
-        <div><span>클리어 방</span><strong>${summary?.roomsCleared ?? state.metrics.roomsCleared}</strong></div>
-        <div><span>처치</span><strong>${summary?.enemiesDefeated ?? state.metrics.enemiesDefeated}</strong></div>
-        <div><span>최대 연쇄</span><strong>${summary?.maxChain ?? state.metrics.maxChain}</strong></div>
-        <div><span>적 의도</span><strong>${summary?.enemyIntentsResolved ?? state.metrics.enemyIntentsResolved ?? 0}</strong></div>
-        <div><span>보스 변화</span><strong>${summary?.bossPhaseTriggers ?? state.metrics.bossPhaseTriggers ?? 0}</strong></div>
-        <div><span>별사탕</span><strong>${summary?.gold ?? state.player.gold}</strong></div>
-        <div><span>덱</span><strong>${summary?.deckSize ?? state.deck.length}</strong></div>
-        <div><span>보석</span><strong>${summary?.gemCount ?? state.inventory.gemBag.length}</strong></div>
+        ${stats.map(renderResultStat).join("")}
       </div>
-      <div class="unlock-list">
-        <strong>새로 열린 것</strong>
-        <div class="build-chip-list">
-          ${unlocks.length === 0 ? "<span class='muted'>이번 탐험의 신규 해금 없음</span>" : unlocks.map((item) => `<span class="build-chip unlock-chip">${item.label} · ${item.name}</span>`).join("")}
+      <div class="unlock-list result-unlock-list">
+        <div class="unlock-list-head">
+          <strong>새로 열린 것</strong>
+          <span>${unlocks.length}개</span>
+        </div>
+        <div class="build-chip-list result-unlock-chip-list">
+          ${unlocks.length === 0 ? "<span class='muted'>이번 탐험의 신규 해금 없음</span>" : unlocks.map(renderResultUnlockChip).join("")}
         </div>
       </div>
     </section>
   `;
+}
+
+function renderResultStat(stat) {
+  const value = Number(stat.value) || 0;
+  const ratio = resultStatRatio(stat.key, value);
+  return `
+    <div class="result-stat result-stat-${stat.key}" style="--result-progress:${ratio}">
+      <span class="result-stat-icon">${stat.icon}</span>
+      <span class="result-stat-copy">
+        <em>${stat.label}</em>
+        <strong>${escapeHtml(stat.value)}</strong>
+        <small>${stat.detail}</small>
+      </span>
+      <i class="result-stat-meter"><b></b></i>
+    </div>
+  `;
+}
+
+function resultStatRatio(key, value) {
+  const caps = { rooms: 15, defeat: 24, chain: 9, intent: 18, boss: 3, gold: 150, deck: 28, gem: 12 };
+  return `${Math.max(8, Math.min(100, Math.round((value / (caps[key] || 10)) * 100)))}%`;
+}
+
+function renderResultUnlockChip(item) {
+  const kind = resultUnlockKind(item);
+  return `
+    <span class="build-chip unlock-chip result-unlock-chip unlock-kind-${kind}">
+      <span class="unlock-icon result-unlock-icon">${unlockIconText(kind)}</span>
+      <span>
+        <b>${escapeHtml(item.name || "새 해금")}</b>
+        <em>${escapeHtml(item.label || resultUnlockLabel(kind))}</em>
+      </span>
+    </span>
+  `;
+}
+
+function resultUnlockKind(item = {}) {
+  const label = item.label || "";
+  if (label.includes("스테이지")) return "stage";
+  if (label.includes("캐릭터")) return "character";
+  if (label.includes("카드")) return "card";
+  if (label.includes("보석")) return "gem";
+  if (label.includes("유물")) return "relic";
+  if (label.includes("기운")) return "arcana";
+  if (label.includes("업적")) return "achievement";
+  if (label.includes("마을")) return "town";
+  return "unlock";
+}
+
+function resultUnlockLabel(kind) {
+  return ({ stage: "스테이지", character: "캐릭터", card: "카드", gem: "보석", relic: "유물", arcana: "기운", achievement: "업적", town: "마을" })[kind] || "해금";
 }
 
 function renderBuildPanel(state, index) {
