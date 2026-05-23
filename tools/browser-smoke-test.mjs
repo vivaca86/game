@@ -316,28 +316,38 @@ if (enabledCards === 0) throw new Error("사용 가능한 카드가 없습니다
 await page.locator(".play-card:not(:disabled)").first().click();
 await page.waitForSelector(".action-feedback-card", { timeout: 10000 });
 await page.waitForSelector(".action-feedback-card .feedback-stat-damage", { timeout: 10000 });
+await page.waitForSelector(".combat-impact-strip", { timeout: 10000 });
+await page.waitForSelector(".combat-impact-chip.impact-damage", { timeout: 10000 });
+await page.waitForSelector(".combat-impact-chip.impact-gem", { timeout: 10000 });
+await page.waitForSelector(".enemy-impact-chip.impact-damage", { timeout: 10000 });
 const actionFeedbackText = await page.textContent(".action-feedback-card");
 if (!actionFeedbackText?.includes("카드 사용") || !actionFeedbackText.includes("햇콩 펀치")) {
   throw new Error("카드 사용 액션 피드백 표시 실패");
 }
+const combatImpactText = await page.textContent(".combat-impact-strip");
+if (!combatImpactText?.includes("방금 효과") || !combatImpactText.includes("피해") || !combatImpactText.includes("보석")) {
+  throw new Error("전투 연출 스트립 표시 실패");
+}
 const enemyHitCount = await page.locator(".enemy-hit").count();
 const remainingEnemyCount = await page.locator(".enemy-card").count();
 if (remainingEnemyCount > 0 && enemyHitCount === 0) throw new Error("피격 몬스터 강조 표시 실패");
-const actionFeedbackOverflowItems = await page.locator(".action-feedback, .action-feedback-copy, .feedback-stat, .enemy-hit").evaluateAll((elements) => elements
+const actionFeedbackOverflowItems = await page.locator(".action-feedback, .action-feedback-copy, .feedback-stat, .combat-impact-strip, .combat-impact-chip, .enemy-impact-chip, .enemy-hit").evaluateAll((elements) => elements
   .filter((element) => element.scrollWidth > element.clientWidth + 2 || element.scrollHeight > element.clientHeight + 2)
   .map((element) => element.className));
 if (actionFeedbackOverflowItems.length > 0) {
   throw new Error(`액션 피드백 UI 넘침: ${actionFeedbackOverflowItems.slice(0, 4).join(" | ")}`);
 }
+await page.locator(".combat-impact-strip").screenshot({ path: "tmp/combat-impact-strip-desktop.png" });
 await page.screenshot({ path: "tmp/action-feedback-desktop.png", fullPage: true });
 await page.setViewportSize({ width: 390, height: 820 });
 await page.waitForTimeout(120);
-const actionFeedbackMobileOverflow = await page.locator(".action-feedback, .action-feedback-copy, .feedback-stat").evaluateAll((elements) => elements
+const actionFeedbackMobileOverflow = await page.locator(".action-feedback, .action-feedback-copy, .feedback-stat, .combat-impact-strip, .combat-impact-chip, .enemy-impact-chip").evaluateAll((elements) => elements
   .filter((element) => element.scrollWidth > element.clientWidth + 2 || element.scrollHeight > element.clientHeight + 2)
   .map((element) => element.className));
 if (actionFeedbackMobileOverflow.length > 0) {
   throw new Error(`모바일 액션 피드백 UI 넘침: ${actionFeedbackMobileOverflow.slice(0, 4).join(" | ")}`);
 }
+await page.locator(".combat-impact-strip").screenshot({ path: "tmp/combat-impact-strip-mobile.png" });
 await page.screenshot({ path: "tmp/action-feedback-mobile.png", fullPage: true });
 await page.setViewportSize({ width: 1366, height: 900 });
 await page.click('[data-action="debug-relic"]');

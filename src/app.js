@@ -989,6 +989,7 @@ function renderCombat(state, index) {
     <div class="combat-grid">
       ${renderCombatForecast(state, index, forecast)}
       ${renderDisruptionControl(state, index)}
+      ${renderCombatImpactStrip(state)}
       <section class="enemy-row">
         ${state.enemies.map((enemy) => renderEnemyCard(enemy, state, index)).join("")}
       </section>
@@ -1001,6 +1002,61 @@ function renderCombat(state, index) {
       <button class="secondary-btn" data-action="end-turn">턴 종료</button>
     </div>
   `;
+}
+
+function renderCombatImpactStrip(state) {
+  const feedback = state.status?.actionFeedback;
+  if (!feedback || !["card", "enemy", "cleanse"].includes(feedback.kind)) return "";
+  const items = combatImpactItems(feedback);
+  if (items.length === 0) return "";
+  return `
+    <section class="combat-impact-strip feedback-tone-${feedback.tone}" aria-label="방금 전투 효과">
+      <div class="combat-impact-head">
+        <span class="combat-impact-icon">${escapeHtml(feedback.icon)}</span>
+        <div>
+          <span>방금 효과</span>
+          <strong>${escapeHtml(feedback.subject)}</strong>
+        </div>
+      </div>
+      <div class="combat-impact-list">
+        ${items.map((item) => `
+          <span class="combat-impact-chip impact-${item.tone}">
+            <b>${escapeHtml(item.label)}</b>
+            <em>${escapeHtml(item.value)}</em>
+          </span>
+        `).join("")}
+      </div>
+    </section>
+  `;
+}
+
+function combatImpactItems(feedback) {
+  const items = [];
+  for (const event of feedback.selfEvents || []) {
+    items.push({ tone: event.tone || "note", label: event.label || "효과", value: String(event.value || "") });
+  }
+  for (const event of feedback.targetEvents || []) {
+    const parts = [];
+    if (event.damage > 0) parts.push(`피해 -${event.damage}`);
+    if (event.blocked > 0) parts.push(`차단 ${event.blocked}`);
+    if (event.defeated) parts.push("처치");
+    if (parts.length > 0) {
+      items.push({
+        tone: event.defeated || event.damage > 0 ? "damage" : "guard",
+        label: event.targetName || "대상",
+        value: parts.join(" · ")
+      });
+    }
+  }
+  for (const event of feedback.gemEvents || []) {
+    items.push({ tone: "gem", label: "보석", value: `${event.name} · ${event.summary}` });
+  }
+  if (items.length === 0) {
+    for (const metric of feedback.metrics || []) {
+      items.push({ tone: feedbackMetricClass(metric.label), label: metric.label, value: String(metric.value) });
+    }
+  }
+  return items.slice(0, 6);
 }
 
 function renderHandCard(card, handIndex, state, index) {
@@ -1403,6 +1459,7 @@ function renderEnemyCard(enemy, state, index) {
         </div>
       </div>
       <div class="hp-line"><i style="width:${Math.max(0, Math.round((enemy.hp / enemy.maxHp) * 100))}%"></i></div>
+      ${renderEnemyImpactBadges(enemy, state.status.actionFeedback)}
       <div class="enemy-stat-row">
         <span>체력 ${enemy.hp}/${enemy.maxHp}</span>
         <span>방어 ${enemy.block || 0}</span>
@@ -1418,6 +1475,26 @@ function renderEnemyCard(enemy, state, index) {
       ${renderIntentTimeline(enemy, state.turn)}
       ${renderEnemyStatus(enemy)}
     </article>
+  `;
+}
+
+function renderEnemyImpactBadges(enemy, feedback) {
+  const event = feedback?.targetEvents?.find((item) => item.targetInstanceId === enemy.instanceId);
+  if (!event) return "";
+  const badges = [];
+  if (event.damage > 0) badges.push({ tone: "damage", label: "피해", value: `-${event.damage}` });
+  if (event.blocked > 0) badges.push({ tone: "guard", label: "차단", value: `${event.blocked}` });
+  if (event.defeated) badges.push({ tone: "damage", label: "처치", value: "완료" });
+  if (badges.length === 0) return "";
+  return `
+    <div class="enemy-impact-badges" aria-label="${enemy.name} 직전 피해">
+      ${badges.map((badge) => `
+        <span class="enemy-impact-chip impact-${badge.tone}">
+          <b>${badge.label}</b>
+          <em>${badge.value}</em>
+        </span>
+      `).join("")}
+    </div>
   `;
 }
 

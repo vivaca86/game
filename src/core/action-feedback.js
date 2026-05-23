@@ -11,7 +11,10 @@ export function setActionFeedback(state, feedback = {}) {
     subject: feedback.subject || "",
     detail: feedback.detail || "",
     metrics: (feedback.metrics || []).filter((item) => item && item.value !== undefined && item.value !== null),
-    targetInstanceIds: [...new Set(feedback.targetInstanceIds || [])]
+    targetInstanceIds: [...new Set(feedback.targetInstanceIds || [])],
+    targetEvents: structuredClone(feedback.targetEvents || []),
+    selfEvents: structuredClone(feedback.selfEvents || []),
+    gemEvents: structuredClone(feedback.gemEvents || [])
   };
   return state.status.actionFeedback;
 }

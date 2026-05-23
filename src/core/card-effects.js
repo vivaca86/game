@@ -205,6 +205,7 @@ function damageEnemy(enemy, amount, state, index, card, context) {
   if (enemy.hp <= 0) {
     context.killedThisPlay = true;
     addFeedbackValue(context, "defeated", 1);
+    markTargetDefeatedFeedback(context, enemy);
     context.killedEnemyIds = context.killedEnemyIds || [];
     context.killedEnemyIds.push(enemy.id);
     context.killedEnemyRanks = context.killedEnemyRanks || [];
@@ -237,8 +238,39 @@ function recordDamageFeedback(context, enemy, damage, blocked) {
   if (damage <= 0 && blocked <= 0) return;
   context.feedback.targetInstanceIds = context.feedback.targetInstanceIds || [];
   context.feedback.targetNames = context.feedback.targetNames || [];
+  context.feedback.targetEvents = context.feedback.targetEvents || [];
   if (!context.feedback.targetInstanceIds.includes(enemy.instanceId)) context.feedback.targetInstanceIds.push(enemy.instanceId);
   if (!context.feedback.targetNames.includes(enemy.name)) context.feedback.targetNames.push(enemy.name);
+  const event = context.feedback.targetEvents.find((item) => item.targetInstanceId === enemy.instanceId);
+  if (event) {
+    event.damage += damage;
+    event.blocked += blocked;
+  } else {
+    context.feedback.targetEvents.push({
+      targetInstanceId: enemy.instanceId,
+      targetName: enemy.name,
+      damage,
+      blocked,
+      defeated: false
+    });
+  }
+}
+
+function markTargetDefeatedFeedback(context, enemy) {
+  if (!context?.feedback || !enemy) return;
+  context.feedback.targetEvents = context.feedback.targetEvents || [];
+  let event = context.feedback.targetEvents.find((item) => item.targetInstanceId === enemy.instanceId);
+  if (!event) {
+    event = {
+      targetInstanceId: enemy.instanceId,
+      targetName: enemy.name,
+      damage: 0,
+      blocked: 0,
+      defeated: false
+    };
+    context.feedback.targetEvents.push(event);
+  }
+  event.defeated = true;
 }
 
 function applyStatus(enemy, status, amount) {

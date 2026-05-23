@@ -2,7 +2,7 @@ import { checkAchievements } from "./achievements.js";
 import { applyCardEffects, cardCost } from "./card-effects.js";
 import { addLog, drawCards } from "./game-state.js";
 import { openReward } from "./rewards.js";
-import { ensureGemState } from "./gems.js";
+import { ensureGemState, equippedGemInstancesForCard } from "./gems.js";
 import { setActionFeedback } from "./action-feedback.js";
 import { bossPhaseBlock, enemyAttackBonus, enemyBlockBonus, enemyIntentAmount, enemyMaxHp } from "./balance.js";
 import {
@@ -104,7 +104,7 @@ export function playCard(state, index, handIndex) {
   else state.discardPile.push(cardId);
 
   state.status.previousCard = { id: card.id, cost };
-  setCardActionFeedback(state, card, context);
+  setCardActionFeedback(state, index, card, context);
   checkAchievements(state, index, "reach_chain");
   if (state.enemies.length === 0) completeCombat(state, index);
   return true;
@@ -191,7 +191,7 @@ export function endTurn(state, index) {
   return true;
 }
 
-function setCardActionFeedback(state, card, context) {
+function setCardActionFeedback(state, index, card, context) {
   const feedback = context.feedback || {};
   const metrics = [
     feedback.damage > 0 ? { label: "피해", value: feedback.damage } : null,
@@ -204,6 +204,12 @@ function setCardActionFeedback(state, card, context) {
     feedback.defeated > 0 ? { label: "처치", value: feedback.defeated } : null
   ].filter(Boolean);
   const targetNames = [...new Set(feedback.targetNames || [])].slice(0, 2);
+  const gemEvents = equippedGemInstancesForCard(state, index, card.id)
+    .map((instance) => {
+      const gem = index.gems.get(instance.gemId);
+      return gem ? { name: gem.name, summary: gemFeedbackSummary(gem) } : null;
+    })
+    .filter(Boolean);
   setActionFeedback(state, {
     kind: "card",
     tone: card.type,
@@ -212,7 +218,10 @@ function setCardActionFeedback(state, card, context) {
     subject: card.name,
     detail: targetNames.length > 0 ? `${targetNames.join(", ")}에게 효과 적용` : `${card.type === "guard" ? "방어 흐름" : "카드 효과"} 발동`,
     metrics,
-    targetInstanceIds: feedback.targetInstanceIds || []
+    targetInstanceIds: feedback.targetInstanceIds || [],
+    targetEvents: feedback.targetEvents || [],
+    selfEvents: cardSelfFeedbackEvents(feedback),
+    gemEvents
   });
 }
 
@@ -225,11 +234,42 @@ function setEnemyTurnFeedback(state, { damage, blocked, piercing, markBonus }) {
     subject: damage > 0 ? `피해 ${damage}` : "공격 방어",
     detail: damage > 0 ? "적 의도를 처리했습니다." : "보호막과 효과로 피해를 막았습니다.",
     metrics: [
+      damage > 0 ? { label: "피해", value: damage } : null,
       { label: "차단", value: blocked },
       piercing > 0 ? { label: "관통", value: piercing } : null,
       markBonus > 0 ? { label: "표식", value: `+${markBonus}` } : null
+    ].filter(Boolean),
+    selfEvents: [
+      damage > 0 ? { tone: "damage", label: "플레이어", value: `피해 -${damage}` } : null,
+      blocked > 0 ? { tone: "guard", label: "보호막", value: `차단 ${blocked}` } : null,
+      piercing > 0 ? { tone: "damage", label: "관통", value: `-${piercing}` } : null
     ].filter(Boolean)
   });
+}
+
+function cardSelfFeedbackEvents(feedback) {
+  return [
+    feedback.shield > 0 ? { tone: "guard", label: "플레이어", value: `보호막 +${feedback.shield}` } : null,
+    feedback.healed > 0 ? { tone: "heal", label: "플레이어", value: `회복 +${feedback.healed}` } : null,
+    feedback.draw > 0 ? { tone: "flow", label: "손패", value: `드로우 +${feedback.draw}` } : null,
+    feedback.energy > 0 ? { tone: "flow", label: "기운", value: `+${feedback.energy}` } : null,
+    feedback.marks > 0 ? { tone: "status", label: "표식", value: `+${feedback.marks}` } : null
+  ].filter(Boolean);
+}
+
+function gemFeedbackSummary(gem) {
+  const effect = gem.effects?.[0];
+  if (!effect) return gem.text || "효과";
+  if (effect.op === "modify_damage_percent") return `피해 +${effect.amount}%`;
+  if (effect.op === "modify_shield_percent") return `보호막 +${effect.amount}%`;
+  if (effect.op === "modify_cost") return `비용 ${effect.amount}`;
+  if (effect.op === "heal_on_play") return `회복 +${effect.amount}`;
+  if (effect.op === "apply_mark_on_play") return `표식 +${effect.amount}`;
+  if (effect.op === "echo_basic_effect") return `메아리 ${Math.round(effect.ratio * 100)}%`;
+  if (effect.op === "splash_damage") return `주변 ${Math.round(effect.ratio * 100)}%`;
+  if (effect.op === "preserve_chain") return "연쇄 유지";
+  if (effect.op === "bridge_next_color_bonus") return "다음 색 연결";
+  return gem.text || "효과";
 }
 
 function cardFeedbackIcon(type) {
