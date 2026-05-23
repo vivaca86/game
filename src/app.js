@@ -853,21 +853,110 @@ function renderCombat(state, index) {
       <section class="hand-row">
         ${state.hand.map((cardId, handIndex) => {
           const card = index.cards.get(cardId);
-          const cost = cardCost(card, state, index);
-          return `
-            <button class="play-card card-type-${card.type}" data-action="play-card" data-hand-index="${handIndex}" style="--card-accent:${accentFor(card.color)}" ${cost > state.player.energy ? "disabled" : ""}>
-              <span class="cost">${cost}</span>
-              <strong>${card.name}</strong>
-              <small>${typeLabels[card.type] || card.type}</small>
-              ${renderCardArt(card, "hand")}
-              <p>${card.text}</p>
-            </button>
-          `;
+          return renderHandCard(card, handIndex, state, index);
         }).join("")}
       </section>
       <button class="secondary-btn" data-action="end-turn">턴 종료</button>
     </div>
   `;
+}
+
+function renderHandCard(card, handIndex, state, index) {
+  if (!card) return "";
+  const cost = cardCost(card, state, index);
+  const canPlay = cost <= state.player.energy;
+  const previews = cardEffectPreviewChips(card, state, index);
+  return `
+    <button class="play-card card-type-${card.type} ${canPlay ? "playable" : "unplayable"}" data-action="play-card" data-hand-index="${handIndex}" style="--card-accent:${accentFor(card.color)}" ${canPlay ? "" : "disabled"}>
+      <span class="cost">${cost}</span>
+      <span class="card-ready-chip ${canPlay ? "ready" : "blocked"}">${canPlay ? "사용 가능" : `기운 ${cost - state.player.energy} 부족`}</span>
+      <strong>${card.name}</strong>
+      <small>${typeLabels[card.type] || card.type}</small>
+      ${renderCardArt(card, "hand")}
+      <p>${card.text}</p>
+      <span class="card-preview-list" aria-label="${card.name} 효과 미리보기">
+        ${previews.map(renderCardPreviewChip).join("") || `<span class="card-preview-chip preview-note"><b>효</b><em>특수 효과</em></span>`}
+      </span>
+    </button>
+  `;
+}
+
+function renderCardPreviewChip(chip) {
+  return `<span class="card-preview-chip preview-${chip.tone}"><b>${chip.icon}</b><em>${chip.label}</em></span>`;
+}
+
+function cardEffectPreviewChips(card, state, index) {
+  const chips = [];
+  for (const effect of card.effects || []) {
+    const chip = cardEffectPreviewChip(effect, card, state, index);
+    if (Array.isArray(chip)) chips.push(...chip);
+    else if (chip) chips.push(chip);
+  }
+  if (state.status.playerWeak > 0 && chips.some((chip) => chip.tone === "damage")) {
+    chips.push({ tone: "danger", icon: "약", label: "약화 반영" });
+  }
+  return chips.slice(0, 5);
+}
+
+function cardEffectPreviewChip(effect, card, state, index) {
+  const front = state.enemies[0];
+  const enemyCount = state.enemies.length;
+  if (effect.op === "damage_front") return damagePreviewChip("피", estimateCardDamage(effect.amount, state, front), "피해");
+  if (effect.op === "damage_all") return damagePreviewChip("전", estimateCardDamage(effect.amount, state, front) * enemyCount, `전체 ${enemyCount}`);
+  if (effect.op === "damage_random") return damagePreviewChip("무", estimateCardDamage(effect.amount, state, front) * (effect.hits || 1), `무작위 x${effect.hits || 1}`);
+  if (effect.op === "damage_bonus_if_cards_played_at_least") {
+    const ready = state.metrics.cardsPlayedThisTurn >= effect.threshold;
+    return ready ? damagePreviewChip("추", estimateCardDamage(effect.amount, state, front), "조건 피해") : { tone: "note", icon: "조", label: `${effect.threshold}장 필요` };
+  }
+  if (effect.op === "damage_bonus_if_chain_at_least") {
+    const ready = (state.status.chain || 0) >= effect.threshold;
+    return ready ? damagePreviewChip("연", estimateCardDamage(effect.amount, state, front), "연쇄 피해") : { tone: "note", icon: "연", label: `연쇄 ${effect.threshold} 필요` };
+  }
+  if (effect.op === "damage_bonus_if_hand_at_most") {
+    const ready = state.hand.length <= effect.threshold;
+    return ready ? damagePreviewChip("손", estimateCardDamage(effect.amount, state, front), "손패 보너스") : { tone: "note", icon: "손", label: `${effect.threshold}장 이하` };
+  }
+  if (effect.op === "damage_bonus_vs_marked") {
+    const markedCount = state.enemies.filter((enemy) => enemy.status?.mark > 0).length;
+    return markedCount > 0 ? damagePreviewChip("표", effect.amount * markedCount, `표식 ${markedCount}`) : { tone: "note", icon: "표", label: "표식 대상 필요" };
+  }
+  if (effect.op === "gain_shield") return { tone: "guard", icon: "막", label: `보호막 +${effect.amount}` };
+  if (effect.op === "retain_shield_next_turn") return { tone: "guard", icon: "유", label: `유지 ${effect.amount}` };
+  if (effect.op === "reduce_next_attack") return { tone: "guard", icon: "감", label: `피해감소 ${effect.amount}` };
+  if (effect.op === "draw") return { tone: "flow", icon: "뽑", label: `드로우 ${effect.amount}` };
+  if (effect.op === "draw_if_kill") return { tone: "flow", icon: "처", label: `처치 시 ${effect.amount}` };
+  if (effect.op === "gain_energy") return { tone: "flow", icon: "기", label: `기운 +${effect.amount}` };
+  if (effect.op === "lose_energy") return { tone: "danger", icon: "기", label: `기운 -${effect.amount}` };
+  if (effect.op === "discount_next_card") return { tone: "flow", icon: "할", label: `다음 비용 -${effect.amount}` };
+  if (effect.op === "increase_next_card_cost") return { tone: "danger", icon: "값", label: `다음 비용 +${effect.amount}` };
+  if (effect.op === "apply_mark") return { tone: "status", icon: "표", label: `표식 +${effect.amount}` };
+  if (effect.op === "heal_if_hp_ratio_below") {
+    const ready = state.player.hp / state.player.maxHp <= effect.ratio;
+    return { tone: ready ? "heal" : "note", icon: "회", label: ready ? `회복 +${effect.amount}` : `${Math.round(effect.ratio * 100)}% 이하` };
+  }
+  if (effect.op === "enable_reflect_damage") return { tone: "guard", icon: "반", label: `반사 ${Math.round(effect.ratio * 100)}%` };
+  if (effect.op === "increase_next_card_reward_options") return { tone: "reward", icon: "보", label: `보상 +${effect.amount}` };
+  if (effect.op === "prepare_socket_bonus") return { tone: "reward", icon: "홈", label: `소켓 +${effect.amount}` };
+  if (effect.op === "repeat_previous_basic_effect" || effect.op === "repeat_previous_basic_effect_if_cost_at_most") {
+    const previous = state.status.previousCard;
+    const allowed = previous && (!effect.cost || previous.cost <= effect.cost) && previous.id !== card.id;
+    return { tone: allowed ? "flow" : "note", icon: "반", label: allowed ? "이전 효과" : "이전 카드 필요" };
+  }
+  if (effect.op === "add_battle_rule") return { tone: "guard", icon: "약", label: `${colorLabels[effect.color] || effect.color} 보호막` };
+  if (effect.op === "reset_chain") return { tone: "danger", icon: "끊", label: "연쇄 초기화" };
+  if (effect.op === "exhaust_self") return { tone: "note", icon: "소", label: "이번 전투 제외" };
+  return { tone: "note", icon: "효", label: effect.op };
+}
+
+function damagePreviewChip(icon, value, label) {
+  return { tone: "damage", icon, label: `${label} ${value}` };
+}
+
+function estimateCardDamage(amount, state, enemy) {
+  if (!amount || !enemy) return 0;
+  const weakAmount = state.status.playerWeak > 0 ? Math.max(1, Math.ceil(amount * 0.75)) : amount;
+  const markBonus = enemy.status?.mark ? Math.ceil(weakAmount * Math.min(0.6, enemy.status.mark * 0.15)) : 0;
+  return Math.max(0, weakAmount + markBonus - (enemy.block || 0));
 }
 
 function renderDisruptionControl(state, index) {
