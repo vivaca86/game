@@ -1631,7 +1631,9 @@ function intentShortDetail(intent) {
   if (intent.effect === "summon") return "친구 호출";
   if (intent.effect === "add_temp_card") return `방해 ${intent.amount || 1}`;
   if (intent.effect === "reduce_energy") return `기운 -${intent.amount || 1}`;
-  if (intent.effect === "chain_down") return `연쇄 -${intent.amount || 1}`;
+  if (intent.effect === "chain_down") {
+    return intent.costIncrease ? `연쇄 -${intent.amount || 1} · 비용 +${intent.costIncrease}` : `연쇄 -${intent.amount || 1}`;
+  }
   return intent.label || "특수";
 }
 
@@ -1768,7 +1770,9 @@ function combatForecast(state) {
     if (intent.effect === "heal_self") effects.push(`회복 ${intent.amount || 0}`);
     if (intent.effect === "add_temp_card") effects.push(`방해 카드 ${intent.amount || 1}장`);
     if (intent.effect === "reduce_energy") effects.push(`다음 턴 기운 -${intent.amount || 1}`);
-    if (intent.effect === "chain_down") effects.push(`연쇄 -${intent.amount || 1}`);
+    if (intent.effect === "chain_down") {
+      effects.push(intent.costIncrease ? `연쇄 -${intent.amount || 1}, 다음 비용 +${intent.costIncrease}` : `연쇄 -${intent.amount || 1}`);
+    }
     if (intent.effect === "summon") effects.push("친구 호출");
   });
   const markBonus = state.status.playerMarked > 0 ? Math.ceil(incoming.normalDamage * Math.min(0.5, state.status.playerMarked * 0.15)) : 0;
@@ -1811,6 +1815,7 @@ function combatStatusChips(state, index, forecast) {
   if (disruptionCount > 0) chips.push({ label: `방해 ${disruptionCount}`, tone: "danger" });
   if (state.status.disruptionsCleared > 0) chips.push({ label: `정리 ${state.status.disruptionsCleared}`, tone: "guard" });
   if (state.status.nextTurnEnergyPenalty > 0) chips.push({ label: `다음 기운 -${state.status.nextTurnEnergyPenalty}`, tone: "danger" });
+  if (state.status.nextCardCostIncrease > 0) chips.push({ label: `다음 비용 +${state.status.nextCardCostIncrease}`, tone: "danger" });
   return chips;
 }
 

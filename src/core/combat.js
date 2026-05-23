@@ -291,7 +291,11 @@ export function intentDetail(intent) {
   if (intent.effect === "fortify_all") return `모두 방어 ${intent.amount || 0}`;
   if (intent.effect === "heal_self") return `체력 회복 ${intent.amount || 0}`;
   if (intent.effect === "pierce_attack") return `관통 피해 ${intent.amount || 0}`;
-  if (intent.effect === "chain_down") return `연쇄 -${intent.amount || 1}`;
+  if (intent.effect === "chain_down") {
+    const parts = [`연쇄 -${intent.amount || 1}`];
+    if (intent.costIncrease) parts.push(`다음 비용 +${intent.costIncrease}`);
+    return parts.join(" · ");
+  }
   if (intent.effect === "summon") return "친구 호출";
   return intent.label || intent.type;
 }
@@ -362,10 +366,41 @@ function extraIntentFor(enemy, stageOrder, roomType) {
     return bossIntentFor(stageOrder);
   }
   if (enemy.rank === "elite") {
-    return stageOrder % 2 === 0
+    const familyIntent = familyIntentFor(enemy.family, stageOrder, enemy.id.includes("_trick"));
+    return familyIntent || (stageOrder % 2 === 0
       ? { type: "special", effect: "fortify_all", amount: 4 + Math.floor(stageOrder / 2), label: "대장 응원" }
-      : { type: "special", effect: "pierce_attack", amount: 4 + Math.floor(stageOrder / 2), label: "틈새 장난" };
+      : { type: "special", effect: "pierce_attack", amount: 4 + Math.floor(stageOrder / 2), label: "틈새 장난" });
   }
+  return familyIntentFor(enemy.family, stageOrder, enemy.id.includes("_trick")) || fallbackIntentFor(enemy, stageOrder);
+}
+
+function familyIntentFor(family, stageOrder, isTrick) {
+  const guard = 3 + Math.floor(stageOrder / 2);
+  const pierce = 2 + Math.floor(stageOrder / 4) + (stageOrder < 8 ? 1 : 0);
+  const heal = 5 + stageOrder;
+  const chainDown = isTrick ? 3 : 2;
+  const chainCostIncrease = stageOrder >= 6 ? 1 : 0;
+  const intents = {
+    "구름": { type: "special", effect: "fortify_all", amount: guard, label: "몽실 숨기" },
+    "부적": { type: "debuff", status: isTrick ? "weak" : "mark", amount: 1, label: isTrick ? "종이 흔들기" : "부적 표식" },
+    "새싹": { type: "special", effect: "heal_self", amount: heal, label: "새싹 돋기" },
+    "등불": { type: "debuff", status: "mark", amount: 1, label: "반짝 표식" },
+    "별사탕": { type: "special", effect: "reduce_energy", amount: 1, label: "달콤한 현기증" },
+    "리본": { type: "special", effect: "chain_down", amount: chainDown, costIncrease: chainCostIncrease, label: "리본 헝클기" },
+    "방울": { type: "special", effect: "add_temp_card", amount: 1, cardId: "card_temp_dust", label: "방울 먼지" },
+    "말랑": { type: "special", effect: "fortify_all", amount: guard + 1, label: "말랑 쿠션" },
+    "프리즘": { type: "special", effect: "pierce_attack", amount: pierce + 1, label: "프리즘 관통" },
+    "달빛": { type: "debuff", status: "weak", amount: 1, label: "달빛 졸음" },
+    "복숭아": { type: "special", effect: "pierce_attack", amount: pierce, label: "복숭아 콕" },
+    "장난감": { type: "special", effect: "add_temp_card", amount: 1, cardId: "card_temp_dust", label: "장난감 먼지" },
+    "잎사귀": { type: "special", effect: "heal_self", amount: heal + 2, label: "잎사귀 회복" },
+    "별빛": { type: "debuff", status: "mark", amount: 1, label: "별빛 조준" },
+    "쿠키": { type: "special", effect: isTrick ? "reduce_energy" : "fortify_all", amount: isTrick ? 1 : guard, label: isTrick ? "쿠키 유혹" : "쿠키 방패" }
+  };
+  return intents[family] || null;
+}
+
+function fallbackIntentFor(enemy, stageOrder) {
   const familyPattern = stageOrder % 6;
   if (enemy.id.includes("_trick")) {
     const effects = [
@@ -395,9 +430,30 @@ function bossIntentFor(stageOrder) {
 
 function enemyRole(enemy, stageOrder, roomType) {
   if (enemy.rank === "boss") return ["호출형 보스", "압박형 보스", "연쇄 방해 보스", "관통형 보스", "장벽형 보스"][(stageOrder - 1) % 5];
-  if (enemy.rank === "elite") return stageOrder % 2 === 0 ? "방어 정예" : "관통 정예";
-  if (enemy.id.includes("_trick")) return "방해형";
-  return stageOrder % 3 === 0 ? "회복형" : stageOrder % 2 === 0 ? "방어형" : "공격형";
+  const familyRole = familyRoleFor(enemy.family);
+  if (enemy.rank === "elite") return `${familyRole || (stageOrder % 2 === 0 ? "방어" : "관통")} 정예`;
+  if (enemy.id.includes("_trick")) return `${familyRole || "방해"} 장난형`;
+  return familyRole || (stageOrder % 3 === 0 ? "회복형" : stageOrder % 2 === 0 ? "방어형" : "공격형");
+}
+
+function familyRoleFor(family) {
+  return ({
+    "구름": "장벽형",
+    "부적": "표식형",
+    "새싹": "회복형",
+    "등불": "표식형",
+    "별사탕": "기운 방해형",
+    "리본": "연쇄 방해형",
+    "방울": "방해형",
+    "말랑": "장벽형",
+    "프리즘": "관통형",
+    "달빛": "약화형",
+    "복숭아": "관통형",
+    "장난감": "방해형",
+    "잎사귀": "회복형",
+    "별빛": "표식형",
+    "쿠키": "장벽형"
+  })[family] || "";
 }
 
 function resolveEnemyIntent(state, index, enemy, intent, incoming) {
@@ -447,6 +503,9 @@ function resolveSpecialIntent(state, index, enemy, intent, incoming) {
   }
   if (intent.effect === "chain_down") {
     state.status.chain = Math.max(0, (state.status.chain || 0) - (intent.amount || 1));
+    if (intent.costIncrease) {
+      state.status.nextCardCostIncrease = Math.max(state.status.nextCardCostIncrease || 0, intent.costIncrease);
+    }
     addLog(state, `${enemy.name}: 연쇄 ${intent.amount || 1} 감소`);
   }
   if (intent.effect === "summon") {

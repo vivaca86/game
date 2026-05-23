@@ -225,6 +225,34 @@ const nextRun = startRun(index, {
 });
 if (nextRun.stageId !== "stage_lavender_hall") throw new Error("해금 스테이지 새 런 시작 실패");
 if (!nextRun.enemies.some((enemy) => enemy.role && enemy.intents.length >= 3)) throw new Error("적 역할/추가 패턴 검증 실패");
+
+const familyIntentLabels = new Set();
+const familyRoles = new Set();
+let ribbonCostIncreaseSeen = false;
+for (const stage of data.stages) {
+  for (let seedOffset = 0; seedOffset < 8; seedOffset += 1) {
+    const probe = startRun(index, {
+      characterId: "char_haru",
+      stageId: stage.id,
+      seed: 20260700 + stage.order * 10 + seedOffset,
+      profile
+    });
+    if (probe.phase !== "combat") continue;
+    probe.enemies.forEach((enemy) => {
+      if (enemy.role) familyRoles.add(enemy.role);
+      if (enemy.family === "리본" && enemy.intents.some((intent) => intent.effect === "chain_down" && intent.costIncrease > 0)) {
+        ribbonCostIncreaseSeen = true;
+      }
+      enemy.intents.forEach((intent) => familyIntentLabels.add(intent.label));
+    });
+  }
+}
+const expectedFamilyLabels = ["몽실 숨기", "부적 표식", "새싹 돋기", "리본 헝클기", "방울 먼지", "프리즘 관통", "장난감 먼지", "쿠키 방패"];
+expectedFamilyLabels.forEach((label) => {
+  if (!familyIntentLabels.has(label)) throw new Error(`가족별 몬스터 특수 의도 누락: ${label}`);
+});
+if (familyRoles.size < 8) throw new Error(`몬스터 역할 차별화 부족: ${familyRoles.size}`);
+if (!ribbonCostIncreaseSeen) throw new Error("리본 계열 다음 카드 비용 압박 검증 실패");
 const snapshot = createSaveSnapshot(state);
 const restored = restoreRunState(snapshot, index);
 if (!restored?.inventory?.gemBag?.length) throw new Error("저장 보석 보관함 복원 실패");
