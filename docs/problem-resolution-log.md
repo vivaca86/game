@@ -20,3 +20,13 @@
 - 해결 방안: 문제점과 해결 방안은 `docs/problem-resolution-log.md`에서 별도 관리한다.
 - 재발 방지 기준: `PROJECT_RULES.md` 3번 규칙에 문제 해결 로그 관리 기준을 명시한다.
 - 해결 커밋: 이 항목이 포함된 커밋.
+
+## 2026-05-26
+
+### 문제: 프로젝트 운영 규칙을 에이전트가 놓칠 수 있음
+
+- 원인: 원격 최신 저장소에는 `PROJECT_RULES.md`와 `docs/handoff.md`가 있었지만, Codex/에이전트가 작업 시작 시 어떤 문서를 먼저 읽어야 하는지 알려주는 루트 `AGENTS.md`가 없었다. 전역 `C:\Users\i\.codex\AGENTS.md`도 비어 있었다.
+- 영향: 새 세션이나 다른 PC에서 `PROJECT_RULES.md`의 작업 루트 정리, 대화 원문 로그, 문제 해결 로그 규칙을 놓치고 작업할 수 있다.
+- 해결 방안: 저장소 루트에 `AGENTS.md`를 추가해 작업 시작 전 `PROJECT_RULES.md`, `docs/handoff.md`, `docs/current-issues-and-plan.md`, `docs/recovery-audit.md`, `RESEARCH_CHECKLIST.md`를 읽도록 지정한다. 전역 `C:\Users\i\.codex\AGENTS.md`에도 저장소 `AGENTS.md`를 우선 확인하라는 공통 지시를 작성한다.
+- 재발 방지 기준: 저장소 운영 규칙이 새로 생기거나 바뀌면, 실제 규칙 문서뿐 아니라 에이전트 진입점인 `AGENTS.md`도 함께 갱신한다.
+- 해결 커밋: 이 항목이 포함된 커밋.

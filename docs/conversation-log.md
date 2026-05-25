@@ -137,3 +137,57 @@ GitHub `game/main`에 올라간 내용:
 ### 사용자
 
 진행해
+
+## 2026-05-26
+
+### 사용자
+
+흠...최상위 작업 지시 사항이 깃에 있으면안되고 코덱스 여기 내부에 있어야하는건가?
+
+### Codex
+
+응, 구분이 필요해.
+
+`Git에 있는 PROJECT_RULES.md`는 **프로젝트 인수인계/운영 규칙**으로는 맞아. 다른 PC, 다른 세션, 다른 작업자가 봐야 하는 기준이면 Git에 있어야 해.
+
+하지만 그게 **Codex 내부 최상위 지시사항**이 되는 건 아니야.
+
+### 사용자
+
+세션 시작 지시나 내부 지시는 어디어 어떻게 해놔야해?
+
+### Codex
+
+전역 기본값은 `C:\Users\i\.codex\AGENTS.md`, 프로젝트별 규칙은 저장소 루트의 `AGENTS.md`, 인수인계/공유 문서는 `PROJECT_RULES.md`와 `docs/handoff.md`로 나누는 게 좋다고 안내했다.
+
+### 사용자
+
+그런데 지금도 그런문서있을껄?
+
+### Codex
+
+현재 전역 `C:\Users\i\.codex\AGENTS.md`는 비어 있고, 원격 최신에는 `PROJECT_RULES.md`와 `docs/handoff.md`는 있지만 루트 `AGENTS.md`는 없다고 확인했다. 예전 폐기 폴더에는 `AGENTS.md`가 있었고, 그 내용은 `docs/HARNESS.md`를 먼저 읽으라는 진입점 문서였다.
+
+### 사용자
+
+PROJECT_RULES 이건 내용이 뭔데
+
+### Codex
+
+`PROJECT_RULES.md`는 작업 루트 정리, 대화 원문 로그 관리, 문제점과 해결 방안 로그 관리의 3개 운영 규칙이라고 설명했다.
+
+### 사용자
+
+맞아 그걸 에이전트에 남겨야하는거아냐? 너말대로라면
+
+### Codex
+
+맞다고 답했다. `AGENTS.md`는 Codex/에이전트 작업 시작 진입점이고, `PROJECT_RULES.md`는 실제 상세 운영 규칙으로 역할을 나누는 게 맞다고 설명했다.
+
+### 사용자
+
+그래 그럼 일단 그렇게 해줘
+
+### Codex
+
+원격 최신 `origin/main` 기준으로 `codex/add-agent-entry` 브랜치를 만들고, 저장소 루트 `AGENTS.md`와 전역 `C:\Users\i\.codex\AGENTS.md`를 작성했다. 루트 `AGENTS.md`는 `PROJECT_RULES.md`, `docs/handoff.md`, `docs/current-issues-and-plan.md`, `docs/recovery-audit.md`, `RESEARCH_CHECKLIST.md`를 작업 시작 전에 읽도록 지정한다.
