@@ -191,3 +191,11 @@ PROJECT_RULES 이건 내용이 뭔데
 ### Codex
 
 원격 최신 `origin/main` 기준으로 `codex/add-agent-entry` 브랜치를 만들고, 저장소 루트 `AGENTS.md`와 전역 `C:\Users\i\.codex\AGENTS.md`를 작성했다. 루트 `AGENTS.md`는 `PROJECT_RULES.md`, `docs/handoff.md`, `docs/current-issues-and-plan.md`, `docs/recovery-audit.md`, `RESEARCH_CHECKLIST.md`를 작업 시작 전에 읽도록 지정한다.
+
+### 사용자
+
+마무리해
+
+### Codex
+
+마무리 절차로 Git 상태를 확인했다. 현재 작업 브랜치 `codex/add-agent-entry`는 `origin/main`과 같은 커밋 `7ecf677 Add agent entry rules`를 보고 있으며, 워킹트리는 깨끗했다. 로컬 삭제/정리는 `PROJECT_RULES.md` 기준상 사용자 재확인 후에만 진행해야 한다.
