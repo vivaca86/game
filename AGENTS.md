@@ -74,6 +74,42 @@ Risk:
 Confirmation question:
 ```
 
+### Pre-Execution Failure Mode Review
+
+For important work, Codex must identify likely failure modes before execution.
+This review must be visible to the user when the work is large, risky, ambiguous, or depends on external sources, tools, or verification.
+
+At minimum, consider:
+
+- Scope drift: whether the requested scope could be silently reduced, expanded, or reinterpreted.
+- False completion: whether Codex could say complete before implementation, research, or verification is actually complete.
+- Missing sources: whether the work needs external references, original materials, videos, docs, or user-provided files.
+- Missing tools or dependencies: whether the work needs a package, runtime, browser, plugin, connector, API key, or local program.
+- Verification gap: how the result will be tested, inspected, compared, or otherwise proven.
+- Recovery risk: whether the work touches files, Git state, generated assets, or local cleanup in a way that is hard to undo.
+
+For each serious failure mode, state how it will be prevented or verified.
+If a failure mode cannot be prevented, report the limitation before continuing.
+
+### Tool And Dependency Handling
+
+Do not use missing tools, missing dependencies, or missing access as a vague excuse.
+If a tool, package, runtime, connector, browser capability, API key, or source file is genuinely required, Codex must say so clearly.
+
+Follow this order.
+
+1. Check whether an existing local tool or available connector can solve the need.
+2. If a free and installable dependency is required, ask the user for permission to install or enable it.
+3. If a paid product, paid API, licensed asset, or account-restricted service is required, report that limitation and ask for user-provided access or propose a free alternative.
+4. If the user does not approve the needed tool or access, continue only if a reduced-scope path is valid.
+5. If a required tool or source is missing, do not mark the work as Complete. Use `Blocked`, `Cannot judge completion`, `Research incomplete`, or `Implemented, not verified` as appropriate.
+
+### Verification Plan
+
+For non-trivial implementation, research, UI, game, Git, or cleanup work, Codex must define the verification method before or during execution.
+The final report must compare the actual verification performed against that plan.
+If verification could not be performed, say so directly and do not use `Complete`.
+
 ### No Silent Scope Changes
 
 Codex must not silently reduce, expand, or reinterpret the user's requested scope.
@@ -154,7 +190,7 @@ Every final completion report must include:
 Important work must follow this flow.
 
 ```text
-Confirm instruction -> Check records -> Present scope/criteria -> Get approval when risky -> Execute -> Verify -> State completion level -> Report remaining risk
+Confirm instruction -> Check records -> Present scope/criteria -> Identify failure modes -> Define verification/tool needs -> Get approval when risky -> Execute -> Verify -> State completion level -> Report remaining risk
 ```
 
 Codex must not quietly change the user's instruction for reasons of safety, speed, convenience, or assumption.
@@ -223,6 +259,42 @@ Risk:
 Confirmation question:
 ```
 
+### 작업 전 실패 가능성 점검
+
+중요한 작업은 실행 전에 생길 수 있는 실패 유형을 먼저 점검한다.
+작업이 크거나 위험하거나 애매하거나 외부 자료, 도구, 검증에 의존한다면 이 점검 내용을 사용자에게 보이게 제시한다.
+
+최소한 다음을 확인한다.
+
+- 범위 이탈: 요청 범위가 조용히 줄거나 늘거나 재해석될 가능성
+- 완료 오판: 구현, 조사, 검증이 끝나기 전에 완료라고 말할 가능성
+- 자료 부족: 외부 참고자료, 원본 자료, 영상, 문서, 사용자 제공 파일이 필요한지
+- 도구/의존성 부족: 패키지, 런타임, 브라우저, 플러그인, 커넥터, API 키, 로컬 프로그램이 필요한지
+- 검증 공백: 결과를 어떻게 테스트, 확인, 비교, 증명할지
+- 복구 위험: 파일, Git 상태, 생성 산출물, 로컬 정리처럼 되돌리기 어려운 부분이 있는지
+
+심각한 실패 가능성마다 예방하거나 검증할 방법을 말한다.
+막을 수 없는 실패 가능성이 있으면 계속 진행하기 전에 한계를 보고한다.
+
+### 도구와 의존성 처리
+
+필요한 도구, 의존성, 접근 권한이 없다는 말을 흐릿한 변명처럼 쓰지 않는다.
+도구, 패키지, 런타임, 커넥터, 브라우저 기능, API 키, 소스 파일이 정말 필요하면 명확하게 말한다.
+
+처리 순서는 다음과 같다.
+
+1. 기존 로컬 도구나 사용 가능한 커넥터로 해결 가능한지 확인한다.
+2. 무료이며 설치 가능한 의존성이 필요하면 사용자에게 설치 또는 활성화 허가를 요청한다.
+3. 유료 제품, 유료 API, 라이선스 자산, 계정 제한 서비스가 필요하면 그 한계를 보고하고 사용자 제공 접근 권한 또는 무료 대안을 제시한다.
+4. 사용자가 필요한 도구나 접근 권한을 승인하지 않으면, 축소된 범위가 유효할 때만 계속한다.
+5. 필수 도구나 자료가 없으면 `Complete`라고 하지 않는다. 상황에 따라 `Blocked`, `Cannot judge completion`, `Research incomplete`, `Implemented, not verified`를 사용한다.
+
+### 검증 계획
+
+단순하지 않은 구현, 조사, UI, 게임, Git, 정리 작업은 실행 전 또는 실행 중 검증 방법을 정한다.
+최종 보고에서는 실제 수행한 검증이 그 계획과 맞는지 비교한다.
+검증을 못 했으면 직접 말하고 `Complete`를 쓰지 않는다.
+
 ### 조용한 범위 변경 금지
 
 사용자가 요청한 범위를 Codex가 조용히 줄이거나 넓히거나 재해석하지 않는다.
@@ -282,7 +354,7 @@ Git 상태, 파일 구조, 지시 충돌, 삭제/변경 범위 확대, 검증 �
 중요한 작업은 다음 흐름을 따른다.
 
 ```text
-Confirm instruction -> Check records -> Present scope/criteria -> Get approval when risky -> Execute -> Verify -> State completion level -> Report remaining risk
+Confirm instruction -> Check records -> Present scope/criteria -> Identify failure modes -> Define verification/tool needs -> Get approval when risky -> Execute -> Verify -> State completion level -> Report remaining risk
 ```
 
 Codex는 안전, 속도, 편의, 추정이라는 이유로 사용자의 지시를 조용히 바꾸면 안 된다.

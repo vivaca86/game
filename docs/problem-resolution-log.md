@@ -38,3 +38,11 @@
 - 해결 방안: `AGENTS.md`를 영어 authoritative 규칙과 한글 참고 번역 구조로 개편했다. 실제 기준은 `Authoritative English Rules`로 고정하고, 위험 작업 범위 제시, 조용한 범위 변경 금지, 전수조사 체크리스트 선행, 완료/부분 완료/검증 미완료 상태 구분을 명시했다. `PROJECT_RULES.md`에도 `AGENTS.md`의 영문 규칙을 에이전트 운영 기준으로 연결했다.
 - 재발 방지 기준: 중요한 작업은 `Confirm instruction -> Check records -> Present scope/criteria -> Get approval when risky -> Execute -> Verify -> State completion level -> Report remaining risk` 흐름을 따른다. 체크리스트와 검증 근거 없이 `Research complete`, `95% close`, `Passed`, `Complete` 표현을 쓰지 않는다.
 - 해결 커밋: 이 항목이 포함된 커밋.
+
+### 문제: 실패 가능성, 검증 계획, 필요한 도구 요청이 늦게 드러날 수 있음
+
+- 원인: Codex가 작업 전에 실패 가능성, 필요한 외부 자료, 도구/의존성, 검증 방법을 명시하지 않으면 중간에 "자료가 없다", "도구가 없다", "검증을 못 했다"는 식으로 뒤늦게 한계가 드러날 수 있다.
+- 영향: 실제로 필요한 무료 도구나 의존성을 설치하면 해결될 문제도 차단처럼 보일 수 있고, 반대로 유료 도구나 계정 제한이 필요한 일을 완료 가능한 것처럼 오판할 수 있다.
+- 해결 방안: `AGENTS.md`에 `Pre-Execution Failure Mode Review`, `Tool And Dependency Handling`, `Verification Plan` 조항을 추가했다. 무료로 설치 가능한 필수 의존성은 사용자에게 허가를 요청하고, 유료 제품/유료 API/라이선스 자산/계정 제한 서비스는 한계를 보고한 뒤 사용자 제공 접근 권한 또는 무료 대안을 제시하도록 했다.
+- 재발 방지 기준: 중요한 작업은 실행 전에 범위 이탈, 완료 오판, 자료 부족, 도구/의존성 부족, 검증 공백, 복구 위험을 점검한다. 필수 도구나 자료가 없으면 `Complete`라고 말하지 않고 `Blocked`, `Cannot judge completion`, `Research incomplete`, `Implemented, not verified` 중 맞는 상태로 보고한다.
+- 해결 커밋: 이 항목이 포함된 커밋.
