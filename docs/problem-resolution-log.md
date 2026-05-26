@@ -141,3 +141,11 @@
 - 해결 방안: `tools/audit-slice-effects.mjs`를 추가해 docs/runtime fixture의 카드 설명/effect drift, `후보` 잔존, effect op별 한글 설명 단서/수치, Phaser runtime 처리 여부를 검사한다. `package.json`의 `check`에도 `slice:effects`를 연결했다. `apply_mark`는 `enemyMark` 상태로 구현하고, 다음 피해 보너스로 소비되도록 했다.
 - 재발 방지 기준: 새 카드 effect op를 추가할 때는 fixture 설명, runtime simulation 처리, `slice:effects` 규칙, smoke test 필요 여부를 함께 갱신한다. 설명에 적힌 기능이 현재 slice에서 구현되지 않았으면 후보나 조건을 남기지 않는다.
 - 해결 커밋: `fd49a77 Add slice effect audit`
+
+### 문제: 방의 `encounterPoolId`가 직접 enemy/event/boss id를 참조해 확장성이 막힘
+
+- 원인: 첫 세로 조각에서는 route room의 `encounterPoolId`가 `enemy_folded_sentry`, `event_rune_bench`, `boss_curtain_lion`처럼 실제 콘텐츠 id를 직접 가리켰다. 이 구조는 이름은 pool이지만 실제로는 단일 직접 참조라서 여러 적 후보, 가중치, 방 타입별 검증을 붙이기 어려웠다.
+- 영향: 이후 콘텐츠를 늘릴 때 방마다 enemy id를 직접 바꾸는 방식으로 흐르기 쉬워지고, combat/event/boss 참조 도메인이 섞여도 검증하기 어렵다.
+- 해결 방안: explicit `encounterPools[]` 데이터를 추가하고 route `encounterPoolId`가 pool id를 참조하게 바꿨다. pool entries는 실제 enemy/event/boss content id와 weight를 갖고, runtime은 pool entry를 통해 전투 대상을 선택한다. validator는 pool 타입, entries, weight, 방 타입 일치, boss pool의 stage boss 포함 여부를 검사한다.
+- 재발 방지 기준: 새 방이나 encounter pool을 추가할 때 직접 enemy/event/boss id를 route에 넣지 않는다. route는 pool id만 참조하고, 실제 후보는 `encounterPools[].entries`에 둔다.
+- 해결 커밋: `7420a77 Add explicit encounter pools`

@@ -435,3 +435,15 @@ Phaser 런타임 첫 골조와 데이터 부팅, 디버그 진입 작업을 그�
 데이터에서는 이미 구현된 효과의 후보 표현을 제거했고, 현재 slice runtime에 없는 `전투당 1회 제한` 설명/condition은 제거했다. `card_sun_jab`의 첫 공격 보너스 문구도 현재 slice에서 캐릭터 패시브가 구현되지 않았으므로 제거했다. `card_lamplight_mark`는 데이터에 있던 `apply_mark` op를 실제 전투 상태 `enemyMark`로 연결하고, 다음 피해에 보너스를 주며 소비되도록 구현했다. debug overlay, CombatScene 표시, save schema/state, smoke test도 `enemyMark`를 포함하도록 갱신했다.
 
 검증은 `npm.cmd run slice:effects`, `npm.cmd run slice:validate`, `npm.cmd run phaser:smoke`, `npm.cmd run check`, `git diff --check`로 진행했다. `phaser:smoke`는 `card_lamplight_mark` 부여 진입에서 `enemyMark=2`, 다음 공격 후 `enemyMark=0`, `enemyHp=15`를 확인한다. Vite build는 통과했지만 500kB 초과 chunk warning은 남아 있어 추후 번들 분리 후보로 기록한다. 구현 커밋은 `fd49a77 Add slice effect audit`이다.
+
+### 사용자
+
+다음 작업으로 넘어가자고 지시했다. 인앱 브라우저는 `?debug=1&entry=combat&resetSave=1&grantCard=card_lamplight_mark` 상태였다.
+
+### Codex
+
+다음 기반 작업을 `encounterPoolId` explicit encounter pool 분리로 확정했다. `EncounterPoolData`, `EncounterPoolEntry`, `EncounterPoolRule` 타입을 `src/data/schema.ts`와 `docs/game-data-types.v1.ts`, `docs/data-schema-draft.md`에 추가했고, fixture의 전투/이벤트/보스 방 `encounterPoolId`가 직접 enemy/event/boss id가 아니라 `encounterPools[].id`를 참조하도록 변경했다.
+
+runtime에서는 `getEncounterPoolContentId`를 추가해 combat/boss 진입과 debug 초기 전투 생성이 pool entry를 통해 실제 적/보스를 선택하도록 바꿨다. event 방도 pool에서 선택된 event id를 로그에 남긴다. `tools/validate-slice-fixture.mjs`는 encounter pool의 타입, entries, weight, 방 타입 일치, boss pool의 `stage.bossId` 포함 여부를 검증하도록 확장했다.
+
+검증은 `npm.cmd run slice:validate`, `npm.cmd run slice:effects`, `npm.cmd run check`, `npm.cmd run phaser:smoke`, `git diff --check`로 진행했다. 모두 통과했고, Vite build의 500kB 초과 chunk warning은 기존과 같은 잔여 번들 분리 후보로 남았다. 구현 커밋은 `7420a77 Add explicit encounter pools`이다.
