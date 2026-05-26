@@ -245,3 +245,11 @@
 - Resolution: Added a deterministic transparent spritesheet placeholder for `boss_curtain_lion`. Updated the shared combat panel portrait renderer to support both regular enemies and bosses from `assetKeys.sprite`, with a larger boss display size. Screenshot review also moved the Boss End Turn button to the safer Combat button position.
 - Prevention: Boss sprite passes must include an actual BossScene screenshot, not only a generated spritesheet or manifest audit. Regular enemy and boss rendering can share code, but completion should still be recorded separately.
 - Resolution commit: `a98ec51 Render boss sprite placeholder`
+
+### Problem: Progression icon assets were validated but not visible in player-facing scenes
+
+- Cause: The data and manifest referenced stage map, rune, relic, and character portrait asset keys, but the Phaser scenes mostly rendered those surfaces as text-only state. Strict asset audit could pass while those visual keys were not meaningfully exercised in screenshots.
+- Impact: The foundation could claim an asset path was connected because preload and manifest checks passed, even though Reward, Rune Bench, Result, and the common scene shell did not prove those icons or portrait assets in context.
+- Resolution: Added deterministic candidate art for the stage map icon, rune icons, first relic icon, and first character portrait. Updated shared scene shells, Reward, Rune Bench, and Result to render those assets through `assetKeys`, and added a relic debug summary plus a Result smoke screenshot case for a debug-granted relic.
+- Prevention: Future asset surface passes should identify whether a key is only preloaded or also visible in a representative scene. Smoke should include at least one debug state for assets that do not appear in the default loop.
+- Resolution commit: `6ea9679 Render progression icon candidates`

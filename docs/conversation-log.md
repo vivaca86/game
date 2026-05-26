@@ -559,3 +559,14 @@ The next scoped task was fixed as the boss sprite pipeline placeholder pass. The
 `tools/generate-dev-runtime-assets.mjs` now generates a transparent deterministic spritesheet placeholder for `boss_curtain_lion`, preserving the manifest 275x275 frame layout. `src/phaser/scenes/CombatScene.ts` now renders both regular enemy and boss portraits from `assetKeys.sprite` through the shared combat panel, scaling the boss portrait slightly larger. `src/phaser/scenes/BossScene.ts` also received a narrow End Turn button position adjustment after screenshot review showed the old boss button still crowding the panel/card area.
 
 Verification used `npm.cmd run assets:audit:strict`, `npm.cmd run check`, `npm.cmd run phaser:smoke`, `git diff --check`, visual inspection of `public/assets/runtime/bosses/boss_curtain_lion_v001.png`, and `tmp/phaser-BossScene.png`. The scoped implementation commit is `a98ec51 Render boss sprite placeholder`. This is a pipeline placeholder pass only.
+
+### User
+The user asked whether the next step should continue foundation work or polish the temporary images. After the distinction was clarified, the user approved continuing the foundation path.
+
+### Codex
+
+The next scoped task was fixed as a progression icon candidate pass. The included assets were `map_icon_lantern_foyer`, the three rune icons, `relic_brass_bookmark_icon`, and `char_mina_pagehand_portrait`. Effect spritesheets, the character spritesheet animation path, UI panel skinning, final art, and approved art were excluded.
+
+`tools/generate-dev-runtime-assets.mjs` now generates deterministic candidate art for those progression-facing icons and the character portrait. Shared scene shells render the active character portrait and stage map icon from `assetKeys`; Reward renders reward-type icons; Rune Bench renders rune icons; Result renders collected relic icons and the debug overlay now exposes `relics=` so smoke can verify a debug-granted relic state.
+
+Verification used `npm.cmd run assets:audit:strict`, `npm.cmd run check`, `npm.cmd run phaser:smoke`, `git diff --check`, and visual inspection of `tmp/phaser-1920-TownScene.png`, `tmp/phaser-1920-RewardScene.png`, `tmp/phaser-1920-RuneBenchScene.png`, and `tmp/phaser-1920-ResultScene.png`. The scoped implementation commit is `6ea9679 Render progression icon candidates`. This is a candidate/development art pass only.
