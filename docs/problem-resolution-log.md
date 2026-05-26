@@ -253,3 +253,11 @@
 - Resolution: Added deterministic candidate art for the stage map icon, rune icons, first relic icon, and first character portrait. Updated shared scene shells, Reward, Rune Bench, and Result to render those assets through `assetKeys`, and added a relic debug summary plus a Result smoke screenshot case for a debug-granted relic.
 - Prevention: Future asset surface passes should identify whether a key is only preloaded or also visible in a representative scene. Smoke should include at least one debug state for assets that do not appear in the default loop.
 - Resolution commit: `6ea9679 Render progression icon candidates`
+
+### Problem: Effect spritesheets existed but combat feedback did not use them
+
+- Cause: The manifest preloaded `effect_paper_slash`, `effect_ink_splash`, and `effect_stage_spotlight`, and boss phase data referenced `visualCueKey`, but Combat and Boss scenes did not choose or render any effect spritesheet from combat state.
+- Impact: Card actions and boss phase changes could be mechanically verified while still feeling visually inert, and asset audit could pass without proving the effect assets in a gameplay screenshot.
+- Resolution: Added deterministic transparent spritesheet candidates for the three effect assets. Added a combat feedback selector based on recent combat log state, rendered the selected spritesheet frame in Combat/Boss scenes, exposed `effect=` in the debug overlay, and extended smoke coverage with paper-slash, ink-splash, and stage-spotlight screenshots.
+- Prevention: Future effect work should keep simulation state serializable and derive renderer feedback from explicit state/log boundaries. Any new effect key should include an automated debug state or screenshot that proves it renders in context.
+- Resolution commit: `a0a15e1 Render combat effect feedback`

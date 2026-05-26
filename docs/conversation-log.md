@@ -570,3 +570,14 @@ The next scoped task was fixed as a progression icon candidate pass. The include
 `tools/generate-dev-runtime-assets.mjs` now generates deterministic candidate art for those progression-facing icons and the character portrait. Shared scene shells render the active character portrait and stage map icon from `assetKeys`; Reward renders reward-type icons; Rune Bench renders rune icons; Result renders collected relic icons and the debug overlay now exposes `relics=` so smoke can verify a debug-granted relic state.
 
 Verification used `npm.cmd run assets:audit:strict`, `npm.cmd run check`, `npm.cmd run phaser:smoke`, `git diff --check`, and visual inspection of `tmp/phaser-1920-TownScene.png`, `tmp/phaser-1920-RewardScene.png`, `tmp/phaser-1920-RuneBenchScene.png`, and `tmp/phaser-1920-ResultScene.png`. The scoped implementation commit is `6ea9679 Render progression icon candidates`. This is a candidate/development art pass only.
+
+### User
+The user approved continuing with the next remaining foundation item after effect spritesheets were identified as the recommended next group.
+
+### Codex
+
+The next scoped task was fixed as an effect spritesheet pipeline pass. The included assets were `effect_paper_slash`, `effect_ink_splash`, and `effect_stage_spotlight`; final VFX timing, sound, broad animation systems, character sprite work, and UI panel skinning were excluded.
+
+`tools/generate-dev-runtime-assets.mjs` now generates deterministic transparent spritesheet candidates for the three effect assets. `src/simulation/state/combatFeedback.ts` derives a current feedback effect key from recent combat log state without storing renderer objects in simulation state. Combat and Boss scenes render the matching spritesheet frame over the combatant area, and the debug overlay exposes `effect=` so smoke can verify paper slash, ink splash, and boss stage spotlight states.
+
+Verification used `npm.cmd run assets:audit:strict`, `npm.cmd run check`, `npm.cmd run phaser:smoke`, `git diff --check`, and visual inspection of `tmp/phaser-effect-paper-slash.png`, `tmp/phaser-effect-ink-splash.png`, `tmp/phaser-effect-stage-spotlight.png`, plus generated effect sheet inspection. The scoped implementation commit is `a0a15e1 Render combat effect feedback`. This is a combat feedback pipeline proof only.
