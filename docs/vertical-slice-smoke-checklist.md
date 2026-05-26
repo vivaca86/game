@@ -40,6 +40,7 @@ Date: 2026-05-26
 | DATA-005 | All referenced asset keys exist in the planned manifest. | `npm.cmd run slice:validate` | Verified |
 | DATA-006 | Card descriptions and effect ops do not contradict each other. | `npm.cmd run slice:effects` | Verified |
 | DATA-007 | Save data does not store Phaser objects. | `npm.cmd run phaser:smoke` save snapshot check | Verified |
+| DATA-008 | Room `encounterPoolId` values reference explicit encounter-pool data, and pool entries point to the right content domain. | `npm.cmd run slice:validate` + `npm.cmd run phaser:smoke` | Verified |
 
 ## UI Checks
 
@@ -97,6 +98,7 @@ Date: 2026-05-26
 - `git diff --check`: passed.
 - Save reload: `phaser:smoke` verifies saved mid-combat state restores after reload and saved completed-stage profile state survives reload. In-app browser also verified reset-save flow, card action, no-reset reload, and restored `phase=combat`, `enemyHp=17`, `playerEnergy=2`, `savedPhase=combat`.
 - Effect audit: `slice:effects` verifies docs/runtime fixture card effect text stays in sync, implemented card descriptions do not keep draft `후보` wording, each card effect op has a Korean description cue/amount, and each op is handled by the Phaser slice simulation.
+- Encounter pool refs: `slice:validate` verifies route `encounterPoolId` values point to `encounterPools[].id`, pool type matches the room type, pool entries reference the right enemy/event/boss domain, and the boss pool includes the stage `bossId`.
 - Mark smoke: `phaser:smoke` uses `?debug=1&entry=combat&resetSave=1&grantCard=card_lamplight_mark`, confirms mark becomes `enemyMark=2`, then the next attack consumes mark to `enemyMark=0` and reduces enemy HP from 24 to 15.
 - 1920/view checks: `phaser:smoke` now captures 1920x1080 screenshots for Town, Dungeon, Combat, Reward, Rune Bench, and Boss under `tmp/phaser-1920-*.png`. Combat and Boss assertions verify five-card hands, expected debug state, non-empty screenshots, and debug-overlay avoidance of the hand and enemy intent areas.
 - Responsive overlay checks: `phaser:smoke` also captures 1280 and 1080 overlay screenshots for Combat and Boss under `tmp/phaser-overlay-*.png`. In-app browser verification at 1080x918 confirmed `phase=combat`, `enemyHp=24`, `playerEnergy=3`, overlay size `220x260`, and no overlap with the five-card hand or enemy intent panel.
@@ -111,6 +113,6 @@ This is still not a production-complete game, final art/assets pass, exhaustive 
 
 ## Next Work
 
-1. Split fixture `encounterPoolId` into explicit encounter-pool data if the next content pass needs multiple enemies per room.
-2. Continue source/version confirmation separately; current implementation is a slice foundation, not source parity.
+1. Continue source/version confirmation separately; current implementation is a slice foundation, not source parity.
+2. Compare planned asset keys with actual generated asset files when the asset pipeline begins.
 3. Expand content, final art/assets, balance, and UX polish only after the foundation remains green.

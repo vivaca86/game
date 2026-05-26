@@ -549,7 +549,7 @@
           {
             "id": "room_intro_combat",
             "type": "combat",
-            "encounterPoolId": "enemy_folded_sentry",
+            "encounterPoolId": "encounter_pool_intro_combat",
             "rewardPoolId": "reward_pool_card_intro",
             "requiredClear": true
           },
@@ -562,20 +562,20 @@
           {
             "id": "room_rune_bench",
             "type": "event",
-            "encounterPoolId": "event_rune_bench",
+            "encounterPoolId": "encounter_pool_rune_bench",
             "requiredClear": true
           },
           {
             "id": "room_pressure_combat",
             "type": "combat",
-            "encounterPoolId": "enemy_ink_mote",
+            "encounterPoolId": "encounter_pool_pressure_combat",
             "rewardPoolId": "reward_pool_rune_intro",
             "requiredClear": true
           },
           {
             "id": "room_foyer_boss",
             "type": "boss",
-            "encounterPoolId": "boss_curtain_lion",
+            "encounterPoolId": "encounter_pool_foyer_boss",
             "rewardPoolId": "reward_pool_boss_clear",
             "requiredClear": true
           }
@@ -591,6 +591,96 @@
           "backgroundSet": "bg_lantern_foyer_set",
           "mapIcon": "map_icon_lantern_foyer"
         }
+      }
+    ],
+    "encounterPools": [
+      {
+        "id": "encounter_pool_intro_combat",
+        "displayNameKo": "현관 첫 전투 풀",
+        "descriptionKo": "첫 전투에서 접힌 파수꾼을 선택하는 세로 조각 전투 풀.",
+        "tags": ["encounter_pool", "combat", "slice"],
+        "referenceRole": "first_slice_stage",
+        "evidence": {
+          "level": "source_level",
+          "sources": ["research/stage-gap-map.md"],
+          "notes": "Explicit encounter pool for the first slice combat."
+        },
+        "type": "combat",
+        "entries": [
+          { "contentId": "enemy_folded_sentry", "weight": 1 }
+        ],
+        "rules": [
+          {
+            "id": "rule_intro_single_enemy",
+            "descriptionKo": "세로 조각 첫 전투는 항상 접힌 파수꾼 1종을 선택한다."
+          }
+        ]
+      },
+      {
+        "id": "encounter_pool_rune_bench",
+        "displayNameKo": "룬 작업대 이벤트 풀",
+        "descriptionKo": "접힌 작업대 이벤트를 선택하는 세로 조각 이벤트 풀.",
+        "tags": ["encounter_pool", "event", "slice"],
+        "referenceRole": "rune_socket_event",
+        "evidence": {
+          "level": "source_level",
+          "sources": ["research/event-gap-map.md"],
+          "notes": "Explicit encounter pool for the rune bench event."
+        },
+        "type": "event",
+        "entries": [
+          { "contentId": "event_rune_bench", "weight": 1 }
+        ],
+        "rules": [
+          {
+            "id": "rule_rune_bench_single_event",
+            "descriptionKo": "세로 조각에서는 접힌 작업대 이벤트만 선택한다."
+          }
+        ]
+      },
+      {
+        "id": "encounter_pool_pressure_combat",
+        "displayNameKo": "현관 압박 전투 풀",
+        "descriptionKo": "룬 장착 후 잉크 얼룩불을 선택하는 세로 조각 전투 풀.",
+        "tags": ["encounter_pool", "combat", "slice"],
+        "referenceRole": "first_slice_stage",
+        "evidence": {
+          "level": "source_level",
+          "sources": ["research/stage-gap-map.md"],
+          "notes": "Explicit encounter pool for the second slice combat."
+        },
+        "type": "combat",
+        "entries": [
+          { "contentId": "enemy_ink_mote", "weight": 1 }
+        ],
+        "rules": [
+          {
+            "id": "rule_pressure_single_enemy",
+            "descriptionKo": "세로 조각 두 번째 전투는 항상 잉크 얼룩불 1종을 선택한다."
+          }
+        ]
+      },
+      {
+        "id": "encounter_pool_foyer_boss",
+        "displayNameKo": "현관 보스 풀",
+        "descriptionKo": "등불 현관의 보스 커튼 사자무대를 선택하는 세로 조각 보스 풀.",
+        "tags": ["encounter_pool", "boss", "slice"],
+        "referenceRole": "first_boss_phase_gate",
+        "evidence": {
+          "level": "source_level",
+          "sources": ["research/boss-gap-map.md"],
+          "notes": "Explicit encounter pool for the first slice boss."
+        },
+        "type": "boss",
+        "entries": [
+          { "contentId": "boss_curtain_lion", "weight": 1 }
+        ],
+        "rules": [
+          {
+            "id": "rule_foyer_single_boss",
+            "descriptionKo": "세로 조각 보스 방은 항상 커튼 사자무대를 선택한다."
+          }
+        ]
       }
     ],
     "enemies": [

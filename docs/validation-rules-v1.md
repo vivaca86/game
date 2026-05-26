@@ -59,6 +59,7 @@ evidence.sources
 | relics | rarity, effects, assetKeys |
 | characters | maxHp, startingEnergy, startingDeck, passives, assetKeys |
 | stages | order, biomeKey, route, bossId, rewardPools, assetKeys |
+| encounterPools | type, entries, rules |
 | enemies | role, maxHp, intents, assetKeys |
 | bosses | role, maxHp, intents, phases, assetKeys |
 | events | choices, assetKeys |
@@ -107,9 +108,10 @@ evidence.sources
 
 - stage의 `bossId`는 `bosses[].id`에 있어야 한다.
 - route의 `rewardPoolId`는 `rewardPools[].id`에 있어야 한다.
-- `type: "combat"`의 `encounterPoolId`는 첫 fixture에서는 `enemies[].id`를 직접 참조한다. encounter pool 분리는 후속 결정으로 미룬다.
-- `type: "event"`의 `encounterPoolId`는 `events[].id`를 참조할 수 있다.
-- `type: "boss"`의 `encounterPoolId`는 `bosses[].id`를 참조할 수 있다.
+- `type: "combat"`, `"elite"`, `"event"`, `"boss"`의 `encounterPoolId`는 `encounterPools[].id`를 참조해야 한다.
+- encounter pool의 `type`은 방 타입과 일치해야 한다.
+- combat/elite pool entries는 `enemies[].id`, event pool entries는 `events[].id`, boss pool entries는 `bosses[].id`를 참조해야 한다.
+- boss room의 encounter pool은 해당 stage의 `bossId`를 포함해야 한다.
 
 ## Smoke checklist 연결
 
@@ -171,6 +173,5 @@ tsc --noEmit --strict --skipLibCheck docs/game-data-types.v1.ts
 
 ## 다음 작업
 
-1. fixture의 `encounterPoolId`를 별도 encounter pool 데이터로 분리할지 결정한다.
-2. 새 카드/effect op를 추가할 때 `slice:effects` 규칙과 Phaser slice simulation 처리를 함께 갱신한다.
-3. 원작 대응 기준은 source/version 확인이 끝날 때까지 별도 검증으로 유지한다.
+1. 새 카드/effect op를 추가할 때 `slice:effects` 규칙과 Phaser slice simulation 처리를 함께 갱신한다.
+2. 원작 대응 기준은 source/version 확인이 끝날 때까지 별도 검증으로 유지한다.

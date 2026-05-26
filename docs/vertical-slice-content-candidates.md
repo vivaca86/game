@@ -162,6 +162,6 @@ paper_town_start
 
 ## 다음 작업
 
-1. 새 콘텐츠를 늘리기 전 `encounterPoolId`를 별도 encounter-pool 데이터로 분리할지 결정한다.
-2. `docs/asset-manifest.slice.v1.json`의 planned asset key를 실제 파일 생성 결과와 비교한다.
-3. `Needs direct proof` 상태의 후보는 debug 화면에서도 draft임을 표시한다.
+1. `docs/asset-manifest.slice.v1.json`의 planned asset key를 실제 파일 생성 결과와 비교한다.
+2. `Needs direct proof` 상태의 후보는 debug 화면에서도 draft임을 표시한다.
+3. encounter pool을 확장할 때는 pool entries와 방 타입 검증을 먼저 갱신한다.

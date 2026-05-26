@@ -303,13 +303,13 @@ notes?: string
 13. `docs/debug-entry-plan.md`: URL debug entry와 debug action 계획
 14. `docs/implementation-start-checklist.md`: 실제 구현 착수 전 체크리스트
 
-## 다음 작업
+## 초기 구현 작업
 
-1. `simulation/`에 전투 상태, 카드 사용, 적 의도 처리의 첫 규칙을 연결한다.
-2. `TownScene -> WorldMapScene -> DungeonScene -> CombatScene`의 입력 기반 scene flow를 연결한다.
-3. `RewardScene`, `RuneBenchScene`, `BossScene`, `ResultScene`을 실제 상태 변화와 연결한다.
-4. fixture의 `encounterPoolId`를 별도 encounter pool 데이터로 분리할지 결정한다.
-5. 첫 구현 착수 전 원작 기준 버전/패치/영상 기준선을 확정한다.
+1. `simulation/`에 전투 상태, 카드 사용, 적 의도 처리의 첫 규칙을 연결했다.
+2. `TownScene -> WorldMapScene -> DungeonScene -> CombatScene`의 입력 기반 scene flow를 연결했다.
+3. `RewardScene`, `RuneBenchScene`, `BossScene`, `ResultScene`을 실제 상태 변화와 연결했다.
+4. fixture의 `encounterPoolId`는 explicit encounter pool 데이터로 분리했다.
+5. 원작 기준 버전/패치/영상 기준선 확정은 계속 별도 작업으로 남긴다.
 
 위 작업이 나오기 전에는 본격 구현 착수 또는 원작 유사도 판정을 하지 않는다.
 
@@ -344,5 +344,5 @@ Current foundation status:
 1. Save reload verification is in place for mid-combat and completed-stage state, including a save boundary check for Phaser object leakage.
 2. 1920x1080 screenshot checks and debug-overlay visual overlap checks are in place.
 3. Card description/effect-op audit is in place through `npm.cmd run slice:effects`.
-4. Remaining foundation decision: decide whether `encounterPoolId` stays a direct enemy/boss id for the slice or becomes explicit encounter-pool data.
+4. Route `encounterPoolId` values now point to explicit encounter-pool data instead of direct enemy/boss/event ids.
 5. Continue source/version confirmation separately before any parity or 95% similarity claim.

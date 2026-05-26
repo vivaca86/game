@@ -14,6 +14,7 @@ const CONTENT_GROUPS = [
   "arcanas",
   "characters",
   "stages",
+  "encounterPools",
   "enemies",
   "bosses",
   "events",
@@ -57,6 +58,7 @@ export function validateLoadedData(bundle: GameDataBundle): ValidationResult {
   validateContent("runes", bundle.runes, errors);
   validateContent("characters", bundle.characters, errors);
   validateContent("stages", bundle.stages, errors);
+  validateContent("encounterPools", bundle.encounterPools, errors);
   validateContent("enemies", bundle.enemies, errors);
   validateContent("bosses", bundle.bosses, errors);
   validateContent("events", bundle.events, errors);

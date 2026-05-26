@@ -148,6 +148,25 @@ export interface RoomSlot {
   requiredClear?: boolean;
 }
 
+export type EncounterPoolType = "combat" | "elite" | "event" | "boss";
+
+export interface EncounterPoolEntry {
+  contentId: ContentId;
+  weight?: number;
+}
+
+export interface EncounterPoolRule {
+  id: ContentId;
+  descriptionKo: string;
+  condition?: string;
+}
+
+export interface EncounterPoolData extends BaseContent {
+  type: EncounterPoolType;
+  entries: EncounterPoolEntry[];
+  rules: EncounterPoolRule[];
+}
+
 export interface StageData extends BaseContent {
   order: number;
   biomeKey: string;
@@ -376,6 +395,7 @@ export interface GameDataBundle {
   arcanas: ArcanaData[];
   characters: CharacterData[];
   stages: StageData[];
+  encounterPools: EncounterPoolData[];
   enemies: EnemyData[];
   bosses: BossData[];
   events: EventData[];

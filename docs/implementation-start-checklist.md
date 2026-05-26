@@ -70,5 +70,8 @@
 실제 구현 착수 직전에는 아래 결정을 확인한다.
 
 - `docs/` fixture를 계속 원본으로 둘지, `src/data/` fixture를 원본으로 승격할지
-- `encounterPoolId`를 지금 분리할지, 첫 scaffold 이후로 미룰지
 - 실제 simulation 시스템을 어느 순서로 연결할지
+
+## 결정 완료
+
+- `encounterPoolId`는 직접 enemy/event/boss id가 아니라 explicit `encounterPools[].id`를 참조한다.

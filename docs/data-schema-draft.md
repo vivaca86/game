@@ -190,12 +190,26 @@ interface RoomSlot {
   encounterPoolId?: ContentId;
   rewardPoolId?: ContentId;
 }
+
+interface EncounterPoolData extends BaseContent {
+  type: "combat" | "elite" | "event" | "boss";
+  entries: {
+    contentId: ContentId;
+    weight?: number;
+  }[];
+  rules: {
+    id: ContentId;
+    descriptionKo: string;
+    condition?: string;
+  }[];
+}
 ```
 
 검증 규칙:
 
 - 스테이지는 최소 전투, 보상, 보스 흐름을 가져야 한다.
 - 방 타입별 UI와 보상 풀이 연결되어야 한다.
+- 전투/이벤트/보스 방의 `encounterPoolId`는 직접 적/이벤트/보스 ID가 아니라 `EncounterPoolData.id`를 참조해야 한다.
 - 1차 세로 조각에서는 한 스테이지라도 마을 복귀까지 닫힌 루프가 필요하다.
 
 ## 몬스터와 보스
@@ -379,5 +393,5 @@ interface AssetManifestEntry {
 1. `docs/game-data-types.v1.ts`를 실제 프로젝트 생성 시 `src/data/schema.ts` 또는 동등한 위치로 옮긴다.
 2. 세로 조각 후보 데이터를 `src/data/fixtures/vertical-slice.v1.json`으로 이관한다.
 3. planned asset manifest를 `src/data/assetManifest.slice.v1.json`으로 이관한다.
-4. fixture의 `encounterPoolId`를 별도 encounter pool 데이터로 분리할지 결정한다.
-5. asset manifest의 planned path를 실제 에셋 생성 결과와 비교한다.
+4. asset manifest의 planned path를 실제 에셋 생성 결과와 비교한다.
+5. source/version 확인이 끝나기 전까지 원작 유사도 판단은 별도 보류한다.

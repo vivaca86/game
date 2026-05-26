@@ -4,6 +4,7 @@ import { claimFirstReward, prepareRewardOffer } from "../rewards/rewardSystem";
 import { ensureRuneBenchGrant, equipFirstRune } from "../runes/runeSystem";
 import {
   getCurrentRoom,
+  getEncounterPoolContentId,
   getStage,
   pushRunLog,
   type SliceRunState
@@ -35,9 +36,12 @@ export function enterCurrentRoom(run: SliceRunState, bundle: GameDataBundle): vo
     prepareRewardOffer(run, bundle, room.rewardPoolId ?? getStage(bundle, run)?.rewardPools[0], 3);
     pushRunLog(run, `flow:reward:${room.id}`);
   } else if (room.type === "event" || room.type === "rest") {
+    const eventId = room.type === "event"
+      ? getEncounterPoolContentId(bundle, room.encounterPoolId, "event")
+      : undefined;
     run.phase = "rune_bench";
     ensureRuneBenchGrant(run, bundle);
-    pushRunLog(run, `flow:rune_bench:${room.id}`);
+    pushRunLog(run, `flow:rune_bench:${eventId ?? room.id}`);
   } else {
     run.phase = "dungeon";
     pushRunLog(run, `flow:room_placeholder:${room.id}`);

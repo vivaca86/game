@@ -1,6 +1,7 @@
 import type {
   CardData,
   ContentId,
+  EncounterPoolType,
   GameDataBundle,
   RewardEntry,
   RunState,
@@ -164,6 +165,15 @@ export function getCurrentRoom(bundle: GameDataBundle, run: SliceRunState): Room
   return getStage(bundle, run)?.route[run.roomIndex];
 }
 
+export function getEncounterPoolContentId(
+  bundle: GameDataBundle,
+  poolId: ContentId | undefined,
+  expectedType: EncounterPoolType
+): ContentId | undefined {
+  const pool = bundle.encounterPools.find((item) => item.id === poolId && item.type === expectedType);
+  return pool?.entries[0]?.contentId;
+}
+
 export function getCard(bundle: GameDataBundle, cardId: ContentId): CardData | undefined {
   return bundle.cards.find((card) => card.id === cardId);
 }
@@ -321,7 +331,10 @@ function createInitialCombatForPhase(
   debug: DebugConfig
 ): SliceCombatState | undefined {
   if (run.phase === "boss") {
+    const room = getCurrentRoom(bundle, run);
+    const pooledBossId = getEncounterPoolContentId(bundle, room?.encounterPoolId, "boss");
     const boss = bundle.bosses.find((item) => item.id === debug.bossId)
+      ?? bundle.bosses.find((item) => item.id === pooledBossId)
       ?? bundle.bosses.find((item) => item.id === getStage(bundle, run)?.bossId)
       ?? bundle.bosses[0];
     return boss ? {
@@ -340,8 +353,9 @@ function createInitialCombatForPhase(
   }
 
   const room = getCurrentRoom(bundle, run);
+  const pooledEnemyId = getEncounterPoolContentId(bundle, room?.encounterPoolId, "combat");
   const enemy = bundle.enemies.find((item) => item.id === debug.enemyId)
-    ?? bundle.enemies.find((item) => item.id === room?.encounterPoolId)
+    ?? bundle.enemies.find((item) => item.id === pooledEnemyId)
     ?? bundle.enemies[0];
 
   return enemy ? {

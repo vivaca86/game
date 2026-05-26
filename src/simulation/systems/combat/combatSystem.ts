@@ -5,6 +5,7 @@ import type { SliceCombatState } from "../../state/combatState";
 import {
   getCard,
   getCurrentRoom,
+  getEncounterPoolContentId,
   getStage,
   pushRunLog,
   resetCombatHand,
@@ -16,11 +17,12 @@ type CombatantData = EnemyData | BossData;
 export function startCombatForCurrentRoom(run: SliceRunState, bundle: GameDataBundle): void {
   const room = getCurrentRoom(bundle, run);
   const isBoss = room?.type === "boss";
+  const encounterContentId = getEncounterPoolContentId(bundle, room?.encounterPoolId, isBoss ? "boss" : "combat");
   const combatant = isBoss
-    ? bundle.bosses.find((boss) => boss.id === room?.encounterPoolId)
+    ? bundle.bosses.find((boss) => boss.id === encounterContentId)
       ?? bundle.bosses.find((boss) => boss.id === getStage(bundle, run)?.bossId)
       ?? bundle.bosses[0]
-    : bundle.enemies.find((enemy) => enemy.id === room?.encounterPoolId) ?? bundle.enemies[0];
+    : bundle.enemies.find((enemy) => enemy.id === encounterContentId) ?? bundle.enemies[0];
 
   if (!combatant) {
     pushRunLog(run, "combat:start:missing");

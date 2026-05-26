@@ -121,6 +121,38 @@ function checkRewardRefs(data, ids) {
   });
 }
 
+function checkEncounterPools(data, ids) {
+  asArray(data.encounterPools, "encounterPools").forEach((pool) => {
+    if (!["combat", "elite", "event", "boss"].includes(pool.type)) {
+      fail(`encounterPools/${pool.id}: unsupported type "${pool.type}"`);
+      return;
+    }
+
+    const entries = asArray(pool.entries || [], `encounterPools/${pool.id}.entries`);
+    if (entries.length === 0) fail(`encounterPools/${pool.id}: entries must be non-empty`);
+    asArray(pool.rules || [], `encounterPools/${pool.id}.rules`);
+
+    entries.forEach((entry, index) => {
+      if (!entry.contentId) {
+        fail(`encounterPools/${pool.id}.entries[${index}]: missing contentId`);
+        return;
+      }
+      if (entry.weight !== undefined && (typeof entry.weight !== "number" || entry.weight <= 0)) {
+        fail(`encounterPools/${pool.id}.entries[${index}]: weight must be a positive number`);
+      }
+
+      const targetSet = pool.type === "boss"
+        ? ids.boss
+        : pool.type === "event"
+          ? ids.event
+          : ids.enemy;
+      if (!targetSet.has(entry.contentId)) {
+        fail(`encounterPools/${pool.id}: ${pool.type} entry missing content "${entry.contentId}"`);
+      }
+    });
+  });
+}
+
 function checkStageRoutes(data, ids) {
   const rewardPoolIds = ids.rewardPool;
   asArray(data.stages, "stages").forEach((stage) => {
@@ -132,14 +164,21 @@ function checkStageRoutes(data, ids) {
       if (room.rewardPoolId && !rewardPoolIds.has(room.rewardPoolId)) {
         fail(`room/${room.id}: missing rewardPool "${room.rewardPoolId}"`);
       }
-      if (room.type === "combat" && !ids.enemy.has(room.encounterPoolId)) {
-        fail(`room/${room.id}: combat encounter must reference enemies[].id, got "${room.encounterPoolId}"`);
+      const expectedPoolType = room.type === "combat" || room.type === "elite" || room.type === "event" || room.type === "boss"
+        ? room.type
+        : undefined;
+      if (!expectedPoolType) return;
+
+      const pool = data.encounterPools?.find((item) => item.id === room.encounterPoolId);
+      if (!pool) {
+        fail(`room/${room.id}: missing encounterPool "${room.encounterPoolId}"`);
+        return;
       }
-      if (room.type === "event" && !ids.event.has(room.encounterPoolId)) {
-        fail(`room/${room.id}: event encounter must reference events[].id, got "${room.encounterPoolId}"`);
+      if (pool.type !== expectedPoolType) {
+        fail(`room/${room.id}: encounterPool "${pool.id}" type must be ${expectedPoolType}, got ${pool.type}`);
       }
-      if (room.type === "boss" && !ids.boss.has(room.encounterPoolId)) {
-        fail(`room/${room.id}: boss encounter must reference bosses[].id, got "${room.encounterPoolId}"`);
+      if (room.type === "boss" && !pool.entries?.some((entry) => entry.contentId === stage.bossId)) {
+        fail(`room/${room.id}: boss encounterPool "${pool.id}" must include stage bossId "${stage.bossId}"`);
       }
     });
   });
@@ -189,6 +228,7 @@ if (fixture && manifest) {
     arcanas: asArray(data.arcanas, "arcanas"),
     characters: asArray(data.characters, "characters"),
     stages: asArray(data.stages, "stages"),
+    encounterPools: asArray(data.encounterPools, "encounterPools"),
     enemies: asArray(data.enemies, "enemies"),
     bosses: asArray(data.bosses, "bosses"),
     events: asArray(data.events, "events"),
@@ -198,7 +238,7 @@ if (fixture && manifest) {
     powerUps: asArray(data.powerUps, "powerUps")
   };
 
-  ["cards", "runes", "relics", "characters", "stages", "enemies", "bosses", "events", "unlocks"].forEach((domain) => {
+  ["cards", "runes", "relics", "characters", "stages", "encounterPools", "enemies", "bosses", "events", "unlocks"].forEach((domain) => {
     requireCommon(domains[domain], domain, roleMapText);
   });
 
@@ -245,6 +285,7 @@ if (fixture && manifest) {
     arcana: uniqueIds(domains.arcanas, "arcanas"),
     character: uniqueIds(domains.characters, "characters"),
     stage: uniqueIds(domains.stages, "stages"),
+    encounterPool: uniqueIds(domains.encounterPools, "encounterPools"),
     enemy: uniqueIds(domains.enemies, "enemies"),
     boss: uniqueIds(domains.bosses, "bosses"),
     event: uniqueIds(domains.events, "events"),
@@ -254,6 +295,7 @@ if (fixture && manifest) {
   };
 
   checkRewardRefs(data, ids);
+  checkEncounterPools(data, ids);
   checkStageRoutes(data, ids);
   checkUnlockRefs(data, ids);
 }

@@ -32,8 +32,6 @@ export function createDebugConfig(flags: RuntimeFlags, bundle: GameDataBundle): 
   const stage = bundle.stages.find((item) => item.id === flags.stageId) ?? bundle.stages[0];
   const firstCombatRoom = stage?.route.find((room) => room.type === "combat");
   const firstBossRoom = stage?.route.find((room) => room.type === "boss");
-  const enemy = bundle.enemies.find((item) => item.id === flags.enemyId) ?? bundle.enemies[0];
-  const boss = bundle.bosses.find((item) => item.id === flags.bossId) ?? bundle.bosses[0];
   const rewardPool =
     bundle.rewardPools.find((item) => item.id === flags.rewardPoolId) ?? bundle.rewardPools[0];
 
@@ -42,8 +40,8 @@ export function createDebugConfig(flags: RuntimeFlags, bundle: GameDataBundle): 
     entry: flags.entry,
     stageId: stage?.id ?? "missing_stage",
     roomId: flags.roomId ?? (flags.entry === "boss" ? firstBossRoom?.id : firstCombatRoom?.id),
-    enemyId: flags.enemyId ?? enemy?.id,
-    bossId: flags.bossId ?? boss?.id,
+    enemyId: flags.enemyId,
+    bossId: flags.bossId,
     rewardPoolId: flags.rewardPoolId ?? rewardPool?.id,
     showLog: flags.showLog,
     resetSave: flags.resetSave,
