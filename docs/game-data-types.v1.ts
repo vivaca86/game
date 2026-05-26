@@ -241,7 +241,15 @@ export interface UnlockTrigger {
 }
 
 export interface UnlockGrant {
-  type: "card" | "rune" | "relic" | "arcana" | "character" | "stage" | "power_up";
+  type:
+    | "card"
+    | "rune"
+    | "relic"
+    | "arcana"
+    | "character"
+    | "stage"
+    | "stage_clear"
+    | "power_up";
   contentId: ContentId;
 }
 

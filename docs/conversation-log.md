@@ -356,3 +356,13 @@ GitHub의 game 쪽을 확인하고, 이어서 해야 하는 작업이 무엇으�
 ### Codex
 
 추상 설계를 구현 전 설계물로 구체화했다. `docs/game-data-types.v1.ts`에 복사 가능한 TypeScript 타입 초안을 작성했고, `docs/vertical-slice-content-candidates.md`에 첫 세로 조각 후보 묶음을 정리했다. `docs/reference-role-map-slice-v1.md`에는 후보별 원작 기능 역할 대응표를 채웠고, `docs/vertical-slice-smoke-checklist.md`에는 구현 후 검증할 smoke 항목을 `PRE`, `DATA`, `UI`, `COMBAT`, `LOOP`, `VIEW` 그룹으로 나눴다. 기존 기반 문서와 README도 새 후속 산출물을 가리키도록 갱신했다.
+
+### 사용자
+
+기반 작업은 튼튼해야 한다고 다시 강조했고, 다음 작업 진행을 지시했다.
+
+### Codex
+
+첫 세로 조각의 최소 데이터 fixture와 planned asset manifest, validation 기준을 추가했다. `docs/vertical-slice-data.fixture.v1.json`에는 카드, 룬, 유물, 캐릭터, 스테이지, 몬스터, 보스, 이벤트, 보상 풀, 해금 draft 데이터를 넣었고, `docs/asset-manifest.slice.v1.json`에는 아직 생성되지 않은 planned 에셋 키와 runtime path를 분리했다. `docs/validation-rules-v1.md`에는 JSON 파싱, 필수 필드, referenceRole, asset key, reward refs, route refs, smoke checklist 연결 기준을 작성했다. 구현 완료나 에셋 완료로 오해하지 않도록 manifest와 fixture 상태를 draft/planned로 표시했다.
+
+검증을 수동 PowerShell에서 끝내지 않고 `tools/validate-slice-fixture.mjs`로 자동화했다. 첫 실행에서 manifest 항목은 `key`를 쓰는데 validator가 `id`를 요구하는 버그를 발견했고, manifest 전용 `key` 검증으로 수정했다. 이후 `node tools/validate-slice-fixture.mjs`와 `npm.cmd run slice:validate`가 모두 통과했다.

@@ -30,12 +30,20 @@
 | starter_draw_cycle | card | 손패 순환 카드 | `research/card-gap-map.md` | Needs direct proof | card_page_step | 책장 넘기기 | 드로우와 다음 행동 연결 | 페이지 넘김 연출 | 비용/드로우 규칙 draft | Yes | 손패 흐름 검증 |
 | starter_chain_attack | card | 연쇄 조건 공격 카드 | `research/systems-rules.md` | Source-level | card_ribbon_snap | 리본 튕기기 | 연쇄 보상 판단 | 리본 스냅 이펙트 | 연쇄 기준 draft | Yes | 연쇄 UI 검증 |
 | starter_mark_setup | card | 표식/대상 설정 카드 | `research/systems-rules.md` | Source-level | card_lamplight_mark | 등불 표식 | 다음 피해 증가 준비 | 등불 스티커 표식 | 표식 공식 draft | Yes | 상태 UI 검증 |
+| starter_big_guard | card | 높은 비용의 큰 방어 카드 | `research/card-gap-map.md` | Needs direct proof | card_stage_patch | 무대 덧대기 | 더 큰 보호막과 피해 완화 선택지 | 무대 바닥을 덧대는 종이 방어 연출 | 보호막/감소 수치 draft | Yes | 방어 보상 후보 |
+| starter_area_attack | card | 복수 적을 상대하는 광역 공격 | `research/card-gap-map.md` | Needs direct proof | card_ink_spill | 잉크 번짐 | 복수 적 전투 대응 | 잉크가 무대 위로 번지는 공격 | 광역 피해 수치 draft | Yes | 다중 적 후보 |
+| starter_small_heal | card | 소량 회복 또는 유지력 카드 | `research/systems-rules.md` | Source-level | card_paper_bloom | 종이꽃 회복 | 긴 루프에서 생존 보정 | 접힌 종이꽃이 피는 회복 연출 | 회복 제한 draft | Yes | 회복 UI 검증 |
+| starter_free_chip | card | 0비용 작은 행동 카드 | `research/card-gap-map.md` | Needs direct proof | card_pinpoint_glint | 금핀 반짝임 | 연쇄/룬 발동용 작은 피해 | 황동 핀이 반짝이는 찌르기 | 0비용 밸런스 위험 | Yes | 룬 발동 검증 |
+| starter_reward_setup | card | 보상 선택지를 바꾸는 카드 | `research/systems-rules.md` | Source-level | card_curtain_call | 커튼콜 | 전투와 보상 흐름 연결 | 무대 커튼콜로 보상 후보 확대 | 보상 조작 수치 draft | Yes | reward flow 후보 |
 | basic_socket_modifier | rune_or_gem | 카드에 장착해 효과를 바꾼다. | `research/gem-gap-map.md` | Needs direct proof | rune_paper_spark | 종이 불씨 룬 | 공격 카드 피해 증가 | 유리종이 불씨 토큰 | 장착 제한 증거 부족 | Yes | 장착 검증 1 |
 | defense_socket_modifier | rune_or_gem | 방어 카드에 장착해 방어 효율을 바꾼다. | `research/gem-gap-map.md` | Needs direct proof | rune_glass_leaf | 유리잎 룬 | 보호막 증가 | 투명 유리종이 잎 토큰 | 장착 제한 증거 부족 | Yes | 장착 검증 2 |
+| chain_bridge_modifier | rune_or_gem | 카드 사용 흐름이나 연쇄를 보조한다. | `research/gem-gap-map.md` | Needs direct proof | rune_ribbon_loop | 리본 고리 룬 | 기술 카드가 연쇄를 이어 주게 함 | 리본 고리 유리종이 토큰 | 장착 제한 증거 부족 | Yes | 장착 검증 3 |
 | early_basic_attacker | enemy | 초반 기본 공격 적 | `research/enemy-gap-map.md` | Needs direct proof | enemy_folded_sentry | 접힌 파수꾼 | 공격 의도와 피격 확인 | 접힌 종이 경비 형태 | 원작 몬스터 직접 대응 없음 | Yes | 첫 전투 적 |
 | early_light_disruptor | enemy | 초반 방해 적 | `research/enemy-gap-map.md` | Needs direct proof | enemy_ink_mote | 잉크 얼룩불 | 비용 압박 또는 상태 방해 | 잉크 얼룩과 종이 불빛 | 방해 공식 draft | Yes | 압박 전투 적 |
 | first_boss_phase_gate | boss | 첫 보스 문턱 | `research/enemy-gap-map.md` | Needs direct proof | boss_curtain_lion | 커튼 사자무대 | 페이즈와 클리어 보상 제공 | 거대한 팝업 무대 장치 | 페이즈 수치 draft | Yes | 첫 보스 |
 | first_reward_relic | relic | 보스 클리어 보상 | `research/relic-gap-map.md` | Source-level | relic_brass_bookmark | 황동 책갈피 | 다음 런 성장 신호 | 황동 책갈피 소품 | 효과 수치 draft | Yes | 보스 보상 |
+| rune_socket_event | event | 카드에 룬/보석을 장착하는 중간 방 | `research/gem-gap-map.md` | Needs direct proof | event_rune_bench | 접힌 작업대 | 장착 선택과 전후 효과 비교 | 종이 작업대와 유리룬 배치 | 원작 장착 UI 증거 부족 | Yes | 장착 방 |
+| first_stage_clear_unlock | unlock | 첫 스테이지 클리어 후 진행 상태 변화 | `research/stage-gap-map.md` | Source-level | unlock_stage_route_key | 첫 무대 열쇠 | 클리어 상태와 다음 진행 신호 | 무대 열쇠/스탬프 형태 | 다음 스테이지 세부 미확정 | Yes | 마을 복귀 검증 |
 
 ## UI 대응
 

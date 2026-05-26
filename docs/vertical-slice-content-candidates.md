@@ -143,7 +143,7 @@ paper_town_start
 
 | id | 표시명 | referenceRole | 조건 | 보상 |
 | --- | --- | --- | --- | --- |
-| unlock_stage_route_key | 첫 무대 열쇠 | first_stage_clear_unlock | `stage_lantern_foyer` 클리어 | 다음 스테이지 placeholder 잠금 해제 |
+| unlock_stage_route_key | 첫 무대 열쇠 | first_stage_clear_unlock | `stage_lantern_foyer` 클리어 | `stage_lantern_foyer` 클리어 상태 기록 |
 
 ## 에셋 키 후보
 
@@ -163,6 +163,6 @@ paper_town_start
 ## 다음 작업
 
 1. 이 후보를 `docs/reference-role-map-slice-v1.md`에 대응표로 연결한다.
-2. `docs/game-data-types.v1.ts` 기준으로 최소 샘플 데이터를 작성한다.
-3. 각 후보의 asset key를 `assets/runtime` manifest 초안으로 분리한다.
+2. `docs/vertical-slice-data.fixture.v1.json`을 실제 fixture 로더 기준으로 정리한다.
+3. `docs/asset-manifest.slice.v1.json`의 planned asset key를 실제 파일 생성 기준으로 검증한다.
 4. 첫 Phaser 구조를 만들 때 이 후보만 로드하도록 제한한다.

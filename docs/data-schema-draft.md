@@ -316,11 +316,14 @@ interface AssetManifestEntry {
 
 1. `docs/game-data-types.v1.ts`: 복사 가능한 TypeScript 타입 초안
 2. `docs/vertical-slice-content-candidates.md`: 세로 조각 최소 콘텐츠 후보
+3. `docs/vertical-slice-data.fixture.v1.json`: 첫 세로 조각 데이터 fixture
+4. `docs/asset-manifest.slice.v1.json`: 첫 세로 조각 planned asset manifest
+5. `docs/validation-rules-v1.md`: fixture/manifest 검증 기준
 
 ## 다음 작업
 
 1. `docs/game-data-types.v1.ts`를 실제 프로젝트 생성 시 `src/data/schema.ts` 또는 동등한 위치로 옮긴다.
-2. 각 데이터 그룹별 최소 샘플 1개를 작성한다.
-3. `referenceRole` 누락 검사 규칙을 만든다.
-4. 에셋 매니페스트와 데이터 참조 검증 스크립트를 설계한다.
-5. 세로 조각 후보 데이터를 fixture로 만든다.
+2. `docs/validation-rules-v1.md`를 실제 Node 검증 스크립트로 옮긴다.
+3. fixture의 `encounterPoolId`를 별도 encounter pool 데이터로 분리할지 결정한다.
+4. asset manifest의 planned path를 실제 에셋 생성 결과와 비교한다.
+5. 세로 조각 후보 데이터를 runtime fixture로 이관한다.

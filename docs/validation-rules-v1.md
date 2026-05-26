@@ -1,0 +1,163 @@
+# 검증 기준 v1
+
+작성일: 2026-05-26
+
+## 상태
+
+- 상태: 구현 전 검증 기준
+- 기준 타입: `docs/game-data-types.v1.ts`
+- 기준 fixture: `docs/vertical-slice-data.fixture.v1.json`
+- 기준 manifest: `docs/asset-manifest.slice.v1.json`
+- 아직 아님: 실제 검증 스크립트 구현, 브라우저 검증 완료, TypeScript 컴파일 보장
+
+## 목적
+
+첫 세로 조각 구현 전에 데이터, 에셋, 원작 대응, 세이브 경계를 무너뜨리지 않기 위한 검사 기준을 고정한다.
+
+## 검증 그룹
+
+| 그룹 | 목적 | 첫 구현 전 상태 |
+| --- | --- | --- |
+| JSON | fixture와 manifest가 파싱 가능한 JSON인지 확인 | 필수 |
+| Schema | 타입 초안의 필수 필드가 데이터에 있는지 확인 | 필수 |
+| Reference role | 모든 주요 콘텐츠가 대응표에 연결됐는지 확인 | 필수 |
+| Asset key | 데이터가 참조하는 에셋 키가 manifest에 있는지 확인 | 필수 |
+| Reward refs | 보상 풀이 참조하는 콘텐츠 ID가 존재하는지 확인 | 필수 |
+| Route refs | 스테이지 route가 encounter/event/boss/reward를 찾을 수 있는지 확인 | 필수 |
+| Save boundary | 세이브 후보가 Phaser 객체 없이 ID와 수치만 갖는지 확인 | 구현 시 필수 |
+| Browser smoke | 화면과 상호작용이 체크리스트를 통과하는지 확인 | 구현 후 필수 |
+
+## JSON 검사
+
+필수 조건:
+
+- `docs/vertical-slice-data.fixture.v1.json`은 JSON으로 파싱되어야 한다.
+- `docs/asset-manifest.slice.v1.json`은 JSON으로 파싱되어야 한다.
+- metadata의 `status`는 `draft_fixture` 또는 `planned_manifest`처럼 완료가 아님을 드러내야 한다.
+
+## 필수 필드 검사
+
+각 콘텐츠의 필수 필드:
+
+```text
+id
+displayNameKo
+descriptionKo
+tags
+referenceRole
+evidence.level
+evidence.sources
+```
+
+도메인별 필수 필드:
+
+| 도메인 | 추가 필수 필드 |
+| --- | --- |
+| cards | type, cost, rarity, effects, runeSlots, assetKeys, balance |
+| runes | socketType, rarity, effects, validCardTypes, assetKeys, recommendation |
+| relics | rarity, effects, assetKeys |
+| characters | maxHp, startingEnergy, startingDeck, passives, assetKeys |
+| stages | order, biomeKey, route, bossId, rewardPools, assetKeys |
+| enemies | role, maxHp, intents, assetKeys |
+| bosses | role, maxHp, intents, phases, assetKeys |
+| events | choices, assetKeys |
+| rewardPools | entries, rules |
+| unlocks | trigger, grants |
+
+## Reference role 검사
+
+필수 조건:
+
+- 모든 주요 콘텐츠의 `referenceRole`은 `docs/reference-role-map-slice-v1.md`에 등장해야 한다.
+- `referenceRole`이 없는 fixture 행은 세로 조각 데이터에 넣지 않는다.
+- `Needs direct proof` 상태의 값은 `draft`로 취급하고, 최종값처럼 보고하지 않는다.
+
+## Asset key 검사
+
+검사 대상:
+
+- 카드: `assetKeys.frame`, `assetKeys.illustration`, `assetKeys.typeIcon`
+- 룬/보석: `assetKeys.icon`
+- 유물/아르카나: `assetKeys.icon`
+- 캐릭터: `assetKeys.portrait`, `assetKeys.sprite`
+- 스테이지: `assetKeys.backgroundSet`, `assetKeys.mapIcon`
+- 몬스터/보스: `assetKeys.sprite`, `assetKeys.intentIcons[]`, `phases[].visualCueKey`
+- 이벤트: `assetKeys.scene`
+
+필수 조건:
+
+- 모든 asset key는 `docs/asset-manifest.slice.v1.json`의 `assets[].key`에 있어야 한다.
+- manifest에 있는 path는 `assets/runtime/` 아래를 가리켜야 한다.
+- manifest status가 `planned_manifest`이면 실제 파일 존재를 요구하지 않는다.
+
+## Reward refs 검사
+
+필수 조건:
+
+- reward entry의 `contentId`는 해당 type의 데이터에 있어야 한다.
+- `type: "unlock"`은 `unlocks[].id`를 참조해야 한다.
+- `type: "heal"`과 `type: "currency"`는 `contentId` 없이 `amount`를 가질 수 있다.
+- reward pool은 빈 `entries`를 가질 수 없다.
+- unlock grant의 `type: "stage_clear"`는 `stages[].id`를 참조해야 하며, 새 스테이지 해금이 아니라 진행 상태 변화로 취급한다.
+
+## Route refs 검사
+
+필수 조건:
+
+- stage의 `bossId`는 `bosses[].id`에 있어야 한다.
+- route의 `rewardPoolId`는 `rewardPools[].id`에 있어야 한다.
+- `type: "combat"`의 `encounterPoolId`는 첫 fixture에서는 `enemies[].id`를 직접 참조한다. encounter pool 분리는 후속 결정으로 미룬다.
+- `type: "event"`의 `encounterPoolId`는 `events[].id`를 참조할 수 있다.
+- `type: "boss"`의 `encounterPoolId`는 `bosses[].id`를 참조할 수 있다.
+
+## Smoke checklist 연결
+
+구현 후 아래 문서의 항목 상태를 갱신한다.
+
+- `docs/vertical-slice-smoke-checklist.md`
+
+연결 기준:
+
+| 문서 항목 | 검증 출처 |
+| --- | --- |
+| DATA-* | fixture, manifest, validation script |
+| UI-* | 브라우저 스크린샷 |
+| COMBAT-* | 전투 debug state와 로그 |
+| LOOP-* | 수동 또는 자동 full-loop smoke |
+| VIEW-* | 1920x1080, 1280x720 스크린샷 |
+
+## 현재 검증 명령
+
+Slice fixture 검증:
+
+```powershell
+npm run slice:validate
+```
+
+PowerShell JSON 파싱 보조:
+
+```powershell
+Get-Content docs/vertical-slice-data.fixture.v1.json -Raw | ConvertFrom-Json | Out-Null
+Get-Content docs/asset-manifest.slice.v1.json -Raw | ConvertFrom-Json | Out-Null
+```
+
+Git whitespace 검사:
+
+```powershell
+git diff --check
+```
+
+TypeScript 구문 검사:
+
+```powershell
+tsc --noEmit --strict --skipLibCheck docs/game-data-types.v1.ts
+```
+
+현재 PC에는 `tsc`가 없을 수 있다. 이 경우 타입 컴파일은 `Implemented, not verified`가 아니라 `not verified by compiler`로 보고한다.
+
+## 다음 작업
+
+1. fixture의 `encounterPoolId`를 별도 encounter pool 데이터로 분리할지 결정한다.
+2. smoke checklist ID와 실제 테스트 파일명을 연결한다.
+3. Phaser 프로젝트 생성 후 fixture와 manifest를 로드하는 첫 데이터 부팅 테스트를 만든다.
+4. `npm run slice:validate`를 향후 통합 check에 연결할지 결정한다.

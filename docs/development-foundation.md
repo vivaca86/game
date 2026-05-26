@@ -281,7 +281,7 @@ notes?: string
 | 데이터 스키마 상세 | 타입 초안 작성 | 실제 프로젝트 생성 시 `src/data/schema.ts`로 이관 |
 | 원작 기준 버전 | 미확정 | 조사 기준 버전/패치/영상 기준선 확정 |
 | 원작 대응표 | 첫 후보 행 작성 | `Ready for slice`와 `Needs direct proof` 행 분리 |
-| 세로 조각 통과 기준 | smoke 체크리스트 작성 | 테스트 스크립트 이름과 체크리스트 ID 연결 |
+| 세로 조각 통과 기준 | fixture/manifest/checklist 작성 | validation script와 smoke script로 이관 |
 | 세이브 구조 | 미확정 | saveVersion, unlocks, profile, settings 구조 설계 |
 | 디버그 UI | 미확정 | 초기 디버그 패널 요구사항 작성 |
 
@@ -294,12 +294,15 @@ notes?: string
 5. `docs/vertical-slice-content-candidates.md`: 첫 세로 조각 콘텐츠 후보
 6. `docs/reference-role-map-slice-v1.md`: 첫 세로 조각 원작 대응표
 7. `docs/vertical-slice-smoke-checklist.md`: smoke 체크리스트
+8. `docs/vertical-slice-data.fixture.v1.json`: 첫 세로 조각 데이터 fixture
+9. `docs/asset-manifest.slice.v1.json`: 첫 세로 조각 planned asset manifest
+10. `docs/validation-rules-v1.md`: fixture/manifest 검증 기준
 
 ## 다음 작업
 
-1. Phaser 프로젝트 구조를 만들기 전 폴더, manifest, debug entry를 확정한다.
-2. 최소 샘플 데이터를 `docs/game-data-types.v1.ts` 기준 fixture로 작성한다.
-3. `referenceRole`과 asset key 누락 검증 스크립트 계획을 세운다.
+1. `docs/validation-rules-v1.md`를 실제 검증 스크립트로 옮긴다.
+2. Phaser 프로젝트 구조를 만들기 전 폴더, manifest, debug entry를 확정한다.
+3. fixture의 `encounterPoolId`를 별도 encounter pool 데이터로 분리할지 결정한다.
 4. 첫 구현 착수 전 원작 기준 버전/패치/영상 기준선을 확정한다.
 
 위 작업이 나오기 전에는 본격 구현 착수 또는 원작 유사도 판정을 하지 않는다.
@@ -315,3 +318,6 @@ notes?: string
 - `docs/vertical-slice-content-candidates.md`: 첫 세로 조각 콘텐츠 후보
 - `docs/reference-role-map-slice-v1.md`: 첫 세로 조각 원작 대응표
 - `docs/vertical-slice-smoke-checklist.md`: smoke 체크리스트
+- `docs/vertical-slice-data.fixture.v1.json`: 첫 세로 조각 데이터 fixture
+- `docs/asset-manifest.slice.v1.json`: 첫 세로 조각 planned asset manifest
+- `docs/validation-rules-v1.md`: fixture/manifest 검증 기준

@@ -1,0 +1,271 @@
+{
+  "metadata": {
+    "id": "asset_manifest_slice_v1",
+    "date": "2026-05-26",
+    "status": "planned_manifest",
+    "styleKey": "premium_popup_book",
+    "notes": [
+      "These entries are planned asset keys for the first vertical slice.",
+      "The files do not exist yet and must not be reported as completed assets.",
+      "Runtime paths are provisional and should be verified when assets are generated."
+    ]
+  },
+  "assets": [
+    {
+      "key": "bg_lantern_foyer_set",
+      "type": "image",
+      "path": "assets/runtime/backgrounds/bg_lantern_foyer_set_v001.png",
+      "nativeSize": { "w": 1920, "h": 1080 },
+      "styleKey": "premium_popup_book"
+    },
+    {
+      "key": "map_icon_lantern_foyer",
+      "type": "image",
+      "path": "assets/runtime/icons/map_icon_lantern_foyer_v001.png",
+      "nativeSize": { "w": 256, "h": 256 },
+      "styleKey": "premium_popup_book"
+    },
+    {
+      "key": "card_frame_attack",
+      "type": "image",
+      "path": "assets/runtime/cards/card_frame_attack_v001.png",
+      "nativeSize": { "w": 300, "h": 440 },
+      "styleKey": "premium_popup_book"
+    },
+    {
+      "key": "card_frame_defense",
+      "type": "image",
+      "path": "assets/runtime/cards/card_frame_defense_v001.png",
+      "nativeSize": { "w": 300, "h": 440 },
+      "styleKey": "premium_popup_book"
+    },
+    {
+      "key": "card_frame_skill",
+      "type": "image",
+      "path": "assets/runtime/cards/card_frame_skill_v001.png",
+      "nativeSize": { "w": 300, "h": 440 },
+      "styleKey": "premium_popup_book"
+    },
+    {
+      "key": "icon_card_attack",
+      "type": "image",
+      "path": "assets/runtime/icons/icon_card_attack_v001.png",
+      "nativeSize": { "w": 96, "h": 96 },
+      "styleKey": "premium_popup_book"
+    },
+    {
+      "key": "icon_card_defense",
+      "type": "image",
+      "path": "assets/runtime/icons/icon_card_defense_v001.png",
+      "nativeSize": { "w": 96, "h": 96 },
+      "styleKey": "premium_popup_book"
+    },
+    {
+      "key": "icon_card_skill",
+      "type": "image",
+      "path": "assets/runtime/icons/icon_card_skill_v001.png",
+      "nativeSize": { "w": 96, "h": 96 },
+      "styleKey": "premium_popup_book"
+    },
+    {
+      "key": "card_art_sun_jab",
+      "type": "image",
+      "path": "assets/runtime/cards/card_art_sun_jab_v001.png",
+      "nativeSize": { "w": 520, "h": 360 },
+      "styleKey": "premium_popup_book"
+    },
+    {
+      "key": "card_art_fold_guard",
+      "type": "image",
+      "path": "assets/runtime/cards/card_art_fold_guard_v001.png",
+      "nativeSize": { "w": 520, "h": 360 },
+      "styleKey": "premium_popup_book"
+    },
+    {
+      "key": "card_art_page_step",
+      "type": "image",
+      "path": "assets/runtime/cards/card_art_page_step_v001.png",
+      "nativeSize": { "w": 520, "h": 360 },
+      "styleKey": "premium_popup_book"
+    },
+    {
+      "key": "card_art_ribbon_snap",
+      "type": "image",
+      "path": "assets/runtime/cards/card_art_ribbon_snap_v001.png",
+      "nativeSize": { "w": 520, "h": 360 },
+      "styleKey": "premium_popup_book"
+    },
+    {
+      "key": "card_art_lamplight_mark",
+      "type": "image",
+      "path": "assets/runtime/cards/card_art_lamplight_mark_v001.png",
+      "nativeSize": { "w": 520, "h": 360 },
+      "styleKey": "premium_popup_book"
+    },
+    {
+      "key": "card_art_stage_patch",
+      "type": "image",
+      "path": "assets/runtime/cards/card_art_stage_patch_v001.png",
+      "nativeSize": { "w": 520, "h": 360 },
+      "styleKey": "premium_popup_book"
+    },
+    {
+      "key": "card_art_ink_spill",
+      "type": "image",
+      "path": "assets/runtime/cards/card_art_ink_spill_v001.png",
+      "nativeSize": { "w": 520, "h": 360 },
+      "styleKey": "premium_popup_book"
+    },
+    {
+      "key": "card_art_paper_bloom",
+      "type": "image",
+      "path": "assets/runtime/cards/card_art_paper_bloom_v001.png",
+      "nativeSize": { "w": 520, "h": 360 },
+      "styleKey": "premium_popup_book"
+    },
+    {
+      "key": "card_art_pinpoint_glint",
+      "type": "image",
+      "path": "assets/runtime/cards/card_art_pinpoint_glint_v001.png",
+      "nativeSize": { "w": 520, "h": 360 },
+      "styleKey": "premium_popup_book"
+    },
+    {
+      "key": "card_art_curtain_call",
+      "type": "image",
+      "path": "assets/runtime/cards/card_art_curtain_call_v001.png",
+      "nativeSize": { "w": 520, "h": 360 },
+      "styleKey": "premium_popup_book"
+    },
+    {
+      "key": "rune_paper_spark_icon",
+      "type": "image",
+      "path": "assets/runtime/icons/rune_paper_spark_icon_v001.png",
+      "nativeSize": { "w": 128, "h": 128 },
+      "styleKey": "premium_popup_book"
+    },
+    {
+      "key": "rune_ribbon_loop_icon",
+      "type": "image",
+      "path": "assets/runtime/icons/rune_ribbon_loop_icon_v001.png",
+      "nativeSize": { "w": 128, "h": 128 },
+      "styleKey": "premium_popup_book"
+    },
+    {
+      "key": "rune_glass_leaf_icon",
+      "type": "image",
+      "path": "assets/runtime/icons/rune_glass_leaf_icon_v001.png",
+      "nativeSize": { "w": 128, "h": 128 },
+      "styleKey": "premium_popup_book"
+    },
+    {
+      "key": "relic_brass_bookmark_icon",
+      "type": "image",
+      "path": "assets/runtime/icons/relic_brass_bookmark_icon_v001.png",
+      "nativeSize": { "w": 128, "h": 128 },
+      "styleKey": "premium_popup_book"
+    },
+    {
+      "key": "char_mina_pagehand_portrait",
+      "type": "image",
+      "path": "assets/runtime/characters/char_mina_pagehand_portrait_v001.png",
+      "nativeSize": { "w": 512, "h": 512 },
+      "styleKey": "premium_popup_book"
+    },
+    {
+      "key": "char_mina_pagehand_sprite",
+      "type": "spritesheet",
+      "path": "assets/runtime/characters/char_mina_pagehand_sprite_v001.png",
+      "nativeSize": { "w": 768, "h": 768 },
+      "frameSize": { "w": 192, "h": 192 },
+      "anchor": { "x": 0.5, "y": 1.0 },
+      "styleKey": "premium_popup_book"
+    },
+    {
+      "key": "monster_folded_sentry",
+      "type": "spritesheet",
+      "path": "assets/runtime/monsters/monster_folded_sentry_v001.png",
+      "nativeSize": { "w": 768, "h": 768 },
+      "frameSize": { "w": 192, "h": 192 },
+      "anchor": { "x": 0.5, "y": 1.0 },
+      "styleKey": "premium_popup_book"
+    },
+    {
+      "key": "monster_ink_mote",
+      "type": "spritesheet",
+      "path": "assets/runtime/monsters/monster_ink_mote_v001.png",
+      "nativeSize": { "w": 768, "h": 768 },
+      "frameSize": { "w": 192, "h": 192 },
+      "anchor": { "x": 0.5, "y": 1.0 },
+      "styleKey": "premium_popup_book"
+    },
+    {
+      "key": "boss_curtain_lion",
+      "type": "spritesheet",
+      "path": "assets/runtime/bosses/boss_curtain_lion_v001.png",
+      "nativeSize": { "w": 1100, "h": 1100 },
+      "frameSize": { "w": 275, "h": 275 },
+      "anchor": { "x": 0.5, "y": 1.0 },
+      "styleKey": "premium_popup_book"
+    },
+    {
+      "key": "icon_intent_attack",
+      "type": "image",
+      "path": "assets/runtime/icons/icon_intent_attack_v001.png",
+      "nativeSize": { "w": 96, "h": 96 },
+      "styleKey": "premium_popup_book"
+    },
+    {
+      "key": "icon_intent_disrupt",
+      "type": "image",
+      "path": "assets/runtime/icons/icon_intent_disrupt_v001.png",
+      "nativeSize": { "w": 96, "h": 96 },
+      "styleKey": "premium_popup_book"
+    },
+    {
+      "key": "icon_intent_block",
+      "type": "image",
+      "path": "assets/runtime/icons/icon_intent_block_v001.png",
+      "nativeSize": { "w": 96, "h": 96 },
+      "styleKey": "premium_popup_book"
+    },
+    {
+      "key": "scene_rune_bench",
+      "type": "image",
+      "path": "assets/runtime/backgrounds/scene_rune_bench_v001.png",
+      "nativeSize": { "w": 1920, "h": 1080 },
+      "styleKey": "premium_popup_book"
+    },
+    {
+      "key": "effect_stage_spotlight",
+      "type": "spritesheet",
+      "path": "assets/runtime/effects/effect_stage_spotlight_v001.png",
+      "nativeSize": { "w": 1024, "h": 1024 },
+      "frameSize": { "w": 256, "h": 256 },
+      "styleKey": "premium_popup_book"
+    },
+    {
+      "key": "effect_paper_slash",
+      "type": "spritesheet",
+      "path": "assets/runtime/effects/effect_paper_slash_v001.png",
+      "nativeSize": { "w": 1024, "h": 1024 },
+      "frameSize": { "w": 256, "h": 256 },
+      "styleKey": "premium_popup_book"
+    },
+    {
+      "key": "effect_ink_splash",
+      "type": "spritesheet",
+      "path": "assets/runtime/effects/effect_ink_splash_v001.png",
+      "nativeSize": { "w": 1024, "h": 1024 },
+      "frameSize": { "w": 256, "h": 256 },
+      "styleKey": "premium_popup_book"
+    },
+    {
+      "key": "ui_panel_paper_9slice",
+      "type": "image",
+      "path": "assets/runtime/ui/ui_panel_paper_9slice_v001.png",
+      "nativeSize": { "w": 256, "h": 256 },
+      "styleKey": "premium_popup_book"
+    }
+  ]
+}

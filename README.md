@@ -17,6 +17,9 @@
 - `docs/development-foundation.md`: 2026-05-26 이후 새 게임 개발 기반 결정
 - `docs/data-schema-draft.md`: 데이터 스키마 초안
 - `docs/game-data-types.v1.ts`: TypeScript 타입 초안
+- `docs/vertical-slice-data.fixture.v1.json`: 첫 세로 조각 데이터 fixture
+- `docs/asset-manifest.slice.v1.json`: 첫 세로 조각 planned asset manifest
+- `docs/validation-rules-v1.md`: fixture/manifest 검증 기준
 - `docs/reference-role-map-template.md`: 원작 기능 역할 대응표 양식
 - `docs/reference-role-map-slice-v1.md`: 첫 세로 조각 원작 대응표
 - `docs/vertical-slice-acceptance.md`: 새 세로 조각 통과 기준
@@ -50,9 +53,12 @@ http://127.0.0.1:4173/docs/vertical-slice/proof.html
 ```bash
 node tools/vertical-slice-proof-smoke.mjs
 node tools/content-quality-audit.mjs --report-only
+npm run slice:validate
 ```
 
 `content-quality-audit.mjs`가 현재 본편을 `BLOCKED`로 보는 것은 의도된 상태다. 본편 그래픽/데이터가 아직 최종 품질이 아니라는 보호 장치다.
+
+`slice:validate`는 2026-05-26 이후 새 세로 조각 fixture와 planned asset manifest의 구조, `referenceRole`, asset key, reward, route 참조를 검사한다.
 
 ## 정리된 것
 
