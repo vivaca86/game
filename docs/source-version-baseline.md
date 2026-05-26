@@ -20,7 +20,7 @@ It does not claim exhaustive research completion, original-game 95% similarity, 
 | Official Store platforms in API snapshot | Windows `true`, macOS `true`, Linux `false` |
 | Official latest Steam Community Announcement seen | 2026-04-29 `1 million Crawlers in 1 week` |
 | Official latest patch label seen | `Hotfix 1.4.1` in the 2026-04-29 announcement |
-| Direct installed build ID | Needs verification |
+| Direct installed build ID | Blocked locally: Steam install/appmanifest not found on this PC in the 2026-05-26 check |
 | In-game version label | Needs verification |
 | Game-file proof | Needs verification |
 
@@ -84,18 +84,49 @@ SteamDB handling:
 
 | Proof target | State |
 | --- | --- |
-| Local Steam `appmanifest_3265700.acf` build ID | Needs verification |
+| Local Steam `appmanifest_3265700.acf` build ID | Blocked locally on 2026-05-26; Steam install/appmanifest not found on this PC |
 | In-game version/build label, if exposed | Needs verification |
 | Fresh-save UI capture for town, first dungeon, first combat, reward, gem/rune, boss, result | Needs verification |
 | Game-file/static-data proof for exact card/gem/relic/character values | Needs verification |
 | Save-slot and demo-to-full migration behavior | Needs verification |
 | Whether later post-2026-04-29 patches shipped without official announcement | Needs verification |
 
+## 2026-05-26 Local Direct-Proof Attempt
+
+Result: `Blocked locally`
+
+What was checked:
+
+- Common Windows Steam roots:
+  - `C:\Program Files (x86)\Steam`
+  - `C:\Program Files\Steam`
+  - `%LOCALAPPDATA%\Steam`
+  - `%APPDATA%\Steam`
+  - `%USERPROFILE%\Steam`
+- Steam registry keys:
+  - `HKCU:\Software\Valve\Steam`
+  - `HKLM:\SOFTWARE\WOW6432Node\Valve\Steam`
+  - `HKLM:\SOFTWARE\Valve\Steam`
+- User-profile recursive search for `appmanifest_3265700.acf`
+- Fixed filesystem drive scan for likely `SteamLibrary` / `Steam` roots
+
+Findings:
+
+- No Steam install root was found in the checked common locations.
+- No Valve/Steam registry key was found in the checked registry paths.
+- No `appmanifest_3265700.acf` was found under the user profile or likely Steam library roots.
+- Only the `C:\` filesystem drive was visible to this session.
+
+Conclusion:
+
+- This workspace cannot prove the installed build ID for app `3265700` yet.
+- Direct build proof requires the user to install/provide access to the Steam library containing Vampire Crawlers or provide the relevant `appmanifest_3265700.acf` and installed game folder.
+
 ## Decision
 
 Future reference-driven implementation should use this as the planning baseline:
 
 1. Treat official Steam News through `Hotfix 1.4.1` as the current official announcement baseline.
-2. Treat direct installed-build proof as missing.
+2. Treat direct installed-build proof as blocked in this local environment until Steam/appmanifest access is provided.
 3. Keep all source-level wiki, Store media, SteamDB, and guide findings in their own evidence layers.
 4. Continue building the local project as an originalized slice foundation until direct proof closes exact reference behavior.
