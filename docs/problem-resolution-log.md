@@ -30,3 +30,11 @@
 - 해결 방안: 저장소 루트에 `AGENTS.md`를 추가해 작업 시작 전 `PROJECT_RULES.md`, `docs/handoff.md`, `docs/current-issues-and-plan.md`, `docs/recovery-audit.md`, `RESEARCH_CHECKLIST.md`를 읽도록 지정한다. 전역 `C:\Users\i\.codex\AGENTS.md`에도 저장소 `AGENTS.md`를 우선 확인하라는 공통 지시를 작성한다.
 - 재발 방지 기준: 저장소 운영 규칙이 새로 생기거나 바뀌면, 실제 규칙 문서뿐 아니라 에이전트 진입점인 `AGENTS.md`도 함께 갱신한다.
 - 해결 커밋: 이 항목이 포함된 커밋.
+
+### 문제: 완료 판정과 작업 범위가 Codex 내부 판단으로 흐려질 수 있음
+
+- 원인: 위험하거나 큰 작업에서 Codex가 사용자의 지시 범위를 그대로 제시하지 않고, 안전이나 속도를 이유로 내부에서 범위를 축소하거나 완료 상태를 좋게 표현할 여지가 있었다.
+- 영향: 사용자는 Codex의 완료 보고를 기준으로 다음 결정을 하므로, 완료되지 않은 일을 완료처럼 말하면 프로젝트 판단 전체가 틀어질 수 있다.
+- 해결 방안: `AGENTS.md`를 영어 authoritative 규칙과 한글 참고 번역 구조로 개편했다. 실제 기준은 `Authoritative English Rules`로 고정하고, 위험 작업 범위 제시, 조용한 범위 변경 금지, 전수조사 체크리스트 선행, 완료/부분 완료/검증 미완료 상태 구분을 명시했다. `PROJECT_RULES.md`에도 `AGENTS.md`의 영문 규칙을 에이전트 운영 기준으로 연결했다.
+- 재발 방지 기준: 중요한 작업은 `Confirm instruction -> Check records -> Present scope/criteria -> Get approval when risky -> Execute -> Verify -> State completion level -> Report remaining risk` 흐름을 따른다. 체크리스트와 검증 근거 없이 `Research complete`, `95% close`, `Passed`, `Complete` 표현을 쓰지 않는다.
+- 해결 커밋: 이 항목이 포함된 커밋.
