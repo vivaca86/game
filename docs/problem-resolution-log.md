@@ -117,3 +117,11 @@
 - 해결 방안: 공통 `renderActionButton`을 추가해 진행 UI를 실제 interactive Phaser rectangle로 만들고, card hand와 `End Turn`에도 `pointerdown` action을 연결했다.
 - 재발 방지 기준: `tools/phaser-smoke-test.mjs`에 canvas 좌표 기반 click smoke를 추가해 `town -> world_map -> dungeon -> combat`, 첫 카드 사용, 턴 종료까지 마우스 클릭으로 검증한다. 인앱 브라우저에서도 같은 흐름을 직접 클릭해 debug overlay 변화로 확인한다.
 - 해결 커밋: `8518d18 Make Phaser controls clickable`
+
+### 문제: 새로고침 후 최소 run 진행 상태를 복원하는 저장 검증선이 없음
+
+- 원인: 기존 `saveCodec`은 초기 `SaveData`만 만들었고, localStorage read/write, debug save 분리, simulation state -> serializable save 변환, reload 복원 경로가 없었다.
+- 영향: `LOOP-007`과 `DATA-007`을 검증할 수 없었고, 사용자가 브라우저 새로고침 또는 재진입을 하면 현재 흐름이 실제로 유지되는지 판단할 수 없었다.
+- 해결 방안: 일반 save와 debug save를 별도 storage key로 분리하고, `RunState`에 phase, deck/hand/draw/discard, 전투 상태, 보상/룬 상태, 완료 stage, 로그 등 최소 복원 필드를 추가했다. `BootScene`은 저장된 run을 복원하고 `PreloadScene`은 `context.run.phase` 기준으로 장면을 시작한다.
+- 재발 방지 기준: `phaser:smoke`에서 mid-combat 저장 복원, completed-stage profile 복원, save JSON에 renderer key가 없는지 확인한다. 인앱 브라우저에서도 reset 없는 재진입 후 debug overlay의 `phase`, `enemyHp`, `playerEnergy`, `savedPhase`를 확인한다.
+- 해결 커밋: `f1c5a2f Add save reload verification`

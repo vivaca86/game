@@ -401,3 +401,11 @@ Phaser 런타임 첫 골조와 데이터 부팅, 디버그 진입 작업을 그�
 ### Codex
 
 버튼처럼 보이던 `Enter:` 안내 문구가 실제 클릭 가능한 Phaser 오브젝트가 아니라 키보드 입력만 연결된 텍스트였음을 확인했다. 진행 버튼을 `renderActionButton`으로 교체하고, 전투/보스 장면의 카드와 `End Turn`도 마우스로 누를 수 있게 연결했다. 자동 검증에는 `tools/phaser-smoke-test.mjs`의 실제 canvas 좌표 클릭 경로를 추가했다. 검증은 `npm.cmd run check`, `npm.cmd run phaser:smoke`, `git diff --check`, 인앱 브라우저 클릭 확인으로 진행했다. 인앱 브라우저에서는 `World Map -> Dungeon -> Enter Room -> first card -> End Turn` 클릭으로 phase 이동, enemyHp 17, turn 2, playerHp 36 변화를 확인했다. 수정 커밋은 `8518d18 Make Phaser controls clickable`이다.
+
+### 사용자
+
+현재가 완전 초기 개발 단계이고 흐름만 잡는 상태인지 확인했고, 다음 작업 진행을 지시했다.
+
+### Codex
+
+클릭 수정 2커밋을 GitHub `main`에 fast-forward push했다. 이어서 다음 기반 작업으로 save reload 검증을 진행했다. `SaveData.currentRun`에 phase, 손패/드로우/버림, 전투 상태, 보상/룬 상태, 진행 로그 등 새로고침 후 흐름을 복원하는 최소 필드를 추가했고, 일반 세이브와 debug 세이브를 별도 localStorage key로 분리했다. `BootScene`은 저장된 run이 있으면 `context.run.phase` 기준으로 장면을 복원하고, action 후에는 serializable save를 저장한다. `phaser:smoke`에는 mid-combat 저장 복원, completed-stage profile 복원, Phaser renderer key 미포함 검증을 추가했다. 인앱 브라우저에서는 reset save 후 카드 사용 상태를 만들고 reset 없는 재진입에서 `phase=combat`, `enemyHp=17`, `playerEnergy=2`, `savedPhase=combat`가 유지되는 것을 확인했다. 구현 커밋은 `f1c5a2f Add save reload verification`이다.
