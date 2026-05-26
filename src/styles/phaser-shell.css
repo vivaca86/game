@@ -32,8 +32,12 @@ body {
 
 .debug-card {
   display: grid;
-  min-width: 260px;
+  box-sizing: border-box;
+  width: 300px;
+  min-width: 0;
+  max-height: calc(100vh - 24px);
   gap: 4px;
+  overflow: hidden;
   padding: 12px 14px;
   border: 1px solid rgba(255, 248, 230, 0.38);
   background: rgba(28, 37, 52, 0.92);
@@ -49,9 +53,30 @@ body {
 
 .debug-card span {
   color: #fff8e6;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .debug-card em {
   color: #ffb4a9;
   font-style: normal;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 1400px) {
+  .debug-card {
+    width: 220px;
+    max-height: 260px;
+    gap: 3px;
+    padding: 9px 10px;
+    font-size: 10px;
+    line-height: 1.25;
+  }
+
+  .debug-card strong {
+    font-size: 11px;
+  }
 }

@@ -5,6 +5,7 @@ interface SceneShellOptions {
   title: string;
   subtitle: string;
   focusLabel: string;
+  showHand?: boolean;
   onCardClick?: (index: number) => void;
 }
 
@@ -53,7 +54,9 @@ export function renderSceneShell(
     textStyle(24, "#805845")
   );
 
-  renderCardHand(scene, context, options.onCardClick);
+  if (options.showHand) {
+    renderCardHand(scene, context, options.onCardClick);
+  }
   renderRoute(scene, context);
 }
 

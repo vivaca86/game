@@ -4,7 +4,7 @@ Date: 2026-05-26
 
 ## Status
 
-- Status: combat simulation, scene flow, click controls, and save reload smoke verified.
+- Status: combat simulation, scene flow, click controls, save reload, and 1920/view smoke verified.
 - Basis: `docs/vertical-slice-acceptance.md`
 - Candidate data: `docs/vertical-slice-content-candidates.md`
 - Still not complete: full vertical-slice pass, final art/assets, exhaustive source parity, 95% similarity.
@@ -45,12 +45,12 @@ Date: 2026-05-26
 
 | ID | Check | Method | Current state |
 | --- | --- | --- | --- |
-| UI-001 | Town screen shows start/progress state. | desktop screenshot | Implemented, not verified |
+| UI-001 | Town screen shows start/progress state. | 1920 screenshot | Verified |
 | UI-002 | World map can enter the selected stage. | keyboard flow | Verified |
-| UI-003 | Dungeon view is not only a static menu and shows route position. | screenshot + interaction | Implemented, not verified |
+| UI-003 | Dungeon view is not only a static menu and shows route position. | 1920 screenshot + interaction smoke | Verified |
 | UI-004 | Combat shows hand, HP, energy, block, and intent. | `npm.cmd run phaser:smoke` | Verified |
-| UI-005 | Reward screen shows options and claim result. | flow smoke | Implemented, not verified |
-| UI-006 | Rune bench shows equip result before/after. | flow smoke | Implemented, not verified |
+| UI-005 | Reward screen shows options and claim result. | flow smoke + 1920 screenshot | Verified |
+| UI-006 | Rune bench shows equip result before/after. | flow smoke + 1920 screenshot | Verified |
 | UI-007 | Boss screen shows boss-specific phase signal. | `npm.cmd run phaser:smoke` | Verified |
 | UI-008 | Result screen shows clear/return state. | full loop smoke | Verified |
 
@@ -82,10 +82,10 @@ Date: 2026-05-26
 
 | ID | Check | Method | Current state |
 | --- | --- | --- | --- |
-| VIEW-001 | 1920x1080 layout keeps five cards and intent readable. | screenshot | Not started |
+| VIEW-001 | 1920x1080 layout keeps five cards and intent readable. | 1920 screenshot + smoke assertions | Verified |
 | VIEW-002 | 1280x720 layout renders nonblank without console errors. | `npm.cmd run phaser:smoke` | Verified |
 | VIEW-003 | Browser console has no app errors. | `npm.cmd run phaser:smoke` | Verified |
-| VIEW-004 | Debug overlay does not hide critical combat information. | screenshot review | Implemented, not verified |
+| VIEW-004 | Debug overlay does not hide critical combat information. | 1920/1280/1080 overlay geometry + screenshot review | Verified |
 
 ## Current Verification Results
 
@@ -94,6 +94,8 @@ Date: 2026-05-26
 - `npm.cmd run phaser:smoke`: passed.
 - `git diff --check`: passed.
 - Save reload: `phaser:smoke` verifies saved mid-combat state restores after reload and saved completed-stage profile state survives reload. In-app browser also verified reset-save flow, card action, no-reset reload, and restored `phase=combat`, `enemyHp=17`, `playerEnergy=2`, `savedPhase=combat`.
+- 1920/view checks: `phaser:smoke` now captures 1920x1080 screenshots for Town, Dungeon, Combat, Reward, Rune Bench, and Boss under `tmp/phaser-1920-*.png`. Combat and Boss assertions verify five-card hands, expected debug state, non-empty screenshots, and debug-overlay avoidance of the hand and enemy intent areas.
+- Responsive overlay checks: `phaser:smoke` also captures 1280 and 1080 overlay screenshots for Combat and Boss under `tmp/phaser-overlay-*.png`. In-app browser verification at 1080x918 confirmed `phase=combat`, `enemyHp=24`, `playerEnergy=3`, overlay size `220x260`, and no overlap with the five-card hand or enemy intent panel.
 
 `phaser:smoke` writes screenshots under `tmp/`, including `tmp/phaser-TownScene.png`, `tmp/phaser-CombatScene.png`, and `tmp/phaser-BossScene.png`. `tmp/` is verification output and is not committed.
 
@@ -105,7 +107,6 @@ To call the first vertical slice passed, all required `PRE`, `DATA`, `UI`, `COMB
 
 ## Next Work
 
-1. Add 1920x1080 screenshot checks and review debug overlay placement.
-2. Add effect-audit coverage for card description/effect-op consistency.
-3. Split fixture `encounterPoolId` into explicit encounter-pool data if the next content pass needs multiple enemies per room.
-4. Continue source/version confirmation separately; current implementation is a slice foundation, not source parity.
+1. Add effect-audit coverage for card description/effect-op consistency.
+2. Split fixture `encounterPoolId` into explicit encounter-pool data if the next content pass needs multiple enemies per room.
+3. Continue source/version confirmation separately; current implementation is a slice foundation, not source parity.

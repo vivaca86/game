@@ -19,6 +19,7 @@ export class CombatScene extends Phaser.Scene {
       title: "Card Combat",
       subtitle: "1-5 play cards / E end turn",
       focusLabel: "Combat state",
+      showHand: true,
       onCardClick: (index) => handleSceneAction(this, context, `card_${index + 1}` as InputAction)
     });
 
@@ -30,11 +31,11 @@ export class CombatScene extends Phaser.Scene {
 }
 
 function renderCombatButtons(scene: Phaser.Scene, context: BootContext): void {
-  const button = scene.add.rectangle(1380, 740, 220, 52, 0x32415a, 0.94);
+  const button = scene.add.rectangle(1380, 638, 220, 52, 0x32415a, 0.94);
   button.setStrokeStyle(3, 0xf5c26b, 0.95);
   button.setInteractive({ useHandCursor: true });
   button.on("pointerdown", () => handleSceneAction(scene, context, "end_turn"));
-  scene.add.text(1294, 724, "End Turn", textStyle(22, "#fff5d7", true));
+  scene.add.text(1294, 622, "End Turn", textStyle(22, "#fff5d7", true));
 }
 
 export function renderCombatPanel(
@@ -49,11 +50,10 @@ export function renderCombatPanel(
   const enemy = getCombatantData(context.run, context.dataBundle);
   const intent = getActiveIntent(context.run, context.dataBundle);
 
-  scene.add.rectangle(1380, 560, 420, 290, fill, 0.96).setStrokeStyle(5, stroke, 0.9);
-  scene.add.text(1204, 442, enemy?.displayNameKo ?? "missing enemy", textStyle(34, titleColor, true));
-  scene.add.text(1204, 500, `HP ${combat?.enemyHp ?? "-"} / ${combat?.enemyMaxHp ?? "-"}`, textStyle(28, bodyColor, true));
-  scene.add.text(1204, 542, `Block ${combat?.enemyBlock ?? 0}`, textStyle(24, bodyColor));
-  scene.add.text(1204, 584, `Intent ${intent?.telegraphKo ?? "none"}`, textStyle(24, bodyColor));
-  scene.add.text(1204, 626, `Turn ${combat?.turn ?? 0}`, textStyle(24, bodyColor));
-  scene.add.text(1204, 685, `Last: ${context.run.log.at(-1) ?? "none"}`, textStyle(20, bodyColor)).setWordWrapWidth(350);
+  scene.add.rectangle(1380, 535, 420, 230, fill, 0.96).setStrokeStyle(5, stroke, 0.9);
+  scene.add.text(1204, 436, enemy?.displayNameKo ?? "missing enemy", textStyle(34, titleColor, true));
+  scene.add.text(1204, 492, `HP ${combat?.enemyHp ?? "-"} / ${combat?.enemyMaxHp ?? "-"}`, textStyle(28, bodyColor, true));
+  scene.add.text(1204, 532, `Block ${combat?.enemyBlock ?? 0}`, textStyle(24, bodyColor));
+  scene.add.text(1204, 572, `Intent ${intent?.telegraphKo ?? "none"}`, textStyle(24, bodyColor));
+  scene.add.text(1204, 610, `Turn ${combat?.turn ?? 0}`, textStyle(24, bodyColor));
 }

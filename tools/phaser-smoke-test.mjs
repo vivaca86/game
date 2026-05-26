@@ -65,6 +65,7 @@ try {
   await checkPage("/", "TownScene", false);
   await checkPage("/?debug=1&entry=combat&resetSave=1", "CombatScene", true);
   await checkPage("/?debug=1&entry=boss&resetSave=1", "BossScene", true);
+  await checkViewScreenshots();
   await checkClickableControls();
   await checkSaveReload();
   await checkCombatActions();
@@ -104,6 +105,122 @@ async function checkPage(pathname, expectedScene, expectDebugOverlay) {
 
   assertNoBrowserErrors(expectedScene, errors);
   await page.close();
+}
+
+async function checkViewScreenshots() {
+  const viewCases = [
+    {
+      pathname: "/?debug=1&entry=town&resetSave=1",
+      scene: "TownScene",
+      requiredState: { phase: "town", savedPhase: "town" }
+    },
+    {
+      pathname: "/?debug=1&entry=dungeon&resetSave=1",
+      scene: "DungeonScene",
+      requiredState: { phase: "dungeon" }
+    },
+    {
+      pathname: "/?debug=1&entry=combat&resetSave=1",
+      scene: "CombatScene",
+      requiredState: { phase: "combat", enemyHp: "24", playerEnergy: "3" },
+      assertHandCount: 5,
+      assertOverlayCombatSafe: true
+    },
+    {
+      pathname: "/?debug=1&entry=reward&resetSave=1",
+      scene: "RewardScene",
+      requiredState: { phase: "reward" },
+      minRewardCount: 3
+    },
+    {
+      pathname: "/?debug=1&entry=rune_bench&resetSave=1",
+      scene: "RuneBenchScene",
+      requiredState: { phase: "rune_bench" },
+      minRuneCount: 1
+    },
+    {
+      pathname: "/?debug=1&entry=boss&resetSave=1",
+      scene: "BossScene",
+      requiredState: { phase: "boss", enemyHp: "64" },
+      assertHandCount: 5,
+      assertOverlayCombatSafe: true
+    }
+  ];
+
+  for (const viewCase of viewCases) {
+    await withDebugPageAtViewport(
+      viewCase.pathname,
+      viewCase.scene,
+      { width: 1920, height: 1080 },
+      async (page) => {
+        await assertCanvasFitsViewport(page, viewCase.scene, 1920, 1080);
+
+        for (const [key, value] of Object.entries(viewCase.requiredState ?? {})) {
+          await waitForDebugValue(page, key, value);
+        }
+        const state = await getDebugMap(page);
+        if (viewCase.assertHandCount) {
+          const cardsInHand = (state.hand ?? "").split(",").filter(Boolean);
+          if (cardsInHand.length !== viewCase.assertHandCount) {
+            throw new Error(`${viewCase.scene}: expected ${viewCase.assertHandCount} cards, got ${cardsInHand.length}`);
+          }
+        }
+        if (viewCase.minRewardCount) {
+          const rewards = (state.rewards ?? "").split(",").filter((item) => item && item !== "none");
+          if (rewards.length < viewCase.minRewardCount) {
+            throw new Error(`${viewCase.scene}: expected at least ${viewCase.minRewardCount} rewards, got ${rewards.length}`);
+          }
+        }
+        if (viewCase.minRuneCount) {
+          const runes = (state.runes ?? "").split(",").filter((item) => item && item !== "none");
+          if (runes.length < viewCase.minRuneCount) {
+            throw new Error(`${viewCase.scene}: expected at least ${viewCase.minRuneCount} rune, got ${runes.length}`);
+          }
+        }
+
+        if (viewCase.assertOverlayCombatSafe) {
+          await assertDebugOverlayAvoidsCombatAreas(page, viewCase.scene);
+        }
+
+        const screenshot = await page.screenshot({
+          path: path.join(tmpDir, `phaser-1920-${viewCase.scene}.png`),
+          fullPage: false
+        });
+        if (screenshot.length < 20000) {
+          throw new Error(`${viewCase.scene}: 1920 screenshot looks empty`);
+        }
+      }
+    );
+  }
+
+  const overlaySafeCases = [
+    { pathname: "/?debug=1&entry=combat&resetSave=1", scene: "CombatScene" },
+    { pathname: "/?debug=1&entry=boss&resetSave=1", scene: "BossScene" }
+  ];
+  const overlayViewports = [
+    { label: "1280", viewport: { width: 1280, height: 720 } },
+    { label: "1080", viewport: { width: 1080, height: 918 } }
+  ];
+
+  for (const overlayCase of overlaySafeCases) {
+    for (const overlayViewport of overlayViewports) {
+      await withDebugPageAtViewport(
+        overlayCase.pathname,
+        overlayCase.scene,
+        overlayViewport.viewport,
+        async (page) => {
+          await assertDebugOverlayAvoidsCombatAreas(page, `${overlayCase.scene} ${overlayViewport.label}`);
+          const screenshot = await page.screenshot({
+            path: path.join(tmpDir, `phaser-overlay-${overlayViewport.label}-${overlayCase.scene}.png`),
+            fullPage: false
+          });
+          if (screenshot.length < 15000) {
+            throw new Error(`${overlayCase.scene} ${overlayViewport.label}: overlay screenshot looks empty`);
+          }
+        }
+      );
+    }
+  }
 }
 
 async function checkCombatActions() {
@@ -151,7 +268,7 @@ async function checkClickableControls() {
     await waitForDebugValue(page, "enemyHp", "17");
     await waitForDebugValue(page, "playerEnergy", "2");
 
-    await clickScenePoint(page, 1380, 740);
+    await clickScenePoint(page, 1380, 638);
     await waitForDebugValue(page, "playerHp", "36");
     await waitForDebugValue(page, "turn", "2");
   });
@@ -219,14 +336,21 @@ async function checkBossResultFlow() {
 }
 
 async function withDebugPage(pathname, expectedScene, action) {
-  const page = await browser.newPage({ viewport: { width: 1280, height: 720 } });
+  await withDebugPageAtViewport(pathname, expectedScene, { width: 1280, height: 720 }, action);
+}
+
+async function withDebugPageAtViewport(pathname, expectedScene, viewport, action) {
+  const page = await browser.newPage({ viewport });
   const errors = bindErrorCapture(page);
-  await page.goto(new URL(pathname, baseUrl).href, { waitUntil: "networkidle" });
-  await page.waitForSelector("canvas", { timeout: 10000 });
-  await waitForDebugScene(page, expectedScene);
-  await action(page);
-  assertNoBrowserErrors(expectedScene, errors);
-  await page.close();
+  try {
+    await page.goto(new URL(pathname, baseUrl).href, { waitUntil: "networkidle" });
+    await page.waitForSelector("canvas", { timeout: 10000 });
+    await waitForDebugScene(page, expectedScene);
+    await action(page);
+    assertNoBrowserErrors(expectedScene, errors);
+  } finally {
+    await page.close();
+  }
 }
 
 async function playUntilDebugValue(page, key, value, limit) {
@@ -299,6 +423,50 @@ async function clickScenePoint(page, sceneX, sceneY) {
     canvasBox.y + (sceneY / 1080) * canvasBox.height
   );
   await page.waitForTimeout(120);
+}
+
+async function assertCanvasFitsViewport(page, label, minWidth, minHeight) {
+  const canvasBox = await page.locator("canvas").boundingBox();
+  if (!canvasBox) {
+    throw new Error(`${label}: missing canvas`);
+  }
+
+  if (canvasBox.width < minWidth || canvasBox.height < minHeight) {
+    throw new Error(`${label}: expected ${minWidth}x${minHeight} canvas, got ${canvasBox.width}x${canvasBox.height}`);
+  }
+}
+
+async function assertDebugOverlayAvoidsCombatAreas(page, label) {
+  const result = await page.evaluate(() => {
+    const overlay = document.querySelector("#debug-overlay");
+    const canvas = document.querySelector("canvas");
+    if (!overlay || !canvas) {
+      return { ok: false, reason: "missing overlay or canvas" };
+    }
+
+    const overlayRect = overlay.getBoundingClientRect();
+    const canvasRect = canvas.getBoundingClientRect();
+    const sceneToViewport = (rect) => ({
+      left: canvasRect.left + (rect.left / 1920) * canvasRect.width,
+      right: canvasRect.left + (rect.right / 1920) * canvasRect.width,
+      top: canvasRect.top + (rect.top / 1080) * canvasRect.height,
+      bottom: canvasRect.top + (rect.bottom / 1080) * canvasRect.height
+    });
+    const intersects = (a, b) => !(a.right <= b.left || a.left >= b.right || a.bottom <= b.top || a.top >= b.bottom);
+    const criticalAreas = [
+      { name: "five-card hand", rect: sceneToViewport({ left: 320, top: 650, right: 1510, bottom: 930 }) },
+      { name: "enemy intent panel", rect: sceneToViewport({ left: 1165, top: 430, right: 1605, bottom: 780 }) }
+    ];
+    const overlap = criticalAreas.find((area) => intersects(overlayRect, area.rect));
+
+    return overlap
+      ? { ok: false, reason: `overlaps ${overlap.name}` }
+      : { ok: true, reason: "safe" };
+  });
+
+  if (!result.ok) {
+    throw new Error(`${label}: debug overlay ${result.reason}`);
+  }
 }
 
 async function waitForDebugScene(page, sceneName) {
