@@ -197,3 +197,11 @@
 - 해결 방안: 첫 교체 단위를 카드 프레임 3종과 카드 타입 아이콘 3종으로 제한하고, generator에 exact key 기반 전용 paint branch를 추가했다. 작업 중 넓은 attack 조건 때문에 `icon_intent_attack`이 같이 바뀌는 것을 `git status`로 발견했고, exact key 조건으로 좁힌 뒤 재생성했다.
 - 재발 방지 기준: 에셋 그룹을 교체할 때는 `git diff --name-only`로 변경 파일이 목표 그룹에만 남았는지 확인하고, `npm.cmd run assets:audit:strict`, `npm.cmd run check`, `npm.cmd run phaser:smoke`, `git diff --check`를 통과시킨다. candidate/development asset은 approved final art로 말하지 않는다.
 - 해결 커밋: `dce1754 Add card UI candidate assets`
+
+### 문제: 카드 에셋이 preload만 되고 실제 손패 렌더링에는 쓰이지 않음
+
+- 원인: Phaser `PreloadScene`은 manifest의 card frame/art/icon texture를 로드했지만, `renderCardHand`는 rectangle과 text만 직접 그렸다.
+- 영향: card art PNG를 교체해도 전투/보스 화면에서 사용자가 변화를 확인할 수 없고, 에셋 파이프라인이 실제 UI 표면까지 닫혔다고 말할 수 없었다.
+- 해결 방안: 첫 손패 카드 일러스트 5종에 exact key candidate art branch를 추가하고, `renderCardHand`가 `assetKeys.frame`, `assetKeys.illustration`, `assetKeys.typeIcon` texture를 그리도록 연결했다. 기존 클릭 동작은 card 전체 invisible hit target으로 유지했다.
+- 재발 방지 기준: runtime asset을 교체할 때는 preload/audit뿐 아니라 실제 사용하는 화면 또는 smoke screenshot에서 texture가 렌더링되는지 확인한다. 후보 아트가 화면에 보이더라도 approved final art로 말하지 않는다.
+- 해결 커밋: `a9f6ef3 Render card candidate art in hand`
