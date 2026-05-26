@@ -164,6 +164,12 @@ async function checkViewScreenshots() {
       requiredState: { phase: "boss", enemyHp: "64" },
       assertHandCount: 5,
       assertOverlayCombatSafe: true
+    },
+    {
+      pathname: "/?debug=1&entry=result&resetSave=1&grantRelic=relic_brass_bookmark",
+      scene: "ResultScene",
+      requiredState: { phase: "result" },
+      minRelicCount: 1
     }
   ];
 
@@ -195,6 +201,12 @@ async function checkViewScreenshots() {
           const runes = (state.runes ?? "").split(",").filter((item) => item && item !== "none");
           if (runes.length < viewCase.minRuneCount) {
             throw new Error(`${viewCase.scene}: expected at least ${viewCase.minRuneCount} rune, got ${runes.length}`);
+          }
+        }
+        if (viewCase.minRelicCount) {
+          const relics = (state.relics ?? "").split(",").filter((item) => item && item !== "none");
+          if (relics.length < viewCase.minRelicCount) {
+            throw new Error(`${viewCase.scene}: expected at least ${viewCase.minRelicCount} relic, got ${relics.length}`);
           }
         }
 

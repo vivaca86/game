@@ -41,6 +41,15 @@ const candidateBossSpriteKeys = new Set([
   "boss_curtain_lion"
 ]);
 
+const candidateProgressIconKeys = new Set([
+  "map_icon_lantern_foyer",
+  "rune_paper_spark_icon",
+  "rune_ribbon_loop_icon",
+  "rune_glass_leaf_icon",
+  "relic_brass_bookmark_icon",
+  "char_mina_pagehand_portrait"
+]);
+
 function crc32(buffer) {
   let crc = 0xffffffff;
   for (const byte of buffer) {
@@ -157,6 +166,24 @@ function paletteFor(asset) {
   if (asset.key === "boss_curtain_lion") {
     return { base: [245, 221, 188], accent: [196, 73, 89], dark: [68, 52, 76] };
   }
+  if (asset.key === "map_icon_lantern_foyer") {
+    return { base: [246, 231, 192], accent: [214, 91, 80], dark: [58, 68, 90] };
+  }
+  if (asset.key === "rune_paper_spark_icon") {
+    return { base: [249, 235, 203], accent: [218, 95, 74], dark: [77, 57, 72] };
+  }
+  if (asset.key === "rune_ribbon_loop_icon") {
+    return { base: [244, 231, 205], accent: [186, 74, 106], dark: [78, 58, 90] };
+  }
+  if (asset.key === "rune_glass_leaf_icon") {
+    return { base: [236, 240, 221], accent: [76, 151, 132], dark: [51, 82, 91] };
+  }
+  if (asset.key === "relic_brass_bookmark_icon") {
+    return { base: [246, 229, 190], accent: [191, 139, 55], dark: [76, 58, 56] };
+  }
+  if (asset.key === "char_mina_pagehand_portrait") {
+    return { base: [248, 236, 210], accent: [82, 143, 150], dark: [58, 65, 89] };
+  }
   if (asset.path.includes("/backgrounds/")) return { base: [240, 222, 178], accent, dark: [112, 92, 72] };
   if (asset.path.includes("/cards/")) return { base: [250, 238, 206], accent, dark: [98, 72, 54] };
   if (asset.path.includes("/icons/")) return { base: [246, 231, 192], accent, dark: [76, 82, 96] };
@@ -173,6 +200,7 @@ function paintFor(asset) {
   if (candidateBackgroundKeys.has(asset.key)) return paintBackground(asset);
   if (candidateMonsterSpriteKeys.has(asset.key)) return paintMonsterSprite(asset);
   if (candidateBossSpriteKeys.has(asset.key)) return paintBossSprite(asset);
+  if (candidateProgressIconKeys.has(asset.key)) return paintProgressIcon(asset);
 
   const palette = paletteFor(asset);
   const frame = asset.frameSize;
@@ -801,6 +829,106 @@ function paintBossSprite(asset) {
     }
     if ((mane || face || chest) && ((fx + fy + frameIndex) % 31 < 2)) {
       color = mix(color, [255, 239, 196, 255], 0.24);
+    }
+
+    return color;
+  };
+}
+
+function paintProgressIcon(asset) {
+  const palette = paletteFor(asset);
+  const seed = hash(asset.key);
+  return (x, y, width, height) => {
+    const scale = Math.min(width, height) / 128;
+    const nx = (x - width / 2) / scale + 64;
+    const ny = (y - height / 2) / scale + 64;
+    const [paperR, paperG, paperB] = palette.base;
+    const [accentR, accentG, accentB] = palette.accent;
+    const [darkR, darkG, darkB] = palette.dark;
+    const grain = ((Math.floor(nx) * 17 + Math.floor(ny) * 23 + seed) % 43) < 8 ? -8 : 0;
+    const paper = [paperR + grain, paperG + grain, paperB + grain, 255];
+    const accent = [accentR, accentG, accentB, 255];
+    const dark = [darkR, darkG, darkB, 255];
+    const gold = [224, 174, 82, 255];
+    const distance = Math.hypot(nx - 64, ny - 64);
+
+    if (distance > 60) return [0, 0, 0, 0];
+
+    let color = distance > 55
+      ? dark
+      : mix(paper, accent, distance < 47 ? 0.14 : 0.06);
+
+    if (asset.key === "map_icon_lantern_foyer") {
+      if (pointInPolygon(nx, ny, [[30, 43], [53, 35], [53, 91], [30, 99]])) color = mix(paper, accent, 0.2);
+      if (pointInPolygon(nx, ny, [[53, 35], [80, 43], [80, 99], [53, 91]])) color = mix(paper, dark, 0.08);
+      if (pointInPolygon(nx, ny, [[80, 43], [98, 35], [98, 91], [80, 99]])) color = mix(paper, accent, 0.34);
+      if (distanceToSegment(nx, ny, 34, 47, 94, 38) < 2 || distanceToSegment(nx, ny, 53, 35, 53, 91) < 2
+        || distanceToSegment(nx, ny, 80, 43, 80, 99) < 2) {
+        color = dark;
+      }
+      if (distanceToSegment(nx, ny, 64, 23, 64, 43) < 3) color = dark;
+      if (insideRoundedRect(nx, ny, 49, 43, 30, 38, 7)) color = dark;
+      if (insideRoundedRect(nx, ny, 55, 52, 18, 21, 5)) color = [255, 225, 112, 255];
+      if (Math.hypot(nx - 64, ny - 64) < 18) color = mix(color, [255, 240, 154, 255], 0.42);
+      if (Math.abs(nx - 90) + Math.abs(ny - 83) < 12) color = accent;
+      return color;
+    }
+
+    if (asset.key === "rune_paper_spark_icon") {
+      const diamond = Math.abs(nx - 64) + Math.abs(ny - 64) < 38;
+      const inner = Math.abs(nx - 64) + Math.abs(ny - 64) < 27;
+      if (diamond) color = dark;
+      if (inner) color = mix(paper, accent, 0.18);
+      const flame = pointInPolygon(nx, ny, [[55, 70], [62, 39], [70, 58], [75, 42], [81, 73], [69, 89], [58, 88]]);
+      if (flame) color = accent;
+      if (pointInPolygon(nx, ny, [[61, 74], [65, 56], [72, 76], [66, 84]])) color = [255, 235, 128, 255];
+      if (distanceToSegment(nx, ny, 36, 92, 92, 36) < 3) color = gold;
+      return color;
+    }
+
+    if (asset.key === "rune_ribbon_loop_icon") {
+      const leftLoop = Math.hypot((nx - 48) / 21, (ny - 64) / 16);
+      const rightLoop = Math.hypot((nx - 80) / 21, (ny - 64) / 16);
+      if ((leftLoop < 1.1 && leftLoop > 0.55) || (rightLoop < 1.1 && rightLoop > 0.55)) color = dark;
+      if (distanceToSegment(nx, ny, 45, 49, 83, 79) < 7 || distanceToSegment(nx, ny, 45, 79, 83, 49) < 7) color = accent;
+      if (distanceToSegment(nx, ny, 45, 49, 83, 79) < 3 || distanceToSegment(nx, ny, 45, 79, 83, 49) < 3) color = [255, 219, 120, 255];
+      if (insideRoundedRect(nx, ny, 55, 55, 18, 18, 5)) color = dark;
+      return color;
+    }
+
+    if (asset.key === "rune_glass_leaf_icon") {
+      const leaf = pointInPolygon(nx, ny, [[65, 25], [91, 55], [82, 88], [56, 103], [38, 76], [43, 45]]);
+      const cut = pointInPolygon(nx, ny, [[65, 35], [80, 56], [72, 80], [58, 90], [48, 72], [50, 50]]);
+      if (leaf) color = dark;
+      if (cut) color = mix([206, 240, 226, 255], accent, 0.22);
+      if (distanceToSegment(nx, ny, 49, 92, 84, 42) < 3) color = [235, 255, 240, 255];
+      if (distanceToSegment(nx, ny, 58, 74, 37, 96) < 5) color = accent;
+      if (Math.hypot(nx - 85, ny - 39) < 8) color = [255, 242, 148, 255];
+      return color;
+    }
+
+    if (asset.key === "relic_brass_bookmark_icon") {
+      if (insideRoundedRect(nx, ny, 43, 24, 42, 82, 7)) color = dark;
+      if (insideRoundedRect(nx, ny, 49, 31, 30, 67, 5)) color = gold;
+      if (pointInPolygon(nx, ny, [[49, 76], [64, 93], [79, 76], [79, 99], [49, 99]])) color = dark;
+      if (insideRoundedRect(nx, ny, 55, 39, 18, 9, 4) || insideRoundedRect(nx, ny, 55, 56, 18, 9, 4)) color = paper;
+      if (distanceToSegment(nx, ny, 42, 106, 86, 106) < 4) color = mix(dark, gold, 0.34);
+      return color;
+    }
+
+    if (asset.key === "char_mina_pagehand_portrait") {
+      const hair = insideEllipse(nx, ny, 64, 50, 30, 28) || insideEllipse(nx, ny, 49, 61, 15, 20) || insideEllipse(nx, ny, 79, 61, 15, 20);
+      const face = insideEllipse(nx, ny, 64, 57, 22, 24);
+      const body = pointInPolygon(nx, ny, [[43, 92], [85, 92], [101, 121], [27, 121]]);
+      if (body) color = mix(accent, dark, 0.12);
+      if (hair) color = dark;
+      if (face) color = paper;
+      if (insideEllipse(nx, ny, 56, 57, 3, 3) || insideEllipse(nx, ny, 72, 57, 3, 3)) color = [255, 223, 104, 255];
+      if (distanceToSegment(nx, ny, 57, 70, 64, 75) < 2 || distanceToSegment(nx, ny, 64, 75, 71, 70) < 2) color = dark;
+      if (insideRoundedRect(nx, ny, 36, 88, 56, 24, 5)) color = mix(paper, [255, 255, 236, 255], 0.28);
+      if (distanceToSegment(nx, ny, 36, 88, 92, 112) < 3 || distanceToSegment(nx, ny, 92, 88, 36, 112) < 3) color = dark;
+      if (Math.abs(nx - 64) + Math.abs(ny - 27) < 15) color = gold;
+      return color;
     }
 
     return color;

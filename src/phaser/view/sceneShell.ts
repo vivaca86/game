@@ -54,6 +54,7 @@ export function renderSceneShell(
     `HP ${context.run.player.hp}/${context.run.player.maxHp}  EN ${context.run.player.energy}/${context.run.player.maxEnergy}  BLK ${context.run.player.block}`,
     textStyle(24, "#805845")
   );
+  renderCharacterPortrait(scene, character);
 
   if (options.showHand) {
     renderCardHand(scene, context, options.onCardClick);
@@ -143,7 +144,10 @@ export function renderRoute(scene: Phaser.Scene, context: BootContext): void {
     return;
   }
 
-  scene.add.text(1050, 218, "Route", textStyle(30, "#32415a", true));
+  if (stage.assetKeys.mapIcon && scene.textures.exists(stage.assetKeys.mapIcon)) {
+    scene.add.image(1012, 236, stage.assetKeys.mapIcon).setDisplaySize(64, 64);
+  }
+  scene.add.text(1060, 218, "Route", textStyle(30, "#32415a", true));
   stage.route.slice(0, 5).forEach((room, index) => {
     const x = 1060 + index * 160;
     const fill = room.type === "boss" ? 0xce5869 : room.type === "event" ? 0x6c8fd6 : 0x4f9b75;
@@ -169,6 +173,19 @@ export function textStyle(size: number, color: string, bold = false): Phaser.Typ
 function addInfoPill(scene: Phaser.Scene, x: number, y: number, label: string, color: number): void {
   scene.add.rectangle(x + 150, y + 20, 300, 40, color, 0.9).setStrokeStyle(2, 0xffffff, 0.5);
   scene.add.text(x + 16, y + 8, label, textStyle(20, "#fff8e6", true));
+}
+
+function renderCharacterPortrait(
+  scene: Phaser.Scene,
+  character: BootContext["dataBundle"]["characters"][number] | undefined
+): void {
+  const portraitKey = character?.assetKeys.portrait;
+  if (!portraitKey || !scene.textures.exists(portraitKey)) {
+    return;
+  }
+
+  scene.add.circle(566, 332, 74, 0xfff2d6, 0.82).setStrokeStyle(4, 0xc6a65e, 0.95);
+  scene.add.image(566, 332, portraitKey).setDisplaySize(132, 132);
 }
 
 function renderSceneBackdrop(scene: Phaser.Scene, context: BootContext, explicitBackgroundKey?: string): void {

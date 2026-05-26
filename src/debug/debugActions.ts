@@ -25,6 +25,7 @@ export function createDebugSummary(context: BootContext): string[] {
     `discard=${context.run.discard.length}`,
     `rewards=${context.run.offeredRewards.join(",") || "none"}`,
     `runes=${context.run.runes.join(",") || "none"}`,
+    `relics=${context.run.relics.join(",") || "none"}`,
     `equipped=${Object.entries(context.run.equippedRunes).map(([cardId, runes]) => `${cardId}:${runes.join("+")}`).join(",") || "none"}`,
     context.debug.bossId ? `boss=${context.debug.bossId}` : "boss=none",
     `log=${context.run.log.at(-1) ?? "none"}`,

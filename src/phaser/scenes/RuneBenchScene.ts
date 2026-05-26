@@ -24,7 +24,11 @@ export class RuneBenchScene extends Phaser.Scene {
     const runeIds = context.run.runes.length > 0 ? context.run.runes : context.dataBundle.runes.slice(0, 1).map((rune) => rune.id);
     runeIds.slice(0, 3).forEach((runeId, index) => {
       const rune = context.dataBundle.runes.find((item) => item.id === runeId);
-      this.add.text(1060, 500 + index * 54, rune?.displayNameKo ?? runeId, textStyle(28, "#32415a", true));
+      const y = 500 + index * 54;
+      if (rune?.assetKeys.icon && this.textures.exists(rune.assetKeys.icon)) {
+        this.add.image(1032, y + 18, rune.assetKeys.icon).setDisplaySize(44, 44);
+      }
+      this.add.text(1072, y, rune?.displayNameKo ?? runeId, textStyle(28, "#32415a", true));
     });
     this.add.text(1060, 664, `Equipped: ${Object.keys(context.run.equippedRunes).length}`, textStyle(24, "#805845"));
     renderActionButton(this, 1010, 742, "Equip Rune", () => handleSceneAction(this, context, "confirm"));

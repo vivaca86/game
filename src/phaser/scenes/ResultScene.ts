@@ -21,9 +21,24 @@ export class ResultScene extends Phaser.Scene {
 
     this.add.text(1060, 500, `Cleared: ${context.run.completedStages.join(",") || "none"}`, textStyle(28, "#32415a", true));
     this.add.text(1060, 560, `Saved clears: ${context.save.profile.completedStages.length}`, textStyle(24, "#805845"));
+    renderRelicSummary(this, context);
     renderActionButton(this, 1010, 742, "Return Town", () => handleSceneAction(this, context, "confirm"));
 
     bindKeyboardActions(this, (action) => handleSceneAction(this, context, action));
     renderDebugOverlay(context, "ResultScene");
   }
+}
+
+function renderRelicSummary(scene: Phaser.Scene, context: BootContext): void {
+  const relics = context.run.relics
+    .map((relicId) => context.dataBundle.relics.find((relic) => relic.id === relicId))
+    .filter((relic): relic is NonNullable<typeof relic> => Boolean(relic));
+
+  scene.add.text(1060, 620, `Relics: ${relics.length || "none"}`, textStyle(24, "#805845"));
+  relics.slice(0, 4).forEach((relic, index) => {
+    const x = 1070 + index * 58;
+    if (scene.textures.exists(relic.assetKeys.icon)) {
+      scene.add.image(x, 682, relic.assetKeys.icon).setDisplaySize(46, 46);
+    }
+  });
 }
