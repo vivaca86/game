@@ -181,3 +181,11 @@
 - 해결 방안: `docs/source-version-baseline.md`에 2026-05-27 no-local-Steam working assumption을 추가하고, direct proof를 deferred로 낮췄다. `docs/development-foundation.md`와 `docs/vertical-slice-smoke-checklist.md`에서도 Steam 직접 증거를 active next work에서 제외하고, exact build/runtime claims가 필요하거나 사용자가 접근을 제공할 때만 재개하도록 했다.
 - 재발 방지 기준: Steam/appmanifest 접근이 없는 동안에는 공식 공개 자료, 보존된 조사, 역할 대응표, 자체 검증선을 기준으로 개발을 계속한다. Steam proof는 원작 유사도, 정확한 현행 빌드값, 빌드별 동작을 주장할 때만 다시 연다.
 - 해결 커밋: `ec1ae3c Defer Steam direct proof path`
+
+### 문제: asset manifest는 있어도 Phaser가 실제 runtime 파일을 로드하지 않음
+
+- 원인: 이전 단계에서는 manifest key/path 검증선만 있었고, 실제 `public/assets/runtime` 파일이 없었다. `PreloadScene`도 manifest path를 Phaser loader에 넣지 않고 scene 안에서 placeholder texture를 즉석 생성했다.
+- 영향: strict 파일 검증이 실제로 닫히지 않았고, 나중에 에셋 파일을 바꿔도 브라우저 preload 실패, 크기 불일치, orphan 파일, spritesheet frame 오류를 빠르게 잡기 어려웠다. 또한 placeholder가 최종 아트처럼 오해될 위험이 있었다.
+- 해결 방안: `tools/generate-dev-runtime-assets.mjs`를 추가해 manifest 35개 항목의 개발용 PNG를 `public/assets/runtime`에 생성했다. manifest status를 `generated_manifest`로 바꾸고, `PreloadScene`은 manifest path를 Phaser image/spritesheet loader에 queue하도록 변경했다. `assets:audit:strict`는 파일 35개, 누락 0개, orphan 0개를 검증하고, `phaser:smoke`는 첫 페이지에서 35개 runtime asset URL이 로드되는지 확인한다.
+- 재발 방지 기준: 개발용 placeholder pack은 최종 아트가 아니다. 새 runtime asset을 추가하거나 교체할 때는 generator 또는 실제 asset export 후 `npm.cmd run assets:audit:strict`와 `npm.cmd run phaser:smoke`를 통과시킨다.
+- 해결 커밋: `2168556 Generate dev runtime asset pack`

@@ -493,3 +493,13 @@ Steam은 그냥 없다고 생각하고, 나중에 혹시 모르지만 현재는 
 이를 중요한 기준 변경으로 받아들여 Steam 직접 설치본 증거를 활성 다음 작업에서 deferred proof로 내렸다. `docs/source-version-baseline.md`에는 2026-05-27 no-local-Steam working assumption을 추가해 Steam/appmanifest proof가 더 이상 active next-work item이 아니며, 공식 공개 자료, 보존된 조사, 역할 대응표, 원본화된 구현 판단으로 개발을 계속한다고 기록했다. 동시에 정확한 현행 빌드 런타임 값, 빌드별 동작, 원작 유사도 주장은 여전히 direct proof가 있을 때만 가능하다고 유지했다.
 
 `docs/development-foundation.md`와 `docs/vertical-slice-smoke-checklist.md`에서도 Steam 직접 증거를 개발 진행 조건이 아니라 나중에 접근이 생기면 재개할 항목으로 바꿨다. `Next Work`의 첫 항목은 에셋 파이프라인 strict 검증과 콘텐츠/아트/밸런스 확장으로 정리했다. 검증은 문서 검색, `git diff --check`, `npm.cmd run check`로 진행했다. 기준 변경 커밋은 `ec1ae3c Defer Steam direct proof path`이다.
+
+### 사용자
+
+다음 작업도 이어서 진행하라고 지시했다. 인앱 브라우저는 `?debug=1&entry=combat&resetSave=1&grantCard=card_lamplight_mark` 상태였다.
+
+### Codex
+
+활성 다음 작업을 에셋 파이프라인 시작으로 보고, 최종 아트가 아니라 개발용 runtime placeholder pack을 먼저 만들기로 범위를 정했다. `tools/generate-dev-runtime-assets.mjs`를 추가해 manifest의 35개 asset entry를 기준으로 deterministic PNG를 `public/assets/runtime` 아래 생성하게 했고, manifest의 browser path는 기존처럼 `assets/runtime/...`로 유지했다. `docs/asset-manifest.slice.v1.json`과 `src/data/assetManifest.slice.v1.json`의 status는 `generated_manifest`로 바꾸고, 이 파일들이 최종/승인 아트가 아니라는 note를 남겼다.
+
+`PreloadScene`은 이제 manifest entry를 실제 Phaser image/spritesheet loader에 queue하고, 파일이 없을 때만 fallback generated texture를 만든다. `tools/audit-asset-files.mjs`는 public asset root를 기준으로 strict 검증하도록 조정했고, `tools/phaser-smoke-test.mjs`는 첫 페이지에서 `assets/runtime` URL 35개가 실제로 preload되는지 확인한다. 검증은 `npm.cmd run assets:audit:strict`, `npm.cmd run check`, `npm.cmd run phaser:smoke`, `git diff --check`로 진행했다. 결과적으로 파일 35개, 누락 0개, orphan 0개, Phaser smoke OK다. 이 작업은 runtime asset pipeline foundation이며 최종 아트 완료는 아니다. 구현 커밋은 `2168556 Generate dev runtime asset pack`이다.
