@@ -70,3 +70,11 @@
 - 해결 방안: 로컬 변경분과 원격 `main` 커밋을 다시 대조하고, 새 기반 문서를 `e07c3e6 Document new game foundation`으로 GitHub에 푸시했다. 이어서 `AGENTS.md`, `README.md`, 기존 handoff/current-issues/recovery 문서에 새 기반 문서 우선 규칙을 반영했다.
 - 재발 방지 기준: GitHub 상태를 묻는 작업이라도 로컬 작업트리에 미커밋 최신 문서가 있는지 먼저 확인하고, 원격 기준과 로컬 기준을 분리해 보고한다. 오래된 handoff 문서와 새 기반 문서가 충돌하면 `docs/development-foundation.md`와 새 세로 조각 기준을 우선한다.
 - 해결 커밋: `e07c3e6 Document new game foundation`
+
+### 문제: fixture 검증 스크립트가 manifest key를 id로 오판함
+
+- 원인: `tools/validate-slice-fixture.mjs`에서 일반 콘텐츠 ID 검증 함수를 asset manifest에도 재사용했다. 그러나 manifest 항목은 `id`가 아니라 `key`를 기준으로 한다.
+- 영향: manifest에 정상 등록된 에셋 키가 전부 누락된 것으로 보고되어, fixture와 manifest 참조 검증이 실패했다.
+- 해결 방안: manifest 전용 `uniqueKeys` 검증 함수를 추가하고, asset manifest는 `assets[].key` 기준으로 검사하도록 수정했다.
+- 재발 방지 기준: 콘텐츠 ID와 에셋 키는 둘 다 snake_case라도 의미가 다르므로 검증 함수와 오류 메시지를 분리한다.
+- 해결 커밋: `39144e0 Add slice fixture validation base`
