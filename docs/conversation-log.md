@@ -526,3 +526,14 @@ The next scoped task was fixed as the enemy intent icon candidate pass, not fina
 `tools/generate-dev-runtime-assets.mjs` now has exact-key intent icon branches for attack, disrupt, and block. `src/phaser/scenes/CombatScene.ts` now resolves the active intent icon from `assetKeys.intentIcons[]` using the current combat `intentIndex`, renders it in the Combat panel, and shares that renderer with Boss through the existing `renderCombatPanel` path. A small button-position adjustment was made after screenshot review showed the old End Turn position crowding the panel/card area.
 
 Verification used `npm.cmd run assets:audit:strict`, `npm.cmd run check`, `npm.cmd run phaser:smoke`, `git diff --check`, visual inspection of `tmp/phaser-CombatScene.png`, `tmp/phaser-BossScene.png`, the three generated intent PNGs, and extra turn-two screenshots for `enemy_ink_mote` disrupt intent and boss block intent. The scoped implementation commit is `49d5575 Render intent candidate icons`. This is still a candidate/development art pass, not approved final art.
+
+### User
+The user approved continuing with the next task after the intent icon candidate pass.
+
+### Codex
+
+The next scoped task was fixed as the background candidate pass. The included assets were `bg_lantern_foyer_set` and `scene_rune_bench`; monster sprites, boss art, final/approved background art, and broader layout redesign were kept out of scope.
+
+`tools/generate-dev-runtime-assets.mjs` now has exact-key candidate background branches for the lantern foyer stage and rune bench event scene. `src/phaser/view/sceneShell.ts` now renders a manifest-backed scene backdrop before the UI layer, using the current stage `assetKeys.backgroundSet` by default. `src/phaser/scenes/RuneBenchScene.ts` passes the event scene background resolved from the event encounter pool, with a fallback through the stage route's event room because debug rune-bench entry can keep `roomIndex=0`.
+
+Verification used `npm.cmd run assets:audit:strict`, `npm.cmd run check`, `npm.cmd run phaser:smoke`, `git diff --check`, visual inspection of the two generated background PNGs, `tmp/phaser-CombatScene.png`, and `tmp/phaser-1920-RuneBenchScene.png`. Screenshot review found the first Rune Bench backdrop pass visually competed with UI, so the scene-specific backdrop alpha/wash and `Equipped` text position were adjusted before rerunning verification. The scoped implementation commit is `2b156ef Render background candidate assets`. This remains candidate/development art, not final approved art.

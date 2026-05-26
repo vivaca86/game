@@ -221,3 +221,11 @@
 - Resolution: Added exact-key deterministic candidate art for `icon_intent_attack`, `icon_intent_disrupt`, and `icon_intent_block`. Updated `renderCombatPanel` to resolve the active icon from `assetKeys.intentIcons[]` with `combat.intentIndex`, render the texture beside the intent text, and preserve a text fallback if the texture is missing. The shared panel path covers both Combat and Boss scenes.
 - Prevention: Intent asset replacement should be verified in the real scene, not just by manifest preload. For multi-intent enemies or bosses, check at least one later turn so non-first icon slots are proven.
 - Resolution commit: `49d5575 Render intent candidate icons`
+
+### Problem: Background assets existed but shared Phaser scenes still used a flat color
+
+- Cause: Stage and event data referenced `assetKeys.backgroundSet` and event `assetKeys.scene`, and Phaser preloaded those files, but `renderSceneShell` still drew a full-screen solid rectangle. The Rune Bench scene also had no renderer path that preferred its event scene asset over the generic stage backdrop.
+- Impact: Replacing background PNGs would not be visible in the actual game screens, and event-specific visual identity could silently remain unused.
+- Resolution: Added exact-key deterministic candidate backgrounds for `bg_lantern_foyer_set` and `scene_rune_bench`. Updated the shared scene shell to render the stage background texture behind UI with a readability wash. Updated Rune Bench to resolve its event scene background from the event encounter pool, falling back to the stage route's event room when debug entry keeps the run on room index 0.
+- Prevention: Background asset replacement must be verified in screenshots from scenes that actually use those backgrounds. Scene-specific backgrounds need a data path from room/event data, not just manifest preload.
+- Resolution commit: `2b156ef Render background candidate assets`
