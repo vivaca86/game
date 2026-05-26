@@ -237,3 +237,11 @@
 - Resolution: Added deterministic transparent spritesheet placeholders for `monster_folded_sentry` and `monster_ink_mote`. Updated CombatScene to render a regular-enemy portrait from `enemy.assetKeys.sprite` when `combat.enemyKind === "enemy"`, intentionally leaving boss sprite rendering for a separate pass.
 - Prevention: Sprite placeholder work must include both manifest/file verification and a scene screenshot using the relevant enemy id. Regular enemy and boss sprite paths should be tracked separately so the smaller pass does not silently imply boss art completion.
 - Resolution commit: `33b0837 Render enemy sprite placeholders`
+
+### Problem: Boss sprite assets existed but BossScene did not render the boss texture
+
+- Cause: The boss data and manifest referenced `boss_curtain_lion`, and Phaser preloaded the boss spritesheet, but the shared combat panel only rendered regular enemy portraits after the previous pass. BossScene still showed the boss mostly as text and intent state.
+- Impact: Boss sprite pipeline work could appear complete through preload/audit alone while the actual boss combat screen ignored `boss.assetKeys.sprite`.
+- Resolution: Added a deterministic transparent spritesheet placeholder for `boss_curtain_lion`. Updated the shared combat panel portrait renderer to support both regular enemies and bosses from `assetKeys.sprite`, with a larger boss display size. Screenshot review also moved the Boss End Turn button to the safer Combat button position.
+- Prevention: Boss sprite passes must include an actual BossScene screenshot, not only a generated spritesheet or manifest audit. Regular enemy and boss rendering can share code, but completion should still be recorded separately.
+- Resolution commit: `a98ec51 Render boss sprite placeholder`
