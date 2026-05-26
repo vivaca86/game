@@ -52,7 +52,7 @@ export function renderCombatPanel(
   const intentIconKey = resolveIntentIconKey(context);
 
   scene.add.rectangle(1380, 535, 420, 230, fill, 0.96).setStrokeStyle(5, stroke, 0.9);
-  renderEnemyPortrait(scene, context, fill, stroke);
+  renderCombatantPortrait(scene, context, fill, stroke);
   scene.add.text(1204, 436, enemy?.displayNameKo ?? "missing enemy", textStyle(34, titleColor, true));
   scene.add.text(1204, 492, `HP ${combat?.enemyHp ?? "-"} / ${combat?.enemyMaxHp ?? "-"}`, textStyle(28, bodyColor, true));
   scene.add.text(1204, 532, `Block ${combat?.enemyBlock ?? 0} / Mark ${combat?.enemyMark ?? 0}`, textStyle(24, bodyColor));
@@ -68,16 +68,19 @@ export function renderCombatPanel(
   scene.add.text(1204, 610, `Turn ${combat?.turn ?? 0}`, textStyle(24, bodyColor));
 }
 
-function renderEnemyPortrait(scene: Phaser.Scene, context: BootContext, fill: number, stroke: number): void {
+function renderCombatantPortrait(scene: Phaser.Scene, context: BootContext, fill: number, stroke: number): void {
   const combat = context.run.combat;
   const enemy = getCombatantData(context.run, context.dataBundle);
   const spriteKey = enemy?.assetKeys.sprite;
-  if (!combat || combat.enemyKind !== "enemy" || !spriteKey || !scene.textures.exists(spriteKey)) {
+  if (!combat || !spriteKey || !scene.textures.exists(spriteKey)) {
     return;
   }
 
-  scene.add.circle(1530, 505, 58, fill, 0.74).setStrokeStyle(3, stroke, 0.82);
-  scene.add.sprite(1530, 556, spriteKey, 0).setOrigin(0.5, 1).setDisplaySize(108, 108);
+  const isBoss = combat.enemyKind === "boss";
+  scene.add.circle(1530, isBoss ? 512 : 505, isBoss ? 66 : 58, fill, 0.74).setStrokeStyle(3, stroke, 0.82);
+  scene.add.sprite(1530, isBoss ? 575 : 556, spriteKey, 0)
+    .setOrigin(0.5, 1)
+    .setDisplaySize(isBoss ? 132 : 108, isBoss ? 132 : 108);
 }
 
 function resolveIntentIconKey(context: BootContext): string | undefined {

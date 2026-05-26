@@ -37,6 +37,10 @@ const candidateMonsterSpriteKeys = new Set([
   "monster_ink_mote"
 ]);
 
+const candidateBossSpriteKeys = new Set([
+  "boss_curtain_lion"
+]);
+
 function crc32(buffer) {
   let crc = 0xffffffff;
   for (const byte of buffer) {
@@ -150,6 +154,9 @@ function paletteFor(asset) {
   if (asset.key === "monster_ink_mote") {
     return { base: [232, 226, 216], accent: [75, 98, 160], dark: [45, 45, 82] };
   }
+  if (asset.key === "boss_curtain_lion") {
+    return { base: [245, 221, 188], accent: [196, 73, 89], dark: [68, 52, 76] };
+  }
   if (asset.path.includes("/backgrounds/")) return { base: [240, 222, 178], accent, dark: [112, 92, 72] };
   if (asset.path.includes("/cards/")) return { base: [250, 238, 206], accent, dark: [98, 72, 54] };
   if (asset.path.includes("/icons/")) return { base: [246, 231, 192], accent, dark: [76, 82, 96] };
@@ -165,6 +172,7 @@ function paintFor(asset) {
   if (candidateIntentIconKeys.has(asset.key)) return paintIntentIcon(asset);
   if (candidateBackgroundKeys.has(asset.key)) return paintBackground(asset);
   if (candidateMonsterSpriteKeys.has(asset.key)) return paintMonsterSprite(asset);
+  if (candidateBossSpriteKeys.has(asset.key)) return paintBossSprite(asset);
 
   const palette = paletteFor(asset);
   const frame = asset.frameSize;
@@ -686,6 +694,116 @@ function paintMonsterSprite(asset) {
     }
 
     return [0, 0, 0, 0];
+  };
+}
+
+function paintBossSprite(asset) {
+  const palette = paletteFor(asset);
+  const seed = hash(asset.key);
+  return (x, y, width, height) => {
+    const frameWidth = asset.frameSize?.w ?? width;
+    const frameHeight = asset.frameSize?.h ?? height;
+    const columns = Math.max(1, Math.floor(width / frameWidth));
+    const frameColumn = Math.floor(x / frameWidth);
+    const frameRow = Math.floor(y / frameHeight);
+    const frameIndex = frameRow * columns + frameColumn;
+    const fx = x % frameWidth;
+    const fy = y % frameHeight;
+    const bob = Math.round(Math.sin((frameIndex / 16) * Math.PI * 2) * 7);
+    const maneSpread = Math.round(Math.cos((frameIndex / 16) * Math.PI * 2) * 5);
+    const [paperR, paperG, paperB] = palette.base;
+    const [accentR, accentG, accentB] = palette.accent;
+    const [darkR, darkG, darkB] = palette.dark;
+    const grain = ((fx * 11 + fy * 15 + seed + frameIndex * 17) % 41) < 7 ? -8 : 0;
+    const paper = [paperR + grain, paperG + grain, paperB + grain, 255];
+    const accent = [accentR, accentG, accentB, 255];
+    const dark = [darkR, darkG, darkB, 255];
+    const gold = [231, 181, 82, 255];
+    const centerX = 138;
+    const centerY = 116 + bob;
+
+    if (insideEllipse(fx, fy, centerX, 236, 82, 18)) {
+      return [darkR, darkG, darkB, 72];
+    }
+
+    let color = [0, 0, 0, 0];
+    const mane = insideEllipse(fx, fy, centerX, centerY, 82 + maneSpread, 70)
+      || insideEllipse(fx, fy, centerX - 42, centerY + 19, 45, 54)
+      || insideEllipse(fx, fy, centerX + 42, centerY + 19, 45, 54);
+    const face = insideEllipse(fx, fy, centerX, centerY + 6, 52, 45);
+    const muzzle = insideEllipse(fx, fy, centerX, centerY + 31, 37, 21);
+    const chest = pointInPolygon(fx, fy, [
+      [centerX - 58, 168 + bob],
+      [centerX + 58, 168 + bob],
+      [centerX + 73, 230],
+      [centerX - 73, 230]
+    ]);
+    const leftCurtain = pointInPolygon(fx, fy, [
+      [centerX - 113, 39],
+      [centerX - 75, 31],
+      [centerX - 83, 211],
+      [centerX - 128, 230]
+    ]);
+    const rightCurtain = pointInPolygon(fx, fy, [
+      [centerX + 75, 31],
+      [centerX + 113, 39],
+      [centerX + 128, 230],
+      [centerX + 83, 211]
+    ]);
+
+    if (leftCurtain || rightCurtain) color = mix(accent, dark, 0.12);
+    if ((leftCurtain || rightCurtain) && (Math.floor((fx + frameIndex * 5) / 16) % 2 === 0)) {
+      color = mix(color, [255, 196, 132, 255], 0.18);
+    }
+    if (mane) color = dark;
+    if (face) color = paper;
+    if (muzzle) color = mix(paper, [255, 245, 216, 255], 0.42);
+    if (chest) color = mix(paper, dark, 0.12);
+
+    const crown = pointInPolygon(fx, fy, [
+      [centerX - 39, centerY - 49],
+      [centerX - 22, centerY - 78],
+      [centerX, centerY - 52],
+      [centerX + 23, centerY - 78],
+      [centerX + 40, centerY - 49],
+      [centerX + 32, centerY - 33],
+      [centerX - 32, centerY - 33]
+    ]);
+    if (crown) color = gold;
+    if (distanceToSegment(fx, fy, centerX - 32, centerY - 33, centerX + 32, centerY - 33) < 4) color = dark;
+
+    if (insideEllipse(fx, fy, centerX - 19, centerY + 3, 8, 6)
+      || insideEllipse(fx, fy, centerX + 19, centerY + 3, 8, 6)) {
+      color = [255, 230, 112, 255];
+    }
+    if (insideEllipse(fx, fy, centerX - 20, centerY + 2, 3, 3)
+      || insideEllipse(fx, fy, centerX + 18, centerY + 2, 3, 3)) {
+      color = [255, 250, 196, 255];
+    }
+    if (insideEllipse(fx, fy, centerX, centerY + 26, 8, 6)) color = dark;
+    if (distanceToSegment(fx, fy, centerX - 18, centerY + 41, centerX, centerY + 50) < 3
+      || distanceToSegment(fx, fy, centerX, centerY + 50, centerX + 18, centerY + 41) < 3) {
+      color = dark;
+    }
+
+    for (const [sx, sy] of [[centerX - 72, 88 + bob], [centerX + 72, 88 + bob], [centerX - 62, 141 + bob], [centerX + 62, 141 + bob]]) {
+      if (Math.abs(fx - sx) + Math.abs(fy - sy) < 19) color = accent;
+      if (Math.abs(fx - sx) + Math.abs(fy - sy) < 9) color = gold;
+    }
+
+    if (distanceToSegment(fx, fy, centerX - 78, 203, centerX - 46, 241) < 7
+      || distanceToSegment(fx, fy, centerX + 78, 203, centerX + 46, 241) < 7) {
+      color = dark;
+    }
+    if (insideRoundedRect(fx, fy, centerX - 88, 214, 42, 17, 8)
+      || insideRoundedRect(fx, fy, centerX + 46, 214, 42, 17, 8)) {
+      color = gold;
+    }
+    if ((mane || face || chest) && ((fx + fy + frameIndex) % 31 < 2)) {
+      color = mix(color, [255, 239, 196, 255], 0.24);
+    }
+
+    return color;
   };
 }
 

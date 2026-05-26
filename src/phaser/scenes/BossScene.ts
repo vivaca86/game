@@ -38,9 +38,9 @@ export class BossScene extends Phaser.Scene {
 }
 
 function renderBossEndTurnButton(scene: Phaser.Scene, context: BootContext): void {
-  const button = scene.add.rectangle(1380, 638, 220, 52, 0x32415a, 0.94);
+  const button = scene.add.rectangle(1470, 616, 190, 52, 0x32415a, 0.94);
   button.setStrokeStyle(3, 0xf5c26b, 0.95);
   button.setInteractive({ useHandCursor: true });
   button.on("pointerdown", () => handleSceneAction(scene, context, "end_turn"));
-  scene.add.text(1294, 622, "End Turn", textStyle(22, "#fff5d7", true));
+  scene.add.text(1400, 600, "End Turn", textStyle(22, "#fff5d7", true));
 }
