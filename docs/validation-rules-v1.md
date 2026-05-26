@@ -35,7 +35,7 @@
 
 - `docs/vertical-slice-data.fixture.v1.json`은 JSON으로 파싱되어야 한다.
 - `docs/asset-manifest.slice.v1.json`은 JSON으로 파싱되어야 한다.
-- metadata의 `status`는 `draft_fixture` 또는 `planned_manifest`처럼 완료가 아님을 드러내야 한다.
+- metadata의 `status`는 `draft_fixture`, `planned_manifest`, `generated_manifest`처럼 완료/승인이 아님을 드러내야 한다.
 
 ## 필수 필드 검사
 
@@ -92,6 +92,7 @@ evidence.sources
 - 모든 asset key는 `docs/asset-manifest.slice.v1.json`의 `assets[].key`에 있어야 한다.
 - manifest에 있는 path는 `assets/runtime/` 아래를 가리켜야 한다.
 - manifest status가 `planned_manifest`이면 실제 파일 존재를 요구하지 않는다.
+- manifest status가 `generated_manifest`이면 개발용 runtime 파일 존재와 크기를 요구하지만, 최종 아트 승인으로 보지 않는다.
 
 ## Asset file 검사
 
@@ -99,11 +100,12 @@ evidence.sources
 
 - `docs/asset-manifest.slice.v1.json`과 `src/data/assetManifest.slice.v1.json`의 metadata와 asset entry가 서로 같아야 한다.
 - manifest key와 path는 중복될 수 없다.
+- manifest path는 브라우저 URL 기준 `assets/runtime/`이고, 저장소의 실제 파일은 `public/assets/runtime/` 아래에 둔다.
 - 실제 파일이 존재하면 PNG header 기준 `nativeSize`와 일치해야 한다.
 - spritesheet는 `nativeSize`가 `frameSize`로 나누어 떨어져야 한다.
 - `assets/runtime/` 아래 실제 이미지 파일이 manifest에 없으면 strict 모드에서 실패한다.
 - `planned_manifest` 상태에서는 파일 미존재를 에셋 완료 실패가 아니라 planned missing으로 보고한다.
-- 에셋 생성 파이프라인이 시작되면 `npm.cmd run assets:audit:strict`를 통과해야 한다.
+- `generated_manifest` 상태와 strict 모드는 파일 누락을 실패로 잡는다.
 
 ## Reward refs 검사
 
@@ -159,6 +161,7 @@ npm run slice:effects
 Asset manifest/file 감사:
 
 ```powershell
+npm run assets:generate:dev
 npm run assets:audit
 ```
 
@@ -167,6 +170,7 @@ npm run assets:audit
 ```powershell
 npm.cmd run slice:validate
 npm.cmd run slice:effects
+npm.cmd run assets:generate:dev
 npm.cmd run assets:audit
 npm.cmd run assets:audit:strict
 ```

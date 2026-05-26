@@ -2,12 +2,12 @@
   "metadata": {
     "id": "asset_manifest_slice_v1",
     "date": "2026-05-26",
-    "status": "planned_manifest",
+    "status": "generated_manifest",
     "styleKey": "premium_popup_book",
     "notes": [
-      "These entries are planned asset keys for the first vertical slice.",
-      "The files do not exist yet and must not be reported as completed assets.",
-      "Runtime paths are provisional and should be verified when assets are generated."
+      "These entries are generated development placeholder asset keys for the first vertical slice.",
+      "Runtime files exist under public/assets/runtime and are served at assets/runtime paths.",
+      "These generated files are not final art and must not be reported as completed or approved assets."
     ]
   },
   "assets": [

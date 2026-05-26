@@ -5,7 +5,8 @@ import { fileURLToPath } from "node:url";
 const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const docsManifestPath = path.join(rootDir, "docs", "asset-manifest.slice.v1.json");
 const runtimeManifestPath = path.join(rootDir, "src", "data", "assetManifest.slice.v1.json");
-const runtimeAssetRoot = path.join(rootDir, "assets", "runtime");
+const publicRoot = path.join(rootDir, "public");
+const runtimeAssetRoot = path.join(publicRoot, "assets", "runtime");
 const requireFiles = process.argv.includes("--require-files") || process.env.ASSET_AUDIT_REQUIRE_FILES === "1";
 
 const errors = [];
@@ -154,7 +155,7 @@ async function auditFiles(assetsByKey, manifestStatus) {
   let existing = 0;
 
   for (const asset of assetsByKey.values()) {
-    const filePath = path.join(rootDir, asset.path);
+    const filePath = path.join(publicRoot, asset.path);
     const exists = await fileExists(filePath);
     if (!exists) {
       missing.push(asset.path);
@@ -186,7 +187,9 @@ async function auditFiles(assetsByKey, manifestStatus) {
 
   const knownPaths = new Set([...assetsByKey.values()].map((asset) => asset.path));
   const actualFiles = await listRuntimeAssetFiles(runtimeAssetRoot);
-  const orphanFiles = actualFiles.map(rel).filter((filePath) => !knownPaths.has(filePath));
+  const orphanFiles = actualFiles
+    .map((filePath) => path.relative(publicRoot, filePath).replaceAll("\\", "/"))
+    .filter((filePath) => !knownPaths.has(filePath));
   if (orphanFiles.length > 0) {
     const sample = orphanFiles.slice(0, 5).join(", ");
     const message = `runtime asset files not listed in manifest: ${orphanFiles.length}${sample ? ` (${sample}${orphanFiles.length > 5 ? ", ..." : ""})` : ""}`;

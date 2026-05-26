@@ -210,7 +210,9 @@ const roleMapText = await readFile(roleMapPath, "utf8").catch((error) => {
 
 if (fixture && manifest) {
   if (fixture.metadata?.status !== "draft_fixture") warn("fixture metadata.status is not draft_fixture");
-  if (manifest.metadata?.status !== "planned_manifest") warn("manifest metadata.status is not planned_manifest");
+  if (!["planned_manifest", "generated_manifest"].includes(manifest.metadata?.status)) {
+    warn("manifest metadata.status is not planned_manifest or generated_manifest");
+  }
 
   const data = fixture.data || {};
   const assets = asArray(manifest.assets, "manifest.assets");

@@ -37,11 +37,11 @@ Date: 2026-05-26
 | DATA-002 | All displayed content has Korean name/description fields. | `npm.cmd run slice:validate` | Verified |
 | DATA-003 | All slice content has `referenceRole`. | `npm.cmd run slice:validate` | Verified |
 | DATA-004 | All `referenceRole` values are mapped in `reference-role-map-slice-v1.md`. | `npm.cmd run slice:validate` | Verified |
-| DATA-005 | All referenced asset keys exist in the planned manifest. | `npm.cmd run slice:validate` | Verified |
+| DATA-005 | All referenced asset keys exist in the generated manifest. | `npm.cmd run slice:validate` | Verified |
 | DATA-006 | Card descriptions and effect ops do not contradict each other. | `npm.cmd run slice:effects` | Verified |
 | DATA-007 | Save data does not store Phaser objects. | `npm.cmd run phaser:smoke` save snapshot check | Verified |
 | DATA-008 | Room `encounterPoolId` values reference explicit encounter-pool data, and pool entries point to the right content domain. | `npm.cmd run slice:validate` + `npm.cmd run phaser:smoke` | Verified |
-| DATA-009 | Planned asset manifest stays in sync with runtime manifest and can audit generated runtime files. | `npm.cmd run assets:audit`; `npm.cmd run assets:audit:strict` after files exist | Verified for planned-manifest guard; strict file pass not yet applicable |
+| DATA-009 | Generated asset manifest stays in sync with runtime manifest, strict file audit passes, and Phaser preloads runtime asset URLs. | `npm.cmd run assets:audit:strict` + `npm.cmd run phaser:smoke` asset response check | Verified |
 
 ## UI Checks
 
@@ -94,7 +94,7 @@ Date: 2026-05-26
 
 - `npm.cmd run slice:validate`: passed.
 - `npm.cmd run slice:effects`: passed.
-- `npm.cmd run assets:audit`: passed in planned-manifest mode.
+- `npm.cmd run assets:audit`: passed in generated-manifest mode.
 - `npm.cmd run check`: passed.
 - `npm.cmd run phaser:smoke`: passed.
 - `git diff --check`: passed.
@@ -104,7 +104,7 @@ Date: 2026-05-26
 - Mark smoke: `phaser:smoke` uses `?debug=1&entry=combat&resetSave=1&grantCard=card_lamplight_mark`, confirms mark becomes `enemyMark=2`, then the next attack consumes mark to `enemyMark=0` and reduces enemy HP from 24 to 15.
 - 1920/view checks: `phaser:smoke` now captures 1920x1080 screenshots for Town, Dungeon, Combat, Reward, Rune Bench, and Boss under `tmp/phaser-1920-*.png`. Combat and Boss assertions verify five-card hands, expected debug state, non-empty screenshots, and debug-overlay avoidance of the hand and enemy intent areas.
 - Responsive overlay checks: `phaser:smoke` also captures 1280 and 1080 overlay screenshots for Combat and Boss under `tmp/phaser-overlay-*.png`. In-app browser verification at 1080x918 confirmed `phase=combat`, `enemyHp=24`, `playerEnergy=3`, overlay size `220x260`, and no overlap with the five-card hand or enemy intent panel.
-- Asset file audit: `assets:audit` verifies the docs manifest and runtime manifest stay synchronized, asset keys/paths remain unique, existing PNG files match `nativeSize`, and planned missing files are reported without being treated as completed assets while status is `planned_manifest`.
+- Asset file audit: `assets:audit` verifies the docs manifest and runtime manifest stay synchronized, asset keys/paths remain unique, generated PNG files under `public/assets/runtime` match `nativeSize`, and these files are still development placeholders rather than final art. `phaser:smoke` verifies the first page preloads all 35 `assets/runtime` URLs without browser errors.
 
 `phaser:smoke` writes screenshots under `tmp/`, including `tmp/phaser-TownScene.png`, `tmp/phaser-CombatScene.png`, and `tmp/phaser-BossScene.png`. `tmp/` is verification output and is not committed.
 
@@ -116,6 +116,6 @@ This is still not a production-complete game, final art/assets pass, exhaustive 
 
 ## Next Work
 
-1. When the asset pipeline begins, generate files under `assets/runtime/` and run `npm.cmd run assets:audit:strict` to catch missing, wrong-size, or orphaned runtime assets.
+1. Replace generated development placeholders with approved art assets one group at a time, keeping `npm.cmd run assets:audit:strict` green.
 2. Expand content, final art/assets, balance, and UX polish only after the foundation remains green.
 3. Keep Steam/appmanifest direct proof deferred unless the user later provides access or exact build/runtime claims become necessary.

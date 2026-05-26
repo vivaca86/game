@@ -17,24 +17,27 @@ assets/
   refs/
   concepts/
   source/
-  runtime/
-    backgrounds/
-    characters/
-    monsters/
-    bosses/
-    cards/
-    ui/
-    icons/
-    effects/
-    animation/
   atlases/
   audio/
+
+public/
+  assets/
+    runtime/
+      backgrounds/
+      characters/
+      monsters/
+      bosses/
+      cards/
+      ui/
+      icons/
+      effects/
+      animation/
 ```
 
 - `refs`: 참고자료, 원작 분석, 무드보드
 - `concepts`: 시안, 키아트, 방향성 이미지
 - `source`: 원본 PSD, 대형 PNG, 생성 원본
-- `runtime`: 게임에서 직접 로드하는 정규화 에셋
+- `public/assets/runtime`: 게임에서 직접 로드하는 정규화 에셋. manifest의 `assets/runtime/...` 경로는 이 public 폴더에서 서빙되는 URL이다.
 - `atlases`: 패킹된 스프라이트 아틀라스
 - `audio`: 사운드와 음악
 

@@ -86,9 +86,9 @@ interface BootContext {
 | 모드 | 처리 |
 | --- | --- |
 | 일반 모드 | 누락 에셋이 있으면 부트 실패로 보고한다. |
-| debug 모드 | 명시적 placeholder를 만들 수 있다. 다만 화면과 로그에 `debug placeholder`임을 남긴다. |
+| debug 모드 | 누락 에셋에 한해 fallback placeholder를 만들 수 있다. 다만 화면과 로그에 fallback임을 남긴다. |
 
-planned manifest는 실제 에셋 완료가 아니다. placeholder가 보인 상태를 아트 통과로 말하지 않는다.
+`generated_manifest`는 개발용 placeholder 파일이 있다는 뜻이지 최종 에셋 완료가 아니다. placeholder가 보인 상태를 아트 통과로 말하지 않는다.
 
 ### 5. Entry scene 선택
 
@@ -127,7 +127,7 @@ TownScene
 - stage route가 없는 content id 참조
 - save decode 실패
 - debug entry가 없는 stage, room, card, rune, boss를 참조
-- 에셋 누락을 일반 모드에서 placeholder로 숨김
+- 에셋 누락을 일반 모드에서 조용히 숨김
 
 실패 시에는 console error와 debug/error overlay에 같은 원인을 남긴다.
 

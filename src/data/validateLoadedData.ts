@@ -72,7 +72,7 @@ export function validateLoadedData(bundle: GameDataBundle): ValidationResult {
   }
 
   if (bundle.assets.length > 0) {
-    warnings.push("asset manifest is planned; generated placeholders are used in this scaffold");
+    warnings.push("asset manifest uses generated development placeholders until final art is approved");
   }
 
   return {

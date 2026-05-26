@@ -79,6 +79,12 @@ try {
 async function checkPage(pathname, expectedScene, expectDebugOverlay) {
   const page = await browser.newPage({ viewport: { width: 1280, height: 720 } });
   const errors = bindErrorCapture(page);
+  const assetResponses = [];
+  page.on("response", (response) => {
+    if (response.url().includes("/assets/runtime/")) {
+      assetResponses.push({ url: response.url(), status: response.status() });
+    }
+  });
 
   await page.goto(new URL(pathname, baseUrl).href, { waitUntil: "networkidle" });
   await page.waitForSelector("canvas", { timeout: 10000 });
@@ -104,7 +110,21 @@ async function checkPage(pathname, expectedScene, expectDebugOverlay) {
   }
 
   assertNoBrowserErrors(expectedScene, errors);
+  if (expectedScene === "TownScene") {
+    assertRuntimeAssetsLoaded(assetResponses);
+  }
   await page.close();
+}
+
+function assertRuntimeAssetsLoaded(assetResponses) {
+  if (assetResponses.length < 35) {
+    throw new Error(`runtime asset preload count too low: ${assetResponses.length}/35`);
+  }
+
+  const badResponse = assetResponses.find((response) => response.status < 200 || response.status >= 400);
+  if (badResponse) {
+    throw new Error(`runtime asset preload failed: ${badResponse.status} ${badResponse.url}`);
+  }
 }
 
 async function checkViewScreenshots() {

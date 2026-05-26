@@ -66,6 +66,7 @@ npm.cmd run legacy:dev
 ```powershell
 npm.cmd run slice:validate
 npm.cmd run slice:effects
+npm.cmd run assets:generate:dev
 npm.cmd run assets:audit
 npm.cmd run check
 npm.cmd run phaser:smoke
@@ -83,7 +84,9 @@ npm.cmd run slice:validate
 
 `slice:effects`는 docs/runtime fixture의 카드 한글 설명과 실제 effect op/amount가 서로 어긋나지 않는지 검사한다.
 
-`assets:audit`은 docs/runtime asset manifest가 서로 갈라지지 않았는지 확인하고, 실제 `assets/runtime` PNG가 생기면 크기와 orphan 파일을 검사한다. 에셋 파이프라인이 시작된 뒤에는 `npm.cmd run assets:audit:strict`를 통과해야 한다.
+`assets:generate:dev`는 manifest 기준 개발용 placeholder PNG를 `public/assets/runtime`에 생성한다. 이 파일들은 최종 아트가 아니다.
+
+`assets:audit`은 docs/runtime asset manifest가 서로 갈라지지 않았는지 확인하고, 실제 `public/assets/runtime` PNG의 크기와 orphan 파일을 검사한다. 에셋 파이프라인이 시작된 뒤에는 `npm.cmd run assets:audit:strict`를 통과해야 한다.
 
 `phaser:smoke`는 실행 중인 Vite dev server에서 기본 진입, `entry=combat`, `entry=boss` debug 화면의 canvas와 콘솔 오류를 확인한다.
 

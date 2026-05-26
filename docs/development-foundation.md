@@ -348,4 +348,4 @@ Current foundation status:
 3. Card description/effect-op audit is in place through `npm.cmd run slice:effects`.
 4. Route `encounterPoolId` values now point to explicit encounter-pool data instead of direct enemy/boss/event ids.
 5. Source/version planning baseline is fixed in `docs/source-version-baseline.md`; direct installed-build proof is deferred under the no-local-Steam working assumption and is not an active development blocker.
-6. Planned asset manifest and runtime manifest drift/file audit is in place through `npm.cmd run assets:audit`; strict real-file verification waits until generated files exist.
+6. Generated development runtime assets exist under `public/assets/runtime`, Phaser preloads them by manifest path, and strict file verification is in place through `npm.cmd run assets:audit:strict`. These are not final or approved art assets.

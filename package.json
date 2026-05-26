@@ -22,6 +22,7 @@
     "quality:audit:report": "node tools/content-quality-audit.mjs --report-only",
     "slice:validate": "node tools/validate-slice-fixture.mjs",
     "slice:effects": "node tools/audit-slice-effects.mjs",
+    "assets:generate:dev": "node tools/generate-dev-runtime-assets.mjs",
     "assets:audit": "node tools/audit-asset-files.mjs",
     "assets:audit:strict": "node tools/audit-asset-files.mjs --require-files",
     "phaser:smoke": "node tools/phaser-smoke-test.mjs",
