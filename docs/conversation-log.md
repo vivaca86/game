@@ -581,3 +581,12 @@ The next scoped task was fixed as an effect spritesheet pipeline pass. The inclu
 `tools/generate-dev-runtime-assets.mjs` now generates deterministic transparent spritesheet candidates for the three effect assets. `src/simulation/state/combatFeedback.ts` derives a current feedback effect key from recent combat log state without storing renderer objects in simulation state. Combat and Boss scenes render the matching spritesheet frame over the combatant area, and the debug overlay exposes `effect=` so smoke can verify paper slash, ink splash, and boss stage spotlight states.
 
 Verification used `npm.cmd run assets:audit:strict`, `npm.cmd run check`, `npm.cmd run phaser:smoke`, `git diff --check`, and visual inspection of `tmp/phaser-effect-paper-slash.png`, `tmp/phaser-effect-ink-splash.png`, `tmp/phaser-effect-stage-spotlight.png`, plus generated effect sheet inspection. The scoped implementation commit is `a0a15e1 Render combat effect feedback`. This is a combat feedback pipeline proof only.
+
+### User
+The user asked to make sure all work, including conversation logs, was uploaded to GitHub before wrapping up.
+
+### Codex
+
+The final sync scope was limited to checking the current `main` branch, confirming whether any local code or documentation changes remained, recording this wrap-up checkpoint in `docs/conversation-log.md`, and pushing the resulting log commit to `origin/main` if the remote branch had not diverged.
+
+Before this wrap-up log entry, `main` was already aligned with `origin/main` at `8fde559 Record combat effect feedback pass`, meaning the effect spritesheet implementation and its documentation had already been pushed. No merge, rebase, reset, force push, cleanup, branch replacement, or unrelated file staging was included in the scope.
