@@ -94,3 +94,18 @@
 - 해결 방안: `playwright`를 dev dependency로 추가하고, 새 Phaser 전용 `tools/phaser-smoke-test.mjs`를 작성해 기본 진입, combat debug entry, boss debug entry를 확인했다.
 - 재발 방지 기준: 브라우저 검증 스크립트는 로컬 dependency를 우선 사용하고, 하드코딩된 번들 경로는 fallback으로만 둔다.
 - 해결 커밋: `9c05c2c Add Phaser scaffold runtime`
+### 문제: `apply_patch` 기준 경로가 저장소 바깥으로 잡혀 simulation 파일이 잘못 생성됨
+
+- 원인: `apply_patch`가 현재 저장소 루트가 아니라 상위 작업 폴더 기준으로 파일을 적용하면서, `src/simulation/...` 파일들이 `C:\Users\i\Documents\New project\src\simulation` 아래에 생성됐다.
+- 영향: 저장소 Git 상태에는 들어가지 않았지만, 작업 루트 바깥에 Codex가 만든 불필요한 파일이 생겼다.
+- 해결 방안: 사용자에게 대상/포함/제외/위험을 보고하고 승인을 받은 뒤, `C:\Users\i\Documents\New project\src\simulation`만 정확히 확인해 삭제했다. 이후 모든 `apply_patch` 경로를 `sunlight-map-card-crawler/...`로 명시해 저장소 내부에 다시 적용했다.
+- 재발 방지 기준: `apply_patch`에 workdir을 줄 수 없는 환경에서는 저장소 하위 경로를 명시한다. 파일이 예상 위치와 다르면 즉시 멈추고 실제 경로를 보고한다.
+- 해결 커밋: `b71f7ad Add first combat simulation flow`; 로그 해시 정리는 후속 커밋에서 반영.
+
+### 문제: 장기 boss smoke 중 overlay 갱신 전 다음 키 입력이 들어감
+
+- 원인: 보스전 자동 플레이 smoke가 scene restart 직후 debug overlay가 갱신되기 전에 다음 키를 눌러, 이미 사라진 카드 슬롯을 다시 선택했다.
+- 영향: 실제 simulation 검증이 아니라 smoke timing 문제로 `card:missing:5` 로그가 발생하며 `phaser:smoke`가 실패했다.
+- 해결 방안: smoke 입력마다 짧은 안정화 대기를 넣고, boss phase trigger는 `bossPhaseTriggered=true` debug overlay 값으로 명시 검증하도록 바꿨다.
+- 재발 방지 기준: scene restart를 동반하는 브라우저 smoke는 키 입력 후 overlay 상태 안정화를 기다리고, 장기 루프 검증은 최종 phase뿐 아니라 중간 핵심 상태도 직접 확인한다.
+- 해결 커밋: `b71f7ad Add first combat simulation flow`; 로그 해시 정리는 후속 커밋에서 반영.
