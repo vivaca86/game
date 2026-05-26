@@ -8,6 +8,13 @@ const manifestPath = path.join(rootDir, "src", "data", "assetManifest.slice.v1.j
 const outputRoot = path.join(rootDir, "public");
 
 const manifest = JSON.parse(await readFile(manifestPath, "utf8"));
+const candidateCardArtKeys = new Set([
+  "card_art_sun_jab",
+  "card_art_fold_guard",
+  "card_art_page_step",
+  "card_art_ribbon_snap",
+  "card_art_lamplight_mark"
+]);
 
 function crc32(buffer) {
   let crc = 0xffffffff;
@@ -83,6 +90,15 @@ function paletteFor(asset) {
   if (asset.key === "card_frame_skill" || asset.key === "icon_card_skill") {
     return { base: [247, 238, 212], accent: [86, 154, 135], dark: [72, 67, 108] };
   }
+  if (asset.key === "card_art_sun_jab" || asset.key === "card_art_ribbon_snap") {
+    return { base: [252, 235, 199], accent: [212, 88, 76], dark: [82, 57, 55] };
+  }
+  if (asset.key === "card_art_fold_guard") {
+    return { base: [237, 238, 224], accent: [74, 121, 145], dark: [48, 72, 94] };
+  }
+  if (asset.key === "card_art_page_step" || asset.key === "card_art_lamplight_mark") {
+    return { base: [246, 237, 207], accent: [91, 151, 133], dark: [72, 67, 108] };
+  }
   if (asset.path.includes("/backgrounds/")) return { base: [240, 222, 178], accent, dark: [112, 92, 72] };
   if (asset.path.includes("/cards/")) return { base: [250, 238, 206], accent, dark: [98, 72, 54] };
   if (asset.path.includes("/icons/")) return { base: [246, 231, 192], accent, dark: [76, 82, 96] };
@@ -94,6 +110,7 @@ function paletteFor(asset) {
 function paintFor(asset) {
   if (asset.key.startsWith("card_frame_")) return paintCardFrame(asset);
   if (asset.key.startsWith("icon_card_")) return paintCardTypeIcon(asset);
+  if (candidateCardArtKeys.has(asset.key)) return paintCardArt(asset);
 
   const palette = paletteFor(asset);
   const frame = asset.frameSize;
@@ -132,6 +149,83 @@ function paintFor(asset) {
     }
 
     return [r, g, b, 255];
+  };
+}
+
+function paintCardArt(asset) {
+  const palette = paletteFor(asset);
+  const seed = hash(asset.key);
+  return (x, y, width, height) => {
+    const [paperR, paperG, paperB] = palette.base;
+    const [accentR, accentG, accentB] = palette.accent;
+    const [darkR, darkG, darkB] = palette.dark;
+    const grain = ((x * 17 + y * 11 + seed) % 37) < 7 ? -9 : 0;
+    const stageDepth = Math.max(0, Math.min(1, y / height));
+    let color = mix(
+      [paperR + grain, paperG + grain, paperB + grain, 255],
+      [darkR, darkG, darkB, 255],
+      stageDepth * 0.16
+    );
+
+    if (insideRoundedRect(x, y, 18, 18, width - 36, height - 36, 22)) {
+      color = mix(color, [255, 249, 226, 255], 0.18);
+    }
+    if (!insideRoundedRect(x, y, 8, 8, width - 16, height - 16, 24)) {
+      return [0, 0, 0, 0];
+    }
+    if (!insideRoundedRect(x, y, 16, 16, width - 32, height - 32, 18)) {
+      color = [darkR, darkG, darkB, 255];
+    }
+
+    const floorLine = Math.floor(height * 0.72);
+    if (y > floorLine) {
+      color = mix(color, [darkR, darkG, darkB, 255], 0.12);
+      if ((x + seed) % 42 < 4) color = mix(color, [255, 245, 212, 255], 0.2);
+    }
+
+    if (asset.key === "card_art_sun_jab") {
+      const sun = Math.hypot(x - width * 0.27, y - height * 0.26);
+      if (sun < 46) color = [255, 213, 94, 255];
+      if (sun < 27) color = [255, 246, 177, 255];
+      if (distanceToSegment(x, y, 176, 268, 395, 76) < 13) color = [darkR, darkG, darkB, 255];
+      if (distanceToSegment(x, y, 190, 255, 410, 66) < 6) color = [accentR, accentG, accentB, 255];
+      if (pointInPolygon(x, y, [[396, 76], [442, 56], [421, 102]])) color = [accentR, accentG, accentB, 255];
+    } else if (asset.key === "card_art_fold_guard") {
+      const shield = pointInPolygon(x, y, [[260, 66], [380, 118], [352, 270], [260, 316], [168, 270], [140, 118]]);
+      const fold = pointInPolygon(x, y, [[260, 88], [336, 125], [319, 248], [260, 286]]);
+      if (shield) color = [darkR, darkG, darkB, 255];
+      if (fold) color = [112, 164, 178, 255];
+      if (distanceToSegment(x, y, 260, 88, 260, 286) < 5) color = [244, 231, 189, 255];
+      if (distanceToSegment(x, y, 140, 118, 380, 118) < 7) color = [244, 231, 189, 255];
+    } else if (asset.key === "card_art_page_step") {
+      for (let step = 0; step < 5; step += 1) {
+        const sx = 130 + step * 58;
+        const sy = 254 - step * 32;
+        if (insideRoundedRect(x, y, sx, sy, 116, 26, 6)) color = [darkR, darkG, darkB, 255];
+        if (insideRoundedRect(x, y, sx + 8, sy + 4, 100, 14, 4)) color = [240, 229, 192, 255];
+      }
+      if (Math.hypot(x - 382, y - 101) < 17 || Math.hypot(x - 422, y - 84) < 11) color = [accentR, accentG, accentB, 255];
+    } else if (asset.key === "card_art_ribbon_snap") {
+      if (distanceToSegment(x, y, 92, 238, 192, 118) < 15) color = [darkR, darkG, darkB, 255];
+      if (distanceToSegment(x, y, 180, 122, 335, 216) < 15) color = [accentR, accentG, accentB, 255];
+      if (distanceToSegment(x, y, 330, 216, 430, 96) < 12) color = [darkR, darkG, darkB, 255];
+      if (Math.hypot(x - 430, y - 96) < 22) color = [255, 224, 113, 255];
+      if (Math.abs(x - 430) + Math.abs(y - 96) < 36) color = mix(color, [255, 236, 138, 255], 0.75);
+    } else if (asset.key === "card_art_lamplight_mark") {
+      const glow = Math.hypot(x - 260, y - 164);
+      if (glow < 130) color = mix(color, [255, 211, 104, 255], (130 - glow) / 185);
+      if (insideRoundedRect(x, y, 224, 112, 72, 96, 12)) color = [darkR, darkG, darkB, 255];
+      if (insideRoundedRect(x, y, 238, 128, 44, 58, 8)) color = [255, 231, 137, 255];
+      if (distanceToSegment(x, y, 260, 80, 260, 112) < 5) color = [darkR, darkG, darkB, 255];
+      if (distanceToSegment(x, y, 167, 267, 354, 267) < 5 || distanceToSegment(x, y, 260, 195, 260, 313) < 5) {
+        color = [accentR, accentG, accentB, 255];
+      }
+      if (Math.hypot(x - 260, y - 267) < 43 && Math.hypot(x - 260, y - 267) > 34) {
+        color = [accentR, accentG, accentB, 255];
+      }
+    }
+
+    return color;
   };
 }
 

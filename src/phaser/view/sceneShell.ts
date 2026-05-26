@@ -76,17 +76,48 @@ export function renderCardHand(
   cards.forEach((card, index) => {
     const x = 430 + index * 230;
     const y = 790;
-    const cardRect = scene.add.rectangle(x, y, 190, 250, 0xfffbef, 0.98);
-    cardRect.setStrokeStyle(4, card.type === "attack" ? 0xce5869 : card.type === "defense" ? 0x5d8d86 : 0x677ab8);
+    const cardWidth = 190;
+    const cardHeight = 278;
+    renderCardFace(scene, x, y, cardWidth, cardHeight, card);
+
+    const hitTarget = scene.add.rectangle(x, y, cardWidth, cardHeight, 0xffffff, 0.001);
     if (onCardClick) {
-      cardRect.setInteractive({ useHandCursor: true });
-      cardRect.on("pointerdown", () => onCardClick(index));
+      hitTarget.setInteractive({ useHandCursor: true });
+      hitTarget.on("pointerdown", () => onCardClick(index));
     }
-    scene.add.text(x + 52, y - 110, `${index + 1}`, textStyle(20, "#805845", true));
-    scene.add.text(x - 78, y - 100, `${card.cost}`, textStyle(36, "#1e2a3e", true));
-    scene.add.text(x - 78, y - 48, card.displayNameKo, textStyle(24, "#1e2a3e", true)).setWordWrapWidth(154);
-    scene.add.text(x - 78, y + 18, card.descriptionKo, textStyle(18, "#6d5a48")).setWordWrapWidth(154);
+    scene.add.text(x + 56, y - 126, `${index + 1}`, textStyle(19, "#805845", true));
+    scene.add.text(x - 77, y - 126, `${card.cost}`, textStyle(34, "#1e2a3e", true));
+    scene.add.text(x - 72, y + 4, card.displayNameKo, textStyle(20, "#1e2a3e", true)).setWordWrapWidth(144);
+    scene.add.text(x - 72, y + 54, card.descriptionKo, textStyle(13, "#6d5a48")).setWordWrapWidth(146);
   });
+}
+
+function renderCardFace(
+  scene: Phaser.Scene,
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  card: BootContext["dataBundle"]["cards"][number]
+): void {
+  const frameKey = card.assetKeys.frame;
+  const artKey = card.assetKeys.illustration;
+  const iconKey = card.assetKeys.typeIcon;
+
+  if (scene.textures.exists(frameKey)) {
+    scene.add.image(x, y, frameKey).setDisplaySize(width, height);
+  } else {
+    const fallback = scene.add.rectangle(x, y, width, height, 0xfffbef, 0.98);
+    fallback.setStrokeStyle(4, card.type === "attack" ? 0xce5869 : card.type === "defense" ? 0x5d8d86 : 0x677ab8);
+  }
+
+  if (scene.textures.exists(artKey)) {
+    scene.add.image(x, y - 50, artKey).setDisplaySize(width - 48, 96);
+  }
+
+  if (scene.textures.exists(iconKey)) {
+    scene.add.image(x + 58, y - 102, iconKey).setDisplaySize(30, 30);
+  }
 }
 
 export function renderActionButton(
