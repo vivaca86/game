@@ -107,6 +107,7 @@ Date: 2026-05-26
 - Asset file audit: `assets:audit` verifies the docs manifest and runtime manifest stay synchronized, asset keys/paths remain unique, generated PNG files under `public/assets/runtime` match `nativeSize`, and these files are still development placeholders rather than final art. `phaser:smoke` verifies the first page preloads all 35 `assets/runtime` URLs without browser errors.
 - 2026-05-27 card UI candidate pass: the generated development art for `card_frame_attack`, `card_frame_defense`, `card_frame_skill`, `icon_card_attack`, `icon_card_defense`, and `icon_card_skill` was replaced with more specific deterministic candidate art. This is a first replacement-loop proof, not approved final art.
 - 2026-05-27 card art render pass: the first hand card illustrations `card_art_sun_jab`, `card_art_fold_guard`, `card_art_page_step`, `card_art_ribbon_snap`, and `card_art_lamplight_mark` were replaced with deterministic candidate art, and the Phaser hand renderer now draws card frame, illustration, and type icon textures instead of rectangle-only cards. This is still candidate/development art.
+- 2026-05-27 remaining card art candidate pass: the remaining slice card illustrations `card_art_stage_patch`, `card_art_ink_spill`, `card_art_paper_bloom`, `card_art_pinpoint_glint`, and `card_art_curtain_call` were replaced with deterministic candidate art. Separate `grantCard` screenshots verified these remaining cards render through the existing hand texture path. This completes the first candidate pass for all 10 slice card illustrations, but not final approved art.
 
 `phaser:smoke` writes screenshots under `tmp/`, including `tmp/phaser-TownScene.png`, `tmp/phaser-CombatScene.png`, and `tmp/phaser-BossScene.png`. `tmp/` is verification output and is not committed.
 
@@ -118,6 +119,6 @@ This is still not a production-complete game, final art/assets pass, exhaustive 
 
 ## Next Work
 
-1. Continue replacing generated development placeholders one group at a time, keeping `npm.cmd run assets:audit:strict` green. Candidate passes now cover card frames, card type icons, and the first five hand card illustrations; next likely groups are the remaining five card illustrations, intent icons, backgrounds, monsters, and boss art.
+1. Continue replacing generated development placeholders one group at a time, keeping `npm.cmd run assets:audit:strict` green. Candidate passes now cover card frames, card type icons, and all 10 slice card illustrations; next likely groups are intent icons, backgrounds, monsters, and boss art.
 2. Expand content, final art/assets, balance, and UX polish only after the foundation remains green.
 3. Keep Steam/appmanifest direct proof deferred unless the user later provides access or exact build/runtime claims become necessary.

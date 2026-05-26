@@ -13,7 +13,12 @@ const candidateCardArtKeys = new Set([
   "card_art_fold_guard",
   "card_art_page_step",
   "card_art_ribbon_snap",
-  "card_art_lamplight_mark"
+  "card_art_lamplight_mark",
+  "card_art_stage_patch",
+  "card_art_ink_spill",
+  "card_art_paper_bloom",
+  "card_art_pinpoint_glint",
+  "card_art_curtain_call"
 ]);
 
 function crc32(buffer) {
@@ -98,6 +103,15 @@ function paletteFor(asset) {
   }
   if (asset.key === "card_art_page_step" || asset.key === "card_art_lamplight_mark") {
     return { base: [246, 237, 207], accent: [91, 151, 133], dark: [72, 67, 108] };
+  }
+  if (asset.key === "card_art_stage_patch" || asset.key === "card_art_paper_bloom") {
+    return { base: [245, 236, 210], accent: [91, 158, 128], dark: [73, 77, 94] };
+  }
+  if (asset.key === "card_art_ink_spill" || asset.key === "card_art_pinpoint_glint") {
+    return { base: [241, 235, 216], accent: [78, 107, 164], dark: [52, 55, 92] };
+  }
+  if (asset.key === "card_art_curtain_call") {
+    return { base: [246, 228, 200], accent: [190, 72, 86], dark: [72, 57, 76] };
   }
   if (asset.path.includes("/backgrounds/")) return { base: [240, 222, 178], accent, dark: [112, 92, 72] };
   if (asset.path.includes("/cards/")) return { base: [250, 238, 206], accent, dark: [98, 72, 54] };
@@ -222,6 +236,57 @@ function paintCardArt(asset) {
       }
       if (Math.hypot(x - 260, y - 267) < 43 && Math.hypot(x - 260, y - 267) > 34) {
         color = [accentR, accentG, accentB, 255];
+      }
+    } else if (asset.key === "card_art_stage_patch") {
+      if (insideRoundedRect(x, y, 139, 84, 242, 178, 26)) color = [darkR, darkG, darkB, 255];
+      if (insideRoundedRect(x, y, 156, 101, 208, 144, 18)) color = [236, 225, 188, 255];
+      if ((x > 170 && x < 350 && (y - 116) % 28 < 4) || (y > 116 && y < 230 && (x - 178) % 32 < 4)) {
+        color = mix(color, [accentR, accentG, accentB, 255], 0.6);
+      }
+      if (distanceToSegment(x, y, 112, 292, 408, 292) < 5) color = [185, 139, 52, 255];
+      if (Math.hypot(x - 151, y - 91) < 15 || Math.hypot(x - 367, y - 253) < 13) color = [255, 236, 143, 255];
+    } else if (asset.key === "card_art_ink_spill") {
+      const puddles = [
+        [238, 174, 72],
+        [289, 145, 44],
+        [201, 218, 37],
+        [329, 212, 32],
+        [172, 156, 27],
+        [352, 120, 22]
+      ];
+      for (const [cx, cy, radius] of puddles) {
+        if (Math.hypot(x - cx, y - cy) < radius) color = [darkR, darkG, darkB, 255];
+      }
+      if (distanceToSegment(x, y, 126, 282, 388, 98) < 7) color = [accentR, accentG, accentB, 255];
+      if (distanceToSegment(x, y, 141, 297, 408, 112) < 3) color = [238, 229, 207, 255];
+    } else if (asset.key === "card_art_paper_bloom") {
+      for (let petal = 0; petal < 8; petal += 1) {
+        const angle = (Math.PI * 2 * petal) / 8;
+        const cx = 260 + Math.cos(angle) * 58;
+        const cy = 166 + Math.sin(angle) * 44;
+        if (Math.hypot((x - cx) / 1.35, y - cy) < 31) color = [darkR, darkG, darkB, 255];
+        if (Math.hypot((x - cx) / 1.35, y - cy) < 21) color = [235, 229, 195, 255];
+      }
+      if (Math.hypot(x - 260, y - 166) < 35) color = [255, 218, 103, 255];
+      if (distanceToSegment(x, y, 260, 197, 260, 296) < 6) color = [accentR, accentG, accentB, 255];
+      if (pointInPolygon(x, y, [[260, 244], [196, 218], [222, 272]])) color = [accentR, accentG, accentB, 255];
+      if (pointInPolygon(x, y, [[260, 259], [326, 230], [302, 286]])) color = [accentR, accentG, accentB, 255];
+    } else if (asset.key === "card_art_pinpoint_glint") {
+      if (Math.hypot(x - 260, y - 170) < 100 && Math.hypot(x - 260, y - 170) > 92) color = [darkR, darkG, darkB, 255];
+      if (Math.hypot(x - 260, y - 170) < 56 && Math.hypot(x - 260, y - 170) > 50) color = [accentR, accentG, accentB, 255];
+      if (distanceToSegment(x, y, 260, 56, 260, 286) < 4 || distanceToSegment(x, y, 146, 170, 374, 170) < 4) {
+        color = [darkR, darkG, darkB, 255];
+      }
+      if (Math.abs(x - 260) + Math.abs(y - 170) < 30) color = [255, 236, 121, 255];
+      if (Math.hypot(x - 348, y - 93) < 16 || Math.hypot(x - 174, y - 258) < 12) color = [255, 244, 168, 255];
+    } else if (asset.key === "card_art_curtain_call") {
+      if (x < 150 || x > 370) color = mix(color, [accentR, accentG, accentB, 255], 0.72);
+      if ((x < 150 || x > 370) && (x + seed) % 44 < 9) color = [darkR, darkG, darkB, 255];
+      if (insideRoundedRect(x, y, 166, 86, 188, 138, 18)) color = [255, 238, 179, 255];
+      if (distanceToSegment(x, y, 154, 244, 366, 244) < 7) color = [185, 139, 52, 255];
+      if (distanceToSegment(x, y, 260, 96, 260, 217) < 5) color = [darkR, darkG, darkB, 255];
+      if (Math.hypot(x - 260, y - 83) < 18 || Math.hypot(x - 220, y - 128) < 10 || Math.hypot(x - 300, y - 128) < 10) {
+        color = [255, 229, 116, 255];
       }
     }
 
