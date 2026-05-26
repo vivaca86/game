@@ -11,7 +11,7 @@
 - 영향: 사용자가 원한 실제 대화 원문 기록과 달라, 나중에 맥락 확인 시 판단 과정이 누락될 수 있다.
 - 해결 방안: 대화 로그는 요약하지 않고 사용자 요청과 Codex 답변을 가능한 한 원문 그대로 기록한다.
 - 재발 방지 기준: `PROJECT_RULES.md` 2번 규칙에 "요약본이 아니라 원문 그대로"라는 기준을 명시한다.
-- 해결 커밋: 이 항목이 포함된 커밋.
+- 해결 커밋: `d87fe0e Add conversation and problem logs`
 
 ### 문제: 문제점과 해결 방안이 대화 로그에 섞일 가능성
 
@@ -19,7 +19,7 @@
 - 영향: 이후 작업자가 반복 문제, 해결 방안, 재발 방지 기준을 빠르게 찾기 어렵다.
 - 해결 방안: 문제점과 해결 방안은 `docs/problem-resolution-log.md`에서 별도 관리한다.
 - 재발 방지 기준: `PROJECT_RULES.md` 3번 규칙에 문제 해결 로그 관리 기준을 명시한다.
-- 해결 커밋: 이 항목이 포함된 커밋.
+- 해결 커밋: `d87fe0e Add conversation and problem logs`
 
 ## 2026-05-26
 
@@ -29,7 +29,7 @@
 - 영향: 새 세션이나 다른 PC에서 `PROJECT_RULES.md`의 작업 루트 정리, 대화 원문 로그, 문제 해결 로그 규칙을 놓치고 작업할 수 있다.
 - 해결 방안: 저장소 루트에 `AGENTS.md`를 추가해 작업 시작 전 `PROJECT_RULES.md`, `docs/handoff.md`, `docs/current-issues-and-plan.md`, `docs/recovery-audit.md`, `RESEARCH_CHECKLIST.md`를 읽도록 지정한다. 전역 `C:\Users\i\.codex\AGENTS.md`에도 저장소 `AGENTS.md`를 우선 확인하라는 공통 지시를 작성한다.
 - 재발 방지 기준: 저장소 운영 규칙이 새로 생기거나 바뀌면, 실제 규칙 문서뿐 아니라 에이전트 진입점인 `AGENTS.md`도 함께 갱신한다.
-- 해결 커밋: 이 항목이 포함된 커밋.
+- 해결 커밋: `7ecf677 Add agent entry rules`, later strengthened by `61c40d5 Strengthen agent operating rules`
 
 ### 문제: 완료 판정과 작업 범위가 Codex 내부 판단으로 흐려질 수 있음
 
@@ -37,7 +37,7 @@
 - 영향: 사용자는 Codex의 완료 보고를 기준으로 다음 결정을 하므로, 완료되지 않은 일을 완료처럼 말하면 프로젝트 판단 전체가 틀어질 수 있다.
 - 해결 방안: `AGENTS.md`를 영어 authoritative 규칙과 한글 참고 번역 구조로 개편했다. 실제 기준은 `Authoritative English Rules`로 고정하고, 위험 작업 범위 제시, 조용한 범위 변경 금지, 전수조사 체크리스트 선행, 완료/부분 완료/검증 미완료 상태 구분을 명시했다. `PROJECT_RULES.md`에도 `AGENTS.md`의 영문 규칙을 에이전트 운영 기준으로 연결했다.
 - 재발 방지 기준: 중요한 작업은 `Confirm instruction -> Check records -> Present scope/criteria -> Get approval when risky -> Execute -> Verify -> State completion level -> Report remaining risk` 흐름을 따른다. 체크리스트와 검증 근거 없이 `Research complete`, `95% close`, `Passed`, `Complete` 표현을 쓰지 않는다.
-- 해결 커밋: 이 항목이 포함된 커밋.
+- 해결 커밋: `61c40d5 Strengthen agent operating rules`
 
 ### 문제: 실패 가능성, 검증 계획, 필요한 도구 요청이 늦게 드러날 수 있음
 
@@ -45,7 +45,7 @@
 - 영향: 실제로 필요한 무료 도구나 의존성을 설치하면 해결될 문제도 차단처럼 보일 수 있고, 반대로 유료 도구나 계정 제한이 필요한 일을 완료 가능한 것처럼 오판할 수 있다.
 - 해결 방안: `AGENTS.md`에 `Pre-Execution Failure Mode Review`, `Tool And Dependency Handling`, `Verification Plan` 조항을 추가했다. 무료로 설치 가능한 필수 의존성은 사용자에게 허가를 요청하고, 유료 제품/유료 API/라이선스 자산/계정 제한 서비스는 한계를 보고한 뒤 사용자 제공 접근 권한 또는 무료 대안을 제시하도록 했다.
 - 재발 방지 기준: 중요한 작업은 실행 전에 범위 이탈, 완료 오판, 자료 부족, 도구/의존성 부족, 검증 공백, 복구 위험을 점검한다. 필수 도구나 자료가 없으면 `Complete`라고 말하지 않고 `Blocked`, `Cannot judge completion`, `Research incomplete`, `Implemented, not verified` 중 맞는 상태로 보고한다.
-- 해결 커밋: 이 항목이 포함된 커밋.
+- 해결 커밋: `2d59f94 Add preflight failure mode rules`
 
 ### 문제: 긴 작업 중 기준 이탈이나 최신 사용자 지시 누락이 생길 수 있음
 
@@ -53,4 +53,12 @@
 - 영향: 사용자가 최신 지시로 방향을 바꿨는데도 Codex가 이전 목표를 완료 처리하거나, 새 위험과 검증 공백을 놓친 채 진행할 수 있다.
 - 해결 방안: `AGENTS.md`에 `Progress Checkpoints And Drift Control` 조항을 추가하고, `PROJECT_RULES.md`에도 오래 걸리거나 여러 단계로 나뉘거나 위험도가 높은 작업은 체크포인트를 두도록 명시했다.
 - 재발 방지 기준: 체크포인트마다 완료 항목, 남은 항목, 원래 범위와 현재 작업의 일치 여부, 새 위험/도구 부족/자료 부족/검증 공백을 갱신한다. 중단, 요약, 컨텍스트 손실, 사용자 새 메시지 이후에는 계속하기 전에 최신 사용자 지시를 다시 확인한다.
-- 해결 커밋: 이 항목이 포함된 커밋.
+- 해결 커밋: `62e92bd Add progress checkpoint rules`
+
+### 문제: 문제 해결 로그의 해결 커밋이 placeholder로 남아 있음
+
+- 원인: 문제 해결 로그는 해결 커밋을 기록해야 하지만, 기존 항목들이 실제 커밋 해시가 아닌 일반 placeholder 문구로 남아 있었다.
+- 영향: 이후 작업자가 어떤 변경으로 문제가 해결됐는지 Git에서 직접 추적하기 어렵다.
+- 해결 방안: 기존 문제 해결 항목의 해결 커밋을 실제 커밋 해시와 커밋 제목으로 교체했다.
+- 재발 방지 기준: 문제 해결 로그를 작성할 때는 placeholder가 아니라 실제 커밋 해시를 적는다. 아직 커밋 전이면 커밋 전 상태임을 명확히 적고, 커밋 후 실제 해시로 교체한다.
+- 해결 커밋: PENDING_HASH

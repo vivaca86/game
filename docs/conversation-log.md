@@ -274,3 +274,11 @@ GitHub 저장소 내부까지 규칙을 반영하는 작업으로 진행했다. 
 ### Codex
 
 반영 상태를 다시 검토하면서 장기 작업 중간 체크포인트와 기준 이탈 방지 조항이 충분히 명시되지 않은 것을 발견했다. 전역 `AGENTS.md`, 작업 루트 `AGENTS.md`, 저장소 `AGENTS.md`, `PROJECT_RULES.md`에 `Progress Checkpoints And Drift Control` 기준을 추가했다.
+
+### 사용자
+
+자 그럼 다시 한번 검토해봐
+
+### Codex
+
+전역/작업 루트/저장소 `AGENTS.md`, `PROJECT_RULES.md`, Git 상태, 대화 로그, 문제 해결 로그를 다시 검토했다. 핵심 운영 규칙은 모두 반영되어 있었지만, `docs/problem-resolution-log.md`의 해결 커밋 항목이 실제 커밋 해시가 아니라 placeholder 문구로 남아 있는 문제를 발견했다. 기존 항목의 해결 커밋을 실제 커밋 해시로 교체하고, 이 문제 자체도 문제 해결 로그에 추가했다.
