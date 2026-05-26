@@ -348,3 +348,4 @@ Current foundation status:
 3. Card description/effect-op audit is in place through `npm.cmd run slice:effects`.
 4. Route `encounterPoolId` values now point to explicit encounter-pool data instead of direct enemy/boss/event ids.
 5. Source/version planning baseline is fixed in `docs/source-version-baseline.md`, but direct installed-build proof is blocked locally because Steam/appmanifest was not found on this PC.
+6. Planned asset manifest and runtime manifest drift/file audit is in place through `npm.cmd run assets:audit`; strict real-file verification waits until generated files exist.

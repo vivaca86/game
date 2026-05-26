@@ -22,6 +22,7 @@
 | Schema | 타입 초안의 필수 필드가 데이터에 있는지 확인 | 필수 |
 | Reference role | 모든 주요 콘텐츠가 대응표에 연결됐는지 확인 | 필수 |
 | Asset key | 데이터가 참조하는 에셋 키가 manifest에 있는지 확인 | 필수 |
+| Asset files | planned/runtime manifest 동기화와 실제 runtime 파일 생성 결과 확인 | 에셋 생성 전에는 planned missing 허용, 생성 후 strict 필수 |
 | Reward refs | 보상 풀이 참조하는 콘텐츠 ID가 존재하는지 확인 | 필수 |
 | Route refs | 스테이지 route가 encounter/event/boss/reward를 찾을 수 있는지 확인 | 필수 |
 | Effect text/op | 카드 한글 설명과 실제 effect op/amount가 어긋나지 않는지 확인 | 필수 |
@@ -92,6 +93,18 @@ evidence.sources
 - manifest에 있는 path는 `assets/runtime/` 아래를 가리켜야 한다.
 - manifest status가 `planned_manifest`이면 실제 파일 존재를 요구하지 않는다.
 
+## Asset file 검사
+
+필수 조건:
+
+- `docs/asset-manifest.slice.v1.json`과 `src/data/assetManifest.slice.v1.json`의 metadata와 asset entry가 서로 같아야 한다.
+- manifest key와 path는 중복될 수 없다.
+- 실제 파일이 존재하면 PNG header 기준 `nativeSize`와 일치해야 한다.
+- spritesheet는 `nativeSize`가 `frameSize`로 나누어 떨어져야 한다.
+- `assets/runtime/` 아래 실제 이미지 파일이 manifest에 없으면 strict 모드에서 실패한다.
+- `planned_manifest` 상태에서는 파일 미존재를 에셋 완료 실패가 아니라 planned missing으로 보고한다.
+- 에셋 생성 파이프라인이 시작되면 `npm.cmd run assets:audit:strict`를 통과해야 한다.
+
 ## Reward refs 검사
 
 필수 조건:
@@ -143,11 +156,19 @@ Slice card effect text/op 감사:
 npm run slice:effects
 ```
 
+Asset manifest/file 감사:
+
+```powershell
+npm run assets:audit
+```
+
 이 PowerShell 환경에서 `npm.ps1` 실행 정책에 막히면 아래 명령을 사용한다.
 
 ```powershell
 npm.cmd run slice:validate
 npm.cmd run slice:effects
+npm.cmd run assets:audit
+npm.cmd run assets:audit:strict
 ```
 
 PowerShell JSON 파싱 보조:

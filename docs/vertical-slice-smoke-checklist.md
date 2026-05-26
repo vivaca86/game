@@ -41,6 +41,7 @@ Date: 2026-05-26
 | DATA-006 | Card descriptions and effect ops do not contradict each other. | `npm.cmd run slice:effects` | Verified |
 | DATA-007 | Save data does not store Phaser objects. | `npm.cmd run phaser:smoke` save snapshot check | Verified |
 | DATA-008 | Room `encounterPoolId` values reference explicit encounter-pool data, and pool entries point to the right content domain. | `npm.cmd run slice:validate` + `npm.cmd run phaser:smoke` | Verified |
+| DATA-009 | Planned asset manifest stays in sync with runtime manifest and can audit generated runtime files. | `npm.cmd run assets:audit`; `npm.cmd run assets:audit:strict` after files exist | Verified for planned-manifest guard; strict file pass not yet applicable |
 
 ## UI Checks
 
@@ -93,6 +94,7 @@ Date: 2026-05-26
 
 - `npm.cmd run slice:validate`: passed.
 - `npm.cmd run slice:effects`: passed.
+- `npm.cmd run assets:audit`: passed in planned-manifest mode.
 - `npm.cmd run check`: passed.
 - `npm.cmd run phaser:smoke`: passed.
 - `git diff --check`: passed.
@@ -102,6 +104,7 @@ Date: 2026-05-26
 - Mark smoke: `phaser:smoke` uses `?debug=1&entry=combat&resetSave=1&grantCard=card_lamplight_mark`, confirms mark becomes `enemyMark=2`, then the next attack consumes mark to `enemyMark=0` and reduces enemy HP from 24 to 15.
 - 1920/view checks: `phaser:smoke` now captures 1920x1080 screenshots for Town, Dungeon, Combat, Reward, Rune Bench, and Boss under `tmp/phaser-1920-*.png`. Combat and Boss assertions verify five-card hands, expected debug state, non-empty screenshots, and debug-overlay avoidance of the hand and enemy intent areas.
 - Responsive overlay checks: `phaser:smoke` also captures 1280 and 1080 overlay screenshots for Combat and Boss under `tmp/phaser-overlay-*.png`. In-app browser verification at 1080x918 confirmed `phase=combat`, `enemyHp=24`, `playerEnergy=3`, overlay size `220x260`, and no overlap with the five-card hand or enemy intent panel.
+- Asset file audit: `assets:audit` verifies the docs manifest and runtime manifest stay synchronized, asset keys/paths remain unique, existing PNG files match `nativeSize`, and planned missing files are reported without being treated as completed assets while status is `planned_manifest`.
 
 `phaser:smoke` writes screenshots under `tmp/`, including `tmp/phaser-TownScene.png`, `tmp/phaser-CombatScene.png`, and `tmp/phaser-BossScene.png`. `tmp/` is verification output and is not committed.
 
@@ -114,5 +117,5 @@ This is still not a production-complete game, final art/assets pass, exhaustive 
 ## Next Work
 
 1. Provide or install access to the Steam library for app `3265700`, then capture local app manifest build ID, in-game version label if available, and fresh first-run screenshots.
-2. Compare planned asset keys with actual generated asset files when the asset pipeline begins.
+2. When the asset pipeline begins, generate files under `assets/runtime/` and run `npm.cmd run assets:audit:strict` to catch missing, wrong-size, or orphaned runtime assets.
 3. Expand content, final art/assets, balance, and UX polish only after the foundation remains green.

@@ -22,13 +22,15 @@
     "quality:audit:report": "node tools/content-quality-audit.mjs --report-only",
     "slice:validate": "node tools/validate-slice-fixture.mjs",
     "slice:effects": "node tools/audit-slice-effects.mjs",
+    "assets:audit": "node tools/audit-asset-files.mjs",
+    "assets:audit:strict": "node tools/audit-asset-files.mjs --require-files",
     "phaser:smoke": "node tools/phaser-smoke-test.mjs",
     "proof:smoke": "node tools/vertical-slice-proof-smoke.mjs",
     "runtime:smoke": "node tools/runtime-smoke-test.mjs",
     "balance:simulate": "node tools/balance-simulation.mjs",
     "browser:smoke": "node tools/browser-smoke-test.mjs",
     "legacy:check": "node tools/validate-data.mjs && node tools/card-balance-audit.mjs && node tools/gem-audit.mjs && node tools/build-item-audit.mjs && node tools/event-audit.mjs && node tools/reward-flow-audit.mjs && node tools/runtime-smoke-test.mjs && node tools/build-static.mjs",
-    "check": "npm run slice:validate && npm run slice:effects && tsc --noEmit && vite build"
+    "check": "npm run slice:validate && npm run slice:effects && npm run assets:audit && tsc --noEmit && vite build"
   },
   "dependencies": {
     "phaser": "^3.90.0"
