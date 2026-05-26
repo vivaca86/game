@@ -21,6 +21,12 @@ const candidateCardArtKeys = new Set([
   "card_art_curtain_call"
 ]);
 
+const candidateIntentIconKeys = new Set([
+  "icon_intent_attack",
+  "icon_intent_disrupt",
+  "icon_intent_block"
+]);
+
 function crc32(buffer) {
   let crc = 0xffffffff;
   for (const byte of buffer) {
@@ -113,6 +119,15 @@ function paletteFor(asset) {
   if (asset.key === "card_art_curtain_call") {
     return { base: [246, 228, 200], accent: [190, 72, 86], dark: [72, 57, 76] };
   }
+  if (asset.key === "icon_intent_attack") {
+    return { base: [252, 232, 200], accent: [214, 82, 73], dark: [76, 48, 52] };
+  }
+  if (asset.key === "icon_intent_disrupt") {
+    return { base: [236, 232, 214], accent: [83, 107, 176], dark: [54, 52, 92] };
+  }
+  if (asset.key === "icon_intent_block") {
+    return { base: [235, 238, 218], accent: [78, 136, 148], dark: [48, 72, 90] };
+  }
   if (asset.path.includes("/backgrounds/")) return { base: [240, 222, 178], accent, dark: [112, 92, 72] };
   if (asset.path.includes("/cards/")) return { base: [250, 238, 206], accent, dark: [98, 72, 54] };
   if (asset.path.includes("/icons/")) return { base: [246, 231, 192], accent, dark: [76, 82, 96] };
@@ -125,6 +140,7 @@ function paintFor(asset) {
   if (asset.key.startsWith("card_frame_")) return paintCardFrame(asset);
   if (asset.key.startsWith("icon_card_")) return paintCardTypeIcon(asset);
   if (candidateCardArtKeys.has(asset.key)) return paintCardArt(asset);
+  if (candidateIntentIconKeys.has(asset.key)) return paintIntentIcon(asset);
 
   const palette = paletteFor(asset);
   const frame = asset.frameSize;
@@ -377,6 +393,66 @@ function paintCardTypeIcon(asset) {
       const sparkleB = Math.abs(x - 28) + Math.abs(y - 66) < 7;
       if (diamond || sparkleA || sparkleB) color = [darkR, darkG, darkB, 255];
       if (Math.abs(x - 48) + Math.abs(y - 48) < 12) color = [244, 203, 96, 255];
+    }
+
+    return color;
+  };
+}
+
+function paintIntentIcon(asset) {
+  const palette = paletteFor(asset);
+  const seed = hash(asset.key);
+  return (x, y, width, height) => {
+    const centerX = width / 2;
+    const centerY = height / 2;
+    const radius = Math.min(width, height) * 0.44;
+    const distance = Math.hypot(x - centerX, y - centerY);
+    if (distance > radius) return [0, 0, 0, 0];
+
+    const [paperR, paperG, paperB] = palette.base;
+    const [accentR, accentG, accentB] = palette.accent;
+    const [darkR, darkG, darkB] = palette.dark;
+    const grain = ((x * 19 + y * 23 + seed) % 41) < 8 ? -8 : 0;
+    let color = [paperR + grain, paperG + grain, paperB + grain, 255];
+
+    if (distance > radius - 5) {
+      color = [darkR, darkG, darkB, 255];
+    } else if (distance < radius - 12) {
+      color = mix(color, [accentR, accentG, accentB, 255], 0.18);
+    }
+
+    if (Math.abs(x - centerX) + Math.abs(y - centerY) < 22) {
+      color = mix(color, [255, 248, 218, 255], 0.14);
+    }
+
+    if (asset.key === "icon_intent_attack") {
+      if (distanceToSegment(x, y, 27, 70, 67, 30) < 6) color = [darkR, darkG, darkB, 255];
+      if (distanceToSegment(x, y, 36, 73, 75, 34) < 3) color = [255, 224, 126, 255];
+      if (pointInPolygon(x, y, [[66, 22], [80, 25], [72, 39]])) color = [accentR, accentG, accentB, 255];
+      if (distanceToSegment(x, y, 23, 40, 38, 25) < 3 || distanceToSegment(x, y, 58, 74, 74, 58) < 3) {
+        color = [accentR, accentG, accentB, 255];
+      }
+    } else if (asset.key === "icon_intent_disrupt") {
+      const boltA = distanceToSegment(x, y, 27, 35, 43, 49) < 5;
+      const boltB = distanceToSegment(x, y, 43, 49, 34, 62) < 5;
+      const boltC = distanceToSegment(x, y, 34, 62, 65, 38) < 5;
+      const boltD = distanceToSegment(x, y, 65, 38, 55, 66) < 5;
+      if (boltA || boltB || boltC || boltD) color = [darkR, darkG, darkB, 255];
+      if (distanceToSegment(x, y, 27, 35, 43, 49) < 2 || distanceToSegment(x, y, 34, 62, 65, 38) < 2) {
+        color = [accentR, accentG, accentB, 255];
+      }
+      if (insideRoundedRect(x, y, 29, 25, 28, 19, 4) || insideRoundedRect(x, y, 47, 54, 24, 17, 4)) {
+        color = mix([paperR, paperG, paperB, 255], [darkR, darkG, darkB, 255], 0.44);
+      }
+    } else if (asset.key === "icon_intent_block") {
+      const shield = pointInPolygon(x, y, [[48, 18], [72, 30], [68, 64], [48, 79], [28, 64], [24, 30]]);
+      const inner = pointInPolygon(x, y, [[48, 28], [61, 35], [58, 58], [48, 68], [38, 58], [35, 35]]);
+      if (shield) color = [darkR, darkG, darkB, 255];
+      if (inner) color = [accentR, accentG, accentB, 255];
+      if (distanceToSegment(x, y, 48, 30, 48, 66) < 4 || distanceToSegment(x, y, 36, 43, 60, 43) < 3) {
+        color = [235, 238, 218, 255];
+      }
+      if (distanceToSegment(x, y, 24, 72, 72, 72) < 3) color = [185, 139, 52, 255];
     }
 
     return color;
