@@ -10,6 +10,7 @@
 
 - `research/`: 2026-05-22까지 진행한 방대한 게임 조사/역기획 자료
 - 새 개발 기반 문서: `docs/development-foundation.md`, `docs/data-schema-draft.md`, `docs/reference-role-map-template.md`, `docs/vertical-slice-acceptance.md`
+- 새 Phaser 골조: `src/main.ts`, `src/app/`, `src/phaser/`, `src/data/`, `src/debug/`, `src/save/`
 - 이전 앱/감사 산출물: `src/`, `tools/`, `docs/vertical-slice/` 아래의 밝은 카드 던전 실험, 품질 감사, 인수인계, 손패 5장 검증 샘플
 
 ## 먼저 볼 문서
@@ -36,28 +37,35 @@
 
 ## 실행
 
-```bash
-node tools/serve-static.mjs
+```powershell
+npm.cmd run dev
 ```
 
 브라우저:
 
 ```text
-http://127.0.0.1:4173/
+http://127.0.0.1:5173/
 ```
 
-검증 샘플:
+디버그 진입:
 
 ```text
-http://127.0.0.1:4173/docs/vertical-slice/proof.html
+http://127.0.0.1:5173/?debug=1&entry=combat
+http://127.0.0.1:5173/?debug=1&entry=boss
+```
+
+예전 정적 샘플은 legacy 명령으로만 확인한다.
+
+```powershell
+npm.cmd run legacy:dev
 ```
 
 ## 검증
 
-```bash
-node tools/vertical-slice-proof-smoke.mjs
-node tools/content-quality-audit.mjs --report-only
-npm run slice:validate
+```powershell
+npm.cmd run slice:validate
+npm.cmd run check
+npm.cmd run phaser:smoke
 ```
 
 PowerShell 실행 정책 때문에 `npm run ...`이 막히는 환경에서는 아래처럼 실행한다.
@@ -69,6 +77,8 @@ npm.cmd run slice:validate
 `content-quality-audit.mjs`가 현재 본편을 `BLOCKED`로 보는 것은 의도된 상태다. 본편 그래픽/데이터가 아직 최종 품질이 아니라는 보호 장치다.
 
 `slice:validate`는 2026-05-26 이후 새 세로 조각 fixture와 planned asset manifest의 구조, `referenceRole`, asset key, reward, route 참조를 검사한다.
+
+`phaser:smoke`는 실행 중인 Vite dev server에서 기본 진입, `entry=combat`, `entry=boss` debug 화면의 canvas와 콘솔 오류를 확인한다.
 
 ## 정리된 것
 

@@ -3,70 +3,12 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>햇살 미로단</title>
+  <title>종이극장 카드 크롤러</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='18' fill='%23fff4bd'/%3E%3Ccircle cx='32' cy='30' r='16' fill='%23ffcf6b'/%3E%3Cpath d='M20 39c7 7 17 7 24 0' stroke='%23464b67' stroke-width='5' stroke-linecap='round' fill='none'/%3E%3Ccircle cx='25' cy='28' r='3' fill='%23464b67'/%3E%3Ccircle cx='39' cy='28' r='3' fill='%23464b67'/%3E%3C/svg%3E" />
-  <link rel="stylesheet" href="src/styles/app.css" />
 </head>
 <body>
-  <main class="app-shell">
-    <header class="hero">
-      <div>
-        <p class="eyebrow">새 독립 IP 카드 던전</p>
-        <h1>햇살 미로단</h1>
-        <p class="lead">밝은 파스텔풍, 귀여운 마스코트 몬스터, 한글 전용 UI를 기준으로 새롭게 쌓는 카드 던전 게임입니다.</p>
-      </div>
-      <section class="hero-card" aria-label="개발 기준">
-        <strong>현재 기준</strong>
-        <span>데이터 분리</span>
-        <span>한글 문구</span>
-        <span>둥근 카드 프레임</span>
-        <span>밝은 전투 화면</span>
-      </section>
-    </header>
-
-    <section class="dashboard-grid" id="summaryGrid" aria-label="콘텐츠 현황"></section>
-
-    <section class="panel game-panel">
-      <div class="panel-head">
-        <h2>데이터 기반 탐험</h2>
-        <span>전투 연결</span>
-      </div>
-      <div id="gameRoot"></div>
-    </section>
-
-    <section class="workbench">
-      <div class="panel">
-        <div class="panel-head">
-          <h2>카드 샘플</h2>
-          <span id="cardCountBadge"></span>
-        </div>
-        <div class="card-list" id="cardList"></div>
-      </div>
-
-      <div class="panel">
-        <div class="panel-head">
-          <h2>스테이지 흐름</h2>
-          <span>첫 개발 루프</span>
-        </div>
-        <div class="stage-list" id="stageList"></div>
-      </div>
-    </section>
-
-    <section class="panel roadmap-panel">
-      <div class="panel-head">
-        <h2>연결된 시스템</h2>
-        <span>1차 런타임</span>
-      </div>
-      <ol class="roadmap">
-        <li>풀 한글 데이터를 로딩하고 ID 인덱스로 참조한다.</li>
-        <li>캐릭터와 스테이지를 선택해 탐험을 시작한다.</li>
-        <li>손패, 기운, 비용, 카드 효과, 적 의도를 처리한다.</li>
-        <li>일반전, 이벤트, 정예, 보상, 보스 방을 순서대로 진행한다.</li>
-        <li>카드, 보석, 유물, 별사탕 보상과 업적 보상을 연결한다.</li>
-      </ol>
-    </section>
-  </main>
-
-  <script type="module" src="src/app.js"></script>
+  <div id="game-root"></div>
+  <div id="debug-overlay" aria-live="polite"></div>
+  <script type="module" src="/src/main.ts"></script>
 </body>
 </html>

@@ -4,11 +4,11 @@
 
 ## 상태
 
-- 상태: 구현 전 체크리스트
+- 상태: 초기 Phaser scaffold 검증 일부 완료
 - 기준 문서: `docs/vertical-slice-acceptance.md`
 - 기준 후보: `docs/vertical-slice-content-candidates.md`
 - 목적: 첫 Phaser 세로 조각이 통과해야 할 검사 항목을 쪼갠다.
-- 아직 아님: 실제 테스트 통과, Playwright 스크립트, 브라우저 검증 완료
+- 아직 아님: 전체 세로 조각 통과, 전투 규칙 통과, 전체 루프 통과, 최종 에셋 검증
 
 ## 상태값
 
@@ -24,23 +24,23 @@
 
 | ID | 검사 | 방법 | 현재 상태 |
 | --- | --- | --- | --- |
-| PRE-001 | Phaser 앱이 Vite로 실행된다. | `npm run dev` 또는 equivalent | Not started |
-| PRE-002 | TypeScript 타입 오류가 없다. | `npm run typecheck` 후보 | Not started |
-| PRE-003 | 데이터 파일이 로드된다. | 앱 부팅 로그와 데이터 검증 | Not started |
-| PRE-004 | 에셋 manifest 누락이 없다. | manifest 검증 스크립트 | Not started |
-| PRE-005 | 디버그 진입 플래그가 있다. | URL param 또는 debug menu | Not started |
+| PRE-001 | Phaser 앱이 Vite로 실행된다. | `npm.cmd run dev`, `npm.cmd run phaser:smoke` | Verified |
+| PRE-002 | TypeScript 타입 오류가 없다. | `npm.cmd run check` | Verified |
+| PRE-003 | 데이터 파일이 로드된다. | `BootScene`, `npm.cmd run phaser:smoke` | Verified |
+| PRE-004 | 에셋 manifest 누락이 없다. | `npm.cmd run slice:validate` | Verified |
+| PRE-005 | 디버그 진입 플래그가 있다. | `?debug=1&entry=combat`, `?debug=1&entry=boss` | Verified |
 
 ## 데이터 검사
 
 | ID | 검사 | 방법 | 현재 상태 |
 | --- | --- | --- | --- |
-| DATA-001 | 모든 콘텐츠에 `id`가 있다. | schema validation | Not started |
-| DATA-002 | 모든 표시 콘텐츠에 한글 이름과 설명이 있다. | schema validation | Not started |
-| DATA-003 | 모든 세로 조각 콘텐츠에 `referenceRole`이 있다. | role validation | Not started |
-| DATA-004 | 모든 `referenceRole`이 `reference-role-map-slice-v1.md`에 있다. | role map validation | Not started |
-| DATA-005 | 모든 에셋 키가 manifest에 있다. | asset validation | Not started |
+| DATA-001 | 모든 콘텐츠에 `id`가 있다. | `npm.cmd run slice:validate` | Verified |
+| DATA-002 | 모든 표시 콘텐츠에 한글 이름과 설명이 있다. | `npm.cmd run slice:validate` | Verified |
+| DATA-003 | 모든 세로 조각 콘텐츠에 `referenceRole`이 있다. | `npm.cmd run slice:validate` | Verified |
+| DATA-004 | 모든 `referenceRole`이 `reference-role-map-slice-v1.md`에 있다. | `npm.cmd run slice:validate` | Verified |
+| DATA-005 | 모든 에셋 키가 manifest에 있다. | `npm.cmd run slice:validate` | Verified |
 | DATA-006 | 카드 설명과 실제 효과 op가 어긋나지 않는다. | effect audit | Not started |
-| DATA-007 | 세이브에는 Phaser 객체가 들어가지 않는다. | save serialization check | Not started |
+| DATA-007 | 세이브에는 Phaser 객체가 들어가지 않는다. | save serialization check | Implemented, not verified |
 
 ## 화면 검사
 
@@ -49,10 +49,10 @@
 | UI-001 | 마을 화면에서 시작 버튼과 진행 상태가 보인다. | desktop screenshot | Not started |
 | UI-002 | 월드맵에서 `등불 현관` 진입이 가능하다. | click flow | Not started |
 | UI-003 | 던전 시야가 정적 메뉴가 아니라 방/방향 감각을 준다. | screenshot + interaction | Not started |
-| UI-004 | 전투 화면에 손패 5장, HP, 기운, 적 의도가 보인다. | screenshot | Not started |
+| UI-004 | 전투 화면에 손패 5장, HP, 기운, 적 의도가 보인다. | screenshot | Implemented, not verified |
 | UI-005 | 보상 화면에서 선택지와 추천 이유가 보인다. | click flow | Not started |
 | UI-006 | 룬 작업대에서 장착 전후 변화가 보인다. | click flow | Not started |
-| UI-007 | 보스전에서 일반 몬스터보다 큰 실루엣과 페이즈 신호가 보인다. | screenshot | Not started |
+| UI-007 | 보스전에서 일반 몬스터보다 큰 실루엣과 페이즈 신호가 보인다. | screenshot | Implemented, not verified |
 | UI-008 | 결과 화면에서 해금과 마을 복귀가 보인다. | full loop | Not started |
 
 ## 전투 검사
@@ -84,9 +84,18 @@
 | ID | 검사 | 방법 | 현재 상태 |
 | --- | --- | --- | --- |
 | VIEW-001 | 1920x1080에서 카드 5장과 적 의도가 겹치지 않는다. | screenshot | Not started |
-| VIEW-002 | 1280x720에서 핵심 텍스트가 잘리지 않는다. | screenshot | Not started |
-| VIEW-003 | 브라우저 콘솔에 런타임 오류가 없다. | browser console | Not started |
-| VIEW-004 | 디버그 패널이 전투 핵심 UI를 가리지 않는다. | screenshot | Not started |
+| VIEW-002 | 1280x720에서 핵심 텍스트가 잘리지 않는다. | screenshot | Implemented, not verified |
+| VIEW-003 | 브라우저 콘솔에 런타임 오류가 없다. | `npm.cmd run phaser:smoke` | Verified |
+| VIEW-004 | 디버그 패널이 전투 핵심 UI를 가리지 않는다. | screenshot | Implemented, not verified |
+
+## 현재 검증 결과
+
+- `npm.cmd run slice:validate`: 통과
+- `npm.cmd run check`: 통과
+- `npm.cmd run phaser:smoke`: 통과
+- `git diff --check`: 통과
+
+`phaser:smoke`는 `tmp/phaser-TownScene.png`, `tmp/phaser-CombatScene.png`, `tmp/phaser-BossScene.png`를 생성한다. `tmp/`는 검증 산출물이며 Git에 포함하지 않는다.
 
 ## 통과 판정
 
@@ -100,6 +109,6 @@
 
 ## 다음 작업
 
-1. 체크리스트 ID를 실제 테스트 스크립트 이름과 연결한다.
-2. 구현 시작 후 각 항목 상태를 갱신한다.
-3. 첫 브라우저 검증 스크린샷 경로를 이 문서에 추가한다.
+1. 실제 combat simulation을 연결하고 `COMBAT-*` 항목을 검증한다.
+2. 마을 -> 월드맵 -> 던전 -> 전투 -> 보상 -> 룬 -> 보스 -> 결과 흐름을 연결한다.
+3. UI screenshot 검수 기준을 `phaser:smoke`에 더 촘촘히 추가한다.

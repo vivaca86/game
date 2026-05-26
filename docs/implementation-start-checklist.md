@@ -4,9 +4,9 @@
 
 ## 문서 상태
 
-- 상태: 다음 작업 체크리스트
+- 상태: 1차 scaffold 작성 후 갱신
 - 목적: 실제 Phaser scaffold를 시작할 때 범위가 흔들리지 않게 한다.
-- 아직 하지 않은 것: scaffold 생성, dependency 설치, 브라우저 smoke
+- 아직 하지 않은 것: 전체 루프 구현, 실제 카드 전투 규칙 연결, 최종 에셋 생성, 전체 smoke 통과
 
 ## 착수 전 확인
 
@@ -16,9 +16,9 @@
 | 부트 플로우 | Done | `docs/phaser-boot-flow-plan.md` |
 | 디버그 진입 | Done | `docs/debug-entry-plan.md` |
 | 데이터 fixture 검증 | Done | `npm.cmd run slice:validate` |
-| 실제 `src/` 생성 | Not done | 다음 작업 |
-| Phaser/Vite dependency 설치 | Not done | 사용자 승인 또는 명시 지시 필요 |
-| 브라우저 실행 검증 | Not done | Phaser 앱 생성 후 가능 |
+| 실제 `src/` 생성 | Done | `src/main.ts`, `src/app/`, `src/phaser/` |
+| Phaser/Vite dependency 설치 | Done | `package.json`, `package-lock.json` |
+| 브라우저 실행 검증 | Done | `npm.cmd run phaser:smoke` |
 
 ## 첫 구현 범위
 
@@ -55,14 +55,20 @@
 8. 1920x1080 screenshot
 9. 1280x720 screenshot
 
-3번 이후는 실제 scaffold가 생긴 뒤에만 가능하다.
+현재 scaffold에서는 1-7번을 수행했다. 1920x1080/1280x720 세부 시각 검수는 다음 UI smoke 확장에서 더 촘촘히 확인한다.
+
+## 이번 scaffold에서 완료된 것
+
+- `Phaser 3 + TypeScript + Vite` dependency와 scripts를 추가했다.
+- 기존 정적 앱 파일은 삭제하지 않고, `legacy:*` scripts로 분리했다.
+- `src/data/schema.ts`, `src/data/fixtures/vertical-slice.v1.json`, `src/data/assetManifest.slice.v1.json`을 만들었다.
+- `BootScene`, `PreloadScene`, `TownScene`, debug entry용 최소 scene들을 만들었다.
+- `?debug=1&entry=combat`, `?debug=1&entry=boss`를 smoke 대상으로 확인했다.
 
 ## 다음 결정 필요
 
 실제 구현 착수 직전에는 아래 결정을 확인한다.
 
-- 기존 `package.json`을 Vite/Phaser 기준으로 교체할지, 새 scripts를 병행할지
-- Phaser/Vite/TypeScript dependency를 설치할지
-- 기존 정적 앱 `src/` 흔적을 유지할지, 새 구조로 교체할지
 - `docs/` fixture를 계속 원본으로 둘지, `src/data/` fixture를 원본으로 승격할지
 - `encounterPoolId`를 지금 분리할지, 첫 scaffold 이후로 미룰지
+- 실제 simulation 시스템을 어느 순서로 연결할지

@@ -374,3 +374,13 @@ GitHub의 game 쪽을 확인하고, 이어서 해야 하는 작업이 무엇으�
 ### Codex
 
 다음 작업을 실제 구현 직전의 Phaser 프로젝트 구조 확정으로 잡았다. `docs/phaser-project-structure-plan.md`에는 `src/`, `simulation/`, `phaser/`, `data/`, `debug/`, `save/`의 책임 경계를 정리했고, `docs/phaser-boot-flow-plan.md`에는 `main.ts -> BootScene -> PreloadScene -> entry scene` 순서를 기록했다. `docs/debug-entry-plan.md`에는 `?debug=1&entry=combat` 같은 URL 진입과 debug action 목록을 정리했고, `docs/implementation-start-checklist.md`에는 실제 scaffold 착수 전 남은 결정을 체크리스트로 만들었다. 실제 Phaser 설치, `src/` 생성, 브라우저 실행은 아직 하지 않았다.
+
+### 사용자
+
+Phaser 런타임 첫 골조와 데이터 부팅, 디버그 진입 작업을 그대로 진행하라고 지시했다.
+
+### Codex
+
+`Phaser 3 + TypeScript + Vite` dependency를 설치하고, 처음에 최신 `phaser`가 4.x로 설치되는 기준 이탈을 발견해 `phaser@3`으로 되돌렸다. 기존 정적 앱은 삭제하지 않고 `legacy:*` scripts로 분리했으며, 새 진입점은 `index.html -> src/main.ts`로 바꿨다. `src/data/schema.ts`, `src/data/fixtures/vertical-slice.v1.json`, `src/data/assetManifest.slice.v1.json`을 만들고, `BootScene`, `PreloadScene`, `TownScene`, `CombatScene`, `BossScene` 등 최소 scene과 `?debug=1&entry=combat`, `?debug=1&entry=boss` 진입을 구현했다. planned manifest는 실제 에셋이 없으므로 Phaser placeholder texture로만 표시하며, 이를 아트 완료로 보지 않는다고 유지했다.
+
+검증은 `npm.cmd run slice:validate`, `npm.cmd run check`, `npm.cmd run phaser:smoke`, `git diff --check`로 진행했다. 브라우저 smoke를 위해 `tools/phaser-smoke-test.mjs`를 추가했고, 로컬 Playwright 패키지가 없어 `playwright`를 dev dependency로 추가했다.

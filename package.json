@@ -1,12 +1,15 @@
 {
-  "name": "bright-card-dungeon",
+  "name": "paper-theater-card-crawler",
   "version": "0.1.0",
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "node tools/serve-static.mjs",
-    "build": "node tools/build-static.mjs",
-    "preview": "node tools/serve-static.mjs dist",
+    "dev": "vite --host 127.0.0.1",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview --host 127.0.0.1",
+    "legacy:dev": "node tools/serve-static.mjs",
+    "legacy:build": "node tools/build-static.mjs",
+    "legacy:preview": "node tools/serve-static.mjs dist",
     "data:generate:cards": "node tools/generate-full-card-data.mjs",
     "data:generate:content": "node tools/generate-full-content-data.mjs",
     "data:validate": "node tools/validate-data.mjs",
@@ -18,10 +21,20 @@
     "quality:audit": "node tools/content-quality-audit.mjs",
     "quality:audit:report": "node tools/content-quality-audit.mjs --report-only",
     "slice:validate": "node tools/validate-slice-fixture.mjs",
+    "phaser:smoke": "node tools/phaser-smoke-test.mjs",
     "proof:smoke": "node tools/vertical-slice-proof-smoke.mjs",
     "runtime:smoke": "node tools/runtime-smoke-test.mjs",
     "balance:simulate": "node tools/balance-simulation.mjs",
     "browser:smoke": "node tools/browser-smoke-test.mjs",
-    "check": "node tools/validate-data.mjs && node tools/card-balance-audit.mjs && node tools/gem-audit.mjs && node tools/build-item-audit.mjs && node tools/event-audit.mjs && node tools/reward-flow-audit.mjs && node tools/runtime-smoke-test.mjs && node tools/build-static.mjs"
+    "legacy:check": "node tools/validate-data.mjs && node tools/card-balance-audit.mjs && node tools/gem-audit.mjs && node tools/build-item-audit.mjs && node tools/event-audit.mjs && node tools/reward-flow-audit.mjs && node tools/runtime-smoke-test.mjs && node tools/build-static.mjs",
+    "check": "npm run slice:validate && tsc --noEmit && vite build"
+  },
+  "dependencies": {
+    "phaser": "^3.90.0"
+  },
+  "devDependencies": {
+    "playwright": "^1.60.0",
+    "typescript": "^6.0.3",
+    "vite": "^8.0.14"
   }
 }

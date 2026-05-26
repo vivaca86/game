@@ -284,7 +284,7 @@ notes?: string
 | 세로 조각 통과 기준 | fixture/manifest/checklist/validator 작성 | smoke script와 브라우저 검증으로 이관 |
 | 세이브 구조 | 미확정 | saveVersion, unlocks, profile, settings 구조 설계 |
 | 디버그 UI | URL/debug action 계획 작성 | 실제 DOM overlay와 debug action 구현 |
-| Phaser 프로젝트 구조 | 구현 전 계획 작성 | 실제 `src/` scaffold 생성 |
+| Phaser 프로젝트 구조 | 1차 scaffold 작성 | simulation, scene flow, debug action 실제 연결 |
 
 ## 작성된 후속 산출물
 
@@ -305,12 +305,11 @@ notes?: string
 
 ## 다음 작업
 
-1. 실제 Phaser/Vite/TypeScript scaffold 생성 범위와 dependency 설치 여부를 확정한다.
-2. `docs/game-data-types.v1.ts`, `docs/vertical-slice-data.fixture.v1.json`, `docs/asset-manifest.slice.v1.json`을 `src/data/` 기준으로 이관한다.
-3. `docs/phaser-boot-flow-plan.md`에 따라 `BootScene`, `PreloadScene`, 최소 entry scene을 만든다.
-4. `docs/debug-entry-plan.md`에 따라 `?debug=1` entry와 debug action을 만든다.
-5. fixture의 `encounterPoolId`를 별도 encounter pool 데이터로 분리할지 결정한다.
-6. 첫 구현 착수 전 원작 기준 버전/패치/영상 기준선을 확정한다.
+1. `simulation/`에 전투 상태, 카드 사용, 적 의도 처리의 첫 규칙을 연결한다.
+2. `TownScene -> WorldMapScene -> DungeonScene -> CombatScene`의 입력 기반 scene flow를 연결한다.
+3. `RewardScene`, `RuneBenchScene`, `BossScene`, `ResultScene`을 실제 상태 변화와 연결한다.
+4. fixture의 `encounterPoolId`를 별도 encounter pool 데이터로 분리할지 결정한다.
+5. 첫 구현 착수 전 원작 기준 버전/패치/영상 기준선을 확정한다.
 
 위 작업이 나오기 전에는 본격 구현 착수 또는 원작 유사도 판정을 하지 않는다.
 
