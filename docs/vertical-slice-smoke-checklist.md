@@ -1,114 +1,111 @@
-# 세로 조각 smoke 체크리스트 v1
+# Vertical Slice Smoke Checklist v1
 
-작성일: 2026-05-26
+Date: 2026-05-26
 
-## 상태
+## Status
 
-- 상태: 초기 Phaser scaffold 검증 일부 완료
-- 기준 문서: `docs/vertical-slice-acceptance.md`
-- 기준 후보: `docs/vertical-slice-content-candidates.md`
-- 목적: 첫 Phaser 세로 조각이 통과해야 할 검사 항목을 쪼갠다.
-- 아직 아님: 전체 세로 조각 통과, 전투 규칙 통과, 전체 루프 통과, 최종 에셋 검증
+- Status: combat simulation and scene flow smoke verified.
+- Basis: `docs/vertical-slice-acceptance.md`
+- Candidate data: `docs/vertical-slice-content-candidates.md`
+- Still not complete: full vertical-slice pass, final art/assets, save reload persistence, exhaustive source parity, 95% similarity.
 
-## 상태값
+## State Values
 
-| 상태 | 의미 |
+| State | Meaning |
 | --- | --- |
-| Not started | 아직 구현이나 검증이 없다. |
-| Implemented, not verified | 구현은 있으나 검증이 끝나지 않았다. |
-| Needs fix | 검증에서 문제가 나왔다. |
-| Verified | 검사 기준을 충족했다. |
-| Blocked | 도구, 자료, 결정 부족으로 진행할 수 없다. |
+| Not started | No implementation or verification yet. |
+| Implemented, not verified | Code exists, but the specific acceptance check has not been proven. |
+| Needs fix | Verification found a problem. |
+| Verified | The stated check has verification evidence. |
+| Blocked | Tool, source, or decision gap blocks progress. |
 
-## 실행 전 검사
+## Pre-Run Checks
 
-| ID | 검사 | 방법 | 현재 상태 |
+| ID | Check | Method | Current state |
 | --- | --- | --- | --- |
-| PRE-001 | Phaser 앱이 Vite로 실행된다. | `npm.cmd run dev`, `npm.cmd run phaser:smoke` | Verified |
-| PRE-002 | TypeScript 타입 오류가 없다. | `npm.cmd run check` | Verified |
-| PRE-003 | 데이터 파일이 로드된다. | `BootScene`, `npm.cmd run phaser:smoke` | Verified |
-| PRE-004 | 에셋 manifest 누락이 없다. | `npm.cmd run slice:validate` | Verified |
-| PRE-005 | 디버그 진입 플래그가 있다. | `?debug=1&entry=combat`, `?debug=1&entry=boss` | Verified |
+| PRE-001 | Phaser app runs through Vite. | `npm.cmd run dev`, `npm.cmd run phaser:smoke` | Verified |
+| PRE-002 | TypeScript has no errors. | `npm.cmd run check` | Verified |
+| PRE-003 | Runtime data loads. | `BootScene`, `npm.cmd run phaser:smoke` | Verified |
+| PRE-004 | Asset manifest has no missing references. | `npm.cmd run slice:validate` | Verified |
+| PRE-005 | Debug entry flags exist. | `?debug=1&entry=combat`, `?debug=1&entry=boss` | Verified |
 
-## 데이터 검사
+## Data Checks
 
-| ID | 검사 | 방법 | 현재 상태 |
+| ID | Check | Method | Current state |
 | --- | --- | --- | --- |
-| DATA-001 | 모든 콘텐츠에 `id`가 있다. | `npm.cmd run slice:validate` | Verified |
-| DATA-002 | 모든 표시 콘텐츠에 한글 이름과 설명이 있다. | `npm.cmd run slice:validate` | Verified |
-| DATA-003 | 모든 세로 조각 콘텐츠에 `referenceRole`이 있다. | `npm.cmd run slice:validate` | Verified |
-| DATA-004 | 모든 `referenceRole`이 `reference-role-map-slice-v1.md`에 있다. | `npm.cmd run slice:validate` | Verified |
-| DATA-005 | 모든 에셋 키가 manifest에 있다. | `npm.cmd run slice:validate` | Verified |
-| DATA-006 | 카드 설명과 실제 효과 op가 어긋나지 않는다. | effect audit | Not started |
-| DATA-007 | 세이브에는 Phaser 객체가 들어가지 않는다. | save serialization check | Implemented, not verified |
+| DATA-001 | All content has `id`. | `npm.cmd run slice:validate` | Verified |
+| DATA-002 | All displayed content has Korean name/description fields. | `npm.cmd run slice:validate` | Verified |
+| DATA-003 | All slice content has `referenceRole`. | `npm.cmd run slice:validate` | Verified |
+| DATA-004 | All `referenceRole` values are mapped in `reference-role-map-slice-v1.md`. | `npm.cmd run slice:validate` | Verified |
+| DATA-005 | All referenced asset keys exist in the planned manifest. | `npm.cmd run slice:validate` | Verified |
+| DATA-006 | Card descriptions and effect ops do not contradict each other. | effect audit | Not started |
+| DATA-007 | Save data does not store Phaser objects. | save serialization/reload check | Implemented, not verified |
 
-## 화면 검사
+## UI Checks
 
-| ID | 검사 | 방법 | 현재 상태 |
+| ID | Check | Method | Current state |
 | --- | --- | --- | --- |
-| UI-001 | 마을 화면에서 시작 버튼과 진행 상태가 보인다. | desktop screenshot | Not started |
-| UI-002 | 월드맵에서 `등불 현관` 진입이 가능하다. | click flow | Not started |
-| UI-003 | 던전 시야가 정적 메뉴가 아니라 방/방향 감각을 준다. | screenshot + interaction | Not started |
-| UI-004 | 전투 화면에 손패 5장, HP, 기운, 적 의도가 보인다. | screenshot | Implemented, not verified |
-| UI-005 | 보상 화면에서 선택지와 추천 이유가 보인다. | click flow | Not started |
-| UI-006 | 룬 작업대에서 장착 전후 변화가 보인다. | click flow | Not started |
-| UI-007 | 보스전에서 일반 몬스터보다 큰 실루엣과 페이즈 신호가 보인다. | screenshot | Implemented, not verified |
-| UI-008 | 결과 화면에서 해금과 마을 복귀가 보인다. | full loop | Not started |
+| UI-001 | Town screen shows start/progress state. | desktop screenshot | Implemented, not verified |
+| UI-002 | World map can enter the selected stage. | keyboard flow | Verified |
+| UI-003 | Dungeon view is not only a static menu and shows route position. | screenshot + interaction | Implemented, not verified |
+| UI-004 | Combat shows hand, HP, energy, block, and intent. | `npm.cmd run phaser:smoke` | Verified |
+| UI-005 | Reward screen shows options and claim result. | flow smoke | Implemented, not verified |
+| UI-006 | Rune bench shows equip result before/after. | flow smoke | Implemented, not verified |
+| UI-007 | Boss screen shows boss-specific phase signal. | `npm.cmd run phaser:smoke` | Verified |
+| UI-008 | Result screen shows clear/return state. | full loop smoke | Verified |
 
-## 전투 검사
+## Combat Checks
 
-| ID | 검사 | 방법 | 현재 상태 |
+| ID | Check | Method | Current state |
 | --- | --- | --- | --- |
-| COMBAT-001 | `햇살 찌르기`가 앞 적에게 피해를 준다. | debug combat | Not started |
-| COMBAT-002 | `접힌 방패`가 보호막을 올린다. | debug combat | Not started |
-| COMBAT-003 | `책장 넘기기`가 카드 드로우를 만든다. | debug combat | Not started |
-| COMBAT-004 | 적 공격 의도가 턴 종료 때 실제 피해로 이어진다. | turn flow | Not started |
-| COMBAT-005 | 피격, 피해 숫자, 로그가 같은 결과를 말한다. | screenshot + log | Not started |
-| COMBAT-006 | 룬 장착 후 카드 수치가 실제로 바뀐다. | before/after check | Not started |
-| COMBAT-007 | 보스 페이즈가 HP 조건에서 한 번 발동한다. | boss debug | Not started |
+| COMBAT-001 | `card_sun_jab` damages the front enemy. | debug combat overlay: `enemyHp=17` after Digit1 | Verified |
+| COMBAT-002 | `card_fold_guard` gives block. | debug combat overlay: `playerBlock=6` after Digit2 | Verified |
+| COMBAT-003 | `card_page_step` draws a card. | debug combat overlay: `drawPile=0`, `discard=1`, hand updated | Verified |
+| COMBAT-004 | Enemy attack intent deals damage after end turn. | debug combat overlay: `playerHp=36`, `turn=2` after `E` | Verified |
+| COMBAT-005 | Combat log and state agree with the action result. | debug overlay `log=...` plus smoke assertions | Verified |
+| COMBAT-006 | Equipped rune changes attached-card value. | flow smoke: `rune_paper_spark` makes `card_sun_jab` deal 9 | Verified |
+| COMBAT-007 | Boss phase triggers at HP threshold. | boss debug smoke: `bossPhaseTriggered=true` | Verified |
 
-## 루프 검사
+## Loop Checks
 
-| ID | 검사 | 방법 | 현재 상태 |
+| ID | Check | Method | Current state |
 | --- | --- | --- | --- |
-| LOOP-001 | 마을에서 스테이지로 진입한다. | full loop | Not started |
-| LOOP-002 | 첫 전투 승리 후 보상으로 이어진다. | full loop | Not started |
-| LOOP-003 | 보상 선택 후 룬 장착으로 이어진다. | full loop | Not started |
-| LOOP-004 | 룬 장착 효과가 다음 전투에 반영된다. | full loop | Not started |
-| LOOP-005 | 보스 클리어 후 해금이 생긴다. | full loop | Not started |
-| LOOP-006 | 해금 상태가 마을 복귀 후 보인다. | full loop | Not started |
-| LOOP-007 | 새로고침 후 최소 진행 상태가 복원된다. | save reload | Not started |
+| LOOP-001 | Town enters stage flow. | full loop smoke | Verified |
+| LOOP-002 | First combat victory enters reward. | full loop smoke | Verified |
+| LOOP-003 | Reward claim enters rune bench. | full loop smoke | Verified |
+| LOOP-004 | Rune equip affects the next combat. | full loop smoke | Verified |
+| LOOP-005 | Boss clear creates result state. | boss loop smoke | Verified |
+| LOOP-006 | Result can return to town. | boss loop smoke | Verified |
+| LOOP-007 | Minimum progress survives save reload. | save reload check | Not started |
 
-## 반응형 검사
+## Responsive/View Checks
 
-| ID | 검사 | 방법 | 현재 상태 |
+| ID | Check | Method | Current state |
 | --- | --- | --- | --- |
-| VIEW-001 | 1920x1080에서 카드 5장과 적 의도가 겹치지 않는다. | screenshot | Not started |
-| VIEW-002 | 1280x720에서 핵심 텍스트가 잘리지 않는다. | screenshot | Implemented, not verified |
-| VIEW-003 | 브라우저 콘솔에 런타임 오류가 없다. | `npm.cmd run phaser:smoke` | Verified |
-| VIEW-004 | 디버그 패널이 전투 핵심 UI를 가리지 않는다. | screenshot | Implemented, not verified |
+| VIEW-001 | 1920x1080 layout keeps five cards and intent readable. | screenshot | Not started |
+| VIEW-002 | 1280x720 layout renders nonblank without console errors. | `npm.cmd run phaser:smoke` | Verified |
+| VIEW-003 | Browser console has no app errors. | `npm.cmd run phaser:smoke` | Verified |
+| VIEW-004 | Debug overlay does not hide critical combat information. | screenshot review | Implemented, not verified |
 
-## 현재 검증 결과
+## Current Verification Results
 
-- `npm.cmd run slice:validate`: 통과
-- `npm.cmd run check`: 통과
-- `npm.cmd run phaser:smoke`: 통과
-- `git diff --check`: 통과
+- `npm.cmd run slice:validate`: passed.
+- `npm.cmd run check`: passed.
+- `npm.cmd run phaser:smoke`: passed.
+- `git diff --check`: passed.
 
-`phaser:smoke`는 `tmp/phaser-TownScene.png`, `tmp/phaser-CombatScene.png`, `tmp/phaser-BossScene.png`를 생성한다. `tmp/`는 검증 산출물이며 Git에 포함하지 않는다.
+`phaser:smoke` writes screenshots under `tmp/`, including `tmp/phaser-TownScene.png`, `tmp/phaser-CombatScene.png`, and `tmp/phaser-BossScene.png`. `tmp/` is verification output and is not committed.
 
-## 통과 판정
+## Pass Judgment
 
-세로 조각을 통과로 말하려면 아래 조건이 모두 필요하다.
+This is not a full vertical-slice pass yet.
 
-1. `PRE`, `DATA`, `UI`, `COMBAT`, `LOOP`, `VIEW` 그룹의 필수 항목이 `Verified`다.
-2. 남은 `Needs fix` 항목이 없다.
-3. `Blocked` 항목이 있으면 범위 밖인지 사용자가 승인해야 한다.
-4. 검증 결과와 스크린샷 경로를 문서에 남긴다.
-5. 통과 후에도 원작 95% 유사도나 전체 게임 완성으로 말하지 않는다.
+To call the first vertical slice passed, all required `PRE`, `DATA`, `UI`, `COMBAT`, `LOOP`, and `VIEW` rows must be `Verified`, no `Needs fix` rows may remain, and screenshot/save-reload evidence must be recorded. This checklist also does not authorize any original-game 95% similarity claim.
 
-## 다음 작업
+## Next Work
 
-1. 실제 combat simulation을 연결하고 `COMBAT-*` 항목을 검증한다.
-2. 마을 -> 월드맵 -> 던전 -> 전투 -> 보상 -> 룬 -> 보스 -> 결과 흐름을 연결한다.
-3. UI screenshot 검수 기준을 `phaser:smoke`에 더 촘촘히 추가한다.
+1. Add save reload verification for `LOOP-007` and `DATA-007`.
+2. Add 1920x1080 screenshot checks and review debug overlay placement.
+3. Add effect-audit coverage for card description/effect-op consistency.
+4. Split fixture `encounterPoolId` into explicit encounter-pool data if the next content pass needs multiple enemies per room.
+5. Continue source/version confirmation separately; current implementation is a slice foundation, not source parity.

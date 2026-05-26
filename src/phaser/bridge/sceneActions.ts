@@ -1,0 +1,98 @@
+import type Phaser from "phaser";
+import type { BootContext } from "../../app/bootContext";
+import type { InputAction } from "../../input/actions";
+import { endTurn, playCardAtIndex } from "../../simulation/systems/combat/combatSystem";
+import {
+  claimRewardAndAdvance,
+  enterCurrentRoom,
+  enterDungeon,
+  enterWorldMap,
+  equipRuneAndAdvance,
+  returnToTown
+} from "../../simulation/systems/dungeon/dungeonSystem";
+import type { SlicePhase } from "../../simulation/state/runState";
+import { storeBootContext } from "./sceneBridge";
+
+const PHASE_TO_SCENE: Record<SlicePhase, string> = {
+  town: "TownScene",
+  world_map: "WorldMapScene",
+  dungeon: "DungeonScene",
+  combat: "CombatScene",
+  reward: "RewardScene",
+  rune_bench: "RuneBenchScene",
+  boss: "BossScene",
+  result: "ResultScene"
+};
+
+const CARD_ACTIONS: Partial<Record<InputAction, number>> = {
+  card_1: 0,
+  card_2: 1,
+  card_3: 2,
+  card_4: 3,
+  card_5: 4
+};
+
+export function sceneForPhase(phase: SlicePhase): string {
+  return PHASE_TO_SCENE[phase];
+}
+
+export function handleSceneAction(
+  scene: Phaser.Scene,
+  context: BootContext,
+  action: InputAction
+): void {
+  const cardIndex = CARD_ACTIONS[action];
+
+  if (cardIndex !== undefined) {
+    playCardAtIndex(context.run, context.dataBundle, cardIndex);
+  } else if (action === "end_turn") {
+    endTurn(context.run, context.dataBundle);
+  } else if (action === "confirm") {
+    handleConfirm(context);
+  } else {
+    return;
+  }
+
+  syncRunToSave(context);
+  storeBootContext(scene, context);
+  scene.scene.start(sceneForPhase(context.run.phase), context);
+}
+
+function handleConfirm(context: BootContext): void {
+  if (context.run.phase === "town") {
+    enterWorldMap(context.run);
+  } else if (context.run.phase === "world_map") {
+    enterDungeon(context.run);
+  } else if (context.run.phase === "dungeon") {
+    enterCurrentRoom(context.run, context.dataBundle);
+  } else if (context.run.phase === "reward") {
+    claimRewardAndAdvance(context.run, context.dataBundle);
+  } else if (context.run.phase === "rune_bench") {
+    equipRuneAndAdvance(context.run, context.dataBundle);
+  } else if (context.run.phase === "result") {
+    returnToTown(context.run);
+  }
+}
+
+function syncRunToSave(context: BootContext): void {
+  const saveRun = context.save.currentRun;
+  if (saveRun) {
+    saveRun.stageId = context.run.stageId;
+    saveRun.roomIndex = context.run.roomIndex;
+    saveRun.deck = [...context.run.deck];
+    saveRun.hand = [...context.run.hand];
+    saveRun.discard = [...context.run.discard];
+    saveRun.equippedRunes = { ...context.run.equippedRunes };
+    saveRun.relics = [...context.run.relics];
+    saveRun.arcanas = [...context.run.arcanas];
+    saveRun.hp = context.run.player.hp;
+    saveRun.maxHp = context.run.player.maxHp;
+  }
+
+  for (const stageId of context.run.completedStages) {
+    if (!context.save.profile.completedStages.includes(stageId)) {
+      context.save.profile.completedStages.push(stageId);
+    }
+  }
+}
+

@@ -1,8 +1,10 @@
 import Phaser from "phaser";
 import type { BootContext } from "../../app/bootContext";
+import { bindKeyboardActions } from "../../input/bindings";
 import { renderDebugOverlay } from "../../ui/overlays/debugOverlay";
+import { handleSceneAction } from "../bridge/sceneActions";
 import { requireBootContext } from "../bridge/sceneBridge";
-import { renderSceneShell } from "../view/sceneShell";
+import { renderSceneShell, textStyle } from "../view/sceneShell";
 
 export class WorldMapScene extends Phaser.Scene {
   constructor() {
@@ -12,10 +14,15 @@ export class WorldMapScene extends Phaser.Scene {
   create(data: BootContext): void {
     const context = requireBootContext(this, data);
     renderSceneShell(this, context, {
-      title: "월드맵",
-      subtitle: "스테이지 선택 entry",
-      focusLabel: "열린 스테이지"
+      title: "World Map",
+      subtitle: "stage route entry",
+      focusLabel: "Selected stage"
     });
+
+    this.add.text(1060, 500, "Enter: Dungeon", textStyle(28, "#32415a", true));
+    this.add.text(1060, 552, "Route nodes are driven by fixture data.", textStyle(22, "#805845"));
+
+    bindKeyboardActions(this, (action) => handleSceneAction(this, context, action));
     renderDebugOverlay(context, "WorldMapScene");
   }
 }

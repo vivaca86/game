@@ -1,6 +1,9 @@
 import Phaser from "phaser";
 import type { BootContext } from "../../app/bootContext";
+import { bindKeyboardActions } from "../../input/bindings";
+import { selectRewardEntries } from "../../simulation/state/runState";
 import { renderDebugOverlay } from "../../ui/overlays/debugOverlay";
+import { handleSceneAction } from "../bridge/sceneActions";
 import { requireBootContext } from "../bridge/sceneBridge";
 import { renderSceneShell, textStyle } from "../view/sceneShell";
 
@@ -12,20 +15,26 @@ export class RewardScene extends Phaser.Scene {
   create(data: BootContext): void {
     const context = requireBootContext(this, data);
     renderSceneShell(this, context, {
-      title: "보상 선택",
-      subtitle: "reward pool entry",
-      focusLabel: "보상 풀"
+      title: "Reward",
+      subtitle: "first option is claimed by Enter",
+      focusLabel: "Reward pool"
     });
 
-    const rewardPool = context.dataBundle.rewardPools.find((item) => item.id === context.debug.rewardPoolId)
+    const rewardPool = context.dataBundle.rewardPools.find((item) => item.id === context.run.rewardPoolId)
       ?? context.dataBundle.rewardPools[0];
-    if (rewardPool) {
-      this.add.text(1060, 500, rewardPool.displayNameKo, textStyle(34, "#32415a", true));
-      rewardPool.entries.slice(0, 3).forEach((entry, index) => {
-        this.add.text(1060, 560 + index * 44, `${entry.type}: ${entry.contentId ?? entry.amount}`, textStyle(24, "#805845"));
-      });
-    }
+    const offers = selectRewardEntries(
+      context.dataBundle,
+      context.run.rewardPoolId,
+      Math.max(1, context.run.offeredRewards.length)
+    ).filter((entry) => context.run.offeredRewards.length === 0 || context.run.offeredRewards.includes(entry.id));
 
+    this.add.text(1060, 500, rewardPool?.displayNameKo ?? "missing reward pool", textStyle(34, "#32415a", true));
+    offers.slice(0, 4).forEach((entry, index) => {
+      this.add.text(1060, 560 + index * 42, `${index + 1}. ${entry.type}: ${entry.contentId ?? entry.amount}`, textStyle(23, "#805845"));
+    });
+    this.add.text(1060, 735, "Enter: claim first reward", textStyle(24, "#32415a", true));
+
+    bindKeyboardActions(this, (action) => handleSceneAction(this, context, action));
     renderDebugOverlay(context, "RewardScene");
   }
 }

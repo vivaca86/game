@@ -384,3 +384,12 @@ Phaser 런타임 첫 골조와 데이터 부팅, 디버그 진입 작업을 그�
 `Phaser 3 + TypeScript + Vite` dependency를 설치하고, 처음에 최신 `phaser`가 4.x로 설치되는 기준 이탈을 발견해 `phaser@3`으로 되돌렸다. 기존 정적 앱은 삭제하지 않고 `legacy:*` scripts로 분리했으며, 새 진입점은 `index.html -> src/main.ts`로 바꿨다. `src/data/schema.ts`, `src/data/fixtures/vertical-slice.v1.json`, `src/data/assetManifest.slice.v1.json`을 만들고, `BootScene`, `PreloadScene`, `TownScene`, `CombatScene`, `BossScene` 등 최소 scene과 `?debug=1&entry=combat`, `?debug=1&entry=boss` 진입을 구현했다. planned manifest는 실제 에셋이 없으므로 Phaser placeholder texture로만 표시하며, 이를 아트 완료로 보지 않는다고 유지했다.
 
 검증은 `npm.cmd run slice:validate`, `npm.cmd run check`, `npm.cmd run phaser:smoke`, `git diff --check`로 진행했다. 브라우저 smoke를 위해 `tools/phaser-smoke-test.mjs`를 추가했고, 로컬 Playwright 패키지가 없어 `playwright`를 dev dependency로 추가했다.
+### 사용자
+이전 작업을 이어서 진행하라고 했고, 잘못 생성된 바깥 `src/simulation` 정리도 승인했다.
+
+### Codex
+첫 전투 simulation과 scene flow를 연결했다. `src/simulation/`에 run/combat state, combat/reward/rune/dungeon systems를 추가했고, Phaser scene은 `sceneActions` 경계를 통해 simulation action만 호출하도록 바꿨다. 카드 사용, 방어, 드로우, 적 턴, 보상, 룬 장착, 보스 phase, 결과 복귀를 `npm.cmd run phaser:smoke`로 검증했다.
+
+작업 중 `apply_patch` 기준 경로가 저장소보다 한 단계 위로 잡혀 `C:\Users\i\Documents\New project\src\simulation`에 파일이 잘못 생성되는 문제가 있었다. 사용자 승인을 받은 뒤 해당 잘못 생성된 `src/simulation` 폴더만 확인 후 삭제하고, 저장소 내부 `C:\Users\i\Documents\New project\sunlight-map-card-crawler\src\simulation`에 다시 적용했다.
+
+이번 작업은 기반 구현이며, 전체 vertical slice 완료나 원작 95% 유사도 주장이 아니다. 다음 작업은 save reload 검증, 1920x1080 스크린샷/오버레이 검증, 카드 설명과 effect op 감사, encounter pool 분리 여부 결정이다.

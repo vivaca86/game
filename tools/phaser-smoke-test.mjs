@@ -42,11 +42,32 @@ for (const executablePath of [null, ...executableCandidates]) {
 if (!browser) throw launchError;
 
 const baseUrl = process.env.PHASER_SMOKE_URL || "http://127.0.0.1:5173/";
+const damagingCards = new Set([
+  "card_sun_jab",
+  "card_ribbon_snap",
+  "card_ink_spill",
+  "card_pinpoint_glint"
+]);
+const cardCosts = new Map([
+  ["card_sun_jab", 1],
+  ["card_fold_guard", 1],
+  ["card_page_step", 0],
+  ["card_ribbon_snap", 1],
+  ["card_lamplight_mark", 1],
+  ["card_stage_patch", 2],
+  ["card_ink_spill", 2],
+  ["card_paper_bloom", 1],
+  ["card_pinpoint_glint", 0],
+  ["card_curtain_call", 2]
+]);
 
 try {
   await checkPage("/", "TownScene", false);
   await checkPage("/?debug=1&entry=combat", "CombatScene", true);
   await checkPage("/?debug=1&entry=boss", "BossScene", true);
+  await checkCombatActions();
+  await checkSceneFlowAndRuneEffect();
+  await checkBossResultFlow();
   console.log("Phaser smoke OK");
 } finally {
   await browser.close();
@@ -54,12 +75,7 @@ try {
 
 async function checkPage(pathname, expectedScene, expectDebugOverlay) {
   const page = await browser.newPage({ viewport: { width: 1280, height: 720 } });
-  const errors = [];
-
-  page.on("console", (message) => {
-    if (message.type() === "error") errors.push(message.text());
-  });
-  page.on("pageerror", (error) => errors.push(error.message));
+  const errors = bindErrorCapture(page);
 
   await page.goto(new URL(pathname, baseUrl).href, { waitUntil: "networkidle" });
   await page.waitForSelector("canvas", { timeout: 10000 });
@@ -69,11 +85,7 @@ async function checkPage(pathname, expectedScene, expectDebugOverlay) {
   }, null, { timeout: 10000 });
 
   if (expectDebugOverlay) {
-    await page.waitForFunction(
-      (sceneName) => document.querySelector("#debug-overlay")?.textContent?.includes(sceneName),
-      expectedScene,
-      { timeout: 10000 }
-    );
+    await waitForDebugScene(page, expectedScene);
   }
 
   const canvasBox = await page.locator("canvas").boundingBox();
@@ -88,9 +100,184 @@ async function checkPage(pathname, expectedScene, expectDebugOverlay) {
     throw new Error(`${expectedScene}: screenshot looks empty`);
   }
 
-  if (errors.length > 0) {
-    throw new Error(`${expectedScene}: browser errors: ${errors.join(" | ")}`);
+  assertNoBrowserErrors(expectedScene, errors);
+  await page.close();
+}
+
+async function checkCombatActions() {
+  await withDebugPage("/?debug=1&entry=combat", "CombatScene", async (page) => {
+    await pressAndSettle(page, "Digit1");
+    await waitForDebugValue(page, "enemyHp", "17");
+    await waitForDebugValue(page, "playerEnergy", "2");
+  });
+
+  await withDebugPage("/?debug=1&entry=combat", "CombatScene", async (page) => {
+    await pressAndSettle(page, "Digit2");
+    await waitForDebugValue(page, "playerBlock", "6");
+    await waitForDebugValue(page, "playerEnergy", "2");
+  });
+
+  await withDebugPage("/?debug=1&entry=combat", "CombatScene", async (page) => {
+    await pressAndSettle(page, "Digit3");
+    await waitForDebugValue(page, "discard", "1");
+    await waitForDebugValue(page, "drawPile", "0");
+    const state = await getDebugMap(page);
+    if (!state.hand?.includes("card_fold_guard")) {
+      throw new Error("CombatScene: draw card did not update hand");
+    }
+  });
+
+  await withDebugPage("/?debug=1&entry=combat", "CombatScene", async (page) => {
+    await pressAndSettle(page, "KeyE");
+    await waitForDebugValue(page, "playerHp", "36");
+    await waitForDebugValue(page, "turn", "2");
+  });
+}
+
+async function checkSceneFlowAndRuneEffect() {
+  await withDebugPage("/?debug=1&entry=town", "TownScene", async (page) => {
+    await playUntilPhase(page, ["combat"], 8);
+    await playUntilPhase(page, ["reward"], 40);
+    await pressAndSettle(page, "Enter");
+    await waitForDebugValue(page, "phase", "rune_bench");
+    await pressAndSettle(page, "Enter");
+    await waitForDebugValue(page, "phase", "combat");
+    await waitForDebugText(page, "equipped=card_sun_jab:rune_paper_spark");
+    await pressAndSettle(page, "Digit1");
+    await waitForDebugValue(page, "enemyHp", "9");
+  });
+}
+
+async function checkBossResultFlow() {
+  await withDebugPage("/?debug=1&entry=boss", "BossScene", async (page) => {
+    await playUntilDebugValue(page, "bossPhaseTriggered", "true", 80);
+    await playUntilPhase(page, ["result"], 120);
+    await waitForDebugValue(page, "phase", "result");
+    await pressAndSettle(page, "Enter");
+    await waitForDebugValue(page, "phase", "town");
+  });
+}
+
+async function withDebugPage(pathname, expectedScene, action) {
+  const page = await browser.newPage({ viewport: { width: 1280, height: 720 } });
+  const errors = bindErrorCapture(page);
+  await page.goto(new URL(pathname, baseUrl).href, { waitUntil: "networkidle" });
+  await page.waitForSelector("canvas", { timeout: 10000 });
+  await waitForDebugScene(page, expectedScene);
+  await action(page);
+  assertNoBrowserErrors(expectedScene, errors);
+  await page.close();
+}
+
+async function playUntilDebugValue(page, key, value, limit) {
+  for (let step = 0; step < limit; step += 1) {
+    const state = await getDebugMap(page);
+    if (state[key] === value) {
+      return state;
+    }
+    if (state.phase !== "combat" && state.phase !== "boss") {
+      throw new Error(`Cannot wait for ${key}=${value} outside combat; phase=${state.phase}`);
+    }
+    await playUsefulCombatAction(page, state);
   }
 
-  await page.close();
+  const state = await getDebugMap(page);
+  throw new Error(`Did not reach ${key}=${value}; last ${key}=${state[key]}, log=${state.log}`);
+}
+
+async function playUntilPhase(page, targetPhases, limit) {
+  for (let step = 0; step < limit; step += 1) {
+    const state = await getDebugMap(page);
+    if (targetPhases.includes(state.phase)) {
+      return state;
+    }
+
+    if (state.phase === "town" || state.phase === "world_map" || state.phase === "dungeon" || state.phase === "reward" || state.phase === "rune_bench") {
+      await pressAndSettle(page, "Enter");
+    } else if (state.phase === "combat" || state.phase === "boss") {
+      await playUsefulCombatAction(page, state);
+    } else {
+      throw new Error(`Unexpected phase while waiting: ${state.phase}`);
+    }
+  }
+
+  const state = await getDebugMap(page);
+  throw new Error(`Did not reach ${targetPhases.join(" or ")}; last phase=${state.phase}, log=${state.log}`);
+}
+
+async function playUsefulCombatAction(page, state) {
+  const energy = Number(state.playerEnergy ?? 0);
+  const hand = (state.hand ?? "").split(",").filter(Boolean);
+  const pageStepIndex = hand.findIndex((cardId) => cardId === "card_page_step");
+  const attackIndex = hand.findIndex((cardId) => damagingCards.has(cardId) && (cardCosts.get(cardId) ?? 99) <= energy);
+  const blockIndex = hand.findIndex((cardId) => cardId === "card_fold_guard" && (cardCosts.get(cardId) ?? 99) <= energy);
+
+  if (pageStepIndex >= 0) {
+    await pressAndSettle(page, `Digit${pageStepIndex + 1}`);
+  } else if (attackIndex >= 0) {
+    await pressAndSettle(page, `Digit${attackIndex + 1}`);
+  } else if (blockIndex >= 0) {
+    await pressAndSettle(page, `Digit${blockIndex + 1}`);
+  } else {
+    await pressAndSettle(page, "KeyE");
+  }
+}
+
+async function pressAndSettle(page, key) {
+  await page.keyboard.press(key);
+  await page.waitForTimeout(80);
+}
+
+async function waitForDebugScene(page, sceneName) {
+  await page.waitForFunction(
+    (expected) => document.querySelector("#debug-overlay")?.textContent?.includes(expected),
+    sceneName,
+    { timeout: 10000 }
+  );
+}
+
+async function waitForDebugValue(page, key, value) {
+  await page.waitForFunction(
+    ([expectedKey, expectedValue]) => {
+      const spans = Array.from(document.querySelectorAll("#debug-overlay span"));
+      return spans.some((span) => span.textContent === `${expectedKey}=${expectedValue}`);
+    },
+    [key, value],
+    { timeout: 10000 }
+  );
+}
+
+async function waitForDebugText(page, text) {
+  await page.waitForFunction(
+    (expected) => document.querySelector("#debug-overlay")?.textContent?.includes(expected),
+    text,
+    { timeout: 10000 }
+  );
+}
+
+async function getDebugMap(page) {
+  return page.evaluate(() => {
+    const entries = Array.from(document.querySelectorAll("#debug-overlay span"))
+      .map((span) => span.textContent ?? "")
+      .map((item) => {
+        const index = item.indexOf("=");
+        return index >= 0 ? [item.slice(0, index), item.slice(index + 1)] : [item, ""];
+      });
+    return Object.fromEntries(entries);
+  });
+}
+
+function bindErrorCapture(page) {
+  const errors = [];
+  page.on("console", (message) => {
+    if (message.type() === "error") errors.push(message.text());
+  });
+  page.on("pageerror", (error) => errors.push(error.message));
+  return errors;
+}
+
+function assertNoBrowserErrors(sceneName, errors) {
+  if (errors.length > 0) {
+    throw new Error(`${sceneName}: browser errors: ${errors.join(" | ")}`);
+  }
 }

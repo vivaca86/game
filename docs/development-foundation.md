@@ -331,3 +331,18 @@ notes?: string
 - `docs/phaser-boot-flow-plan.md`: Phaser 부트, preload, entry scene 순서 계획
 - `docs/debug-entry-plan.md`: URL debug entry와 debug action 계획
 - `docs/implementation-start-checklist.md`: 실제 구현 착수 전 체크리스트
+## 2026-05-26 Implementation Status Update
+
+- `src/simulation/` now owns the first slice run/combat state: player HP/energy/block, hand/draw/discard, enemy HP/block/intent, reward offers, rune attachment, boss phase flag, and run log.
+- Phaser scenes now route keyboard input through a scene-to-simulation boundary instead of mutating view-only state.
+- Verified flow: town -> world map -> dungeon -> combat -> reward -> rune bench -> combat -> boss -> result -> town.
+- Verified combat behaviors: attack damage, block gain, draw, enemy turn damage, rune-modified damage, boss phase trigger.
+- This is still foundation work, not final balance, final art, full save persistence, exhaustive source parity, or a full vertical-slice pass.
+
+Current next work:
+
+1. Add save reload verification for the run state and confirm no Phaser objects enter save data.
+2. Add 1920x1080 screenshot checks and visual overlap review.
+3. Add effect-audit coverage so card descriptions and effect ops are checked against each other.
+4. Decide whether `encounterPoolId` stays a direct enemy/boss id for the slice or becomes explicit encounter-pool data.
+5. Continue source/version confirmation separately before any parity or 95% similarity claim.

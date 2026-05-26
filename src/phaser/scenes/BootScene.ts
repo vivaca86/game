@@ -5,6 +5,7 @@ import { loadGameData } from "../../data/loadGameData";
 import { validateLoadedData } from "../../data/validateLoadedData";
 import { createDebugConfig } from "../../debug/debugEntry";
 import { createInitialSave } from "../../save/saveCodec";
+import { createInitialRunState } from "../../simulation/state/runState";
 import { storeBootContext } from "../bridge/sceneBridge";
 
 export class BootScene extends Phaser.Scene {
@@ -18,11 +19,13 @@ export class BootScene extends Phaser.Scene {
     const validation = validateLoadedData(loaded.bundle);
     const save = createInitialSave(loaded.bundle);
     const debug = createDebugConfig(runtimeFlags, loaded.bundle);
+    const run = createInitialRunState(loaded.bundle, debug);
     const context: BootContext = {
       dataBundle: loaded.bundle,
       assetManifest: loaded.bundle.assets,
       manifestStatus: loaded.manifestStatus,
       save,
+      run,
       debug,
       runtimeFlags,
       seed: runtimeFlags.seed,

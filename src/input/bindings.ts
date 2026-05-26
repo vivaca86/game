@@ -23,6 +23,7 @@ export function bindKeyboardActions(
   scene: Phaser.Scene,
   onAction: (action: InputAction) => void
 ): void {
+  scene.input.keyboard?.removeAllListeners("keydown");
   scene.input.keyboard?.on("keydown", (event: KeyboardEvent) => {
     const action = KEYBOARD_BINDINGS[event.code];
     if (action) {
