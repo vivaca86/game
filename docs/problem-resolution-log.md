@@ -205,3 +205,11 @@
 - 해결 방안: 첫 손패 카드 일러스트 5종에 exact key candidate art branch를 추가하고, `renderCardHand`가 `assetKeys.frame`, `assetKeys.illustration`, `assetKeys.typeIcon` texture를 그리도록 연결했다. 기존 클릭 동작은 card 전체 invisible hit target으로 유지했다.
 - 재발 방지 기준: runtime asset을 교체할 때는 preload/audit뿐 아니라 실제 사용하는 화면 또는 smoke screenshot에서 texture가 렌더링되는지 확인한다. 후보 아트가 화면에 보이더라도 approved final art로 말하지 않는다.
 - 해결 커밋: `a9f6ef3 Render card candidate art in hand`
+
+### 문제: 카드 일러스트 후보 패스가 첫 손패 5장까지만 닫혀 있음
+
+- 원인: 이전 단계에서 실제 손패 렌더링 연결과 첫 5개 카드 일러스트 후보는 검증했지만, reward/확장 카드 5종은 아직 generic placeholder 패턴에 남아 있었다.
+- 영향: 같은 카드 그룹 안에서도 일부는 후보 모티프가 있고 일부는 generic placeholder라, 카드 아트 파이프라인의 첫 candidate pass가 완전히 닫혔다고 말할 수 없었다.
+- 해결 방안: 남은 5개 card art exact key를 generator candidate set에 추가하고, 각 카드 기능에 맞는 단순 모티프를 생성했다. `grantCard` debug URL로 3개 화면을 캡처해 stage/ink, bloom/pinpoint, curtain 카드가 실제 손패 texture path에서 렌더링되는 것을 확인했다.
+- 재발 방지 기준: 에셋 그룹 완료를 말할 때는 그룹 전체 파일 목록과 실제 화면 렌더링 증거를 함께 확인한다. 이 기준은 candidate pass에만 적용되며, approved final art 완료와는 별도로 기록한다.
+- 해결 커밋: `4f1a91c Add remaining card candidate art`
