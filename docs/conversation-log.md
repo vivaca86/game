@@ -409,3 +409,17 @@ Phaser 런타임 첫 골조와 데이터 부팅, 디버그 진입 작업을 그�
 ### Codex
 
 클릭 수정 2커밋을 GitHub `main`에 fast-forward push했다. 이어서 다음 기반 작업으로 save reload 검증을 진행했다. `SaveData.currentRun`에 phase, 손패/드로우/버림, 전투 상태, 보상/룬 상태, 진행 로그 등 새로고침 후 흐름을 복원하는 최소 필드를 추가했고, 일반 세이브와 debug 세이브를 별도 localStorage key로 분리했다. `BootScene`은 저장된 run이 있으면 `context.run.phase` 기준으로 장면을 복원하고, action 후에는 serializable save를 저장한다. `phaser:smoke`에는 mid-combat 저장 복원, completed-stage profile 복원, Phaser renderer key 미포함 검증을 추가했다. 인앱 브라우저에서는 reset save 후 카드 사용 상태를 만들고 reset 없는 재진입에서 `phase=combat`, `enemyHp=17`, `playerEnergy=2`, `savedPhase=combat`가 유지되는 것을 확인했다. 구현 커밋은 `f1c5a2f Add save reload verification`이다.
+
+### 사용자
+
+작업들이 체크리스트를 만들고 진행되는 것이 맞는지 확인했고, 앞에 진행해야 할 체크리스트를 보여 달라고 했다. 이어서 현재 체크리스트 기준으로 계속 진행하라고 지시했다.
+
+### Codex
+
+다음 전방 작업을 `VIEW-001` 1920x1080 화면 검증과 `VIEW-004` debug overlay 겹침 검증으로 잡았다. `tools/phaser-smoke-test.mjs`에 Town, Dungeon, Combat, Reward, Rune Bench, Boss의 1920x1080 full-page screenshot 검증을 추가했고, Combat/Boss는 손패 5장, 핵심 debug state, enemy intent panel과 hand 영역을 debug overlay가 가리지 않는지 좌표로 검사하도록 했다.
+
+검증 중 debug overlay의 긴 `hand=...` 문자열이 1920 화면 오른쪽 전투 정보 영역을 침범하고, 1080 폭 인앱 브라우저에서는 overlay가 더 크게 느껴질 수 있음을 확인했다. CSS에서 debug panel 폭과 overflow를 제어하고, 1400px 이하에서는 220x260 compact panel로 줄이도록 수정했다. 인앱 브라우저 1080x918 기준으로 `phase=combat`, `enemyHp=24`, `playerEnergy=3`, overlay `220x260`, 핵심 전투 영역 겹침 없음도 확인했다.
+
+또한 `renderSceneShell`이 모든 장면에 손패를 렌더링해 Town/Reward/Rune/Dungeon의 주요 버튼과 카드가 겹치는 것을 발견했다. 손패는 Combat/Boss에서만 표시하도록 `showHand` 옵션을 추가했고, Combat/Boss의 enemy panel과 End Turn 위치를 조정했다. Boss 전용 phase 문구도 enemy panel 뒤에 묻히지 않도록 왼쪽 상태 패널로 옮겼다.
+
+검증은 `npm.cmd run phaser:smoke`, `npm.cmd run check`, `git diff --check`, 인앱 브라우저 레이아웃 확인, 생성된 1920/1080 screenshot 눈검수로 진행했다. `docs/vertical-slice-smoke-checklist.md`에서 `UI-001`, `UI-003`, `UI-005`, `UI-006`, `VIEW-001`, `VIEW-004`를 `Verified`로 갱신했다. 아직 전체 vertical slice 완료가 아니며, 남은 다음 작업은 `DATA-006` 카드 설명과 effect op 일치성 감사다. 구현 커밋은 `1921c9e Add Phaser view verification`이다.

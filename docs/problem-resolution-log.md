@@ -125,3 +125,11 @@
 - 해결 방안: 일반 save와 debug save를 별도 storage key로 분리하고, `RunState`에 phase, deck/hand/draw/discard, 전투 상태, 보상/룬 상태, 완료 stage, 로그 등 최소 복원 필드를 추가했다. `BootScene`은 저장된 run을 복원하고 `PreloadScene`은 `context.run.phase` 기준으로 장면을 시작한다.
 - 재발 방지 기준: `phaser:smoke`에서 mid-combat 저장 복원, completed-stage profile 복원, save JSON에 renderer key가 없는지 확인한다. 인앱 브라우저에서도 reset 없는 재진입 후 debug overlay의 `phase`, `enemyHp`, `playerEnergy`, `savedPhase`를 확인한다.
 - 해결 커밋: `f1c5a2f Add save reload verification`
+
+### 문제: 1920/좁은 화면 검증 전까지 UI 겹침을 놓칠 수 있음
+
+- 원인: 기존 smoke는 canvas가 뜨는지와 전투 흐름을 주로 확인했고, 1920 full-page screenshot, debug overlay 위치, 장면별 손패 노출 여부를 별도로 검증하지 않았다. `renderSceneShell`도 모든 장면에 손패를 렌더링해 Town/Reward/Rune/Dungeon의 버튼과 정보가 카드에 겹칠 수 있었다.
+- 영향: 자동 테스트가 통과해도 사용자가 보는 화면에서는 debug overlay가 enemy intent panel을 가리거나, 비전투 장면의 진행 버튼과 카드가 겹치는 상태가 남을 수 있었다. Boss 화면에서는 보스 phase 문구가 enemy panel 뒤에 묻혀 boss-specific signal이 약해질 수 있었다.
+- 해결 방안: `phaser:smoke`에 1920x1080 full-page screenshot 검증을 추가하고, Combat/Boss는 손패 5장, 기대 debug state, overlay와 hand/enemy intent critical area 간 겹침 여부를 좌표로 검사한다. 1280/1080 overlay screenshot과 geometry 검사도 추가했다. 장면 shell에는 `showHand` 옵션을 추가해 손패를 Combat/Boss에만 표시하고, debug overlay 폭/overflow/compact media query, Combat/Boss panel과 End Turn 위치, Boss phase 표시 위치를 조정했다.
+- 재발 방지 기준: 화면 관련 체크리스트를 `Verified`로 바꿀 때는 DOM/state assertion만이 아니라 screenshot 또는 geometry 근거를 남긴다. debug overlay는 테스트 도구라도 전투 손패와 enemy intent panel을 가리지 않아야 한다.
+- 해결 커밋: `1921c9e Add Phaser view verification`
