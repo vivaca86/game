@@ -133,3 +133,11 @@
 - 해결 방안: `phaser:smoke`에 1920x1080 full-page screenshot 검증을 추가하고, Combat/Boss는 손패 5장, 기대 debug state, overlay와 hand/enemy intent critical area 간 겹침 여부를 좌표로 검사한다. 1280/1080 overlay screenshot과 geometry 검사도 추가했다. 장면 shell에는 `showHand` 옵션을 추가해 손패를 Combat/Boss에만 표시하고, debug overlay 폭/overflow/compact media query, Combat/Boss panel과 End Turn 위치, Boss phase 표시 위치를 조정했다.
 - 재발 방지 기준: 화면 관련 체크리스트를 `Verified`로 바꿀 때는 DOM/state assertion만이 아니라 screenshot 또는 geometry 근거를 남긴다. debug overlay는 테스트 도구라도 전투 손패와 enemy intent panel을 가리지 않아야 한다.
 - 해결 커밋: `1921c9e Add Phaser view verification`
+
+### 문제: 카드 설명과 effect op가 서로 어긋나도 자동으로 막지 못함
+
+- 원인: slice fixture에는 카드 설명과 `effects`가 함께 있었지만, 설명 문구가 실제 op/amount/runtime 처리와 맞는지 검사하는 별도 감사가 없었다. 특히 `card_lamplight_mark`는 데이터에 `apply_mark`가 있었지만 Phaser slice simulation에서 처리되지 않았고, 일부 카드에는 이미 구현된 효과에도 `후보` 문구가 남아 있었다.
+- 영향: 사용자가 보는 카드 설명과 실제 전투 결과가 달라질 수 있고, 구현되지 않은 제한 조건이나 후보 문구를 실제 기능처럼 오해할 수 있었다.
+- 해결 방안: `tools/audit-slice-effects.mjs`를 추가해 docs/runtime fixture의 카드 설명/effect drift, `후보` 잔존, effect op별 한글 설명 단서/수치, Phaser runtime 처리 여부를 검사한다. `package.json`의 `check`에도 `slice:effects`를 연결했다. `apply_mark`는 `enemyMark` 상태로 구현하고, 다음 피해 보너스로 소비되도록 했다.
+- 재발 방지 기준: 새 카드 effect op를 추가할 때는 fixture 설명, runtime simulation 처리, `slice:effects` 규칙, smoke test 필요 여부를 함께 갱신한다. 설명에 적힌 기능이 현재 slice에서 구현되지 않았으면 후보나 조건을 남기지 않는다.
+- 해결 커밋: `fd49a77 Add slice effect audit`

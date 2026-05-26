@@ -423,3 +423,15 @@ Phaser 런타임 첫 골조와 데이터 부팅, 디버그 진입 작업을 그�
 또한 `renderSceneShell`이 모든 장면에 손패를 렌더링해 Town/Reward/Rune/Dungeon의 주요 버튼과 카드가 겹치는 것을 발견했다. 손패는 Combat/Boss에서만 표시하도록 `showHand` 옵션을 추가했고, Combat/Boss의 enemy panel과 End Turn 위치를 조정했다. Boss 전용 phase 문구도 enemy panel 뒤에 묻히지 않도록 왼쪽 상태 패널로 옮겼다.
 
 검증은 `npm.cmd run phaser:smoke`, `npm.cmd run check`, `git diff --check`, 인앱 브라우저 레이아웃 확인, 생성된 1920/1080 screenshot 눈검수로 진행했다. `docs/vertical-slice-smoke-checklist.md`에서 `UI-001`, `UI-003`, `UI-005`, `UI-006`, `VIEW-001`, `VIEW-004`를 `Verified`로 갱신했다. 아직 전체 vertical slice 완료가 아니며, 남은 다음 작업은 `DATA-006` 카드 설명과 effect op 일치성 감사다. 구현 커밋은 `1921c9e Add Phaser view verification`이다.
+
+### 사용자
+
+현재 체크리스트 기준으로 다음 작업을 진행하라고 지시했다. 인앱 브라우저는 `?debug=1&entry=combat&resetSave=1` 상태였다.
+
+### Codex
+
+다음 작업을 `DATA-006` 카드 설명과 effect op 일치성 감사로 확정하고 진행했다. `tools/audit-slice-effects.mjs`를 추가해 docs fixture와 runtime fixture의 카드 설명/effect drift, 구현 카드 설명의 `후보` 잔존, effect op별 한글 설명 단서/수치, Phaser slice simulation 처리 여부를 검사하도록 했다. `package.json`에는 `slice:effects`를 추가하고 `check`에 연결했다.
+
+데이터에서는 이미 구현된 효과의 후보 표현을 제거했고, 현재 slice runtime에 없는 `전투당 1회 제한` 설명/condition은 제거했다. `card_sun_jab`의 첫 공격 보너스 문구도 현재 slice에서 캐릭터 패시브가 구현되지 않았으므로 제거했다. `card_lamplight_mark`는 데이터에 있던 `apply_mark` op를 실제 전투 상태 `enemyMark`로 연결하고, 다음 피해에 보너스를 주며 소비되도록 구현했다. debug overlay, CombatScene 표시, save schema/state, smoke test도 `enemyMark`를 포함하도록 갱신했다.
+
+검증은 `npm.cmd run slice:effects`, `npm.cmd run slice:validate`, `npm.cmd run phaser:smoke`, `npm.cmd run check`, `git diff --check`로 진행했다. `phaser:smoke`는 `card_lamplight_mark` 부여 진입에서 `enemyMark=2`, 다음 공격 후 `enemyMark=0`, `enemyHp=15`를 확인한다. Vite build는 통과했지만 500kB 초과 chunk warning은 남아 있어 추후 번들 분리 후보로 기록한다. 구현 커밋은 `fd49a77 Add slice effect audit`이다.
