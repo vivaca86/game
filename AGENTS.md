@@ -110,6 +110,22 @@ For non-trivial implementation, research, UI, game, Git, or cleanup work, Codex 
 The final report must compare the actual verification performed against that plan.
 If verification could not be performed, say so directly and do not use `Complete`.
 
+### Progress Checkpoints And Drift Control
+
+For long-running, multi-step, or high-risk work, Codex must create visible checkpoints before or during execution.
+Each checkpoint must state what is done, what remains, whether the original scope still matches the current work, and whether any new risk, missing tool, missing source, or verification gap has appeared.
+
+Use checkpoints when:
+
+- The work has multiple phases or files.
+- The work depends on research, external sources, generated assets, browser verification, or Git state.
+- The user sends a new message while work is in progress.
+- The conversation resumes after interruption, compaction, or context loss.
+- A planned step takes longer than expected or produces unexpected results.
+
+After any interruption or new user message, re-check the latest user instruction before continuing.
+Do not finish against an older instruction when a newer one changes the target.
+
 ### No Silent Scope Changes
 
 Codex must not silently reduce, expand, or reinterpret the user's requested scope.
@@ -294,6 +310,22 @@ Confirmation question:
 단순하지 않은 구현, 조사, UI, 게임, Git, 정리 작업은 실행 전 또는 실행 중 검증 방법을 정한다.
 최종 보고에서는 실제 수행한 검증이 그 계획과 맞는지 비교한다.
 검증을 못 했으면 직접 말하고 `Complete`를 쓰지 않는다.
+
+### 진행 체크포인트와 기준 이탈 방지
+
+오래 걸리거나 여러 단계로 나뉘거나 위험도가 높은 작업은 실행 전 또는 실행 중 체크포인트를 만든다.
+각 체크포인트에는 무엇이 끝났는지, 무엇이 남았는지, 원래 범위와 현재 작업이 여전히 맞는지, 새 위험/도구 부족/자료 부족/검증 공백이 생겼는지를 적는다.
+
+다음 경우에는 체크포인트를 사용한다.
+
+- 작업 단계나 파일이 여러 개인 경우
+- 조사, 외부 자료, 생성 산출물, 브라우저 검증, Git 상태에 의존하는 경우
+- 작업 중 사용자의 새 메시지가 들어온 경우
+- 중단, 요약, 컨텍스트 손실 뒤 대화가 재개된 경우
+- 계획한 단계가 예상보다 오래 걸리거나 예상과 다른 결과가 나온 경우
+
+중단이나 새 사용자 메시지 이후에는 계속하기 전에 최신 사용자 지시를 다시 확인한다.
+새 지시가 목표를 바꿨는데 이전 지시 기준으로 마무리하지 않는다.
 
 ### 조용한 범위 변경 금지
 

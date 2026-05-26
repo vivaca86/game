@@ -266,3 +266,11 @@ GitHub 저장소 내부까지 규칙을 반영하는 작업으로 진행했다. 
 ### Codex
 
 전역 `AGENTS.md`, 작업 루트 `AGENTS.md`, 저장소 `AGENTS.md`, `PROJECT_RULES.md`에 작업 전 실패 가능성 점검, 필요한 도구/자료/의존성 확인, 무료 설치 가능 시 사용자 허가 요청, 유료/계정 제한 도구의 한계 보고, 검증 계획 선행 기준을 보강했다.
+
+### 사용자
+
+일단 반영까지 다해보고 검토해봐
+
+### Codex
+
+반영 상태를 다시 검토하면서 장기 작업 중간 체크포인트와 기준 이탈 방지 조항이 충분히 명시되지 않은 것을 발견했다. 전역 `AGENTS.md`, 작업 루트 `AGENTS.md`, 저장소 `AGENTS.md`, `PROJECT_RULES.md`에 `Progress Checkpoints And Drift Control` 기준을 추가했다.
