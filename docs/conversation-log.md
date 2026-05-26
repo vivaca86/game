@@ -515,3 +515,14 @@ Steam은 그냥 없다고 생각하고, 나중에 혹시 모르지만 현재는 
 사용자가 다음 작업도 바로 진행하라고 지시했고, 다음 작은 에셋 그룹을 남은 카드 일러스트 5종으로 확정했다. 범위는 `card_art_stage_patch`, `card_art_ink_spill`, `card_art_paper_bloom`, `card_art_pinpoint_glint`, `card_art_curtain_call`과 generator 분기로 제한했고, intent/background/monster/boss 에셋과 최종 승인 아트는 제외했다.
 
 `tools/generate-dev-runtime-assets.mjs`의 exact key candidate set에 남은 카드 5종을 추가하고, 무대 보수, 잉크 번짐, 종이꽃 회복, 조준 반짝임, 커튼콜 모티프를 각각 생성하도록 했다. 변경 범위는 목표 5개 PNG와 generator, 상태 문서만 남았다. 검증은 `npm.cmd run assets:audit:strict`, `npm.cmd run check`, `npm.cmd run phaser:smoke`, `git diff --check`, 대표 PNG 시각 확인, 그리고 `grantCard` debug URL 3개로 남은 카드들이 실제 손패 texture path에 렌더링되는지 확인했다. 모든 검증은 통과했고, 이로써 10개 slice card illustration의 첫 candidate pass는 닫혔지만 승인/최종 아트 완료는 아니다. 구현 커밋은 `4f1a91c Add remaining card candidate art`이다.
+
+### User
+The user asked to continue the next foundation task after the card illustration candidate pass.
+
+### Codex
+
+The next scoped task was fixed as the enemy intent icon candidate pass, not final art. The included assets were `icon_intent_attack`, `icon_intent_disrupt`, and `icon_intent_block`; background, monster, boss-body, and approved/final art work were kept out of scope.
+
+`tools/generate-dev-runtime-assets.mjs` now has exact-key intent icon branches for attack, disrupt, and block. `src/phaser/scenes/CombatScene.ts` now resolves the active intent icon from `assetKeys.intentIcons[]` using the current combat `intentIndex`, renders it in the Combat panel, and shares that renderer with Boss through the existing `renderCombatPanel` path. A small button-position adjustment was made after screenshot review showed the old End Turn position crowding the panel/card area.
+
+Verification used `npm.cmd run assets:audit:strict`, `npm.cmd run check`, `npm.cmd run phaser:smoke`, `git diff --check`, visual inspection of `tmp/phaser-CombatScene.png`, `tmp/phaser-BossScene.png`, the three generated intent PNGs, and extra turn-two screenshots for `enemy_ink_mote` disrupt intent and boss block intent. The scoped implementation commit is `49d5575 Render intent candidate icons`. This is still a candidate/development art pass, not approved final art.

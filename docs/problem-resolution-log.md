@@ -213,3 +213,11 @@
 - 해결 방안: 남은 5개 card art exact key를 generator candidate set에 추가하고, 각 카드 기능에 맞는 단순 모티프를 생성했다. `grantCard` debug URL로 3개 화면을 캡처해 stage/ink, bloom/pinpoint, curtain 카드가 실제 손패 texture path에서 렌더링되는 것을 확인했다.
 - 재발 방지 기준: 에셋 그룹 완료를 말할 때는 그룹 전체 파일 목록과 실제 화면 렌더링 증거를 함께 확인한다. 이 기준은 candidate pass에만 적용되며, approved final art 완료와는 별도로 기록한다.
 - 해결 커밋: `4f1a91c Add remaining card candidate art`
+
+### Problem: Intent icon assets existed but the combat panel only rendered intent text
+
+- Cause: The slice data already had `assetKeys.intentIcons[]` and the manifest had intent icon PNG entries, but the runtime asset generator still treated those files as generic icon placeholders. The Combat/Boss panel also read `getActiveIntent()` for text only, so replacing intent PNGs would not prove that the game screen actually used them.
+- Impact: Enemy telegraphs could look like plain text even after icon assets were generated, and attack/disrupt/block intent art could silently drift from the active intent index.
+- Resolution: Added exact-key deterministic candidate art for `icon_intent_attack`, `icon_intent_disrupt`, and `icon_intent_block`. Updated `renderCombatPanel` to resolve the active icon from `assetKeys.intentIcons[]` with `combat.intentIndex`, render the texture beside the intent text, and preserve a text fallback if the texture is missing. The shared panel path covers both Combat and Boss scenes.
+- Prevention: Intent asset replacement should be verified in the real scene, not just by manifest preload. For multi-intent enemies or bosses, check at least one later turn so non-first icon slots are proven.
+- Resolution commit: `49d5575 Render intent candidate icons`
