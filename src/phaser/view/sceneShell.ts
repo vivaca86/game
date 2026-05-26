@@ -6,6 +6,7 @@ interface SceneShellOptions {
   subtitle: string;
   focusLabel: string;
   showHand?: boolean;
+  backgroundKey?: string;
   onCardClick?: (index: number) => void;
 }
 
@@ -17,7 +18,7 @@ export function renderSceneShell(
   const { width, height } = scene.scale;
   scene.cameras.main.setBackgroundColor("#f8efd8");
 
-  scene.add.rectangle(width / 2, height / 2, width, height, 0xf8efd8);
+  renderSceneBackdrop(scene, context, options.backgroundKey);
   scene.add.rectangle(width / 2, 80, width, 160, 0x32415a, 0.96);
   scene.add.text(72, 42, options.title, {
     fontFamily: "Arial, sans-serif",
@@ -168,4 +169,23 @@ export function textStyle(size: number, color: string, bold = false): Phaser.Typ
 function addInfoPill(scene: Phaser.Scene, x: number, y: number, label: string, color: number): void {
   scene.add.rectangle(x + 150, y + 20, 300, 40, color, 0.9).setStrokeStyle(2, 0xffffff, 0.5);
   scene.add.text(x + 16, y + 8, label, textStyle(20, "#fff8e6", true));
+}
+
+function renderSceneBackdrop(scene: Phaser.Scene, context: BootContext, explicitBackgroundKey?: string): void {
+  const { width, height } = scene.scale;
+  const stage = context.dataBundle.stages.find((item) => item.id === context.run.stageId)
+    ?? context.dataBundle.stages.find((item) => item.id === context.debug.stageId)
+    ?? context.dataBundle.stages[0];
+  const backgroundKey = explicitBackgroundKey ?? stage?.assetKeys.backgroundSet;
+
+  if (backgroundKey && scene.textures.exists(backgroundKey)) {
+    const isSceneSpecific = Boolean(explicitBackgroundKey);
+    scene.add.image(width / 2, height / 2, backgroundKey)
+      .setDisplaySize(width, height)
+      .setAlpha(isSceneSpecific ? 0.7 : 0.84);
+    scene.add.rectangle(width / 2, height / 2, width, height, 0xfff4df, isSceneSpecific ? 0.34 : 0.28);
+    return;
+  }
+
+  scene.add.rectangle(width / 2, height / 2, width, height, 0xf8efd8);
 }

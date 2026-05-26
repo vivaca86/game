@@ -27,6 +27,11 @@ const candidateIntentIconKeys = new Set([
   "icon_intent_block"
 ]);
 
+const candidateBackgroundKeys = new Set([
+  "bg_lantern_foyer_set",
+  "scene_rune_bench"
+]);
+
 function crc32(buffer) {
   let crc = 0xffffffff;
   for (const byte of buffer) {
@@ -128,6 +133,12 @@ function paletteFor(asset) {
   if (asset.key === "icon_intent_block") {
     return { base: [235, 238, 218], accent: [78, 136, 148], dark: [48, 72, 90] };
   }
+  if (asset.key === "bg_lantern_foyer_set") {
+    return { base: [247, 226, 186], accent: [210, 93, 83], dark: [58, 68, 90] };
+  }
+  if (asset.key === "scene_rune_bench") {
+    return { base: [235, 232, 208], accent: [72, 139, 151], dark: [62, 58, 94] };
+  }
   if (asset.path.includes("/backgrounds/")) return { base: [240, 222, 178], accent, dark: [112, 92, 72] };
   if (asset.path.includes("/cards/")) return { base: [250, 238, 206], accent, dark: [98, 72, 54] };
   if (asset.path.includes("/icons/")) return { base: [246, 231, 192], accent, dark: [76, 82, 96] };
@@ -141,6 +152,7 @@ function paintFor(asset) {
   if (asset.key.startsWith("icon_card_")) return paintCardTypeIcon(asset);
   if (candidateCardArtKeys.has(asset.key)) return paintCardArt(asset);
   if (candidateIntentIconKeys.has(asset.key)) return paintIntentIcon(asset);
+  if (candidateBackgroundKeys.has(asset.key)) return paintBackground(asset);
 
   const palette = paletteFor(asset);
   const frame = asset.frameSize;
@@ -453,6 +465,94 @@ function paintIntentIcon(asset) {
         color = [235, 238, 218, 255];
       }
       if (distanceToSegment(x, y, 24, 72, 72, 72) < 3) color = [185, 139, 52, 255];
+    }
+
+    return color;
+  };
+}
+
+function paintBackground(asset) {
+  const palette = paletteFor(asset);
+  const seed = hash(asset.key);
+  return (x, y, width, height) => {
+    const [paperR, paperG, paperB] = palette.base;
+    const [accentR, accentG, accentB] = palette.accent;
+    const [darkR, darkG, darkB] = palette.dark;
+    const depth = Math.max(0, Math.min(1, y / height));
+    const grain = ((x * 7 + y * 13 + seed) % 43) < 7 ? -7 : 0;
+    let color = mix(
+      [paperR + grain, paperG + grain, paperB + grain, 255],
+      [darkR, darkG, darkB, 255],
+      depth * 0.18
+    );
+
+    if (asset.key === "bg_lantern_foyer_set") {
+      const centerGlow = Math.hypot((x - width * 0.5) / 1.35, y - height * 0.36);
+      if (centerGlow < 420) color = mix(color, [255, 230, 134, 255], (420 - centerGlow) / 900);
+      if (y > height * 0.68) color = mix(color, [116, 80, 68, 255], 0.22);
+      if (Math.abs(y - height * 0.68) < 5) color = [darkR, darkG, darkB, 255];
+
+      const archOuter = Math.hypot((x - width * 0.5) / 1.7, y - height * 0.37);
+      if (archOuter > 410 && archOuter < 430 && y < height * 0.7) color = [darkR, darkG, darkB, 255];
+      const archInner = Math.hypot((x - width * 0.5) / 1.7, y - height * 0.39);
+      if (archInner > 330 && archInner < 338 && y < height * 0.66) color = [185, 139, 52, 255];
+
+      for (const lx of [width * 0.19, width * 0.31, width * 0.69, width * 0.81]) {
+        if (distanceToSegment(x, y, lx, 135, lx, 760) < 5) color = [darkR, darkG, darkB, 255];
+        if (insideRoundedRect(x, y, lx - 24, 210, 48, 88, 12) || insideRoundedRect(x, y, lx - 20, 520, 40, 74, 10)) {
+          color = [255, 218, 105, 255];
+        }
+        if (insideRoundedRect(x, y, lx - 31, 202, 62, 102, 14) && !insideRoundedRect(x, y, lx - 23, 211, 46, 84, 10)) {
+          color = [darkR, darkG, darkB, 255];
+        }
+      }
+
+      for (let panel = 0; panel < 7; panel += 1) {
+        const px = 250 + panel * 236;
+        if (insideRoundedRect(x, y, px, 718, 174, 116, 10)) color = mix(color, [255, 246, 211, 255], 0.42);
+        if (Math.abs(x - px) < 4 && y > 720 && y < 870) color = [darkR, darkG, darkB, 255];
+      }
+
+      if ((x < width * 0.13 || x > width * 0.87) && y < height * 0.78) {
+        color = mix(color, [accentR, accentG, accentB, 255], 0.46);
+        if ((Math.floor((x + seed) / 38) + Math.floor(y / 54)) % 3 === 0) color = mix(color, [darkR, darkG, darkB, 255], 0.35);
+      }
+    } else if (asset.key === "scene_rune_bench") {
+      const tableTop = insideRoundedRect(x, y, 520, 620, 880, 86, 20);
+      const tableFront = insideRoundedRect(x, y, 570, 700, 780, 170, 18);
+      if (y > height * 0.7) color = mix(color, [93, 78, 78, 255], 0.22);
+      if (tableTop || tableFront) color = [darkR, darkG, darkB, 255];
+      if (insideRoundedRect(x, y, 555, 638, 810, 42, 14)) color = [206, 178, 112, 255];
+      if (insideRoundedRect(x, y, 615, 720, 660, 104, 18)) color = mix([paperR, paperG, paperB, 255], [darkR, darkG, darkB, 255], 0.38);
+
+      const circle = Math.hypot(x - width * 0.5, y - height * 0.43);
+      if (circle < 205) color = mix(color, [accentR, accentG, accentB, 255], 0.26);
+      if (circle > 195 && circle < 207) color = [darkR, darkG, darkB, 255];
+      if (circle > 128 && circle < 136) color = [185, 139, 52, 255];
+
+      for (let mark = 0; mark < 8; mark += 1) {
+        const angle = (Math.PI * 2 * mark) / 8;
+        const cx = width * 0.5 + Math.cos(angle) * 160;
+        const cy = height * 0.43 + Math.sin(angle) * 102;
+        if (Math.abs(x - cx) + Math.abs(y - cy) < 28) color = [accentR, accentG, accentB, 255];
+        if (Math.abs(x - cx) + Math.abs(y - cy) < 14) color = [255, 241, 172, 255];
+      }
+
+      if (distanceToSegment(x, y, 750, 565, 1170, 565) < 5 || distanceToSegment(x, y, 960, 342, 960, 565) < 5) {
+        color = [darkR, darkG, darkB, 255];
+      }
+      if (insideRoundedRect(x, y, 898, 488, 124, 84, 14)) color = [255, 226, 118, 255];
+      if (insideRoundedRect(x, y, 916, 505, 88, 48, 10)) color = [accentR, accentG, accentB, 255];
+
+      for (const shelfY of [210, 308, 406]) {
+        if (distanceToSegment(x, y, 240, shelfY, 560, shelfY) < 5 || distanceToSegment(x, y, 1360, shelfY, 1680, shelfY) < 5) {
+          color = [darkR, darkG, darkB, 255];
+        }
+      }
+    }
+
+    if (x < 18 || y < 18 || x >= width - 18 || y >= height - 18) {
+      color = mix(color, [darkR, darkG, darkB, 255], 0.55);
     }
 
     return color;
