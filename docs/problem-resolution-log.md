@@ -157,3 +157,11 @@
 - 해결 방안: `docs/source-version-baseline.md`를 추가해 공식 Steam Store/Steam News API, 기존 Store/media crawl, 기존 SteamDB crawl의 역할과 한계를 분리했다. 2026-05-26 공식 Steam News API 재조회 기준 최신 공식 공지는 2026-04-29 `1 million Crawlers in 1 week`이고, 그 안의 최신 패치 라벨은 `Hotfix 1.4.1`로 기록했다. 동시에 직접 설치 빌드 ID와 인게임 버전 라벨은 `Needs verification`으로 남겼다.
 - 재발 방지 기준: 원작 유사도, 정확한 런타임 값, 빌드별 동작을 말하려면 먼저 local Steam `appmanifest_3265700.acf`, 인게임 버전 표시, 게임 파일 또는 fresh direct capture를 확보한다. SteamDB는 보조 build ordering 후보로만 쓰고 공식 패치 증거로 쓰지 않는다.
 - 해결 커밋: `b1349c3 Add source version baseline`
+
+### 문제: 로컬에서 직접 설치 빌드 증거를 확보할 수 없음
+
+- 원인: 현재 PC에서 Steam 설치 루트, Steam registry key, `appmanifest_3265700.acf`, app `3265700` 설치 폴더가 발견되지 않았다. 세션에서 보이는 파일 시스템 드라이브도 `C:`뿐이라 다른 Steam library 위치를 확인할 수 없었다.
+- 영향: `Hotfix 1.4.1` 공식 라벨과 SteamDB build 후보를 직접 설치 빌드 ID로 연결할 수 없고, fresh installed-build screenshot이나 인게임 버전 라벨도 확보할 수 없다.
+- 해결 방안: common Windows Steam roots, Steam registry paths, 사용자 프로필 내 appmanifest 검색, fixed drive의 Steam/SteamLibrary 후보 경로를 비파괴적으로 확인했다. 결과를 `docs/source-version-baseline.md`, `docs/development-foundation.md`, `docs/vertical-slice-smoke-checklist.md`에 `Blocked locally`로 남겼다.
+- 재발 방지 기준: Steam library 접근이 없는 상태에서는 직접 빌드 증거를 완료로 말하지 않는다. 사용자가 Steam 설치본, `appmanifest_3265700.acf`, 설치 게임 폴더 또는 fresh direct capture를 제공한 뒤에만 build id, 인게임 버전 라벨, screenshot 기준선을 `Verified`로 올린다.
+- 해결 커밋: `6ed8ae8 Document blocked local build proof`

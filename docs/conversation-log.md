@@ -459,3 +459,15 @@ runtime에서는 `getEncounterPoolContentId`를 추가해 combat/boss 진입과 
 SteamDB는 PowerShell 직접 요청 시 “공식 API가 없고 추가 요청하지 말라”는 browser-check/no-API 경고를 반환했으므로 더 이상 직접 요청하지 않았다. 따라서 SteamDB는 기존 로컬 스냅샷 `research/steamdb-build-baseline-crawl.md`만 보조 후보 자료로 유지했고, build `23012943`은 `Hotfix 1.4.1`의 시간상 후보일 뿐 설치 빌드나 패치 확정 증거가 아니라고 명시했다.
 
 `docs/source-version-baseline.md`를 추가해 source 우선순위, 공식 공지 기준선, 금지 표현, 직접 설치 빌드 증거 공백을 고정했다. `docs/development-foundation.md`, `docs/vertical-slice-smoke-checklist.md`, `README.md`도 새 기준선 문서를 가리키도록 갱신했다. 검증은 공식 API 재조회, 오래된 기준선 미확정 문구 검색, `git diff --check`, `npm.cmd run check`로 진행했다. 구현 커밋은 `b1349c3 Add source version baseline`이다.
+
+### 사용자
+
+다음 작업으로 넘어가자고 지시했다. 인앱 브라우저는 `?debug=1&entry=combat&resetSave=1&grantCard=card_lamplight_mark` 상태였다.
+
+### Codex
+
+다음 기반 작업을 `app 3265700`의 직접 설치본 증거 확인으로 확정했다. 목표는 local Steam `appmanifest_3265700.acf`에서 build id와 설치 폴더를 확인하고, 가능하면 인게임 버전 라벨과 fresh screenshot 확보로 이어가는 것이었다. 단, 게임 실행, Steam 로그인/다운로드/구매, 저장 데이터 삭제나 편집은 범위에서 제외했다.
+
+로컬 확인 결과 `C:\Program Files (x86)\Steam`, `C:\Program Files\Steam`, 사용자 `AppData` Steam 후보, `C:\Steam`, `C:\SteamLibrary`, `C:\Games\SteamLibrary` 계열 경로가 없었고, Steam registry key와 사용자 프로필 내 `appmanifest_3265700.acf`도 발견되지 않았다. 현재 세션에서 보이는 파일 시스템 드라이브는 `C:`뿐이었다. 따라서 이 PC에서는 직접 설치 빌드 ID를 증명할 수 없어 `Blocked locally`로 기록했다.
+
+`docs/source-version-baseline.md`에는 2026-05-26 local direct-proof attempt 섹션을 추가했고, `docs/development-foundation.md`와 `docs/vertical-slice-smoke-checklist.md`에는 Steam library/appmanifest 접근이 제공되어야 다음 직접 증거 확인을 진행할 수 있다고 갱신했다. 검증은 탐색 경로 기록, `rg` 문서 확인, `git diff --check`, `npm.cmd run check`로 진행했다. 직접 빌드 증거 확보 자체는 완료가 아니라 로컬 환경상 차단 상태이며, 문서화 커밋은 `6ed8ae8 Document blocked local build proof`이다.
