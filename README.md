@@ -15,6 +15,10 @@
 ## 먼저 볼 문서
 
 - `docs/development-foundation.md`: 2026-05-26 이후 새 게임 개발 기반 결정
+- `docs/phaser-project-structure-plan.md`: Phaser 프로젝트 폴더와 책임 경계 계획
+- `docs/phaser-boot-flow-plan.md`: Phaser 부트, preload, entry scene 순서 계획
+- `docs/debug-entry-plan.md`: URL debug entry와 debug action 계획
+- `docs/implementation-start-checklist.md`: 실제 구현 착수 전 체크리스트
 - `docs/data-schema-draft.md`: 데이터 스키마 초안
 - `docs/game-data-types.v1.ts`: TypeScript 타입 초안
 - `docs/vertical-slice-data.fixture.v1.json`: 첫 세로 조각 데이터 fixture
@@ -54,6 +58,12 @@ http://127.0.0.1:4173/docs/vertical-slice/proof.html
 node tools/vertical-slice-proof-smoke.mjs
 node tools/content-quality-audit.mjs --report-only
 npm run slice:validate
+```
+
+PowerShell 실행 정책 때문에 `npm run ...`이 막히는 환경에서는 아래처럼 실행한다.
+
+```powershell
+npm.cmd run slice:validate
 ```
 
 `content-quality-audit.mjs`가 현재 본편을 `BLOCKED`로 보는 것은 의도된 상태다. 본편 그래픽/데이터가 아직 최종 품질이 아니라는 보호 장치다.

@@ -134,6 +134,12 @@ Slice fixture 검증:
 npm run slice:validate
 ```
 
+이 PowerShell 환경에서 `npm.ps1` 실행 정책에 막히면 아래 명령을 사용한다.
+
+```powershell
+npm.cmd run slice:validate
+```
+
 PowerShell JSON 파싱 보조:
 
 ```powershell

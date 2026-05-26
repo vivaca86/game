@@ -281,9 +281,10 @@ notes?: string
 | 데이터 스키마 상세 | 타입 초안 작성 | 실제 프로젝트 생성 시 `src/data/schema.ts`로 이관 |
 | 원작 기준 버전 | 미확정 | 조사 기준 버전/패치/영상 기준선 확정 |
 | 원작 대응표 | 첫 후보 행 작성 | `Ready for slice`와 `Needs direct proof` 행 분리 |
-| 세로 조각 통과 기준 | fixture/manifest/checklist 작성 | validation script와 smoke script로 이관 |
+| 세로 조각 통과 기준 | fixture/manifest/checklist/validator 작성 | smoke script와 브라우저 검증으로 이관 |
 | 세이브 구조 | 미확정 | saveVersion, unlocks, profile, settings 구조 설계 |
-| 디버그 UI | 미확정 | 초기 디버그 패널 요구사항 작성 |
+| 디버그 UI | URL/debug action 계획 작성 | 실제 DOM overlay와 debug action 구현 |
+| Phaser 프로젝트 구조 | 구현 전 계획 작성 | 실제 `src/` scaffold 생성 |
 
 ## 작성된 후속 산출물
 
@@ -297,13 +298,19 @@ notes?: string
 8. `docs/vertical-slice-data.fixture.v1.json`: 첫 세로 조각 데이터 fixture
 9. `docs/asset-manifest.slice.v1.json`: 첫 세로 조각 planned asset manifest
 10. `docs/validation-rules-v1.md`: fixture/manifest 검증 기준
+11. `docs/phaser-project-structure-plan.md`: Phaser 프로젝트 폴더와 책임 경계 계획
+12. `docs/phaser-boot-flow-plan.md`: Phaser 부트, preload, entry scene 순서 계획
+13. `docs/debug-entry-plan.md`: URL debug entry와 debug action 계획
+14. `docs/implementation-start-checklist.md`: 실제 구현 착수 전 체크리스트
 
 ## 다음 작업
 
-1. `docs/validation-rules-v1.md`를 실제 검증 스크립트로 옮긴다.
-2. Phaser 프로젝트 구조를 만들기 전 폴더, manifest, debug entry를 확정한다.
-3. fixture의 `encounterPoolId`를 별도 encounter pool 데이터로 분리할지 결정한다.
-4. 첫 구현 착수 전 원작 기준 버전/패치/영상 기준선을 확정한다.
+1. 실제 Phaser/Vite/TypeScript scaffold 생성 범위와 dependency 설치 여부를 확정한다.
+2. `docs/game-data-types.v1.ts`, `docs/vertical-slice-data.fixture.v1.json`, `docs/asset-manifest.slice.v1.json`을 `src/data/` 기준으로 이관한다.
+3. `docs/phaser-boot-flow-plan.md`에 따라 `BootScene`, `PreloadScene`, 최소 entry scene을 만든다.
+4. `docs/debug-entry-plan.md`에 따라 `?debug=1` entry와 debug action을 만든다.
+5. fixture의 `encounterPoolId`를 별도 encounter pool 데이터로 분리할지 결정한다.
+6. 첫 구현 착수 전 원작 기준 버전/패치/영상 기준선을 확정한다.
 
 위 작업이 나오기 전에는 본격 구현 착수 또는 원작 유사도 판정을 하지 않는다.
 
@@ -321,3 +328,7 @@ notes?: string
 - `docs/vertical-slice-data.fixture.v1.json`: 첫 세로 조각 데이터 fixture
 - `docs/asset-manifest.slice.v1.json`: 첫 세로 조각 planned asset manifest
 - `docs/validation-rules-v1.md`: fixture/manifest 검증 기준
+- `docs/phaser-project-structure-plan.md`: Phaser 프로젝트 폴더와 책임 경계 계획
+- `docs/phaser-boot-flow-plan.md`: Phaser 부트, preload, entry scene 순서 계획
+- `docs/debug-entry-plan.md`: URL debug entry와 debug action 계획
+- `docs/implementation-start-checklist.md`: 실제 구현 착수 전 체크리스트

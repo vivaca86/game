@@ -366,3 +366,11 @@ GitHub의 game 쪽을 확인하고, 이어서 해야 하는 작업이 무엇으�
 첫 세로 조각의 최소 데이터 fixture와 planned asset manifest, validation 기준을 추가했다. `docs/vertical-slice-data.fixture.v1.json`에는 카드, 룬, 유물, 캐릭터, 스테이지, 몬스터, 보스, 이벤트, 보상 풀, 해금 draft 데이터를 넣었고, `docs/asset-manifest.slice.v1.json`에는 아직 생성되지 않은 planned 에셋 키와 runtime path를 분리했다. `docs/validation-rules-v1.md`에는 JSON 파싱, 필수 필드, referenceRole, asset key, reward refs, route refs, smoke checklist 연결 기준을 작성했다. 구현 완료나 에셋 완료로 오해하지 않도록 manifest와 fixture 상태를 draft/planned로 표시했다.
 
 검증을 수동 PowerShell에서 끝내지 않고 `tools/validate-slice-fixture.mjs`로 자동화했다. 첫 실행에서 manifest 항목은 `key`를 쓰는데 validator가 `id`를 요구하는 버그를 발견했고, manifest 전용 `key` 검증으로 수정했다. 이후 `node tools/validate-slice-fixture.mjs`와 `npm.cmd run slice:validate`가 모두 통과했다.
+
+### 사용자
+
+다음 작업을 묻고, 이어서 진행하라고 지시했다.
+
+### Codex
+
+다음 작업을 실제 구현 직전의 Phaser 프로젝트 구조 확정으로 잡았다. `docs/phaser-project-structure-plan.md`에는 `src/`, `simulation/`, `phaser/`, `data/`, `debug/`, `save/`의 책임 경계를 정리했고, `docs/phaser-boot-flow-plan.md`에는 `main.ts -> BootScene -> PreloadScene -> entry scene` 순서를 기록했다. `docs/debug-entry-plan.md`에는 `?debug=1&entry=combat` 같은 URL 진입과 debug action 목록을 정리했고, `docs/implementation-start-checklist.md`에는 실제 scaffold 착수 전 남은 결정을 체크리스트로 만들었다. 실제 Phaser 설치, `src/` 생성, 브라우저 실행은 아직 하지 않았다.

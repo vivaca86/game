@@ -162,7 +162,6 @@ paper_town_start
 
 ## 다음 작업
 
-1. 이 후보를 `docs/reference-role-map-slice-v1.md`에 대응표로 연결한다.
-2. `docs/vertical-slice-data.fixture.v1.json`을 실제 fixture 로더 기준으로 정리한다.
-3. `docs/asset-manifest.slice.v1.json`의 planned asset key를 실제 파일 생성 기준으로 검증한다.
-4. 첫 Phaser 구조를 만들 때 이 후보만 로드하도록 제한한다.
+1. 첫 Phaser 구조를 만들 때 이 후보만 runtime fixture로 이관한다.
+2. `docs/asset-manifest.slice.v1.json`의 planned asset key를 실제 파일 생성 결과와 비교한다.
+3. `Needs direct proof` 상태의 후보는 debug 화면에서도 draft임을 표시한다.

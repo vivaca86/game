@@ -174,9 +174,16 @@
 2. `docs/reference-role-map-slice-v1.md`: 후보별 원작 기능 역할 대응표
 3. `docs/vertical-slice-smoke-checklist.md`: 구현 후 검증 체크리스트
 4. `docs/game-data-types.v1.ts`: 데이터 타입 초안
+5. `docs/vertical-slice-data.fixture.v1.json`: 첫 세로 조각 데이터 fixture
+6. `docs/asset-manifest.slice.v1.json`: 첫 세로 조각 planned asset manifest
+7. `docs/validation-rules-v1.md`: fixture/manifest 검증 기준
+8. `docs/phaser-project-structure-plan.md`: Phaser 프로젝트 폴더와 책임 경계 계획
+9. `docs/phaser-boot-flow-plan.md`: Phaser 부트, preload, entry scene 순서 계획
+10. `docs/debug-entry-plan.md`: URL debug entry와 debug action 계획
 
 ## 다음 작업
 
-1. Phaser 프로젝트 구조를 만들기 전 필요한 폴더, manifest, debug entry를 확정한다.
-2. smoke checklist ID를 실제 테스트 스크립트 이름과 연결한다.
-3. 첫 구현 시작 후 체크리스트 상태를 갱신한다.
+1. 실제 Phaser/Vite/TypeScript scaffold를 만들지 범위와 dependency 설치 여부를 확정한다.
+2. `src/data/`에 fixture, manifest, schema를 이관한다.
+3. smoke checklist ID를 실제 테스트 스크립트 이름과 연결한다.
+4. 첫 구현 시작 후 체크리스트 상태를 갱신한다.

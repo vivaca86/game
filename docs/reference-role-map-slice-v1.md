@@ -67,6 +67,6 @@
 
 ## 다음 작업
 
-1. 이 대응표의 `ourContentId`를 최소 샘플 데이터 파일로 옮긴다.
-2. `evidenceStatus`가 `Needs direct proof`인 행은 구현 전에도 draft임을 UI/debug에 표시한다.
-3. 세로 조각 smoke 체크리스트에서 각 `referenceRole`이 실제 화면에 나타나는지 확인한다.
+1. `evidenceStatus`가 `Needs direct proof`인 행은 구현 전에도 draft임을 UI/debug에 표시한다.
+2. 세로 조각 smoke 체크리스트에서 각 `referenceRole`이 실제 화면에 나타나는지 확인한다.
+3. 구현 중 새 content id가 생기면 이 문서의 `referenceRole` 누락 여부를 먼저 확인한다.
