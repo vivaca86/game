@@ -116,6 +116,6 @@ This is still not a production-complete game, final art/assets pass, exhaustive 
 
 ## Next Work
 
-1. Provide or install access to the Steam library for app `3265700`, then capture local app manifest build ID, in-game version label if available, and fresh first-run screenshots.
-2. When the asset pipeline begins, generate files under `assets/runtime/` and run `npm.cmd run assets:audit:strict` to catch missing, wrong-size, or orphaned runtime assets.
-3. Expand content, final art/assets, balance, and UX polish only after the foundation remains green.
+1. When the asset pipeline begins, generate files under `assets/runtime/` and run `npm.cmd run assets:audit:strict` to catch missing, wrong-size, or orphaned runtime assets.
+2. Expand content, final art/assets, balance, and UX polish only after the foundation remains green.
+3. Keep Steam/appmanifest direct proof deferred unless the user later provides access or exact build/runtime claims become necessary.

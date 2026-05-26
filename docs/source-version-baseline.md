@@ -1,7 +1,7 @@
 # Source / Version Baseline
 
 Date: 2026-05-26
-Status: planning baseline fixed, direct installed-build proof still missing
+Status: planning baseline fixed; direct installed-build proof deferred under the no-local-Steam assumption
 
 ## Purpose
 
@@ -20,9 +20,9 @@ It does not claim exhaustive research completion, original-game 95% similarity, 
 | Official Store platforms in API snapshot | Windows `true`, macOS `true`, Linux `false` |
 | Official latest Steam Community Announcement seen | 2026-04-29 `1 million Crawlers in 1 week` |
 | Official latest patch label seen | `Hotfix 1.4.1` in the 2026-04-29 announcement |
-| Direct installed build ID | Blocked locally: Steam install/appmanifest not found on this PC in the 2026-05-26 check |
-| In-game version label | Needs verification |
-| Game-file proof | Needs verification |
+| Direct installed build ID | Deferred: assume no local Steam access unless the user provides it later |
+| In-game version label | Deferred with direct build proof |
+| Game-file proof | Deferred with direct build proof |
 
 ## Sources Checked
 
@@ -72,6 +72,17 @@ SteamDB handling:
 | 5 | Press/guides/videos | Useful as secondary capture queues, not final truth unless corroborated |
 | 6 | Current local prototype | Originalized implementation baseline only; never evidence of reference-game completion |
 
+## No-Local-Steam Working Assumption
+
+As of 2026-05-27, the user instructed Codex to assume Steam access is unavailable for now.
+
+Impact:
+
+- Steam/appmanifest proof is no longer an active next-work item.
+- Development may continue from official public sources, preserved local research, role mapping, and originalized implementation decisions.
+- Exact current-build runtime values, build-specific behavior, and original-game similarity claims still require direct proof if those claims become necessary later.
+- If Steam access, an `appmanifest_3265700.acf`, an installed game folder, or fresh captures are provided later, this section can be reopened.
+
 ## Locked Rules
 
 - Do not claim `Hotfix 1.4.1` is the installed build until local app manifest, in-game version text, or another direct build proof confirms it.
@@ -80,16 +91,16 @@ SteamDB handling:
 - Do not use SteamDB as an official source or continue automated SteamDB fetching.
 - Do not start original-game similarity or 95% claims from this baseline.
 
-## Direct Proof Still Needed
+## Direct Proof Deferred
 
 | Proof target | State |
 | --- | --- |
-| Local Steam `appmanifest_3265700.acf` build ID | Blocked locally on 2026-05-26; Steam install/appmanifest not found on this PC |
-| In-game version/build label, if exposed | Needs verification |
-| Fresh-save UI capture for town, first dungeon, first combat, reward, gem/rune, boss, result | Needs verification |
-| Game-file/static-data proof for exact card/gem/relic/character values | Needs verification |
-| Save-slot and demo-to-full migration behavior | Needs verification |
-| Whether later post-2026-04-29 patches shipped without official announcement | Needs verification |
+| Local Steam `appmanifest_3265700.acf` build ID | Deferred; no local Steam access is assumed |
+| In-game version/build label, if exposed | Deferred; only needed for exact build/runtime claims |
+| Fresh-save UI capture for town, first dungeon, first combat, reward, gem/rune, boss, result | Deferred; not required for current originalized foundation work |
+| Game-file/static-data proof for exact card/gem/relic/character values | Deferred; exact value parity is not the current target |
+| Save-slot and demo-to-full migration behavior | Deferred; not required for current local slice foundation |
+| Whether later post-2026-04-29 patches shipped without official announcement | Deferred; verify only if exact source-version claims become necessary |
 
 ## 2026-05-26 Local Direct-Proof Attempt
 
@@ -121,12 +132,13 @@ Conclusion:
 
 - This workspace cannot prove the installed build ID for app `3265700` yet.
 - Direct build proof requires the user to install/provide access to the Steam library containing Vampire Crawlers or provide the relevant `appmanifest_3265700.acf` and installed game folder.
+- Under the 2026-05-27 no-local-Steam working assumption, this proof path is deferred rather than treated as a blocker for current development.
 
 ## Decision
 
 Future reference-driven implementation should use this as the planning baseline:
 
 1. Treat official Steam News through `Hotfix 1.4.1` as the current official announcement baseline.
-2. Treat direct installed-build proof as blocked in this local environment until Steam/appmanifest access is provided.
+2. Treat direct installed-build proof as deferred under the no-local-Steam working assumption; do not keep it as active next work.
 3. Keep all source-level wiki, Store media, SteamDB, and guide findings in their own evidence layers.
-4. Continue building the local project as an originalized slice foundation until direct proof closes exact reference behavior.
+4. Continue building the local project as an originalized slice foundation. Reopen direct proof only if Steam access appears later or exact build/runtime claims become necessary.
