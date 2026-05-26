@@ -2,6 +2,8 @@
 
 작성일: 2026-05-24
 
+> 2026-05-26 업데이트: 이 문서는 이전 정적 HTML/밝은 파스텔 검증 샘플 기준의 문제 정리다. 새 개발은 `docs/development-foundation.md`, `docs/data-schema-draft.md`, `docs/reference-role-map-template.md`, `docs/vertical-slice-acceptance.md`를 우선한다. 기존 품질 감사와 `docs/vertical-slice/proof.html`은 과거 산출물 판단용 참고다.
+
 ## 목적
 
 이 문서는 2026-05-23 대화 이후 확인된 문제, 반복된 실패 패턴, 해결 방법, 그리고 현재 Git에 올리는 산출물의 의미를 정리한다. 핵심은 "많이 만들었다"가 아니라 "검증 가능한 품질 기준을 통과했는가"로 개발 기준을 바꾸는 것이다.

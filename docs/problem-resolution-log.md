@@ -62,3 +62,11 @@
 - 해결 방안: 기존 문제 해결 항목의 해결 커밋을 실제 커밋 해시와 커밋 제목으로 교체했다.
 - 재발 방지 기준: 문제 해결 로그를 작성할 때는 placeholder가 아니라 실제 커밋 해시를 적는다. 아직 커밋 전이면 커밋 전 상태임을 명확히 적고, 커밋 후 실제 해시로 교체한다.
 - 해결 커밋: `62f53b0 Record explicit resolution commits`
+
+### 문제: 원격 GitHub 문서만 보고 로컬 최신 기반 결정을 놓침
+
+- 원인: 원격 `main`의 예전 handoff/recovery 문서를 먼저 기준으로 삼아, 로컬 작업트리에 남아 있던 2026-05-26 기반 결정과 미커밋 문서를 최신 상태로 보지 못했다.
+- 영향: 다음 작업을 예전 `docs/vertical-slice/proof.html` 승인 게이트로 잘못 보고해, 실제로는 데이터 스키마와 원작 대응표, 세로 조각 기준으로 넘어가야 하는 흐름을 흐릴 수 있었다.
+- 해결 방안: 로컬 변경분과 원격 `main` 커밋을 다시 대조하고, 새 기반 문서를 `e07c3e6 Document new game foundation`으로 GitHub에 푸시했다. 이어서 `AGENTS.md`, `README.md`, 기존 handoff/current-issues/recovery 문서에 새 기반 문서 우선 규칙을 반영했다.
+- 재발 방지 기준: GitHub 상태를 묻는 작업이라도 로컬 작업트리에 미커밋 최신 문서가 있는지 먼저 확인하고, 원격 기준과 로컬 기준을 분리해 보고한다. 오래된 handoff 문서와 새 기반 문서가 충돌하면 `docs/development-foundation.md`와 새 세로 조각 기준을 우선한다.
+- 해결 커밋: `e07c3e6 Document new game foundation`

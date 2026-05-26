@@ -340,3 +340,11 @@ GitHub의 game 쪽을 확인하고, 이어서 해야 하는 작업이 무엇으�
 ### Codex
 
 처음에는 원격 `main`의 오래된 인수인계 문서를 기준으로 `docs/vertical-slice/proof.html` 승인 게이트를 다음 작업으로 잘못 보고했다. 재확인 결과 원격 `main`은 아직 이전 커밋이고, 로컬 작업트리에는 2026-05-26 기반 결정, `Phaser 3 + TypeScript + Vite`, `프리미엄 팝업북 판타지 카드 크롤러`, 에셋 제작 규격 v1, 아트 바이블 v1이 미커밋 상태로 남아 있음을 확인했다. 최신 기준의 다음 작업은 현재 문서 검증, 커밋, GitHub 푸시 후 데이터 스키마 초안, 원작 역기획 대응표 양식, 세로 조각 통과 기준으로 넘어가는 것이다.
+
+### 사용자
+
+현재 상태와 다음 작업을 쉽게 설명해 달라고 했고, 이어서 그 작업을 진행하라고 지시했다.
+
+### Codex
+
+현재 로컬 기준은 새 게임 개발 기반공사 단계이며, 먼저 기반 문서 변경분을 검증해 `Document new game foundation` 커밋으로 GitHub `main`에 푸시했다. 이어서 다음 산출물로 `docs/data-schema-draft.md`, `docs/reference-role-map-template.md`, `docs/vertical-slice-acceptance.md`를 작성했다. 새 기준 문서가 이전 `proof.html` 게이트보다 우선한다는 점을 `AGENTS.md`, `README.md`, 기존 handoff/current-issues/recovery 문서에 표시해 다음 세션에서 같은 혼동이 반복되지 않도록 정리했다.

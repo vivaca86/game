@@ -17,11 +17,15 @@ When instructions conflict, follow this order.
 1. The user's current instruction in the active conversation
 2. `AGENTS.md`
 3. `PROJECT_RULES.md`
-4. `docs/handoff.md`
-5. `docs/current-issues-and-plan.md`
-6. `docs/recovery-audit.md`
-7. `RESEARCH_CHECKLIST.md`
-8. `README.md` and other files under `research/`
+4. `docs/development-foundation.md`
+5. `docs/data-schema-draft.md`
+6. `docs/reference-role-map-template.md`
+7. `docs/vertical-slice-acceptance.md`
+8. `docs/handoff.md`
+9. `docs/current-issues-and-plan.md`
+10. `docs/recovery-audit.md`
+11. `RESEARCH_CHECKLIST.md`
+12. `README.md` and other files under `research/`
 
 ### Startup Checklist
 
@@ -30,11 +34,15 @@ Before starting any work in this repository, check the following in order when a
 1. The user's current instruction
 2. `AGENTS.md`
 3. `PROJECT_RULES.md`
-4. `docs/handoff.md`
-5. `docs/current-issues-and-plan.md`
-6. `docs/recovery-audit.md`
-7. `RESEARCH_CHECKLIST.md`
-8. `README.md`
+4. `docs/development-foundation.md`
+5. `docs/data-schema-draft.md`
+6. `docs/reference-role-map-template.md`
+7. `docs/vertical-slice-acceptance.md`
+8. `docs/handoff.md`
+9. `docs/current-issues-and-plan.md`
+10. `docs/recovery-audit.md`
+11. `RESEARCH_CHECKLIST.md`
+12. `README.md`
 
 If a document is missing or the repository is empty, report that fact instead of assuming its contents.
 
@@ -197,7 +205,7 @@ Every final completion report must include:
 - If remote and local Git state diverge, do not merge, reset, or pull without user confirmation.
 - Deletion, forced updates, `git reset`, force push, and local cleanup require user confirmation.
 - Treat the current `content-quality-audit` failure as an intentional protective gate unless the user changes that direction.
-- Main development must proceed only after the user approves the `docs/vertical-slice/proof.html` proof sample.
+- Main implementation must proceed from the current foundation documents: `docs/development-foundation.md`, `docs/data-schema-draft.md`, `docs/reference-role-map-template.md`, and `docs/vertical-slice-acceptance.md`. The older `docs/vertical-slice/proof.html` sample is historical reference, not the current approval gate, unless the user explicitly reinstates it.
 - Matching item counts must not be treated as content completion or 95% similarity to the reference game.
 - Conversation logs and problem-resolution logs must follow `PROJECT_RULES.md`.
 
@@ -228,11 +236,15 @@ Codex가 실제로 따라야 하는 기준은 위의 `Authoritative English Rule
 1. 현재 대화에서 사용자가 직접 지시한 내용
 2. `AGENTS.md`
 3. `PROJECT_RULES.md`
-4. `docs/handoff.md`
-5. `docs/current-issues-and-plan.md`
-6. `docs/recovery-audit.md`
-7. `RESEARCH_CHECKLIST.md`
-8. `README.md`와 그 외 `research/` 문서
+4. `docs/development-foundation.md`
+5. `docs/data-schema-draft.md`
+6. `docs/reference-role-map-template.md`
+7. `docs/vertical-slice-acceptance.md`
+8. `docs/handoff.md`
+9. `docs/current-issues-and-plan.md`
+10. `docs/recovery-audit.md`
+11. `RESEARCH_CHECKLIST.md`
+12. `README.md`와 그 외 `research/` 문서
 
 ### 작업 시작 시 확인
 
@@ -241,11 +253,15 @@ Codex가 실제로 따라야 하는 기준은 위의 `Authoritative English Rule
 1. 현재 사용자 지시
 2. `AGENTS.md`
 3. `PROJECT_RULES.md`
-4. `docs/handoff.md`
-5. `docs/current-issues-and-plan.md`
-6. `docs/recovery-audit.md`
-7. `RESEARCH_CHECKLIST.md`
-8. `README.md`
+4. `docs/development-foundation.md`
+5. `docs/data-schema-draft.md`
+6. `docs/reference-role-map-template.md`
+7. `docs/vertical-slice-acceptance.md`
+8. `docs/handoff.md`
+9. `docs/current-issues-and-plan.md`
+10. `docs/recovery-audit.md`
+11. `RESEARCH_CHECKLIST.md`
+12. `README.md`
 
 문서가 없거나 저장소가 비어 있으면, 있다고 가정하지 말고 없다는 사실을 보고한다.
 
@@ -377,7 +393,7 @@ Git 상태, 파일 구조, 지시 충돌, 삭제/변경 범위 확대, 검증 �
 - 원격과 로컬 Git 상태가 갈라져 있으면 병합, 리셋, 풀을 임의로 하지 않는다.
 - 삭제, 강제 업데이트, `git reset`, force push, 로컬 정리는 반드시 사용자 확인 후 진행한다.
 - `content-quality-audit`가 실패하는 현재 상태를 정상 보호 장치로 취급한다.
-- 본편 개발은 `docs/vertical-slice/proof.html` 기준 샘플이 사용자에게 승인된 뒤에만 진행한다.
+- 본편 구현은 현재 기반 문서인 `docs/development-foundation.md`, `docs/data-schema-draft.md`, `docs/reference-role-map-template.md`, `docs/vertical-slice-acceptance.md` 기준으로 진행한다. 예전 `docs/vertical-slice/proof.html` 샘플은 사용자가 다시 게이트로 지정하지 않는 한 현재 승인 기준이 아니라 과거 참고 자료다.
 - 수량이 맞는 것을 콘텐츠 완성이나 원작 95% 근접으로 말하지 않는다.
 - 대화 원문 로그와 문제 해결 로그는 `PROJECT_RULES.md`의 기준을 따른다.
 

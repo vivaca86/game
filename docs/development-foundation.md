@@ -278,21 +278,32 @@ notes?: string
 | --- | --- | --- |
 | 상세 아트 바이블 | 1차 확정 | 색상 코드, 타입별 UI 상세, 몬스터 계열표, 첫 샘플 에셋 검증 |
 | 에셋 해상도 규격 | 1차 확정 | 에셋 메타데이터 스키마, atlas 패킹 방식, 검증 스크립트 설계 |
-| 데이터 스키마 상세 | 미확정 | cards, gems/runes, relics, stages 등 상세 필드 정의 |
+| 데이터 스키마 상세 | 초안 작성 | TypeScript interface 또는 JSON Schema로 분리 |
 | 원작 기준 버전 | 미확정 | 조사 기준 버전/패치/영상 기준선 확정 |
-| 원작 대응표 | 미확정 | 시스템/콘텐츠/보상/밸런스 역기획표 작성 |
+| 원작 대응표 | 양식 작성 | 세로 조각 후보 행부터 실제 대응표 채우기 |
+| 세로 조각 통과 기준 | 기준 작성 | 구현 전 smoke/checklist 항목으로 분해 |
 | 세이브 구조 | 미확정 | saveVersion, unlocks, profile, settings 구조 설계 |
 | 디버그 UI | 미확정 | 초기 디버그 패널 요구사항 작성 |
 
-## 다음 산출물
+## 작성된 후속 산출물
 
-1. 데이터 스키마 초안
-2. 원작 역기획 대응표 양식
-3. 세로 조각 통과 기준
+1. `docs/data-schema-draft.md`: 데이터 스키마 초안
+2. `docs/reference-role-map-template.md`: 원작 역기획 대응표 양식
+3. `docs/vertical-slice-acceptance.md`: 세로 조각 통과 기준
 
-위 산출물이 나오기 전에는 본격 구현 착수 또는 원작 유사도 판정을 하지 않는다.
+## 다음 작업
+
+1. 데이터 스키마 초안을 TypeScript interface 또는 JSON Schema로 분리한다.
+2. 원작 대응표 양식에 세로 조각 후보 행을 채운다.
+3. 세로 조각 기준을 실제 smoke/checklist 항목으로 쪼갠다.
+4. Phaser 프로젝트 구조를 만들기 전 폴더, manifest, debug entry를 확정한다.
+
+위 작업이 나오기 전에는 본격 구현 착수 또는 원작 유사도 판정을 하지 않는다.
 
 관련 문서:
 
 - `docs/asset-production-spec.md`: 에셋 제작 규격 v1
 - `docs/art-bible.md`: 아트 바이블 v1
+- `docs/data-schema-draft.md`: 데이터 스키마 초안
+- `docs/reference-role-map-template.md`: 원작 역기획 대응표 양식
+- `docs/vertical-slice-acceptance.md`: 세로 조각 통과 기준

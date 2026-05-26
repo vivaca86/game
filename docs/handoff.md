@@ -2,6 +2,8 @@
 
 작성일: 2026-05-23
 
+> 2026-05-26 업데이트: 이 문서는 이전 정적 HTML/밝은 파스텔 검증 샘플 기준의 복구 인수인계다. 새 개발 기준은 `docs/development-foundation.md`, `docs/data-schema-draft.md`, `docs/reference-role-map-template.md`, `docs/vertical-slice-acceptance.md`를 우선한다. 아래 내용은 과거 산출물의 위험과 보존 범위를 이해하기 위한 참고로 본다.
+
 ## 현재 판단
 
 이 프로젝트는 현재 개발 중단 상태다. 기술 골격은 남길 수 있지만, 콘텐츠와 그래픽은 최종품으로 넘기면 안 된다. 다음 개발자는 먼저 `docs/recovery-audit.md`와 이 문서를 읽고, 현재 데이터가 "완성 콘텐츠"가 아니라 "검증용 초안"임을 전제로 이어받아야 한다.
