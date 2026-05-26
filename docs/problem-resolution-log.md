@@ -109,3 +109,11 @@
 - 해결 방안: smoke 입력마다 짧은 안정화 대기를 넣고, boss phase trigger는 `bossPhaseTriggered=true` debug overlay 값으로 명시 검증하도록 바꿨다.
 - 재발 방지 기준: scene restart를 동반하는 브라우저 smoke는 키 입력 후 overlay 상태 안정화를 기다리고, 장기 루프 검증은 최종 phase뿐 아니라 중간 핵심 상태도 직접 확인한다.
 - 해결 커밋: `b71f7ad Add first combat simulation flow`; 로그 해시 정리는 후속 커밋에서 반영.
+
+### 문제: Phaser 화면의 진행 문구가 버튼처럼 보이지만 클릭되지 않음
+
+- 원인: Town, WorldMap, Dungeon, Reward, RuneBench, Result 장면의 진행 안내가 `add.text`로만 렌더링되어 pointer input을 받지 않았다. Combat/Boss 카드와 턴 종료도 키보드 입력에는 연결되어 있었지만 마우스 클릭 경로가 없었다.
+- 영향: 인앱 브라우저에서 사용자가 화면에 보이는 버튼/카드를 클릭해도 진행되지 않고, 키보드 조작을 알아야만 흐름을 확인할 수 있었다.
+- 해결 방안: 공통 `renderActionButton`을 추가해 진행 UI를 실제 interactive Phaser rectangle로 만들고, card hand와 `End Turn`에도 `pointerdown` action을 연결했다.
+- 재발 방지 기준: `tools/phaser-smoke-test.mjs`에 canvas 좌표 기반 click smoke를 추가해 `town -> world_map -> dungeon -> combat`, 첫 카드 사용, 턴 종료까지 마우스 클릭으로 검증한다. 인앱 브라우저에서도 같은 흐름을 직접 클릭해 debug overlay 변화로 확인한다.
+- 해결 커밋: `8518d18 Make Phaser controls clickable`

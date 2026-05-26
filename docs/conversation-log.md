@@ -393,3 +393,11 @@ Phaser 런타임 첫 골조와 데이터 부팅, 디버그 진입 작업을 그�
 작업 중 `apply_patch` 기준 경로가 저장소보다 한 단계 위로 잡혀 `C:\Users\i\Documents\New project\src\simulation`에 파일이 잘못 생성되는 문제가 있었다. 사용자 승인을 받은 뒤 해당 잘못 생성된 `src/simulation` 폴더만 확인 후 삭제하고, 저장소 내부 `C:\Users\i\Documents\New project\sunlight-map-card-crawler\src\simulation`에 다시 적용했다.
 
 이번 작업은 기반 구현이며, 전체 vertical slice 완료나 원작 95% 유사도 주장이 아니다. 다음 작업은 save reload 검증, 1920x1080 스크린샷/오버레이 검증, 카드 설명과 effect op 감사, encounter pool 분리 여부 결정이다.
+
+### 사용자
+
+인앱 브라우저에서 실행 중인 Phaser 화면의 버튼이 눌리지 않는다고 보고했다.
+
+### Codex
+
+버튼처럼 보이던 `Enter:` 안내 문구가 실제 클릭 가능한 Phaser 오브젝트가 아니라 키보드 입력만 연결된 텍스트였음을 확인했다. 진행 버튼을 `renderActionButton`으로 교체하고, 전투/보스 장면의 카드와 `End Turn`도 마우스로 누를 수 있게 연결했다. 자동 검증에는 `tools/phaser-smoke-test.mjs`의 실제 canvas 좌표 클릭 경로를 추가했다. 검증은 `npm.cmd run check`, `npm.cmd run phaser:smoke`, `git diff --check`, 인앱 브라우저 클릭 확인으로 진행했다. 인앱 브라우저에서는 `World Map -> Dungeon -> Enter Room -> first card -> End Turn` 클릭으로 phase 이동, enemyHp 17, turn 2, playerHp 36 변화를 확인했다. 수정 커밋은 `8518d18 Make Phaser controls clickable`이다.
