@@ -1,6 +1,7 @@
 import type Phaser from "phaser";
 import type { BootContext } from "../../app/bootContext";
 import type { InputAction } from "../../input/actions";
+import { persistSave } from "../../save/saveCodec";
 import { endTurn, playCardAtIndex } from "../../simulation/systems/combat/combatSystem";
 import {
   claimRewardAndAdvance,
@@ -11,6 +12,7 @@ import {
   returnToTown
 } from "../../simulation/systems/dungeon/dungeonSystem";
 import type { SlicePhase } from "../../simulation/state/runState";
+import { sliceRunToSaveRun } from "../../simulation/state/runState";
 import { storeBootContext } from "./sceneBridge";
 
 const PHASE_TO_SCENE: Record<SlicePhase, string> = {
@@ -54,6 +56,7 @@ export function handleSceneAction(
   }
 
   syncRunToSave(context);
+  persistSave(context.save, { debug: context.runtimeFlags.debug });
   storeBootContext(scene, context);
   scene.scene.start(sceneForPhase(context.run.phase), context);
 }
@@ -75,19 +78,7 @@ function handleConfirm(context: BootContext): void {
 }
 
 function syncRunToSave(context: BootContext): void {
-  const saveRun = context.save.currentRun;
-  if (saveRun) {
-    saveRun.stageId = context.run.stageId;
-    saveRun.roomIndex = context.run.roomIndex;
-    saveRun.deck = [...context.run.deck];
-    saveRun.hand = [...context.run.hand];
-    saveRun.discard = [...context.run.discard];
-    saveRun.equippedRunes = { ...context.run.equippedRunes };
-    saveRun.relics = [...context.run.relics];
-    saveRun.arcanas = [...context.run.arcanas];
-    saveRun.hp = context.run.player.hp;
-    saveRun.maxHp = context.run.player.maxHp;
-  }
+  context.save.currentRun = sliceRunToSaveRun(context.run);
 
   for (const stageId of context.run.completedStages) {
     if (!context.save.profile.completedStages.includes(stageId)) {
@@ -95,4 +86,3 @@ function syncRunToSave(context: BootContext): void {
     }
   }
 }
-

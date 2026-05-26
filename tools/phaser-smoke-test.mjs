@@ -63,9 +63,10 @@ const cardCosts = new Map([
 
 try {
   await checkPage("/", "TownScene", false);
-  await checkPage("/?debug=1&entry=combat", "CombatScene", true);
-  await checkPage("/?debug=1&entry=boss", "BossScene", true);
+  await checkPage("/?debug=1&entry=combat&resetSave=1", "CombatScene", true);
+  await checkPage("/?debug=1&entry=boss&resetSave=1", "BossScene", true);
   await checkClickableControls();
+  await checkSaveReload();
   await checkCombatActions();
   await checkSceneFlowAndRuneEffect();
   await checkBossResultFlow();
@@ -106,19 +107,19 @@ async function checkPage(pathname, expectedScene, expectDebugOverlay) {
 }
 
 async function checkCombatActions() {
-  await withDebugPage("/?debug=1&entry=combat", "CombatScene", async (page) => {
+  await withDebugPage("/?debug=1&entry=combat&resetSave=1", "CombatScene", async (page) => {
     await pressAndSettle(page, "Digit1");
     await waitForDebugValue(page, "enemyHp", "17");
     await waitForDebugValue(page, "playerEnergy", "2");
   });
 
-  await withDebugPage("/?debug=1&entry=combat", "CombatScene", async (page) => {
+  await withDebugPage("/?debug=1&entry=combat&resetSave=1", "CombatScene", async (page) => {
     await pressAndSettle(page, "Digit2");
     await waitForDebugValue(page, "playerBlock", "6");
     await waitForDebugValue(page, "playerEnergy", "2");
   });
 
-  await withDebugPage("/?debug=1&entry=combat", "CombatScene", async (page) => {
+  await withDebugPage("/?debug=1&entry=combat&resetSave=1", "CombatScene", async (page) => {
     await pressAndSettle(page, "Digit3");
     await waitForDebugValue(page, "discard", "1");
     await waitForDebugValue(page, "drawPile", "0");
@@ -128,7 +129,7 @@ async function checkCombatActions() {
     }
   });
 
-  await withDebugPage("/?debug=1&entry=combat", "CombatScene", async (page) => {
+  await withDebugPage("/?debug=1&entry=combat&resetSave=1", "CombatScene", async (page) => {
     await pressAndSettle(page, "KeyE");
     await waitForDebugValue(page, "playerHp", "36");
     await waitForDebugValue(page, "turn", "2");
@@ -136,7 +137,7 @@ async function checkCombatActions() {
 }
 
 async function checkClickableControls() {
-  await withDebugPage("/?debug=1&entry=town", "TownScene", async (page) => {
+  await withDebugPage("/?debug=1&entry=town&resetSave=1", "TownScene", async (page) => {
     await clickScenePoint(page, 1010, 642);
     await waitForDebugValue(page, "phase", "world_map");
 
@@ -156,8 +157,45 @@ async function checkClickableControls() {
   });
 }
 
+async function checkSaveReload() {
+  await withDebugPage("/?debug=1&entry=town&resetSave=1", "TownScene", async (page) => {
+    await clickScenePoint(page, 1010, 642);
+    await waitForDebugValue(page, "phase", "world_map");
+    await clickScenePoint(page, 1010, 512);
+    await waitForDebugValue(page, "phase", "dungeon");
+    await clickScenePoint(page, 1010, 582);
+    await waitForDebugValue(page, "phase", "combat");
+    await clickScenePoint(page, 430, 790);
+    await waitForDebugValue(page, "enemyHp", "17");
+
+    validateSaveSnapshot(await readDebugSave(page), "mid-combat save");
+
+    await page.goto(new URL("/?debug=1&entry=town", baseUrl).href, { waitUntil: "networkidle" });
+    await waitForDebugScene(page, "CombatScene");
+    await waitForDebugValue(page, "phase", "combat");
+    await waitForDebugValue(page, "enemyHp", "17");
+    await waitForDebugValue(page, "playerEnergy", "2");
+    await waitForDebugValue(page, "savedPhase", "combat");
+  });
+
+  await withDebugPage("/?debug=1&entry=boss&resetSave=1", "BossScene", async (page) => {
+    await playUntilDebugValue(page, "bossPhaseTriggered", "true", 80);
+    await playUntilPhase(page, ["result"], 120);
+    await pressAndSettle(page, "Enter");
+    await waitForDebugValue(page, "phase", "town");
+    await waitForDebugValue(page, "saveCompleted", "stage_lantern_foyer");
+
+    validateSaveSnapshot(await readDebugSave(page), "completed-stage save");
+
+    await page.goto(new URL("/?debug=1&entry=town", baseUrl).href, { waitUntil: "networkidle" });
+    await waitForDebugScene(page, "TownScene");
+    await waitForDebugValue(page, "phase", "town");
+    await waitForDebugValue(page, "saveCompleted", "stage_lantern_foyer");
+  });
+}
+
 async function checkSceneFlowAndRuneEffect() {
-  await withDebugPage("/?debug=1&entry=town", "TownScene", async (page) => {
+  await withDebugPage("/?debug=1&entry=town&resetSave=1", "TownScene", async (page) => {
     await playUntilPhase(page, ["combat"], 8);
     await playUntilPhase(page, ["reward"], 40);
     await pressAndSettle(page, "Enter");
@@ -171,7 +209,7 @@ async function checkSceneFlowAndRuneEffect() {
 }
 
 async function checkBossResultFlow() {
-  await withDebugPage("/?debug=1&entry=boss", "BossScene", async (page) => {
+  await withDebugPage("/?debug=1&entry=boss&resetSave=1", "BossScene", async (page) => {
     await playUntilDebugValue(page, "bossPhaseTriggered", "true", 80);
     await playUntilPhase(page, ["result"], 120);
     await waitForDebugValue(page, "phase", "result");
@@ -300,6 +338,46 @@ async function getDebugMap(page) {
       });
     return Object.fromEntries(entries);
   });
+}
+
+async function readDebugSave(page) {
+  return page.evaluate(() => {
+    const raw = localStorage.getItem("paper_theater_card_crawler_debug_save_v1");
+    return raw ? JSON.parse(raw) : null;
+  });
+}
+
+function validateSaveSnapshot(save, label) {
+  if (!save || typeof save !== "object") {
+    throw new Error(`${label}: missing saved JSON`);
+  }
+  if (save.saveVersion !== 1) {
+    throw new Error(`${label}: missing saveVersion=1`);
+  }
+  if (!save.profile || !save.currentRun || !save.settings) {
+    throw new Error(`${label}: missing save sections`);
+  }
+
+  const forbiddenKeys = new Set(["scene", "sys", "game", "registry", "textures", "cache", "anims"]);
+  const keys = collectObjectKeys(save);
+  const forbidden = keys.find((key) => forbiddenKeys.has(key));
+  if (forbidden) {
+    throw new Error(`${label}: save contains renderer key ${forbidden}`);
+  }
+}
+
+function collectObjectKeys(value, keys = []) {
+  if (!value || typeof value !== "object") return keys;
+  if (Array.isArray(value)) {
+    value.forEach((item) => collectObjectKeys(item, keys));
+    return keys;
+  }
+
+  for (const [key, child] of Object.entries(value)) {
+    keys.push(key);
+    collectObjectKeys(child, keys);
+  }
+  return keys;
 }
 
 function bindErrorCapture(page) {

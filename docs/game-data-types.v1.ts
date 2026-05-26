@@ -298,17 +298,57 @@ export interface ProfileState {
   completedStages: ContentId[];
 }
 
+export type SavePhase =
+  | "town"
+  | "world_map"
+  | "dungeon"
+  | "combat"
+  | "reward"
+  | "rune_bench"
+  | "boss"
+  | "result";
+
+export interface SaveCombatState {
+  enemyId: ContentId;
+  enemyKind: "enemy" | "boss";
+  enemyHp: number;
+  enemyMaxHp: number;
+  enemyBlock: number;
+  intentIndex: number;
+  turn: number;
+  defeated: boolean;
+  bossPhaseTriggered: boolean;
+  pendingAttackBonus: number;
+}
+
 export interface RunState {
   runId: string;
+  phase: SavePhase;
   characterId: ContentId;
   stageId: ContentId;
   roomIndex: number;
   deck: ContentId[];
+  drawPile: ContentId[];
   hand: ContentId[];
   discard: ContentId[];
+  playerEnergy: number;
+  playerMaxEnergy: number;
+  playerBlock: number;
+  combat?: SaveCombatState;
+  rewardPoolId?: ContentId;
+  offeredRewards: ContentId[];
+  rewardSourceRoomIndex?: number;
   equippedRunes: Record<ContentId, ContentId[]>;
+  runes: ContentId[];
   relics: ContentId[];
   arcanas: ContentId[];
+  completedStages: ContentId[];
+  nextCardDiscount: number;
+  nextCardCostPenalty: number;
+  nextDamageReduction: number;
+  nextRewardBonus: number;
+  chainCount: number;
+  log: string[];
   hp: number;
   maxHp: number;
   currency: number;

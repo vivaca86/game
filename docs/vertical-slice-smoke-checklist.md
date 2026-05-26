@@ -4,10 +4,10 @@ Date: 2026-05-26
 
 ## Status
 
-- Status: combat simulation and scene flow smoke verified.
+- Status: combat simulation, scene flow, click controls, and save reload smoke verified.
 - Basis: `docs/vertical-slice-acceptance.md`
 - Candidate data: `docs/vertical-slice-content-candidates.md`
-- Still not complete: full vertical-slice pass, final art/assets, save reload persistence, exhaustive source parity, 95% similarity.
+- Still not complete: full vertical-slice pass, final art/assets, exhaustive source parity, 95% similarity.
 
 ## State Values
 
@@ -39,7 +39,7 @@ Date: 2026-05-26
 | DATA-004 | All `referenceRole` values are mapped in `reference-role-map-slice-v1.md`. | `npm.cmd run slice:validate` | Verified |
 | DATA-005 | All referenced asset keys exist in the planned manifest. | `npm.cmd run slice:validate` | Verified |
 | DATA-006 | Card descriptions and effect ops do not contradict each other. | effect audit | Not started |
-| DATA-007 | Save data does not store Phaser objects. | save serialization/reload check | Implemented, not verified |
+| DATA-007 | Save data does not store Phaser objects. | `npm.cmd run phaser:smoke` save snapshot check | Verified |
 
 ## UI Checks
 
@@ -76,7 +76,7 @@ Date: 2026-05-26
 | LOOP-004 | Rune equip affects the next combat. | full loop smoke | Verified |
 | LOOP-005 | Boss clear creates result state. | boss loop smoke | Verified |
 | LOOP-006 | Result can return to town. | boss loop smoke | Verified |
-| LOOP-007 | Minimum progress survives save reload. | save reload check | Not started |
+| LOOP-007 | Minimum progress survives save reload. | `npm.cmd run phaser:smoke` + in-app browser reload check | Verified |
 
 ## Responsive/View Checks
 
@@ -93,6 +93,7 @@ Date: 2026-05-26
 - `npm.cmd run check`: passed.
 - `npm.cmd run phaser:smoke`: passed.
 - `git diff --check`: passed.
+- Save reload: `phaser:smoke` verifies saved mid-combat state restores after reload and saved completed-stage profile state survives reload. In-app browser also verified reset-save flow, card action, no-reset reload, and restored `phase=combat`, `enemyHp=17`, `playerEnergy=2`, `savedPhase=combat`.
 
 `phaser:smoke` writes screenshots under `tmp/`, including `tmp/phaser-TownScene.png`, `tmp/phaser-CombatScene.png`, and `tmp/phaser-BossScene.png`. `tmp/` is verification output and is not committed.
 
@@ -104,8 +105,7 @@ To call the first vertical slice passed, all required `PRE`, `DATA`, `UI`, `COMB
 
 ## Next Work
 
-1. Add save reload verification for `LOOP-007` and `DATA-007`.
-2. Add 1920x1080 screenshot checks and review debug overlay placement.
-3. Add effect-audit coverage for card description/effect-op consistency.
-4. Split fixture `encounterPoolId` into explicit encounter-pool data if the next content pass needs multiple enemies per room.
-5. Continue source/version confirmation separately; current implementation is a slice foundation, not source parity.
+1. Add 1920x1080 screenshot checks and review debug overlay placement.
+2. Add effect-audit coverage for card description/effect-op consistency.
+3. Split fixture `encounterPoolId` into explicit encounter-pool data if the next content pass needs multiple enemies per room.
+4. Continue source/version confirmation separately; current implementation is a slice foundation, not source parity.

@@ -277,6 +277,56 @@ interface PowerUpData extends BaseContent {
 ## 세이브 경계
 
 ```ts
+type SavePhase =
+  | "town"
+  | "world_map"
+  | "dungeon"
+  | "combat"
+  | "reward"
+  | "rune_bench"
+  | "boss"
+  | "result";
+
+interface SaveCombatState {
+  enemyId: ContentId;
+  enemyKind: "enemy" | "boss";
+  enemyHp: number;
+  enemyMaxHp: number;
+  enemyBlock: number;
+  intentIndex: number;
+  turn: number;
+  defeated: boolean;
+  bossPhaseTriggered: boolean;
+  pendingAttackBonus: number;
+}
+
+interface RunState {
+  runId: string;
+  phase: SavePhase;
+  characterId: ContentId;
+  stageId: ContentId;
+  roomIndex: number;
+  deck: ContentId[];
+  drawPile: ContentId[];
+  hand: ContentId[];
+  discard: ContentId[];
+  playerEnergy: number;
+  playerMaxEnergy: number;
+  playerBlock: number;
+  combat?: SaveCombatState;
+  rewardPoolId?: ContentId;
+  offeredRewards: ContentId[];
+  equippedRunes: Record<ContentId, ContentId[]>;
+  runes: ContentId[];
+  relics: ContentId[];
+  arcanas: ContentId[];
+  completedStages: ContentId[];
+  log: string[];
+  hp: number;
+  maxHp: number;
+  currency: number;
+}
+
 interface SaveData {
   saveVersion: number;
   profile: ProfileState;
@@ -291,6 +341,7 @@ interface SaveData {
 - 세이브는 ID, 수치, 선택 상태, 해금 상태만 가진다.
 - `saveVersion`을 통해 마이그레이션 가능하게 만든다.
 - 디버그 세이브와 실제 세이브를 구분한다.
+- 현재 런 복원에는 phase, 손패/드로우/버림, 전투 상태, 보상/룬 상태처럼 새로고침 후 플레이 흐름을 이어가는 최소 필드를 포함한다.
 
 ## 에셋 매니페스트
 

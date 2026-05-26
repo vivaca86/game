@@ -4,6 +4,9 @@ export function createDebugSummary(context: BootContext): string[] {
   return [
     `entry=${context.entry}`,
     `phase=${context.run.phase}`,
+    `saveVersion=${context.save.saveVersion}`,
+    `savedPhase=${context.save.currentRun?.phase ?? "none"}`,
+    `saveCompleted=${context.save.profile.completedStages.join(",") || "none"}`,
     `seed=${context.seed}`,
     `stage=${context.run.stageId}`,
     `roomIndex=${context.run.roomIndex}`,

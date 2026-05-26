@@ -4,8 +4,8 @@ import type { BootContext } from "../../app/bootContext";
 import { loadGameData } from "../../data/loadGameData";
 import { validateLoadedData } from "../../data/validateLoadedData";
 import { createDebugConfig } from "../../debug/debugEntry";
-import { createInitialSave } from "../../save/saveCodec";
-import { createInitialRunState } from "../../simulation/state/runState";
+import { hasUsableStoredSave, loadSave, persistSave } from "../../save/saveCodec";
+import { createInitialRunState, sliceRunToSaveRun } from "../../simulation/state/runState";
 import { storeBootContext } from "../bridge/sceneBridge";
 
 export class BootScene extends Phaser.Scene {
@@ -17,9 +17,15 @@ export class BootScene extends Phaser.Scene {
     const runtimeFlags = getRuntimeFlags();
     const loaded = loadGameData();
     const validation = validateLoadedData(loaded.bundle);
-    const save = createInitialSave(loaded.bundle);
+    const restoreSavedRun = hasUsableStoredSave(loaded.bundle, { debug: runtimeFlags.debug }) && !runtimeFlags.resetSave;
+    const save = loadSave(loaded.bundle, {
+      debug: runtimeFlags.debug,
+      resetSave: runtimeFlags.resetSave
+    });
     const debug = createDebugConfig(runtimeFlags, loaded.bundle);
-    const run = createInitialRunState(loaded.bundle, debug);
+    const run = createInitialRunState(loaded.bundle, debug, restoreSavedRun ? save.currentRun : undefined);
+    save.currentRun = sliceRunToSaveRun(run);
+
     const context: BootContext = {
       dataBundle: loaded.bundle,
       assetManifest: loaded.bundle.assets,
@@ -35,6 +41,7 @@ export class BootScene extends Phaser.Scene {
     };
 
     storeBootContext(this, context);
+    persistSave(save, { debug: runtimeFlags.debug });
 
     if (!validation.ok) {
       console.error("Slice data validation failed", validation.errors);

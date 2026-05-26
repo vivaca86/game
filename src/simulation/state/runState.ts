@@ -3,21 +3,15 @@ import type {
   ContentId,
   GameDataBundle,
   RewardEntry,
+  RunState,
+  SavePhase,
   RoomSlot,
   StageData
 } from "../../data/schema";
 import type { DebugConfig, EntryKey } from "../../debug/debugEntry";
 import type { SliceCombatState } from "./combatState";
 
-export type SlicePhase =
-  | "town"
-  | "world_map"
-  | "dungeon"
-  | "combat"
-  | "reward"
-  | "rune_bench"
-  | "boss"
-  | "result";
+export type SlicePhase = SavePhase;
 
 export interface SlicePlayerState {
   hp: number;
@@ -55,7 +49,15 @@ export interface SliceRunState {
   log: string[];
 }
 
-export function createInitialRunState(bundle: GameDataBundle, debug: DebugConfig): SliceRunState {
+export function createInitialRunState(
+  bundle: GameDataBundle,
+  debug: DebugConfig,
+  savedRun?: RunState
+): SliceRunState {
+  if (savedRun) {
+    return createRunFromSave(bundle, debug, savedRun);
+  }
+
   const character = bundle.characters[0];
   const stage = bundle.stages.find((item) => item.id === debug.stageId) ?? bundle.stages[0];
   const deck = [...(character?.startingDeck ?? []), ...debug.grants.cards];
@@ -111,6 +113,43 @@ export function createInitialRunState(bundle: GameDataBundle, debug: DebugConfig
   }
 
   return run;
+}
+
+export function sliceRunToSaveRun(run: SliceRunState): RunState {
+  return {
+    runId: run.runId,
+    phase: run.phase,
+    characterId: run.characterId,
+    stageId: run.stageId,
+    roomIndex: run.roomIndex,
+    deck: [...run.deck],
+    drawPile: [...run.drawPile],
+    hand: [...run.hand],
+    discard: [...run.discard],
+    playerEnergy: run.player.energy,
+    playerMaxEnergy: run.player.maxEnergy,
+    playerBlock: run.player.block,
+    combat: run.combat ? { ...run.combat } : undefined,
+    rewardPoolId: run.rewardPoolId,
+    offeredRewards: [...run.offeredRewards],
+    rewardSourceRoomIndex: run.rewardSourceRoomIndex,
+    equippedRunes: Object.fromEntries(
+      Object.entries(run.equippedRunes).map(([cardId, runes]) => [cardId, [...runes]])
+    ),
+    runes: [...run.runes],
+    relics: [...run.relics],
+    arcanas: [...run.arcanas],
+    completedStages: [...run.completedStages],
+    nextCardDiscount: run.nextCardDiscount,
+    nextCardCostPenalty: run.nextCardCostPenalty,
+    nextDamageReduction: run.nextDamageReduction,
+    nextRewardBonus: run.nextRewardBonus,
+    chainCount: run.chainCount,
+    log: [...run.log],
+    hp: run.player.hp,
+    maxHp: run.player.maxHp,
+    currency: 0
+  };
 }
 
 export function entryToPhase(entry: EntryKey): SlicePhase {
@@ -198,6 +237,55 @@ export function pushRunLog(run: SliceRunState, message: string): void {
   run.log = [...run.log, message].slice(-16);
 }
 
+function createRunFromSave(
+  bundle: GameDataBundle,
+  debug: DebugConfig,
+  savedRun: RunState
+): SliceRunState {
+  const run: SliceRunState = {
+    runId: savedRun.runId,
+    phase: savedRun.phase,
+    characterId: savedRun.characterId,
+    stageId: savedRun.stageId,
+    roomIndex: savedRun.roomIndex,
+    deck: [...savedRun.deck],
+    drawPile: [...savedRun.drawPile],
+    hand: [...savedRun.hand],
+    discard: [...savedRun.discard],
+    player: {
+      hp: savedRun.hp,
+      maxHp: savedRun.maxHp,
+      energy: savedRun.playerEnergy,
+      maxEnergy: savedRun.playerMaxEnergy,
+      block: savedRun.playerBlock
+    },
+    combat: savedRun.combat ? { ...savedRun.combat } : undefined,
+    rewardPoolId: savedRun.rewardPoolId,
+    offeredRewards: [...savedRun.offeredRewards],
+    rewardSourceRoomIndex: savedRun.rewardSourceRoomIndex,
+    equippedRunes: Object.fromEntries(
+      Object.entries(savedRun.equippedRunes).map(([cardId, runes]) => [cardId, [...runes]])
+    ),
+    runes: [...savedRun.runes],
+    relics: [...savedRun.relics],
+    arcanas: [...savedRun.arcanas],
+    completedStages: [...savedRun.completedStages],
+    nextCardDiscount: savedRun.nextCardDiscount,
+    nextCardCostPenalty: savedRun.nextCardCostPenalty,
+    nextDamageReduction: savedRun.nextDamageReduction,
+    nextRewardBonus: savedRun.nextRewardBonus,
+    chainCount: savedRun.chainCount,
+    log: savedRun.log.length > 0 ? [...savedRun.log] : [`boot:${savedRun.phase}`]
+  };
+
+  if ((run.phase === "combat" || run.phase === "boss") && !run.combat) {
+    const combat = createInitialCombatForPhase(bundle, run, debug);
+    if (combat) run.combat = combat;
+  }
+
+  return run;
+}
+
 function resolveInitialRoomIndex(stage: StageData | undefined, debug: DebugConfig): number {
   if (!stage) return 0;
   if (debug.roomId) {
@@ -280,4 +368,3 @@ function countCards(cards: ContentId[]): Map<ContentId, number> {
 function takeCard(cardId: ContentId, counts: Map<ContentId, number>): void {
   counts.set(cardId, (counts.get(cardId) ?? 0) + 1);
 }
-

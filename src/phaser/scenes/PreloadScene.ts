@@ -19,6 +19,6 @@ export class PreloadScene extends Phaser.Scene {
       console.info("Using generated placeholder textures for planned manifest", warnings);
     }
 
-    this.scene.start(resolveEntryScene(context.entry), context);
+    this.scene.start(resolveEntryScene(context.run.phase), context);
   }
 }
