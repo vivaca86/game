@@ -165,3 +165,11 @@
 - 해결 방안: common Windows Steam roots, Steam registry paths, 사용자 프로필 내 appmanifest 검색, fixed drive의 Steam/SteamLibrary 후보 경로를 비파괴적으로 확인했다. 결과를 `docs/source-version-baseline.md`, `docs/development-foundation.md`, `docs/vertical-slice-smoke-checklist.md`에 `Blocked locally`로 남겼다.
 - 재발 방지 기준: Steam library 접근이 없는 상태에서는 직접 빌드 증거를 완료로 말하지 않는다. 사용자가 Steam 설치본, `appmanifest_3265700.acf`, 설치 게임 폴더 또는 fresh direct capture를 제공한 뒤에만 build id, 인게임 버전 라벨, screenshot 기준선을 `Verified`로 올린다.
 - 해결 커밋: `6ed8ae8 Document blocked local build proof`
+
+### 문제: planned asset manifest와 실제 runtime 파일이 갈라져도 잡는 검증선이 없음
+
+- 원인: 첫 세로 조각 manifest는 planned key/path를 갖고 있었지만, `docs/asset-manifest.slice.v1.json`과 `src/data/assetManifest.slice.v1.json`의 drift, 실제 `assets/runtime` PNG 크기, orphan 파일, strict 파일 존재 조건을 검사하는 별도 도구가 없었다.
+- 영향: 에셋 파이프라인이 시작된 뒤 key/path가 틀리거나 PNG 크기가 manifest와 달라도 placeholder scaffold가 계속 돌아가서 문제를 늦게 발견할 수 있었다. 반대로 아직 파일이 없는 planned 상태를 에셋 실패 또는 완료로 잘못 말할 위험도 있었다.
+- 해결 방안: `tools/audit-asset-files.mjs`를 추가해 docs/runtime manifest 동기화, key/path 중복, runtime path 규칙, 실제 PNG `nativeSize`, spritesheet `frameSize`, orphan runtime image를 검사한다. 기본 `assets:audit`는 `planned_manifest` missing을 warning으로 보고하고, `assets:audit:strict`는 에셋 생성 이후 파일 누락을 실패로 잡는다.
+- 재발 방지 기준: 실제 runtime asset 파일을 생성하거나 교체할 때는 `npm.cmd run assets:audit:strict`를 통과시킨다. `planned_manifest`에서 missing warning이 난 상태를 에셋 완료로 말하지 않는다.
+- 해결 커밋: `a1636df Add asset file audit guard`

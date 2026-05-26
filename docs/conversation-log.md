@@ -471,3 +471,15 @@ SteamDB는 PowerShell 직접 요청 시 “공식 API가 없고 추가 요청하
 로컬 확인 결과 `C:\Program Files (x86)\Steam`, `C:\Program Files\Steam`, 사용자 `AppData` Steam 후보, `C:\Steam`, `C:\SteamLibrary`, `C:\Games\SteamLibrary` 계열 경로가 없었고, Steam registry key와 사용자 프로필 내 `appmanifest_3265700.acf`도 발견되지 않았다. 현재 세션에서 보이는 파일 시스템 드라이브는 `C:`뿐이었다. 따라서 이 PC에서는 직접 설치 빌드 ID를 증명할 수 없어 `Blocked locally`로 기록했다.
 
 `docs/source-version-baseline.md`에는 2026-05-26 local direct-proof attempt 섹션을 추가했고, `docs/development-foundation.md`와 `docs/vertical-slice-smoke-checklist.md`에는 Steam library/appmanifest 접근이 제공되어야 다음 직접 증거 확인을 진행할 수 있다고 갱신했다. 검증은 탐색 경로 기록, `rg` 문서 확인, `git diff --check`, `npm.cmd run check`로 진행했다. 직접 빌드 증거 확보 자체는 완료가 아니라 로컬 환경상 차단 상태이며, 문서화 커밋은 `6ed8ae8 Document blocked local build proof`이다.
+
+### 사용자
+
+다음 작업도 진행해보자고 지시했다. 인앱 브라우저는 `?debug=1&entry=combat&resetSave=1&grantCard=card_lamplight_mark` 상태였다.
+
+### Codex
+
+직접 설치본 증거 확보는 로컬에서 막혀 있으므로, 다음 실행 가능한 기반 작업을 planned asset manifest와 실제 runtime asset 파일의 검증선 추가로 확정했다. 실제 아트 생성이나 placeholder를 최종 에셋으로 승격하는 작업은 범위에서 제외했고, `planned_manifest` 상태에서는 파일 미존재를 완료 실패가 아니라 planned missing warning으로만 처리하도록 했다.
+
+`tools/audit-asset-files.mjs`를 추가해 `docs/asset-manifest.slice.v1.json`과 `src/data/assetManifest.slice.v1.json`의 metadata/entry drift, 중복 key/path, runtime path 규칙, 실제 PNG가 존재할 때의 `nativeSize`, spritesheet `frameSize` 분할, manifest에 없는 orphan runtime image를 검사하도록 했다. `package.json`에는 `assets:audit`, `assets:audit:strict`를 추가했고, `check`에 기본 `assets:audit`를 연결했다. strict 모드는 에셋 파이프라인이 시작되어 실제 파일이 있어야 하는 시점에 사용한다.
+
+`docs/validation-rules-v1.md`, `docs/vertical-slice-smoke-checklist.md`, `docs/development-foundation.md`, `README.md`도 새 asset audit 기준을 반영하도록 갱신했다. 검증은 `npm.cmd run assets:audit`, `npm.cmd run check`, `npm.cmd run phaser:smoke`, `git diff --check`로 진행했다. 현재 manifest asset 35개는 실제 파일이 없으므로 `assets:audit`에서 planned missing warning으로 보고되며, 에셋 파일 완료는 아직 아니다. 구현 커밋은 `a1636df Add asset file audit guard`이다.
