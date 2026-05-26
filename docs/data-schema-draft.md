@@ -293,6 +293,7 @@ interface SaveCombatState {
   enemyHp: number;
   enemyMaxHp: number;
   enemyBlock: number;
+  enemyMark: number;
   intentIndex: number;
   turn: number;
   defeated: boolean;

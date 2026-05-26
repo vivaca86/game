@@ -113,6 +113,7 @@ function createCombatState(combatant: CombatantData, enemyKind: SliceCombatState
     enemyHp: combatant.maxHp,
     enemyMaxHp: combatant.maxHp,
     enemyBlock: combatant.block ?? 0,
+    enemyMark: 0,
     intentIndex: 0,
     turn: 1,
     defeated: false,
@@ -143,6 +144,10 @@ function applyCardEffect(
     const block = amount + getAttachedRuneBonus(run, bundle, cardId, "modify_attached_card_block");
     run.player.block += block;
     pushRunLog(run, `player:block:+${block}`);
+  } else if (effect.op === "apply_mark") {
+    if (!run.combat) return;
+    run.combat.enemyMark += amount;
+    pushRunLog(run, `enemy:mark:+${amount}`);
   } else if (effect.op === "draw_cards") {
     drawCards(run, amount);
   } else if (effect.op === "discount_next_card") {
@@ -165,9 +170,16 @@ function applyCardEffect(
 
 function dealDamageToEnemy(run: SliceRunState, amount: number, bundle: GameDataBundle): void {
   if (!run.combat) return;
-  const blocked = Math.min(run.combat.enemyBlock, amount);
+  const markBonus = run.combat.enemyMark > 0 ? run.combat.enemyMark : 0;
+  const incoming = amount + markBonus;
+  if (markBonus > 0) {
+    run.combat.enemyMark = 0;
+    pushRunLog(run, `enemy:mark_bonus:${markBonus}`);
+  }
+
+  const blocked = Math.min(run.combat.enemyBlock, incoming);
   run.combat.enemyBlock -= blocked;
-  const hpDamage = Math.max(0, amount - blocked);
+  const hpDamage = Math.max(0, incoming - blocked);
   run.combat.enemyHp = Math.max(0, run.combat.enemyHp - hpDamage);
   pushRunLog(run, `enemy:damage:${hpDamage}:hp=${run.combat.enemyHp}`);
   triggerBossPhaseIfNeeded(run, bundle);
@@ -261,4 +273,3 @@ function handleCombatVictory(run: SliceRunState, bundle: GameDataBundle): void {
   prepareRewardOffer(run, bundle, room?.rewardPoolId, 3);
   pushRunLog(run, `combat:victory:${run.combat.enemyId}`);
 }
-

@@ -339,10 +339,10 @@ notes?: string
 - Verified combat behaviors: attack damage, block gain, draw, enemy turn damage, rune-modified damage, boss phase trigger.
 - This is still foundation work, not final balance, final art, full save persistence, exhaustive source parity, or a full vertical-slice pass.
 
-Current next work:
+Current foundation status:
 
-1. Add save reload verification for the run state and confirm no Phaser objects enter save data.
-2. Add 1920x1080 screenshot checks and visual overlap review.
-3. Add effect-audit coverage so card descriptions and effect ops are checked against each other.
-4. Decide whether `encounterPoolId` stays a direct enemy/boss id for the slice or becomes explicit encounter-pool data.
+1. Save reload verification is in place for mid-combat and completed-stage state, including a save boundary check for Phaser object leakage.
+2. 1920x1080 screenshot checks and debug-overlay visual overlap checks are in place.
+3. Card description/effect-op audit is in place through `npm.cmd run slice:effects`.
+4. Remaining foundation decision: decide whether `encounterPoolId` stays a direct enemy/boss id for the slice or becomes explicit encounter-pool data.
 5. Continue source/version confirmation separately before any parity or 95% similarity claim.

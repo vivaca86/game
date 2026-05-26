@@ -4,7 +4,7 @@ Date: 2026-05-26
 
 ## Status
 
-- Status: combat simulation, scene flow, click controls, save reload, and 1920/view smoke verified.
+- Status: combat simulation, scene flow, click controls, save reload, 1920/view smoke, and card effect audit verified.
 - Basis: `docs/vertical-slice-acceptance.md`
 - Candidate data: `docs/vertical-slice-content-candidates.md`
 - Still not complete: full vertical-slice pass, final art/assets, exhaustive source parity, 95% similarity.
@@ -38,7 +38,7 @@ Date: 2026-05-26
 | DATA-003 | All slice content has `referenceRole`. | `npm.cmd run slice:validate` | Verified |
 | DATA-004 | All `referenceRole` values are mapped in `reference-role-map-slice-v1.md`. | `npm.cmd run slice:validate` | Verified |
 | DATA-005 | All referenced asset keys exist in the planned manifest. | `npm.cmd run slice:validate` | Verified |
-| DATA-006 | Card descriptions and effect ops do not contradict each other. | effect audit | Not started |
+| DATA-006 | Card descriptions and effect ops do not contradict each other. | `npm.cmd run slice:effects` | Verified |
 | DATA-007 | Save data does not store Phaser objects. | `npm.cmd run phaser:smoke` save snapshot check | Verified |
 
 ## UI Checks
@@ -65,6 +65,7 @@ Date: 2026-05-26
 | COMBAT-005 | Combat log and state agree with the action result. | debug overlay `log=...` plus smoke assertions | Verified |
 | COMBAT-006 | Equipped rune changes attached-card value. | flow smoke: `rune_paper_spark` makes `card_sun_jab` deal 9 | Verified |
 | COMBAT-007 | Boss phase triggers at HP threshold. | boss debug smoke: `bossPhaseTriggered=true` | Verified |
+| COMBAT-008 | `card_lamplight_mark` applies mark and the next attack consumes it as bonus damage. | debug combat smoke: `enemyMark=2`, then `enemyMark=0` and `enemyHp=15` | Verified |
 
 ## Loop Checks
 
@@ -90,10 +91,13 @@ Date: 2026-05-26
 ## Current Verification Results
 
 - `npm.cmd run slice:validate`: passed.
+- `npm.cmd run slice:effects`: passed.
 - `npm.cmd run check`: passed.
 - `npm.cmd run phaser:smoke`: passed.
 - `git diff --check`: passed.
 - Save reload: `phaser:smoke` verifies saved mid-combat state restores after reload and saved completed-stage profile state survives reload. In-app browser also verified reset-save flow, card action, no-reset reload, and restored `phase=combat`, `enemyHp=17`, `playerEnergy=2`, `savedPhase=combat`.
+- Effect audit: `slice:effects` verifies docs/runtime fixture card effect text stays in sync, implemented card descriptions do not keep draft `후보` wording, each card effect op has a Korean description cue/amount, and each op is handled by the Phaser slice simulation.
+- Mark smoke: `phaser:smoke` uses `?debug=1&entry=combat&resetSave=1&grantCard=card_lamplight_mark`, confirms mark becomes `enemyMark=2`, then the next attack consumes mark to `enemyMark=0` and reduces enemy HP from 24 to 15.
 - 1920/view checks: `phaser:smoke` now captures 1920x1080 screenshots for Town, Dungeon, Combat, Reward, Rune Bench, and Boss under `tmp/phaser-1920-*.png`. Combat and Boss assertions verify five-card hands, expected debug state, non-empty screenshots, and debug-overlay avoidance of the hand and enemy intent areas.
 - Responsive overlay checks: `phaser:smoke` also captures 1280 and 1080 overlay screenshots for Combat and Boss under `tmp/phaser-overlay-*.png`. In-app browser verification at 1080x918 confirmed `phase=combat`, `enemyHp=24`, `playerEnergy=3`, overlay size `220x260`, and no overlap with the five-card hand or enemy intent panel.
 
@@ -101,12 +105,12 @@ Date: 2026-05-26
 
 ## Pass Judgment
 
-This is not a full vertical-slice pass yet.
+The first vertical-slice smoke checklist is verified: all listed `PRE`, `DATA`, `UI`, `COMBAT`, `LOOP`, and `VIEW` rows are `Verified`, no `Needs fix` rows remain, and screenshot/save-reload/effect-audit evidence is recorded.
 
-To call the first vertical slice passed, all required `PRE`, `DATA`, `UI`, `COMBAT`, `LOOP`, and `VIEW` rows must be `Verified`, no `Needs fix` rows may remain, and screenshot/save-reload evidence must be recorded. This checklist also does not authorize any original-game 95% similarity claim.
+This is still not a production-complete game, final art/assets pass, exhaustive source parity check, or original-game 95% similarity claim.
 
 ## Next Work
 
-1. Add effect-audit coverage for card description/effect-op consistency.
-2. Split fixture `encounterPoolId` into explicit encounter-pool data if the next content pass needs multiple enemies per room.
-3. Continue source/version confirmation separately; current implementation is a slice foundation, not source parity.
+1. Split fixture `encounterPoolId` into explicit encounter-pool data if the next content pass needs multiple enemies per room.
+2. Continue source/version confirmation separately; current implementation is a slice foundation, not source parity.
+3. Expand content, final art/assets, balance, and UX polish only after the foundation remains green.

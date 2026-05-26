@@ -251,6 +251,14 @@ async function checkCombatActions() {
     await waitForDebugValue(page, "playerHp", "36");
     await waitForDebugValue(page, "turn", "2");
   });
+
+  await withDebugPage("/?debug=1&entry=combat&resetSave=1&grantCard=card_lamplight_mark", "CombatScene", async (page) => {
+    await pressAndSettle(page, "Digit4");
+    await waitForDebugValue(page, "enemyMark", "2");
+    await pressAndSettle(page, "Digit1");
+    await waitForDebugValue(page, "enemyMark", "0");
+    await waitForDebugValue(page, "enemyHp", "15");
+  });
 }
 
 async function checkClickableControls() {

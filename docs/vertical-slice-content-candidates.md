@@ -66,14 +66,14 @@ paper_town_start
 | --- | --- | --- | --- | --- | --- |
 | card_sun_jab | 햇살 찌르기 | attack | 1 | starter_cost_1_attack | 앞 적에게 피해 7 |
 | card_fold_guard | 접힌 방패 | defense | 1 | starter_basic_guard | 보호막 6 |
-| card_page_step | 책장 넘기기 | skill | 0 | starter_draw_cycle | 카드 1장 드로우, 다음 카드 비용 후보 -1 |
+| card_page_step | 책장 넘기기 | skill | 0 | starter_draw_cycle | 카드 1장 드로우, 다음 카드 비용 -1 |
 | card_ribbon_snap | 리본 튕기기 | attack | 1 | starter_chain_attack | 피해 4, 연쇄 3 이상이면 추가 피해 |
 | card_lamplight_mark | 등불 표식 | skill | 1 | starter_mark_setup | 표식 2 부여 |
 | card_stage_patch | 무대 덧대기 | defense | 2 | starter_big_guard | 보호막 11, 다음 피해 1 감소 |
 | card_ink_spill | 잉크 번짐 | attack | 2 | starter_area_attack | 모든 적에게 피해 4 |
-| card_paper_bloom | 종이꽃 회복 | skill | 1 | starter_small_heal | HP 3 회복, 전투당 1회 제한 후보 |
+| card_paper_bloom | 종이꽃 회복 | skill | 1 | starter_small_heal | HP 3 회복 |
 | card_pinpoint_glint | 금핀 반짝임 | attack | 0 | starter_free_chip | 피해 3, 룬 발동 테스트 |
-| card_curtain_call | 커튼콜 | skill | 2 | starter_reward_setup | 이번 전투 후 카드 보상 선택지 +1 후보 |
+| card_curtain_call | 커튼콜 | skill | 2 | starter_reward_setup | 이번 전투 후 카드 보상 선택지 +1 |
 
 세로 조각 투입 기본값:
 
@@ -162,6 +162,6 @@ paper_town_start
 
 ## 다음 작업
 
-1. 첫 Phaser 구조를 만들 때 이 후보만 runtime fixture로 이관한다.
+1. 새 콘텐츠를 늘리기 전 `encounterPoolId`를 별도 encounter-pool 데이터로 분리할지 결정한다.
 2. `docs/asset-manifest.slice.v1.json`의 planned asset key를 실제 파일 생성 결과와 비교한다.
 3. `Needs direct proof` 상태의 후보는 debug 화면에서도 draft임을 표시한다.

@@ -4,11 +4,11 @@
 
 ## 상태
 
-- 상태: 구현 전 검증 기준
+- 상태: 세로 조각 기반 검증 기준 및 실행 명령 연결됨
 - 기준 타입: `docs/game-data-types.v1.ts`
 - 기준 fixture: `docs/vertical-slice-data.fixture.v1.json`
 - 기준 manifest: `docs/asset-manifest.slice.v1.json`
-- 아직 아님: 실제 검증 스크립트 구현, 브라우저 검증 완료, TypeScript 컴파일 보장
+- 아직 아님: 본편 전체 콘텐츠 검증, 최종 그래픽 품질 검증, 원작 source/version 확정
 
 ## 목적
 
@@ -24,6 +24,7 @@
 | Asset key | 데이터가 참조하는 에셋 키가 manifest에 있는지 확인 | 필수 |
 | Reward refs | 보상 풀이 참조하는 콘텐츠 ID가 존재하는지 확인 | 필수 |
 | Route refs | 스테이지 route가 encounter/event/boss/reward를 찾을 수 있는지 확인 | 필수 |
+| Effect text/op | 카드 한글 설명과 실제 effect op/amount가 어긋나지 않는지 확인 | 필수 |
 | Save boundary | 세이브 후보가 Phaser 객체 없이 ID와 수치만 갖는지 확인 | 구현 시 필수 |
 | Browser smoke | 화면과 상호작용이 체크리스트를 통과하는지 확인 | 구현 후 필수 |
 
@@ -134,10 +135,17 @@ Slice fixture 검증:
 npm run slice:validate
 ```
 
+Slice card effect text/op 감사:
+
+```powershell
+npm run slice:effects
+```
+
 이 PowerShell 환경에서 `npm.ps1` 실행 정책에 막히면 아래 명령을 사용한다.
 
 ```powershell
 npm.cmd run slice:validate
+npm.cmd run slice:effects
 ```
 
 PowerShell JSON 파싱 보조:
@@ -164,6 +172,5 @@ tsc --noEmit --strict --skipLibCheck docs/game-data-types.v1.ts
 ## 다음 작업
 
 1. fixture의 `encounterPoolId`를 별도 encounter pool 데이터로 분리할지 결정한다.
-2. smoke checklist ID와 실제 테스트 파일명을 연결한다.
-3. Phaser 프로젝트 생성 후 fixture와 manifest를 로드하는 첫 데이터 부팅 테스트를 만든다.
-4. `npm run slice:validate`를 향후 통합 check에 연결할지 결정한다.
+2. 새 카드/effect op를 추가할 때 `slice:effects` 규칙과 Phaser slice simulation 처리를 함께 갱신한다.
+3. 원작 대응 기준은 source/version 확인이 끝날 때까지 별도 검증으로 유지한다.

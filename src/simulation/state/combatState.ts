@@ -8,10 +8,10 @@ export interface SliceCombatState {
   enemyHp: number;
   enemyMaxHp: number;
   enemyBlock: number;
+  enemyMark: number;
   intentIndex: number;
   turn: number;
   defeated: boolean;
   bossPhaseTriggered: boolean;
   pendingAttackBonus: number;
 }
-

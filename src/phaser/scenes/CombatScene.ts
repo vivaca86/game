@@ -53,7 +53,7 @@ export function renderCombatPanel(
   scene.add.rectangle(1380, 535, 420, 230, fill, 0.96).setStrokeStyle(5, stroke, 0.9);
   scene.add.text(1204, 436, enemy?.displayNameKo ?? "missing enemy", textStyle(34, titleColor, true));
   scene.add.text(1204, 492, `HP ${combat?.enemyHp ?? "-"} / ${combat?.enemyMaxHp ?? "-"}`, textStyle(28, bodyColor, true));
-  scene.add.text(1204, 532, `Block ${combat?.enemyBlock ?? 0}`, textStyle(24, bodyColor));
+  scene.add.text(1204, 532, `Block ${combat?.enemyBlock ?? 0} / Mark ${combat?.enemyMark ?? 0}`, textStyle(24, bodyColor));
   scene.add.text(1204, 572, `Intent ${intent?.telegraphKo ?? "none"}`, textStyle(24, bodyColor));
   scene.add.text(1204, 610, `Turn ${combat?.turn ?? 0}`, textStyle(24, bodyColor));
 }

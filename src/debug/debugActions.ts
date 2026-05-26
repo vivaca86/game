@@ -16,6 +16,7 @@ export function createDebugSummary(context: BootContext): string[] {
     context.run.combat ? `enemy=${context.run.combat.enemyId}` : context.debug.enemyId ? `enemy=${context.debug.enemyId}` : "enemy=none",
     context.run.combat ? `enemyHp=${context.run.combat.enemyHp}` : "enemyHp=none",
     context.run.combat ? `enemyBlock=${context.run.combat.enemyBlock}` : "enemyBlock=none",
+    context.run.combat ? `enemyMark=${context.run.combat.enemyMark}` : "enemyMark=none",
     context.run.combat ? `turn=${context.run.combat.turn}` : "turn=none",
     context.run.combat ? `bossPhaseTriggered=${context.run.combat.bossPhaseTriggered}` : "bossPhaseTriggered=none",
     context.run.combat ? `pendingAttackBonus=${context.run.combat.pendingAttackBonus}` : "pendingAttackBonus=none",

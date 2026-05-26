@@ -16,7 +16,7 @@
       {
         "id": "card_sun_jab",
         "displayNameKo": "햇살 찌르기",
-        "descriptionKo": "앞의 적에게 피해 7. 첫 공격 보너스와 룬 피해 보너스를 받을 수 있다.",
+        "descriptionKo": "앞의 적에게 피해 7. 공격 룬 피해 보너스를 받을 수 있다.",
         "tags": ["starter", "attack", "single_target"],
         "referenceRole": "starter_cost_1_attack",
         "evidence": {
@@ -88,7 +88,7 @@
       {
         "id": "card_page_step",
         "displayNameKo": "책장 넘기기",
-        "descriptionKo": "카드 1장을 뽑는다. 이번 턴 다음 카드 비용 -1 후보.",
+        "descriptionKo": "카드 1장을 뽑는다. 다음 카드 비용 -1.",
         "tags": ["starter", "skill", "draw", "cost_flow"],
         "referenceRole": "starter_draw_cycle",
         "evidence": {
@@ -173,7 +173,7 @@
       {
         "id": "card_lamplight_mark",
         "displayNameKo": "등불 표식",
-        "descriptionKo": "앞의 적에게 표식 2. 표식이 있는 적은 다음 피해를 더 받는다.",
+        "descriptionKo": "앞의 적에게 표식 2. 표식은 다음 피해를 +2 한다.",
         "tags": ["reward", "skill", "mark"],
         "referenceRole": "starter_mark_setup",
         "evidence": {
@@ -287,7 +287,7 @@
       {
         "id": "card_paper_bloom",
         "displayNameKo": "종이꽃 회복",
-        "descriptionKo": "HP 3 회복. 전투당 1회 제한 후보.",
+        "descriptionKo": "HP 3 회복.",
         "tags": ["reward", "skill", "heal"],
         "referenceRole": "starter_small_heal",
         "evidence": {
@@ -304,7 +304,6 @@
             "op": "heal",
             "timing": "on_play",
             "value": { "amount": 3, "target": "self" },
-            "condition": "once_per_combat",
             "previewKo": "HP 3 회복"
           }
         ],
@@ -360,7 +359,7 @@
       {
         "id": "card_curtain_call",
         "displayNameKo": "커튼콜",
-        "descriptionKo": "이번 전투 후 카드 보상 선택지 +1 후보.",
+        "descriptionKo": "이번 전투 후 카드 보상 선택지 +1.",
         "tags": ["reward", "skill", "reward_setup"],
         "referenceRole": "starter_reward_setup",
         "evidence": {

@@ -64,6 +64,7 @@ npm.cmd run legacy:dev
 
 ```powershell
 npm.cmd run slice:validate
+npm.cmd run slice:effects
 npm.cmd run check
 npm.cmd run phaser:smoke
 ```
@@ -77,6 +78,8 @@ npm.cmd run slice:validate
 `content-quality-audit.mjs`가 현재 본편을 `BLOCKED`로 보는 것은 의도된 상태다. 본편 그래픽/데이터가 아직 최종 품질이 아니라는 보호 장치다.
 
 `slice:validate`는 2026-05-26 이후 새 세로 조각 fixture와 planned asset manifest의 구조, `referenceRole`, asset key, reward, route 참조를 검사한다.
+
+`slice:effects`는 docs/runtime fixture의 카드 한글 설명과 실제 effect op/amount가 서로 어긋나지 않는지 검사한다.
 
 `phaser:smoke`는 실행 중인 Vite dev server에서 기본 진입, `entry=combat`, `entry=boss` debug 화면의 canvas와 콘솔 오류를 확인한다.
 
