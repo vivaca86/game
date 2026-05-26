@@ -483,3 +483,13 @@ SteamDB는 PowerShell 직접 요청 시 “공식 API가 없고 추가 요청하
 `tools/audit-asset-files.mjs`를 추가해 `docs/asset-manifest.slice.v1.json`과 `src/data/assetManifest.slice.v1.json`의 metadata/entry drift, 중복 key/path, runtime path 규칙, 실제 PNG가 존재할 때의 `nativeSize`, spritesheet `frameSize` 분할, manifest에 없는 orphan runtime image를 검사하도록 했다. `package.json`에는 `assets:audit`, `assets:audit:strict`를 추가했고, `check`에 기본 `assets:audit`를 연결했다. strict 모드는 에셋 파이프라인이 시작되어 실제 파일이 있어야 하는 시점에 사용한다.
 
 `docs/validation-rules-v1.md`, `docs/vertical-slice-smoke-checklist.md`, `docs/development-foundation.md`, `README.md`도 새 asset audit 기준을 반영하도록 갱신했다. 검증은 `npm.cmd run assets:audit`, `npm.cmd run check`, `npm.cmd run phaser:smoke`, `git diff --check`로 진행했다. 현재 manifest asset 35개는 실제 파일이 없으므로 `assets:audit`에서 planned missing warning으로 보고되며, 에셋 파일 완료는 아직 아니다. 구현 커밋은 `a1636df Add asset file audit guard`이다.
+
+### 사용자
+
+Steam은 그냥 없다고 생각하고, 나중에 혹시 모르지만 현재는 없는 전제로 보자고 말했다.
+
+### Codex
+
+이를 중요한 기준 변경으로 받아들여 Steam 직접 설치본 증거를 활성 다음 작업에서 deferred proof로 내렸다. `docs/source-version-baseline.md`에는 2026-05-27 no-local-Steam working assumption을 추가해 Steam/appmanifest proof가 더 이상 active next-work item이 아니며, 공식 공개 자료, 보존된 조사, 역할 대응표, 원본화된 구현 판단으로 개발을 계속한다고 기록했다. 동시에 정확한 현행 빌드 런타임 값, 빌드별 동작, 원작 유사도 주장은 여전히 direct proof가 있을 때만 가능하다고 유지했다.
+
+`docs/development-foundation.md`와 `docs/vertical-slice-smoke-checklist.md`에서도 Steam 직접 증거를 개발 진행 조건이 아니라 나중에 접근이 생기면 재개할 항목으로 바꿨다. `Next Work`의 첫 항목은 에셋 파이프라인 strict 검증과 콘텐츠/아트/밸런스 확장으로 정리했다. 검증은 문서 검색, `git diff --check`, `npm.cmd run check`로 진행했다. 기준 변경 커밋은 `ec1ae3c Defer Steam direct proof path`이다.

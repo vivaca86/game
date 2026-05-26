@@ -173,3 +173,11 @@
 - 해결 방안: `tools/audit-asset-files.mjs`를 추가해 docs/runtime manifest 동기화, key/path 중복, runtime path 규칙, 실제 PNG `nativeSize`, spritesheet `frameSize`, orphan runtime image를 검사한다. 기본 `assets:audit`는 `planned_manifest` missing을 warning으로 보고하고, `assets:audit:strict`는 에셋 생성 이후 파일 누락을 실패로 잡는다.
 - 재발 방지 기준: 실제 runtime asset 파일을 생성하거나 교체할 때는 `npm.cmd run assets:audit:strict`를 통과시킨다. `planned_manifest`에서 missing warning이 난 상태를 에셋 완료로 말하지 않는다.
 - 해결 커밋: `a1636df Add asset file audit guard`
+
+### 문제: Steam 직접 증거가 계속 활성 다음 작업처럼 보일 수 있음
+
+- 원인: local Steam/appmanifest 탐색이 막힌 뒤에도 `docs/vertical-slice-smoke-checklist.md`의 `Next Work` 첫 항목이 Steam library 제공/설치였고, `docs/source-version-baseline.md`도 직접 증거를 `still needed`처럼 표현했다. 사용자는 현재 Steam이 없다고 보는 전제를 명확히 했다.
+- 영향: 실제 개발은 진행 가능한데도 Codex가 다음 작업마다 Steam 확인을 반복하거나, Steam 없음이 전체 개발 blocker처럼 오해될 수 있었다.
+- 해결 방안: `docs/source-version-baseline.md`에 2026-05-27 no-local-Steam working assumption을 추가하고, direct proof를 deferred로 낮췄다. `docs/development-foundation.md`와 `docs/vertical-slice-smoke-checklist.md`에서도 Steam 직접 증거를 active next work에서 제외하고, exact build/runtime claims가 필요하거나 사용자가 접근을 제공할 때만 재개하도록 했다.
+- 재발 방지 기준: Steam/appmanifest 접근이 없는 동안에는 공식 공개 자료, 보존된 조사, 역할 대응표, 자체 검증선을 기준으로 개발을 계속한다. Steam proof는 원작 유사도, 정확한 현행 빌드값, 빌드별 동작을 주장할 때만 다시 연다.
+- 해결 커밋: `ec1ae3c Defer Steam direct proof path`
