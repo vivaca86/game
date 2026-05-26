@@ -78,3 +78,19 @@
 - 해결 방안: manifest 전용 `uniqueKeys` 검증 함수를 추가하고, asset manifest는 `assets[].key` 기준으로 검사하도록 수정했다.
 - 재발 방지 기준: 콘텐츠 ID와 에셋 키는 둘 다 snake_case라도 의미가 다르므로 검증 함수와 오류 메시지를 분리한다.
 - 해결 커밋: `39144e0 Add slice fixture validation base`
+
+### 문제: Phaser 최신 메이저가 기준 스택과 달랐음
+
+- 원인: `npm install phaser`가 현재 최신 메이저인 Phaser 4.x를 설치했다. 그러나 프로젝트 기준 문서는 `Phaser 3 + TypeScript + Vite`로 확정되어 있다.
+- 영향: 타입, scene API, loader 동작이 기준 문서와 달라져 초기 골조가 이후 작업 기준을 흔들 수 있었다.
+- 해결 방안: 설치 직후 `package.json`을 확인하고 `npm.cmd install phaser@3`로 되돌려 `phaser`를 `^3.90.0` 범위로 고정했다.
+- 재발 방지 기준: dependency 설치 후에는 `package.json`의 실제 major version이 기반 문서의 확정 스택과 맞는지 확인한다.
+- 해결 커밋: `9c05c2c Add Phaser scaffold runtime`
+
+### 문제: 브라우저 smoke 검증 도구 경로가 현재 환경과 맞지 않음
+
+- 원인: 기존 smoke script는 예전 Codex 런타임의 Playwright 경로를 하드코딩하고 있었고, 현재 PC에는 그 경로의 Playwright 모듈이 없었다.
+- 영향: Phaser 앱의 실제 브라우저 렌더링과 console error 검증을 완료할 수 없었다.
+- 해결 방안: `playwright`를 dev dependency로 추가하고, 새 Phaser 전용 `tools/phaser-smoke-test.mjs`를 작성해 기본 진입, combat debug entry, boss debug entry를 확인했다.
+- 재발 방지 기준: 브라우저 검증 스크립트는 로컬 dependency를 우선 사용하고, 하드코딩된 번들 경로는 fallback으로만 둔다.
+- 해결 커밋: `9c05c2c Add Phaser scaffold runtime`
