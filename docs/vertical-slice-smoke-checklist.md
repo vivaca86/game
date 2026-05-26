@@ -105,6 +105,7 @@ Date: 2026-05-26
 - 1920/view checks: `phaser:smoke` now captures 1920x1080 screenshots for Town, Dungeon, Combat, Reward, Rune Bench, and Boss under `tmp/phaser-1920-*.png`. Combat and Boss assertions verify five-card hands, expected debug state, non-empty screenshots, and debug-overlay avoidance of the hand and enemy intent areas.
 - Responsive overlay checks: `phaser:smoke` also captures 1280 and 1080 overlay screenshots for Combat and Boss under `tmp/phaser-overlay-*.png`. In-app browser verification at 1080x918 confirmed `phase=combat`, `enemyHp=24`, `playerEnergy=3`, overlay size `220x260`, and no overlap with the five-card hand or enemy intent panel.
 - Asset file audit: `assets:audit` verifies the docs manifest and runtime manifest stay synchronized, asset keys/paths remain unique, generated PNG files under `public/assets/runtime` match `nativeSize`, and these files are still development placeholders rather than final art. `phaser:smoke` verifies the first page preloads all 35 `assets/runtime` URLs without browser errors.
+- 2026-05-27 card UI candidate pass: the generated development art for `card_frame_attack`, `card_frame_defense`, `card_frame_skill`, `icon_card_attack`, `icon_card_defense`, and `icon_card_skill` was replaced with more specific deterministic candidate art. This is a first replacement-loop proof, not approved final art.
 
 `phaser:smoke` writes screenshots under `tmp/`, including `tmp/phaser-TownScene.png`, `tmp/phaser-CombatScene.png`, and `tmp/phaser-BossScene.png`. `tmp/` is verification output and is not committed.
 
@@ -116,6 +117,6 @@ This is still not a production-complete game, final art/assets pass, exhaustive 
 
 ## Next Work
 
-1. Replace generated development placeholders with approved art assets one group at a time, keeping `npm.cmd run assets:audit:strict` green.
+1. Continue replacing generated development placeholders one group at a time, keeping `npm.cmd run assets:audit:strict` green. The first candidate pass covered card frames and card type icons; next likely groups are card illustrations, intent icons, backgrounds, monsters, and boss art.
 2. Expand content, final art/assets, balance, and UX polish only after the foundation remains green.
 3. Keep Steam/appmanifest direct proof deferred unless the user later provides access or exact build/runtime claims become necessary.
