@@ -537,3 +537,14 @@ The next scoped task was fixed as the background candidate pass. The included as
 `tools/generate-dev-runtime-assets.mjs` now has exact-key candidate background branches for the lantern foyer stage and rune bench event scene. `src/phaser/view/sceneShell.ts` now renders a manifest-backed scene backdrop before the UI layer, using the current stage `assetKeys.backgroundSet` by default. `src/phaser/scenes/RuneBenchScene.ts` passes the event scene background resolved from the event encounter pool, with a fallback through the stage route's event room because debug rune-bench entry can keep `roomIndex=0`.
 
 Verification used `npm.cmd run assets:audit:strict`, `npm.cmd run check`, `npm.cmd run phaser:smoke`, `git diff --check`, visual inspection of the two generated background PNGs, `tmp/phaser-CombatScene.png`, and `tmp/phaser-1920-RuneBenchScene.png`. Screenshot review found the first Rune Bench backdrop pass visually competed with UI, so the scene-specific backdrop alpha/wash and `Equipped` text position were adjusted before rerunning verification. The scoped implementation commit is `2b156ef Render background candidate assets`. This remains candidate/development art, not final approved art.
+
+### User
+The user clarified that the current generated images should be understood as temporary images for data and pipeline connection, then asked to continue the next task.
+
+### Codex
+
+The terminology was corrected for this pass: the next task was treated as a regular monster sprite pipeline placeholder pass, not a visual candidate art pass. The included assets were `monster_folded_sentry` and `monster_ink_mote`; boss sprite art, approved seed frames, full animation strips, and final art were excluded.
+
+`tools/generate-dev-runtime-assets.mjs` now generates transparent deterministic spritesheet placeholders for the two regular monsters, preserving the manifest `frameSize` layout. `src/phaser/scenes/CombatScene.ts` now renders a small regular-enemy portrait from `enemy.assetKeys.sprite` inside the combat panel when `combat.enemyKind === "enemy"`, leaving boss rendering out of scope.
+
+Verification used `npm.cmd run assets:audit:strict`, `npm.cmd run check`, `npm.cmd run phaser:smoke`, `git diff --check`, visual inspection of both generated monster spritesheets, `tmp/phaser-CombatScene.png`, and an additional `enemy=enemy_ink_mote` combat screenshot. The scoped implementation commit is `33b0837 Render enemy sprite placeholders`. This is a pipeline placeholder pass only.

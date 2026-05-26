@@ -229,3 +229,11 @@
 - Resolution: Added exact-key deterministic candidate backgrounds for `bg_lantern_foyer_set` and `scene_rune_bench`. Updated the shared scene shell to render the stage background texture behind UI with a readability wash. Updated Rune Bench to resolve its event scene background from the event encounter pool, falling back to the stage route's event room when debug entry keeps the run on room index 0.
 - Prevention: Background asset replacement must be verified in screenshots from scenes that actually use those backgrounds. Scene-specific backgrounds need a data path from room/event data, not just manifest preload.
 - Resolution commit: `2b156ef Render background candidate assets`
+
+### Problem: Regular enemy sprite assets existed but CombatScene did not render them
+
+- Cause: Enemy data already referenced `assetKeys.sprite`, and the manifest loaded regular monster spritesheets, but CombatScene only displayed text, HP, block, mark, and intent. The generated monster files were still generic placeholder sheets and had no screen-level proof.
+- Impact: Sprite pipeline work could appear complete through preload/audit alone while the actual combat UI still ignored enemy sprite data.
+- Resolution: Added deterministic transparent spritesheet placeholders for `monster_folded_sentry` and `monster_ink_mote`. Updated CombatScene to render a regular-enemy portrait from `enemy.assetKeys.sprite` when `combat.enemyKind === "enemy"`, intentionally leaving boss sprite rendering for a separate pass.
+- Prevention: Sprite placeholder work must include both manifest/file verification and a scene screenshot using the relevant enemy id. Regular enemy and boss sprite paths should be tracked separately so the smaller pass does not silently imply boss art completion.
+- Resolution commit: `33b0837 Render enemy sprite placeholders`
