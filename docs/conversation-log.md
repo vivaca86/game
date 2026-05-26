@@ -348,3 +348,11 @@ GitHub의 game 쪽을 확인하고, 이어서 해야 하는 작업이 무엇으�
 ### Codex
 
 현재 로컬 기준은 새 게임 개발 기반공사 단계이며, 먼저 기반 문서 변경분을 검증해 `Document new game foundation` 커밋으로 GitHub `main`에 푸시했다. 이어서 다음 산출물로 `docs/data-schema-draft.md`, `docs/reference-role-map-template.md`, `docs/vertical-slice-acceptance.md`를 작성했다. 새 기준 문서가 이전 `proof.html` 게이트보다 우선한다는 점을 `AGENTS.md`, `README.md`, 기존 handoff/current-issues/recovery 문서에 표시해 다음 세션에서 같은 혼동이 반복되지 않도록 정리했다.
+
+### 사용자
+
+다음 작업을 진행하라고 지시했다.
+
+### Codex
+
+추상 설계를 구현 전 설계물로 구체화했다. `docs/game-data-types.v1.ts`에 복사 가능한 TypeScript 타입 초안을 작성했고, `docs/vertical-slice-content-candidates.md`에 첫 세로 조각 후보 묶음을 정리했다. `docs/reference-role-map-slice-v1.md`에는 후보별 원작 기능 역할 대응표를 채웠고, `docs/vertical-slice-smoke-checklist.md`에는 구현 후 검증할 smoke 항목을 `PRE`, `DATA`, `UI`, `COMBAT`, `LOOP`, `VIEW` 그룹으로 나눴다. 기존 기반 문서와 README도 새 후속 산출물을 가리키도록 갱신했다.

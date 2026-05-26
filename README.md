@@ -16,8 +16,12 @@
 
 - `docs/development-foundation.md`: 2026-05-26 이후 새 게임 개발 기반 결정
 - `docs/data-schema-draft.md`: 데이터 스키마 초안
+- `docs/game-data-types.v1.ts`: TypeScript 타입 초안
 - `docs/reference-role-map-template.md`: 원작 기능 역할 대응표 양식
+- `docs/reference-role-map-slice-v1.md`: 첫 세로 조각 원작 대응표
 - `docs/vertical-slice-acceptance.md`: 새 세로 조각 통과 기준
+- `docs/vertical-slice-content-candidates.md`: 첫 세로 조각 콘텐츠 후보
+- `docs/vertical-slice-smoke-checklist.md`: smoke 체크리스트
 - `docs/current-issues-and-plan.md`: 현재 문제점, 반복 실패, 해결 방법
 - `docs/handoff.md`: 다른 개발자가 이어받기 위한 인수인계서
 - `docs/recovery-audit.md`: 현재 산출물 중 믿을 수 있는 것과 폐기할 것

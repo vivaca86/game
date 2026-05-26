@@ -90,9 +90,13 @@
 4. `ourOriginalization`이 비어 있으면 구현하지 않는다.
 5. 수치가 불명확하면 후보 범위로 남기고 확정값처럼 말하지 않는다.
 
+## 작성된 후속 산출물
+
+1. `docs/reference-role-map-slice-v1.md`: 첫 세로 조각 후보 대응표
+2. `docs/vertical-slice-content-candidates.md`: 대응표에 연결된 최소 후보 묶음
+
 ## 다음 작업
 
-1. `research/gap-map.md`와 도메인별 gap map에서 세로 조각에 필요한 행만 골라 첫 대응표를 채운다.
-2. 카드, 룬/보석, 몬스터, 보스, 스테이지, 마을, 보상 흐름의 `referenceRole` ID를 확정한다.
-3. `Ready for slice` 기준을 만족하는 최소 콘텐츠 묶음을 만든다.
-4. 데이터 스키마의 `referenceRole` 필드와 이 대응표를 검증 스크립트로 연결한다.
+1. `Ready for slice`로 승격할 행과 계속 `Needs direct proof`로 둘 행을 분리한다.
+2. 데이터 스키마의 `referenceRole` 필드와 이 대응표를 검증 스크립트로 연결한다.
+3. 구현 중 추가되는 모든 샘플 데이터가 `docs/reference-role-map-slice-v1.md`에 있는지 검사한다.

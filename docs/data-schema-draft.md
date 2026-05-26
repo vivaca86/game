@@ -312,10 +312,15 @@ interface AssetManifestEntry {
 - 런타임 에셋과 참고 이미지 경로가 섞이면 실패한다.
 - 텍스트는 이미지에 굽지 않는다.
 
+## 작성된 후속 산출물
+
+1. `docs/game-data-types.v1.ts`: 복사 가능한 TypeScript 타입 초안
+2. `docs/vertical-slice-content-candidates.md`: 세로 조각 최소 콘텐츠 후보
+
 ## 다음 작업
 
-1. 이 초안을 TypeScript interface 파일 또는 JSON Schema 초안으로 분리한다.
+1. `docs/game-data-types.v1.ts`를 실제 프로젝트 생성 시 `src/data/schema.ts` 또는 동등한 위치로 옮긴다.
 2. 각 데이터 그룹별 최소 샘플 1개를 작성한다.
 3. `referenceRole` 누락 검사 규칙을 만든다.
 4. 에셋 매니페스트와 데이터 참조 검증 스크립트를 설계한다.
-5. 세로 조각에 들어갈 최소 데이터 묶음을 확정한다.
+5. 세로 조각 후보 데이터를 fixture로 만든다.

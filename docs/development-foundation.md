@@ -278,10 +278,10 @@ notes?: string
 | --- | --- | --- |
 | 상세 아트 바이블 | 1차 확정 | 색상 코드, 타입별 UI 상세, 몬스터 계열표, 첫 샘플 에셋 검증 |
 | 에셋 해상도 규격 | 1차 확정 | 에셋 메타데이터 스키마, atlas 패킹 방식, 검증 스크립트 설계 |
-| 데이터 스키마 상세 | 초안 작성 | TypeScript interface 또는 JSON Schema로 분리 |
+| 데이터 스키마 상세 | 타입 초안 작성 | 실제 프로젝트 생성 시 `src/data/schema.ts`로 이관 |
 | 원작 기준 버전 | 미확정 | 조사 기준 버전/패치/영상 기준선 확정 |
-| 원작 대응표 | 양식 작성 | 세로 조각 후보 행부터 실제 대응표 채우기 |
-| 세로 조각 통과 기준 | 기준 작성 | 구현 전 smoke/checklist 항목으로 분해 |
+| 원작 대응표 | 첫 후보 행 작성 | `Ready for slice`와 `Needs direct proof` 행 분리 |
+| 세로 조각 통과 기준 | smoke 체크리스트 작성 | 테스트 스크립트 이름과 체크리스트 ID 연결 |
 | 세이브 구조 | 미확정 | saveVersion, unlocks, profile, settings 구조 설계 |
 | 디버그 UI | 미확정 | 초기 디버그 패널 요구사항 작성 |
 
@@ -290,13 +290,17 @@ notes?: string
 1. `docs/data-schema-draft.md`: 데이터 스키마 초안
 2. `docs/reference-role-map-template.md`: 원작 역기획 대응표 양식
 3. `docs/vertical-slice-acceptance.md`: 세로 조각 통과 기준
+4. `docs/game-data-types.v1.ts`: TypeScript 타입 초안
+5. `docs/vertical-slice-content-candidates.md`: 첫 세로 조각 콘텐츠 후보
+6. `docs/reference-role-map-slice-v1.md`: 첫 세로 조각 원작 대응표
+7. `docs/vertical-slice-smoke-checklist.md`: smoke 체크리스트
 
 ## 다음 작업
 
-1. 데이터 스키마 초안을 TypeScript interface 또는 JSON Schema로 분리한다.
-2. 원작 대응표 양식에 세로 조각 후보 행을 채운다.
-3. 세로 조각 기준을 실제 smoke/checklist 항목으로 쪼갠다.
-4. Phaser 프로젝트 구조를 만들기 전 폴더, manifest, debug entry를 확정한다.
+1. Phaser 프로젝트 구조를 만들기 전 폴더, manifest, debug entry를 확정한다.
+2. 최소 샘플 데이터를 `docs/game-data-types.v1.ts` 기준 fixture로 작성한다.
+3. `referenceRole`과 asset key 누락 검증 스크립트 계획을 세운다.
+4. 첫 구현 착수 전 원작 기준 버전/패치/영상 기준선을 확정한다.
 
 위 작업이 나오기 전에는 본격 구현 착수 또는 원작 유사도 판정을 하지 않는다.
 
@@ -307,3 +311,7 @@ notes?: string
 - `docs/data-schema-draft.md`: 데이터 스키마 초안
 - `docs/reference-role-map-template.md`: 원작 역기획 대응표 양식
 - `docs/vertical-slice-acceptance.md`: 세로 조각 통과 기준
+- `docs/game-data-types.v1.ts`: TypeScript 타입 초안
+- `docs/vertical-slice-content-candidates.md`: 첫 세로 조각 콘텐츠 후보
+- `docs/reference-role-map-slice-v1.md`: 첫 세로 조각 원작 대응표
+- `docs/vertical-slice-smoke-checklist.md`: smoke 체크리스트

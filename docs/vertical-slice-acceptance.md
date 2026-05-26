@@ -168,9 +168,15 @@
 
 수량은 통과 기준이 아니다. 위 수량은 흐름 검증을 위한 최소 후보일 뿐이다.
 
+## 작성된 후속 산출물
+
+1. `docs/vertical-slice-content-candidates.md`: 첫 세로 조각 콘텐츠 후보
+2. `docs/reference-role-map-slice-v1.md`: 후보별 원작 기능 역할 대응표
+3. `docs/vertical-slice-smoke-checklist.md`: 구현 후 검증 체크리스트
+4. `docs/game-data-types.v1.ts`: 데이터 타입 초안
+
 ## 다음 작업
 
-1. 이 기준에 맞춰 첫 세로 조각의 콘텐츠 후보를 고른다.
-2. `docs/reference-role-map-template.md`를 실제 첫 후보 데이터로 채운다.
-3. `docs/data-schema-draft.md`를 TypeScript 타입과 검증 규칙으로 나눈다.
-4. Phaser 프로젝트 구조를 만들기 전 필요한 폴더, manifest, debug entry를 확정한다.
+1. Phaser 프로젝트 구조를 만들기 전 필요한 폴더, manifest, debug entry를 확정한다.
+2. smoke checklist ID를 실제 테스트 스크립트 이름과 연결한다.
+3. 첫 구현 시작 후 체크리스트 상태를 갱신한다.
