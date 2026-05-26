@@ -447,3 +447,15 @@ Phaser 런타임 첫 골조와 데이터 부팅, 디버그 진입 작업을 그�
 runtime에서는 `getEncounterPoolContentId`를 추가해 combat/boss 진입과 debug 초기 전투 생성이 pool entry를 통해 실제 적/보스를 선택하도록 바꿨다. event 방도 pool에서 선택된 event id를 로그에 남긴다. `tools/validate-slice-fixture.mjs`는 encounter pool의 타입, entries, weight, 방 타입 일치, boss pool의 `stage.bossId` 포함 여부를 검증하도록 확장했다.
 
 검증은 `npm.cmd run slice:validate`, `npm.cmd run slice:effects`, `npm.cmd run check`, `npm.cmd run phaser:smoke`, `git diff --check`로 진행했다. 모두 통과했고, Vite build의 500kB 초과 chunk warning은 기존과 같은 잔여 번들 분리 후보로 남았다. 구현 커밋은 `7420a77 Add explicit encounter pools`이다.
+
+### 사용자
+
+다음 작업으로 넘어가자고 지시했다. 직전 작업 기준 다음 작업은 원작 source/version 기준선 확정이었다.
+
+### Codex
+
+기존 `research/official-steam-news-crawl.md`, `research/steam-store-appdetails-crawl.md`, `research/steamdb-build-baseline-crawl.md`를 확인하고, 2026-05-26 현재 공식 Steam API를 다시 조회했다. Steam News API는 총 22개 news item, 공식 `steam_community_announcements` 9개를 반환했고, 최신 공식 공지는 2026-04-29 `1 million Crawlers in 1 week`였다. 해당 공지 본문에 `Hotfix 1.4.1` 문구가 있음을 확인했다. Steam Store appdetails API에서는 app `3265700`, 정식 제목, 2026-04-21 출시일, 개발사 `poncle`, `Nosebleed Interactive`, 퍼블리셔 `poncle`, Windows/macOS 지원과 Steam Cloud 등 카테고리 정보를 확인했다.
+
+SteamDB는 PowerShell 직접 요청 시 “공식 API가 없고 추가 요청하지 말라”는 browser-check/no-API 경고를 반환했으므로 더 이상 직접 요청하지 않았다. 따라서 SteamDB는 기존 로컬 스냅샷 `research/steamdb-build-baseline-crawl.md`만 보조 후보 자료로 유지했고, build `23012943`은 `Hotfix 1.4.1`의 시간상 후보일 뿐 설치 빌드나 패치 확정 증거가 아니라고 명시했다.
+
+`docs/source-version-baseline.md`를 추가해 source 우선순위, 공식 공지 기준선, 금지 표현, 직접 설치 빌드 증거 공백을 고정했다. `docs/development-foundation.md`, `docs/vertical-slice-smoke-checklist.md`, `README.md`도 새 기준선 문서를 가리키도록 갱신했다. 검증은 공식 API 재조회, 오래된 기준선 미확정 문구 검색, `git diff --check`, `npm.cmd run check`로 진행했다. 구현 커밋은 `b1349c3 Add source version baseline`이다.

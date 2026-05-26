@@ -149,3 +149,11 @@
 - 해결 방안: explicit `encounterPools[]` 데이터를 추가하고 route `encounterPoolId`가 pool id를 참조하게 바꿨다. pool entries는 실제 enemy/event/boss content id와 weight를 갖고, runtime은 pool entry를 통해 전투 대상을 선택한다. validator는 pool 타입, entries, weight, 방 타입 일치, boss pool의 stage boss 포함 여부를 검사한다.
 - 재발 방지 기준: 새 방이나 encounter pool을 추가할 때 직접 enemy/event/boss id를 route에 넣지 않는다. route는 pool id만 참조하고, 실제 후보는 `encounterPools[].entries`에 둔다.
 - 해결 커밋: `7420a77 Add explicit encounter pools`
+
+### 문제: 공식 패치 라벨과 설치 빌드 ID를 섞어 원작 기준선을 과대확정할 수 있음
+
+- 원인: 기존 연구에는 공식 Steam 공지의 `Hotfix 1.4.1` 라벨과 SteamDB의 build `23012943` 후보가 함께 있었지만, 설치된 게임의 app manifest, 인게임 버전 표시, 게임 파일 증거가 아직 없었다. 이 상태에서 build 후보를 공식 패치 확정처럼 다루면 이후 원작 대응 작업이 잘못된 기준 위에 쌓일 수 있었다.
+- 영향: `Hotfix 1.4.1`을 현재 설치 빌드로 단정하거나, SteamDB build `23012943`을 공식 패치 증거로 오해할 수 있었다. 그러면 카드/젬/세이브/밸런스 값 비교가 실제 기준 빌드와 어긋날 수 있다.
+- 해결 방안: `docs/source-version-baseline.md`를 추가해 공식 Steam Store/Steam News API, 기존 Store/media crawl, 기존 SteamDB crawl의 역할과 한계를 분리했다. 2026-05-26 공식 Steam News API 재조회 기준 최신 공식 공지는 2026-04-29 `1 million Crawlers in 1 week`이고, 그 안의 최신 패치 라벨은 `Hotfix 1.4.1`로 기록했다. 동시에 직접 설치 빌드 ID와 인게임 버전 라벨은 `Needs verification`으로 남겼다.
+- 재발 방지 기준: 원작 유사도, 정확한 런타임 값, 빌드별 동작을 말하려면 먼저 local Steam `appmanifest_3265700.acf`, 인게임 버전 표시, 게임 파일 또는 fresh direct capture를 확보한다. SteamDB는 보조 build ordering 후보로만 쓰고 공식 패치 증거로 쓰지 않는다.
+- 해결 커밋: `b1349c3 Add source version baseline`
