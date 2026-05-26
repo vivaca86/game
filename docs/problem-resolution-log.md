@@ -189,3 +189,11 @@
 - 해결 방안: `tools/generate-dev-runtime-assets.mjs`를 추가해 manifest 35개 항목의 개발용 PNG를 `public/assets/runtime`에 생성했다. manifest status를 `generated_manifest`로 바꾸고, `PreloadScene`은 manifest path를 Phaser image/spritesheet loader에 queue하도록 변경했다. `assets:audit:strict`는 파일 35개, 누락 0개, orphan 0개를 검증하고, `phaser:smoke`는 첫 페이지에서 35개 runtime asset URL이 로드되는지 확인한다.
 - 재발 방지 기준: 개발용 placeholder pack은 최종 아트가 아니다. 새 runtime asset을 추가하거나 교체할 때는 generator 또는 실제 asset export 후 `npm.cmd run assets:audit:strict`와 `npm.cmd run phaser:smoke`를 통과시킨다.
 - 해결 커밋: `2168556 Generate dev runtime asset pack`
+
+### 문제: 첫 에셋 교체 루프가 작은 검증 단위로 아직 닫히지 않음
+
+- 원인: 35개 runtime placeholder pack은 strict preload 기반을 만들었지만, 실제 교체 작업을 어떤 단위로 제한하고 범위 이탈을 어떻게 잡을지 아직 한 번도 검증하지 않았다.
+- 영향: 이후 아트 그룹을 바꿀 때 의도하지 않은 PNG가 함께 바뀌거나, candidate art를 승인/최종 아트처럼 착각할 위험이 있었다.
+- 해결 방안: 첫 교체 단위를 카드 프레임 3종과 카드 타입 아이콘 3종으로 제한하고, generator에 exact key 기반 전용 paint branch를 추가했다. 작업 중 넓은 attack 조건 때문에 `icon_intent_attack`이 같이 바뀌는 것을 `git status`로 발견했고, exact key 조건으로 좁힌 뒤 재생성했다.
+- 재발 방지 기준: 에셋 그룹을 교체할 때는 `git diff --name-only`로 변경 파일이 목표 그룹에만 남았는지 확인하고, `npm.cmd run assets:audit:strict`, `npm.cmd run check`, `npm.cmd run phaser:smoke`, `git diff --check`를 통과시킨다. candidate/development asset은 approved final art로 말하지 않는다.
+- 해결 커밋: `dce1754 Add card UI candidate assets`
