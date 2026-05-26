@@ -32,6 +32,11 @@ const candidateBackgroundKeys = new Set([
   "scene_rune_bench"
 ]);
 
+const candidateMonsterSpriteKeys = new Set([
+  "monster_folded_sentry",
+  "monster_ink_mote"
+]);
+
 function crc32(buffer) {
   let crc = 0xffffffff;
   for (const byte of buffer) {
@@ -139,6 +144,12 @@ function paletteFor(asset) {
   if (asset.key === "scene_rune_bench") {
     return { base: [235, 232, 208], accent: [72, 139, 151], dark: [62, 58, 94] };
   }
+  if (asset.key === "monster_folded_sentry") {
+    return { base: [243, 235, 207], accent: [77, 121, 143], dark: [45, 66, 86] };
+  }
+  if (asset.key === "monster_ink_mote") {
+    return { base: [232, 226, 216], accent: [75, 98, 160], dark: [45, 45, 82] };
+  }
   if (asset.path.includes("/backgrounds/")) return { base: [240, 222, 178], accent, dark: [112, 92, 72] };
   if (asset.path.includes("/cards/")) return { base: [250, 238, 206], accent, dark: [98, 72, 54] };
   if (asset.path.includes("/icons/")) return { base: [246, 231, 192], accent, dark: [76, 82, 96] };
@@ -153,6 +164,7 @@ function paintFor(asset) {
   if (candidateCardArtKeys.has(asset.key)) return paintCardArt(asset);
   if (candidateIntentIconKeys.has(asset.key)) return paintIntentIcon(asset);
   if (candidateBackgroundKeys.has(asset.key)) return paintBackground(asset);
+  if (candidateMonsterSpriteKeys.has(asset.key)) return paintMonsterSprite(asset);
 
   const palette = paletteFor(asset);
   const frame = asset.frameSize;
@@ -559,6 +571,124 @@ function paintBackground(asset) {
   };
 }
 
+function paintMonsterSprite(asset) {
+  const palette = paletteFor(asset);
+  const seed = hash(asset.key);
+  return (x, y, width, height) => {
+    const frameWidth = asset.frameSize?.w ?? width;
+    const frameHeight = asset.frameSize?.h ?? height;
+    const columns = Math.max(1, Math.floor(width / frameWidth));
+    const frameColumn = Math.floor(x / frameWidth);
+    const frameRow = Math.floor(y / frameHeight);
+    const frameIndex = frameRow * columns + frameColumn;
+    const fx = x % frameWidth;
+    const fy = y % frameHeight;
+    const bob = Math.round(Math.sin((frameIndex / 16) * Math.PI * 2) * 5);
+    const lean = Math.round(Math.cos((frameIndex / 16) * Math.PI * 2) * 3);
+    const [paperR, paperG, paperB] = palette.base;
+    const [accentR, accentG, accentB] = palette.accent;
+    const [darkR, darkG, darkB] = palette.dark;
+    const grain = ((fx * 17 + fy * 9 + seed + frameIndex * 11) % 37) < 6 ? -9 : 0;
+    const paper = [paperR + grain, paperG + grain, paperB + grain, 255];
+    const accent = [accentR, accentG, accentB, 255];
+    const dark = [darkR, darkG, darkB, 255];
+
+    if (insideEllipse(fx, fy, 96, 164, 56, 13)) {
+      return [darkR, darkG, darkB, 72];
+    }
+
+    if (asset.key === "monster_folded_sentry") {
+      let color = [0, 0, 0, 0];
+      const body = pointInPolygon(fx, fy, [
+        [96 + lean, 34 + bob],
+        [143 + lean, 82 + bob],
+        [130 + lean, 145 + bob],
+        [96 + lean, 165 + bob],
+        [62 + lean, 145 + bob],
+        [49 + lean, 82 + bob]
+      ]);
+      const innerFold = pointInPolygon(fx, fy, [
+        [96 + lean, 48 + bob],
+        [130 + lean, 86 + bob],
+        [119 + lean, 133 + bob],
+        [96 + lean, 151 + bob]
+      ]);
+      const leftFold = pointInPolygon(fx, fy, [
+        [96 + lean, 48 + bob],
+        [61 + lean, 88 + bob],
+        [72 + lean, 135 + bob],
+        [96 + lean, 151 + bob]
+      ]);
+
+      if (body) color = paper;
+      if (leftFold) color = mix(color, [255, 248, 220, 255], 0.26);
+      if (innerFold) color = mix(accent, paper, 0.24);
+      if (body && !pointInPolygon(fx, fy, [
+        [96 + lean, 42 + bob],
+        [135 + lean, 84 + bob],
+        [124 + lean, 141 + bob],
+        [96 + lean, 158 + bob],
+        [68 + lean, 141 + bob],
+        [57 + lean, 84 + bob]
+      ])) {
+        color = dark;
+      }
+
+      if (insideRoundedRect(fx, fy, 77 + lean, 76 + bob, 38, 22, 6)) color = dark;
+      if (insideRoundedRect(fx, fy, 84 + lean, 82 + bob, 24, 9, 4)) color = [255, 225, 112, 255];
+      if (distanceToSegment(fx, fy, 132 + lean, 58 + bob, 158 + lean, 143 + bob) < 4) color = dark;
+      if (distanceToSegment(fx, fy, 136 + lean, 59 + bob, 162 + lean, 142 + bob) < 2) color = [185, 139, 52, 255];
+      if (pointInPolygon(fx, fy, [[127 + lean, 52 + bob], [141 + lean, 47 + bob], [136 + lean, 66 + bob]])) color = [185, 139, 52, 255];
+      if (distanceToSegment(fx, fy, 69 + lean, 150 + bob, 50 + lean, 174) < 5
+        || distanceToSegment(fx, fy, 123 + lean, 150 + bob, 142 + lean, 174) < 5) {
+        color = dark;
+      }
+      if (body && ((fx + fy + frameIndex) % 29 < 2)) color = mix(color, [255, 255, 235, 255], 0.3);
+      return color;
+    }
+
+    if (asset.key === "monster_ink_mote") {
+      let color = [0, 0, 0, 0];
+      const centerX = 96 + lean;
+      const centerY = 101 + bob;
+      const body = insideEllipse(fx, fy, centerX, centerY, 48, 41)
+        || insideEllipse(fx, fy, centerX - 27, centerY + 14, 27, 24)
+        || insideEllipse(fx, fy, centerX + 28, centerY + 13, 25, 23);
+      const core = insideEllipse(fx, fy, centerX, centerY + 3, 31, 27);
+      const flame = pointInPolygon(fx, fy, [
+        [centerX - 17, centerY - 34],
+        [centerX + 2, centerY - 75],
+        [centerX + 20, centerY - 35],
+        [centerX + 15, centerY - 12],
+        [centerX - 14, centerY - 11]
+      ]);
+
+      if (body || flame) color = dark;
+      if (core) color = mix(accent, [38, 38, 72, 255], 0.4);
+      if (insideEllipse(fx, fy, centerX - 15, centerY - 5, 9, 7)
+        || insideEllipse(fx, fy, centerX + 15, centerY - 5, 9, 7)) {
+        color = [255, 229, 119, 255];
+      }
+      if (insideEllipse(fx, fy, centerX - 17, centerY - 7, 4, 3)
+        || insideEllipse(fx, fy, centerX + 13, centerY - 7, 4, 3)) {
+        color = [255, 249, 192, 255];
+      }
+      if (insideEllipse(fx, fy, centerX - 33, centerY + 50, 7, 12)
+        || insideEllipse(fx, fy, centerX + 38, centerY + 48, 6, 10)
+        || insideEllipse(fx, fy, centerX + 8, centerY + 66, 8, 13)) {
+        color = dark;
+      }
+      if (distanceToSegment(fx, fy, centerX - 36, centerY + 28, centerX + 40, centerY + 36) < 3) {
+        color = mix(accent, [255, 248, 216, 255], 0.28);
+      }
+      if ((body || flame) && ((fx * 3 + fy + frameIndex) % 31 < 2)) color = mix(color, [121, 148, 206, 255], 0.45);
+      return color;
+    }
+
+    return [0, 0, 0, 0];
+  };
+}
+
 function mix(a, b, t) {
   return [
     Math.round(a[0] * (1 - t) + b[0] * t),
@@ -578,6 +708,12 @@ function insideRoundedRect(x, y, rectX, rectY, width, height, radius) {
 function nearPanelEdge(x, y, inside, rectX, rectY, width, height, radius) {
   if (!inside) return false;
   return !insideRoundedRect(x, y, rectX + 4, rectY + 4, width - 8, height - 8, Math.max(1, radius - 4));
+}
+
+function insideEllipse(x, y, centerX, centerY, radiusX, radiusY) {
+  const dx = (x - centerX) / radiusX;
+  const dy = (y - centerY) / radiusY;
+  return dx * dx + dy * dy <= 1;
 }
 
 function distanceToSegment(px, py, ax, ay, bx, by) {

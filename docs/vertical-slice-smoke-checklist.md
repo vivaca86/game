@@ -110,6 +110,7 @@ Date: 2026-05-26
 - 2026-05-27 remaining card art candidate pass: the remaining slice card illustrations `card_art_stage_patch`, `card_art_ink_spill`, `card_art_paper_bloom`, `card_art_pinpoint_glint`, and `card_art_curtain_call` were replaced with deterministic candidate art. Separate `grantCard` screenshots verified these remaining cards render through the existing hand texture path. This completes the first candidate pass for all 10 slice card illustrations, but not final approved art.
 - 2026-05-27 intent icon candidate pass: `icon_intent_attack`, `icon_intent_disrupt`, and `icon_intent_block` were replaced with deterministic candidate icons, and the Combat/Boss intent panel now renders the active intent texture from `assetKeys.intentIcons[]`. Additional turn-two screenshots verified the disrupt and block slots. This is still candidate/development art.
 - 2026-05-27 background candidate pass: `bg_lantern_foyer_set` and `scene_rune_bench` were replaced with deterministic candidate backgrounds. Shared Phaser scenes now render the current stage `assetKeys.backgroundSet`, and Rune Bench resolves its event scene asset from the event encounter pool. Combat and Rune Bench screenshots verified that the backgrounds render behind readable UI. This is still candidate/development art.
+- 2026-05-27 monster sprite pipeline placeholder pass: `monster_folded_sentry` and `monster_ink_mote` were replaced with deterministic transparent spritesheet placeholders, and Combat now renders the active regular enemy texture from `enemy.assetKeys.sprite`. Default combat and `enemy=enemy_ink_mote` screenshots verified both regular monster sprites render. This is a pipeline placeholder pass, not a visual candidate or final sprite pass.
 
 `phaser:smoke` writes screenshots under `tmp/`, including `tmp/phaser-TownScene.png`, `tmp/phaser-CombatScene.png`, and `tmp/phaser-BossScene.png`. `tmp/` is verification output and is not committed.
 
@@ -121,6 +122,6 @@ This is still not a production-complete game, final art/assets pass, exhaustive 
 
 ## Next Work
 
-1. Continue replacing generated development placeholders one group at a time, keeping `npm.cmd run assets:audit:strict` green. Candidate passes now cover card frames, card type icons, all 10 slice card illustrations, attack/disrupt/block intent icons, and the two slice backgrounds; next likely groups are monsters and boss art.
+1. Continue replacing generated development placeholders one group at a time, keeping `npm.cmd run assets:audit:strict` green. Pipeline/candidate passes now cover card frames, card type icons, all 10 slice card illustrations, attack/disrupt/block intent icons, the two slice backgrounds, and the two regular monster sprites; next likely group is boss art.
 2. Expand content, final art/assets, balance, and UX polish only after the foundation remains green.
 3. Keep Steam/appmanifest direct proof deferred unless the user later provides access or exact build/runtime claims become necessary.
