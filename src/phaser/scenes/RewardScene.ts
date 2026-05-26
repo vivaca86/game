@@ -5,7 +5,7 @@ import { selectRewardEntries } from "../../simulation/state/runState";
 import { renderDebugOverlay } from "../../ui/overlays/debugOverlay";
 import { handleSceneAction } from "../bridge/sceneActions";
 import { requireBootContext } from "../bridge/sceneBridge";
-import { renderSceneShell, textStyle } from "../view/sceneShell";
+import { renderActionButton, renderSceneShell, textStyle } from "../view/sceneShell";
 
 export class RewardScene extends Phaser.Scene {
   constructor() {
@@ -32,7 +32,7 @@ export class RewardScene extends Phaser.Scene {
     offers.slice(0, 4).forEach((entry, index) => {
       this.add.text(1060, 560 + index * 42, `${index + 1}. ${entry.type}: ${entry.contentId ?? entry.amount}`, textStyle(23, "#805845"));
     });
-    this.add.text(1060, 735, "Enter: claim first reward", textStyle(24, "#32415a", true));
+    renderActionButton(this, 1010, 742, "Claim Reward", () => handleSceneAction(this, context, "confirm"));
 
     bindKeyboardActions(this, (action) => handleSceneAction(this, context, action));
     renderDebugOverlay(context, "RewardScene");

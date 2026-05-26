@@ -5,7 +5,7 @@ import { getCurrentRoom } from "../../simulation/state/runState";
 import { renderDebugOverlay } from "../../ui/overlays/debugOverlay";
 import { handleSceneAction } from "../bridge/sceneActions";
 import { requireBootContext } from "../bridge/sceneBridge";
-import { renderSceneShell, textStyle } from "../view/sceneShell";
+import { renderActionButton, renderSceneShell, textStyle } from "../view/sceneShell";
 
 export class DungeonScene extends Phaser.Scene {
   constructor() {
@@ -22,7 +22,7 @@ export class DungeonScene extends Phaser.Scene {
     });
 
     this.add.text(1060, 500, room ? `${room.id} / ${room.type}` : "missing room", textStyle(30, "#32415a", true));
-    this.add.text(1060, 560, "Enter: enter room", textStyle(24, "#805845", true));
+    renderActionButton(this, 1010, 582, "Enter Room", () => handleSceneAction(this, context, "confirm"));
 
     bindKeyboardActions(this, (action) => handleSceneAction(this, context, action));
     renderDebugOverlay(context, "DungeonScene");

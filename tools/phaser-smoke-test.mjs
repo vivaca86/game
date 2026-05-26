@@ -65,6 +65,7 @@ try {
   await checkPage("/", "TownScene", false);
   await checkPage("/?debug=1&entry=combat", "CombatScene", true);
   await checkPage("/?debug=1&entry=boss", "BossScene", true);
+  await checkClickableControls();
   await checkCombatActions();
   await checkSceneFlowAndRuneEffect();
   await checkBossResultFlow();
@@ -129,6 +130,27 @@ async function checkCombatActions() {
 
   await withDebugPage("/?debug=1&entry=combat", "CombatScene", async (page) => {
     await pressAndSettle(page, "KeyE");
+    await waitForDebugValue(page, "playerHp", "36");
+    await waitForDebugValue(page, "turn", "2");
+  });
+}
+
+async function checkClickableControls() {
+  await withDebugPage("/?debug=1&entry=town", "TownScene", async (page) => {
+    await clickScenePoint(page, 1010, 642);
+    await waitForDebugValue(page, "phase", "world_map");
+
+    await clickScenePoint(page, 1010, 512);
+    await waitForDebugValue(page, "phase", "dungeon");
+
+    await clickScenePoint(page, 1010, 582);
+    await waitForDebugValue(page, "phase", "combat");
+
+    await clickScenePoint(page, 430, 790);
+    await waitForDebugValue(page, "enemyHp", "17");
+    await waitForDebugValue(page, "playerEnergy", "2");
+
+    await clickScenePoint(page, 1380, 740);
     await waitForDebugValue(page, "playerHp", "36");
     await waitForDebugValue(page, "turn", "2");
   });
@@ -226,6 +248,19 @@ async function playUsefulCombatAction(page, state) {
 async function pressAndSettle(page, key) {
   await page.keyboard.press(key);
   await page.waitForTimeout(80);
+}
+
+async function clickScenePoint(page, sceneX, sceneY) {
+  const canvasBox = await page.locator("canvas").boundingBox();
+  if (!canvasBox) {
+    throw new Error("Missing Phaser canvas for click smoke");
+  }
+
+  await page.mouse.click(
+    canvasBox.x + (sceneX / 1920) * canvasBox.width,
+    canvasBox.y + (sceneY / 1080) * canvasBox.height
+  );
+  await page.waitForTimeout(120);
 }
 
 async function waitForDebugScene(page, sceneName) {

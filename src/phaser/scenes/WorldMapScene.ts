@@ -4,7 +4,7 @@ import { bindKeyboardActions } from "../../input/bindings";
 import { renderDebugOverlay } from "../../ui/overlays/debugOverlay";
 import { handleSceneAction } from "../bridge/sceneActions";
 import { requireBootContext } from "../bridge/sceneBridge";
-import { renderSceneShell, textStyle } from "../view/sceneShell";
+import { renderActionButton, renderSceneShell, textStyle } from "../view/sceneShell";
 
 export class WorldMapScene extends Phaser.Scene {
   constructor() {
@@ -19,7 +19,7 @@ export class WorldMapScene extends Phaser.Scene {
       focusLabel: "Selected stage"
     });
 
-    this.add.text(1060, 500, "Enter: Dungeon", textStyle(28, "#32415a", true));
+    renderActionButton(this, 1010, 512, "Dungeon", () => handleSceneAction(this, context, "confirm"));
     this.add.text(1060, 552, "Route nodes are driven by fixture data.", textStyle(22, "#805845"));
 
     bindKeyboardActions(this, (action) => handleSceneAction(this, context, action));

@@ -4,7 +4,7 @@ import { bindKeyboardActions } from "../../input/bindings";
 import { renderDebugOverlay } from "../../ui/overlays/debugOverlay";
 import { handleSceneAction } from "../bridge/sceneActions";
 import { requireBootContext } from "../bridge/sceneBridge";
-import { renderSceneShell, textStyle } from "../view/sceneShell";
+import { renderActionButton, renderSceneShell, textStyle } from "../view/sceneShell";
 
 export class TownScene extends Phaser.Scene {
   constructor() {
@@ -23,7 +23,7 @@ export class TownScene extends Phaser.Scene {
     const completed = context.save.profile.completedStages.length;
     this.add.text(1060, 500, `Unlocked stages ${unlocked}`, textStyle(34, "#32415a", true));
     this.add.text(1060, 555, `Completed stages ${completed}`, textStyle(28, "#805845"));
-    this.add.text(1060, 635, "Enter: World Map", textStyle(24, "#805845", true));
+    renderActionButton(this, 1010, 642, "World Map", () => handleSceneAction(this, context, "confirm"));
 
     bindKeyboardActions(this, (action) => handleSceneAction(this, context, action));
     renderDebugOverlay(context, "TownScene");

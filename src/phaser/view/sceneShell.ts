@@ -5,6 +5,7 @@ interface SceneShellOptions {
   title: string;
   subtitle: string;
   focusLabel: string;
+  onCardClick?: (index: number) => void;
 }
 
 export function renderSceneShell(
@@ -52,11 +53,15 @@ export function renderSceneShell(
     textStyle(24, "#805845")
   );
 
-  renderCardHand(scene, context);
+  renderCardHand(scene, context, options.onCardClick);
   renderRoute(scene, context);
 }
 
-export function renderCardHand(scene: Phaser.Scene, context: BootContext): void {
+export function renderCardHand(
+  scene: Phaser.Scene,
+  context: BootContext,
+  onCardClick?: (index: number) => void
+): void {
   const hand = context.run.hand.length > 0
     ? context.run.hand
     : context.save.currentRun?.hand ?? context.dataBundle.cards.slice(0, 5).map((card) => card.id);
@@ -70,11 +75,29 @@ export function renderCardHand(scene: Phaser.Scene, context: BootContext): void 
     const y = 790;
     const cardRect = scene.add.rectangle(x, y, 190, 250, 0xfffbef, 0.98);
     cardRect.setStrokeStyle(4, card.type === "attack" ? 0xce5869 : card.type === "defense" ? 0x5d8d86 : 0x677ab8);
+    if (onCardClick) {
+      cardRect.setInteractive({ useHandCursor: true });
+      cardRect.on("pointerdown", () => onCardClick(index));
+    }
     scene.add.text(x + 52, y - 110, `${index + 1}`, textStyle(20, "#805845", true));
     scene.add.text(x - 78, y - 100, `${card.cost}`, textStyle(36, "#1e2a3e", true));
     scene.add.text(x - 78, y - 48, card.displayNameKo, textStyle(24, "#1e2a3e", true)).setWordWrapWidth(154);
     scene.add.text(x - 78, y + 18, card.descriptionKo, textStyle(18, "#6d5a48")).setWordWrapWidth(154);
   });
+}
+
+export function renderActionButton(
+  scene: Phaser.Scene,
+  x: number,
+  y: number,
+  label: string,
+  onClick: () => void
+): void {
+  const button = scene.add.rectangle(x, y, 290, 58, 0x32415a, 0.94);
+  button.setStrokeStyle(3, 0xf5c26b, 0.95);
+  button.setInteractive({ useHandCursor: true });
+  button.on("pointerdown", onClick);
+  scene.add.text(x - 124, y - 16, label, textStyle(22, "#fff5d7", true)).setWordWrapWidth(248);
 }
 
 export function renderRoute(scene: Phaser.Scene, context: BootContext): void {
