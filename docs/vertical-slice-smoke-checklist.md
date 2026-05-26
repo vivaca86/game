@@ -113,6 +113,6 @@ This is still not a production-complete game, final art/assets pass, exhaustive 
 
 ## Next Work
 
-1. Continue source/version confirmation separately; current implementation is a slice foundation, not source parity.
+1. Capture direct installed-build proof for app `3265700`: local app manifest build ID, in-game version label if available, and fresh first-run screenshots.
 2. Compare planned asset keys with actual generated asset files when the asset pipeline begins.
 3. Expand content, final art/assets, balance, and UX polish only after the foundation remains green.

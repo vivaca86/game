@@ -279,7 +279,7 @@ notes?: string
 | 상세 아트 바이블 | 1차 확정 | 색상 코드, 타입별 UI 상세, 몬스터 계열표, 첫 샘플 에셋 검증 |
 | 에셋 해상도 규격 | 1차 확정 | 에셋 메타데이터 스키마, atlas 패킹 방식, 검증 스크립트 설계 |
 | 데이터 스키마 상세 | 타입 초안 작성 | 실제 프로젝트 생성 시 `src/data/schema.ts`로 이관 |
-| 원작 기준 버전 | 미확정 | 조사 기준 버전/패치/영상 기준선 확정 |
+| 원작 기준 버전 | 계획 기준선 확정, 직접 빌드 증거 미확정 | `docs/source-version-baseline.md` 기준으로 직접 설치 빌드 증거 확보 |
 | 원작 대응표 | 첫 후보 행 작성 | `Ready for slice`와 `Needs direct proof` 행 분리 |
 | 세로 조각 통과 기준 | fixture/manifest/checklist/validator 작성 | smoke script와 브라우저 검증으로 이관 |
 | 세이브 구조 | 미확정 | saveVersion, unlocks, profile, settings 구조 설계 |
@@ -309,9 +309,9 @@ notes?: string
 2. `TownScene -> WorldMapScene -> DungeonScene -> CombatScene`의 입력 기반 scene flow를 연결했다.
 3. `RewardScene`, `RuneBenchScene`, `BossScene`, `ResultScene`을 실제 상태 변화와 연결했다.
 4. fixture의 `encounterPoolId`는 explicit encounter pool 데이터로 분리했다.
-5. 원작 기준 버전/패치/영상 기준선 확정은 계속 별도 작업으로 남긴다.
+5. 원작 기준 버전/패치/영상 계획 기준선은 `docs/source-version-baseline.md`에 고정했다. 직접 설치 빌드 증거는 아직 남아 있다.
 
-위 작업이 나오기 전에는 본격 구현 착수 또는 원작 유사도 판정을 하지 않는다.
+직접 설치 빌드 증거가 나오기 전에는 원작 유사도 또는 정확한 런타임 값 판정을 하지 않는다.
 
 관련 문서:
 
@@ -324,6 +324,7 @@ notes?: string
 - `docs/vertical-slice-content-candidates.md`: 첫 세로 조각 콘텐츠 후보
 - `docs/reference-role-map-slice-v1.md`: 첫 세로 조각 원작 대응표
 - `docs/vertical-slice-smoke-checklist.md`: smoke 체크리스트
+- `docs/source-version-baseline.md`: 원작 source/version 기준선
 - `docs/vertical-slice-data.fixture.v1.json`: 첫 세로 조각 데이터 fixture
 - `docs/asset-manifest.slice.v1.json`: 첫 세로 조각 planned asset manifest
 - `docs/validation-rules-v1.md`: fixture/manifest 검증 기준
@@ -331,6 +332,7 @@ notes?: string
 - `docs/phaser-boot-flow-plan.md`: Phaser 부트, preload, entry scene 순서 계획
 - `docs/debug-entry-plan.md`: URL debug entry와 debug action 계획
 - `docs/implementation-start-checklist.md`: 실제 구현 착수 전 체크리스트
+- `docs/source-version-baseline.md`: 원작 source/version 기준선
 ## 2026-05-26 Implementation Status Update
 
 - `src/simulation/` now owns the first slice run/combat state: player HP/energy/block, hand/draw/discard, enemy HP/block/intent, reward offers, rune attachment, boss phase flag, and run log.
@@ -345,4 +347,4 @@ Current foundation status:
 2. 1920x1080 screenshot checks and debug-overlay visual overlap checks are in place.
 3. Card description/effect-op audit is in place through `npm.cmd run slice:effects`.
 4. Route `encounterPoolId` values now point to explicit encounter-pool data instead of direct enemy/boss/event ids.
-5. Continue source/version confirmation separately before any parity or 95% similarity claim.
+5. Source/version planning baseline is fixed in `docs/source-version-baseline.md`, but direct installed-build proof is still missing.

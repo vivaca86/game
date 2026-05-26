@@ -30,6 +30,7 @@
 - `docs/vertical-slice-acceptance.md`: 새 세로 조각 통과 기준
 - `docs/vertical-slice-content-candidates.md`: 첫 세로 조각 콘텐츠 후보
 - `docs/vertical-slice-smoke-checklist.md`: smoke 체크리스트
+- `docs/source-version-baseline.md`: 원작 source/version 기준선
 - `docs/current-issues-and-plan.md`: 현재 문제점, 반복 실패, 해결 방법
 - `docs/handoff.md`: 다른 개발자가 이어받기 위한 인수인계서
 - `docs/recovery-audit.md`: 현재 산출물 중 믿을 수 있는 것과 폐기할 것
