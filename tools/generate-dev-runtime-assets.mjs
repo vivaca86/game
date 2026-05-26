@@ -50,6 +50,12 @@ const candidateProgressIconKeys = new Set([
   "char_mina_pagehand_portrait"
 ]);
 
+const candidateEffectSpriteKeys = new Set([
+  "effect_stage_spotlight",
+  "effect_paper_slash",
+  "effect_ink_splash"
+]);
+
 function crc32(buffer) {
   let crc = 0xffffffff;
   for (const byte of buffer) {
@@ -184,6 +190,15 @@ function paletteFor(asset) {
   if (asset.key === "char_mina_pagehand_portrait") {
     return { base: [248, 236, 210], accent: [82, 143, 150], dark: [58, 65, 89] };
   }
+  if (asset.key === "effect_stage_spotlight") {
+    return { base: [255, 241, 195], accent: [232, 183, 80], dark: [90, 69, 82] };
+  }
+  if (asset.key === "effect_paper_slash") {
+    return { base: [255, 238, 207], accent: [216, 82, 72], dark: [79, 54, 58] };
+  }
+  if (asset.key === "effect_ink_splash") {
+    return { base: [238, 234, 219], accent: [75, 103, 169], dark: [45, 45, 82] };
+  }
   if (asset.path.includes("/backgrounds/")) return { base: [240, 222, 178], accent, dark: [112, 92, 72] };
   if (asset.path.includes("/cards/")) return { base: [250, 238, 206], accent, dark: [98, 72, 54] };
   if (asset.path.includes("/icons/")) return { base: [246, 231, 192], accent, dark: [76, 82, 96] };
@@ -201,6 +216,7 @@ function paintFor(asset) {
   if (candidateMonsterSpriteKeys.has(asset.key)) return paintMonsterSprite(asset);
   if (candidateBossSpriteKeys.has(asset.key)) return paintBossSprite(asset);
   if (candidateProgressIconKeys.has(asset.key)) return paintProgressIcon(asset);
+  if (candidateEffectSpriteKeys.has(asset.key)) return paintEffectSprite(asset);
 
   const palette = paletteFor(asset);
   const frame = asset.frameSize;
@@ -932,6 +948,100 @@ function paintProgressIcon(asset) {
     }
 
     return color;
+  };
+}
+
+function paintEffectSprite(asset) {
+  const palette = paletteFor(asset);
+  const seed = hash(asset.key);
+  return (x, y, width, height) => {
+    const frameWidth = asset.frameSize?.w ?? width;
+    const frameHeight = asset.frameSize?.h ?? height;
+    const columns = Math.max(1, Math.floor(width / frameWidth));
+    const frameIndex = Math.floor(y / frameHeight) * columns + Math.floor(x / frameWidth);
+    const fx = x % frameWidth;
+    const fy = y % frameHeight;
+    const progress = frameIndex / 15;
+    const centerX = frameWidth / 2;
+    const centerY = frameHeight / 2;
+    const [paperR, paperG, paperB] = palette.base;
+    const [accentR, accentG, accentB] = palette.accent;
+    const [darkR, darkG, darkB] = palette.dark;
+    const paper = [paperR, paperG, paperB, 255];
+    const accent = [accentR, accentG, accentB, 255];
+    const dark = [darkR, darkG, darkB, 255];
+    const flicker = ((fx * 11 + fy * 17 + seed + frameIndex * 19) % 31) < 5 ? 22 : 0;
+
+    if (asset.key === "effect_stage_spotlight") {
+      let color = [0, 0, 0, 0];
+      const coneWidth = 56 + progress * 68;
+      const topWidth = 17 + progress * 8;
+      const cone = pointInPolygon(fx, fy, [
+        [centerX - topWidth, 24],
+        [centerX + topWidth, 24],
+        [centerX + coneWidth, 216],
+        [centerX - coneWidth, 216]
+      ]);
+      const ring = Math.hypot((fx - centerX) / (78 + progress * 22), (fy - 203) / 16);
+      if (cone) color = [255, 232, 133 + flicker, Math.round(72 + progress * 44)];
+      if (ring < 1 && ring > 0.58) color = [232, 183, 80, Math.round(175 - progress * 35)];
+      if (distanceToSegment(fx, fy, centerX - 18, 24, centerX + 18, 24) < 4) color = dark;
+      if (insideEllipse(fx, fy, centerX, 26, 27, 8)) color = [255, 241, 178, 210];
+      for (let dot = 0; dot < 7; dot += 1) {
+        const angle = progress * Math.PI * 2 + dot * 0.9;
+        const sx = centerX + Math.cos(angle) * (34 + dot * 9);
+        const sy = 96 + Math.sin(angle * 1.4) * 44 + dot * 12;
+        if (Math.abs(fx - sx) + Math.abs(fy - sy) < 8) color = [255, 245, 178, 190];
+      }
+      return color;
+    }
+
+    if (asset.key === "effect_paper_slash") {
+      let color = [0, 0, 0, 0];
+      const sweep = -34 + progress * 50;
+      const slashA = distanceToSegment(fx, fy, 45 + sweep, 190, 206 + sweep, 49) < 9 + progress * 5;
+      const slashB = distanceToSegment(fx, fy, 55 + sweep, 207, 221 + sweep, 61) < 4 + progress * 3;
+      if (slashA) color = [paperR, paperG, paperB, Math.round(220 - progress * 55)];
+      if (slashB) color = [accentR, accentG, accentB, Math.round(245 - progress * 65)];
+      if (distanceToSegment(fx, fy, 68 + sweep, 194, 216 + sweep, 68) < 2) color = [255, 246, 185, 255];
+      for (let shard = 0; shard < 8; shard += 1) {
+        const sx = 66 + shard * 21 + sweep;
+        const sy = 172 - shard * 15 + Math.sin(frameIndex + shard) * 18;
+        if (Math.abs(fx - sx) + Math.abs(fy - sy) < 8) color = mix(accent, dark, 0.18);
+        if (Math.abs(fx - sx) + Math.abs(fy - sy) < 4) color = [255, 238, 178, 230];
+      }
+      return color;
+    }
+
+    if (asset.key === "effect_ink_splash") {
+      let color = [0, 0, 0, 0];
+      const spread = 28 + progress * 72;
+      const puddles = [
+        [centerX, centerY, 30 + progress * 20],
+        [centerX - spread * 0.58, centerY + 18, 18 + progress * 11],
+        [centerX + spread * 0.66, centerY - 8, 16 + progress * 13],
+        [centerX - spread * 0.3, centerY - 48, 13 + progress * 8],
+        [centerX + spread * 0.28, centerY + 54, 15 + progress * 9]
+      ];
+      for (const [cx, cy, radius] of puddles) {
+        if (insideEllipse(fx, fy, cx, cy, radius * 1.2, radius)) {
+          color = mix(dark, accent, 0.18 + progress * 0.18);
+          color[3] = Math.round(225 - progress * 50);
+        }
+      }
+      for (let splat = 0; splat < 12; splat += 1) {
+        const angle = splat * 0.72 + seed * 0.001;
+        const sx = centerX + Math.cos(angle) * (spread * 0.42 + splat * 4);
+        const sy = centerY + Math.sin(angle) * (spread * 0.3 + splat * 3);
+        if (Math.hypot(fx - sx, fy - sy) < 5 + progress * 3) color = [75, 103, 169, Math.round(210 - progress * 55)];
+      }
+      if (Math.hypot((fx - centerX) / 1.3, fy - centerY) < 18 + progress * 10) {
+        color = [45, 45, 82, Math.round(242 - progress * 42)];
+      }
+      return color;
+    }
+
+    return [0, 0, 0, 0];
   };
 }
 

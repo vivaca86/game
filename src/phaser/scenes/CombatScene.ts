@@ -3,6 +3,7 @@ import type { BootContext } from "../../app/bootContext";
 import type { InputAction } from "../../input/actions";
 import { bindKeyboardActions } from "../../input/bindings";
 import { getActiveIntent, getCombatantData } from "../../simulation/systems/combat/combatSystem";
+import { resolveCombatFeedbackEffectKey, resolveCombatFeedbackFrame } from "../../simulation/state/combatFeedback";
 import { renderDebugOverlay } from "../../ui/overlays/debugOverlay";
 import { handleSceneAction } from "../bridge/sceneActions";
 import { requireBootContext } from "../bridge/sceneBridge";
@@ -24,6 +25,7 @@ export class CombatScene extends Phaser.Scene {
     });
 
     renderCombatPanel(this, context, 0xfffbef, 0x8f5b42, "#1e2a3e", "#805845");
+    renderCombatFeedbackEffect(this, context);
     renderCombatButtons(this, context);
     bindKeyboardActions(this, (action) => handleSceneAction(this, context, action));
     renderDebugOverlay(context, "CombatScene");
@@ -68,6 +70,22 @@ export function renderCombatPanel(
   scene.add.text(1204, 610, `Turn ${combat?.turn ?? 0}`, textStyle(24, bodyColor));
 }
 
+export function renderCombatFeedbackEffect(scene: Phaser.Scene, context: BootContext): void {
+  const effectKey = resolveCombatFeedbackEffectKey(context.run, context.dataBundle);
+  if (!effectKey || !scene.textures.exists(effectKey)) {
+    return;
+  }
+
+  const isBoss = context.run.combat?.enemyKind === "boss";
+  const frame = resolveCombatFeedbackFrame(context.run);
+  const config = effectPlacement(effectKey, isBoss);
+  scene.add.sprite(config.x, config.y, effectKey, frame)
+    .setDisplaySize(config.size, config.size)
+    .setAlpha(config.alpha)
+    .setAngle(config.angle)
+    .setDepth(5);
+}
+
 function renderCombatantPortrait(scene: Phaser.Scene, context: BootContext, fill: number, stroke: number): void {
   const combat = context.run.combat;
   const enemy = getCombatantData(context.run, context.dataBundle);
@@ -91,4 +109,16 @@ function resolveIntentIconKey(context: BootContext): string | undefined {
     return undefined;
   }
   return iconKeys[combat.intentIndex % iconKeys.length] ?? iconKeys[0];
+}
+
+function effectPlacement(effectKey: string, isBoss: boolean): { x: number; y: number; size: number; alpha: number; angle: number } {
+  if (effectKey === "effect_paper_slash") {
+    return { x: 1500, y: isBoss ? 535 : 518, size: isBoss ? 188 : 166, alpha: 0.94, angle: -12 };
+  }
+
+  if (effectKey === "effect_ink_splash") {
+    return { x: 1508, y: isBoss ? 536 : 520, size: isBoss ? 186 : 164, alpha: 0.88, angle: 8 };
+  }
+
+  return { x: 1530, y: isBoss ? 524 : 508, size: isBoss ? 194 : 168, alpha: 0.82, angle: 0 };
 }

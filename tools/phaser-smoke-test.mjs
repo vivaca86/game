@@ -260,6 +260,8 @@ async function checkCombatActions() {
     await pressAndSettle(page, "Digit1");
     await waitForDebugValue(page, "enemyHp", "17");
     await waitForDebugValue(page, "playerEnergy", "2");
+    await waitForDebugValue(page, "effect", "effect_paper_slash");
+    await captureEffectScreenshot(page, "paper-slash");
   });
 
   await withDebugPage("/?debug=1&entry=combat&resetSave=1", "CombatScene", async (page) => {
@@ -287,6 +289,8 @@ async function checkCombatActions() {
   await withDebugPage("/?debug=1&entry=combat&resetSave=1&grantCard=card_lamplight_mark", "CombatScene", async (page) => {
     await pressAndSettle(page, "Digit4");
     await waitForDebugValue(page, "enemyMark", "2");
+    await waitForDebugValue(page, "effect", "effect_ink_splash");
+    await captureEffectScreenshot(page, "ink-splash");
     await pressAndSettle(page, "Digit1");
     await waitForDebugValue(page, "enemyMark", "0");
     await waitForDebugValue(page, "enemyHp", "15");
@@ -368,6 +372,8 @@ async function checkSceneFlowAndRuneEffect() {
 async function checkBossResultFlow() {
   await withDebugPage("/?debug=1&entry=boss&resetSave=1", "BossScene", async (page) => {
     await playUntilDebugValue(page, "bossPhaseTriggered", "true", 80);
+    await waitForDebugValue(page, "effect", "effect_stage_spotlight");
+    await captureEffectScreenshot(page, "stage-spotlight");
     await playUntilPhase(page, ["result"], 120);
     await waitForDebugValue(page, "phase", "result");
     await pressAndSettle(page, "Enter");
@@ -450,6 +456,16 @@ async function playUsefulCombatAction(page, state) {
 async function pressAndSettle(page, key) {
   await page.keyboard.press(key);
   await page.waitForTimeout(80);
+}
+
+async function captureEffectScreenshot(page, label) {
+  const screenshot = await page.screenshot({
+    path: path.join(tmpDir, `phaser-effect-${label}.png`),
+    fullPage: false
+  });
+  if (screenshot.length < 15000) {
+    throw new Error(`Effect screenshot ${label} looks empty`);
+  }
 }
 
 async function clickScenePoint(page, sceneX, sceneY) {

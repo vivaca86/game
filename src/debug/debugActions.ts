@@ -1,4 +1,5 @@
 import type { BootContext } from "../app/bootContext";
+import { resolveCombatFeedbackEffectKey } from "../simulation/state/combatFeedback";
 
 export function createDebugSummary(context: BootContext): string[] {
   return [
@@ -28,6 +29,7 @@ export function createDebugSummary(context: BootContext): string[] {
     `relics=${context.run.relics.join(",") || "none"}`,
     `equipped=${Object.entries(context.run.equippedRunes).map(([cardId, runes]) => `${cardId}:${runes.join("+")}`).join(",") || "none"}`,
     context.debug.bossId ? `boss=${context.debug.bossId}` : "boss=none",
+    `effect=${resolveCombatFeedbackEffectKey(context.run, context.dataBundle) ?? "none"}`,
     `log=${context.run.log.at(-1) ?? "none"}`,
     `cards=${context.dataBundle.cards.length}`,
     `assets=${context.assetManifest.length}`,

@@ -5,7 +5,7 @@ import { bindKeyboardActions } from "../../input/bindings";
 import { renderDebugOverlay } from "../../ui/overlays/debugOverlay";
 import { handleSceneAction } from "../bridge/sceneActions";
 import { requireBootContext } from "../bridge/sceneBridge";
-import { renderCombatPanel } from "./CombatScene";
+import { renderCombatFeedbackEffect, renderCombatPanel } from "./CombatScene";
 import { renderSceneShell, textStyle } from "../view/sceneShell";
 
 export class BossScene extends Phaser.Scene {
@@ -24,6 +24,7 @@ export class BossScene extends Phaser.Scene {
     });
 
     renderCombatPanel(this, context, 0x3c3143, 0xf0c36a, "#fff5d7", "#f5c26b");
+    renderCombatFeedbackEffect(this, context);
     this.add.text(
       95,
       472,
