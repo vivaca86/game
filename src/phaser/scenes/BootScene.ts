@@ -15,7 +15,7 @@ export class BootScene extends Phaser.Scene {
 
   create(): void {
     const runtimeFlags = getRuntimeFlags();
-    const loaded = loadGameData();
+    const loaded = loadGameData(runtimeFlags.dataMode);
     const validation = validateLoadedData(loaded.bundle);
     const restoreSavedRun = hasUsableStoredSave(loaded.bundle, { debug: runtimeFlags.debug }) && !runtimeFlags.resetSave;
     const save = loadSave(loaded.bundle, {

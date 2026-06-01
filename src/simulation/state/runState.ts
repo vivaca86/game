@@ -10,6 +10,11 @@ import type {
   StageData
 } from "../../data/schema";
 import type { DebugConfig, EntryKey } from "../../debug/debugEntry";
+import {
+  applyCombatStartPassives,
+  getPassiveAdjustedRewardOfferCount,
+  getPassiveSupplementalRewardEntries
+} from "../systems/passives/passiveSystem";
 import type { SliceCombatState } from "./combatState";
 
 export type SlicePhase = SavePhase;
@@ -20,6 +25,7 @@ export interface SlicePlayerState {
   energy: number;
   maxEnergy: number;
   block: number;
+  gold: number;
 }
 
 export interface SliceRunState {
@@ -42,12 +48,29 @@ export interface SliceRunState {
   relics: ContentId[];
   arcanas: ContentId[];
   completedStages: ContentId[];
+  lastEventChoiceId?: ContentId;
   nextCardDiscount: number;
   nextCardCostPenalty: number;
   nextDamageReduction: number;
   nextRewardBonus: number;
   chainCount: number;
+  firstExpensiveCardFreeAvailable: boolean;
+  guardCardsPlayedThisCombat: number;
+  colorsPlayedThisTurn: ContentId[];
+  prismPathTriggeredThisTurn: boolean;
+  playerMark: number;
+  playerWeak: number;
+  battleRules: SliceBattleRule[];
+  previousCardId?: ContentId;
+  reflectRatio: number;
   log: string[];
+}
+
+export interface SliceBattleRule {
+  rule: string;
+  colorKey?: string;
+  amount: number;
+  sourceCardId: ContentId;
 }
 
 export function createInitialRunState(
@@ -61,10 +84,11 @@ export function createInitialRunState(
 
   const character = bundle.characters[0];
   const stage = bundle.stages.find((item) => item.id === debug.stageId) ?? bundle.stages[0];
-  const deck = [...(character?.startingDeck ?? []), ...debug.grants.cards];
-  const hand = buildOpeningHand(deck);
+  const deck = ensureCardsInDeck([...(character?.startingDeck ?? []), ...debug.grants.cards], debug.handCards);
+  const hand = debug.handCards.length > 0 ? debug.handCards.slice(0, 5) : buildOpeningHand(deck);
   const roomIndex = resolveInitialRoomIndex(stage, debug);
   const phase = entryToPhase(debug.entry);
+  const maxHp = character?.maxHp ?? 1;
 
   const run: SliceRunState = {
     runId: "slice-run-001",
@@ -77,36 +101,53 @@ export function createInitialRunState(
     hand,
     discard: [],
     player: {
-      hp: character?.maxHp ?? 1,
-      maxHp: character?.maxHp ?? 1,
+      hp: clampDebugHp(debug.playerHp, maxHp),
+      maxHp,
       energy: character?.startingEnergy ?? 3,
       maxEnergy: character?.startingEnergy ?? 3,
-      block: 0
+      block: 0,
+      gold: 80
     },
     rewardPoolId: debug.rewardPoolId,
     offeredRewards: [],
     equippedRunes: {},
     runes: [...debug.grants.runes],
     relics: [...debug.grants.relics],
-    arcanas: [],
+    arcanas: [...debug.grants.arcanas],
     completedStages: [],
+    lastEventChoiceId: undefined,
     nextCardDiscount: 0,
     nextCardCostPenalty: 0,
     nextDamageReduction: 0,
     nextRewardBonus: 0,
     chainCount: 0,
+    firstExpensiveCardFreeAvailable: true,
+    guardCardsPlayedThisCombat: 0,
+    colorsPlayedThisTurn: [],
+    prismPathTriggeredThisTurn: false,
+    playerMark: 0,
+    playerWeak: 0,
+    battleRules: [],
+    reflectRatio: 0,
     log: [`boot:${phase}`]
   };
 
   if (phase === "combat" || phase === "boss") {
     const combat = createInitialCombatForPhase(bundle, run, debug);
-    if (combat) run.combat = combat;
+    if (combat) {
+      run.combat = combat;
+      applyCombatStartPassives(run, bundle);
+    }
   }
 
   if (phase === "reward") {
     const rewardPoolId = debug.rewardPoolId ?? getCurrentRoom(bundle, run)?.rewardPoolId ?? stage?.rewardPools[0];
+    const count = getPassiveAdjustedRewardOfferCount(run, bundle, rewardPoolId, 3 + run.nextRewardBonus);
+    const baseEntries = selectRewardEntries(bundle, rewardPoolId, count);
+    const supplementalEntries = getPassiveSupplementalRewardEntries(run, bundle, rewardPoolId, baseEntries);
     run.rewardPoolId = rewardPoolId;
-    run.offeredRewards = selectRewardIds(bundle, rewardPoolId, 3);
+    run.offeredRewards = [...baseEntries, ...supplementalEntries].map((entry) => entry.id);
+    run.nextRewardBonus = 0;
   }
 
   if (phase === "rune_bench" && run.runes.length === 0 && bundle.runes[0]) {
@@ -141,15 +182,22 @@ export function sliceRunToSaveRun(run: SliceRunState): RunState {
     relics: [...run.relics],
     arcanas: [...run.arcanas],
     completedStages: [...run.completedStages],
+    lastEventChoiceId: run.lastEventChoiceId,
     nextCardDiscount: run.nextCardDiscount,
     nextCardCostPenalty: run.nextCardCostPenalty,
     nextDamageReduction: run.nextDamageReduction,
     nextRewardBonus: run.nextRewardBonus,
     chainCount: run.chainCount,
+    firstExpensiveCardFreeAvailable: run.firstExpensiveCardFreeAvailable,
+    guardCardsPlayedThisCombat: run.guardCardsPlayedThisCombat,
+    colorsPlayedThisTurn: [...run.colorsPlayedThisTurn],
+    prismPathTriggeredThisTurn: run.prismPathTriggeredThisTurn,
+    playerMark: run.playerMark,
+    playerWeak: run.playerWeak,
     log: [...run.log],
     hp: run.player.hp,
     maxHp: run.player.maxHp,
-    currency: 0
+    currency: run.player.gold
   };
 }
 
@@ -185,6 +233,17 @@ export function selectRewardEntries(
 ): RewardEntry[] {
   const pool = bundle.rewardPools.find((item) => item.id === rewardPoolId) ?? bundle.rewardPools[0];
   return pool?.entries.slice(0, Math.max(1, count)) ?? [];
+}
+
+export function findRewardEntryById(
+  bundle: GameDataBundle,
+  rewardPoolId: ContentId | undefined,
+  rewardId: ContentId | undefined
+): RewardEntry | undefined {
+  if (!rewardId) return undefined;
+  const primaryPool = bundle.rewardPools.find((item) => item.id === rewardPoolId) ?? bundle.rewardPools[0];
+  return primaryPool?.entries.find((entry) => entry.id === rewardId)
+    ?? bundle.rewardPools.flatMap((pool) => pool.entries).find((entry) => entry.id === rewardId);
 }
 
 export function selectRewardIds(
@@ -267,7 +326,8 @@ function createRunFromSave(
       maxHp: savedRun.maxHp,
       energy: savedRun.playerEnergy,
       maxEnergy: savedRun.playerMaxEnergy,
-      block: savedRun.playerBlock
+      block: savedRun.playerBlock,
+      gold: savedRun.currency
     },
     combat: savedRun.combat ? { ...savedRun.combat } : undefined,
     rewardPoolId: savedRun.rewardPoolId,
@@ -280,17 +340,29 @@ function createRunFromSave(
     relics: [...savedRun.relics],
     arcanas: [...savedRun.arcanas],
     completedStages: [...savedRun.completedStages],
+    lastEventChoiceId: savedRun.lastEventChoiceId,
     nextCardDiscount: savedRun.nextCardDiscount,
     nextCardCostPenalty: savedRun.nextCardCostPenalty,
     nextDamageReduction: savedRun.nextDamageReduction,
     nextRewardBonus: savedRun.nextRewardBonus,
     chainCount: savedRun.chainCount,
+    firstExpensiveCardFreeAvailable: savedRun.firstExpensiveCardFreeAvailable ?? true,
+    guardCardsPlayedThisCombat: savedRun.guardCardsPlayedThisCombat ?? 0,
+    colorsPlayedThisTurn: [...(savedRun.colorsPlayedThisTurn ?? [])],
+    prismPathTriggeredThisTurn: savedRun.prismPathTriggeredThisTurn ?? false,
+    playerMark: savedRun.playerMark ?? 0,
+    playerWeak: savedRun.playerWeak ?? 0,
+    battleRules: [],
+    reflectRatio: 0,
     log: savedRun.log.length > 0 ? [...savedRun.log] : [`boot:${savedRun.phase}`]
   };
 
   if ((run.phase === "combat" || run.phase === "boss") && !run.combat) {
     const combat = createInitialCombatForPhase(bundle, run, debug);
-    if (combat) run.combat = combat;
+    if (combat) {
+      run.combat = combat;
+      applyCombatStartPassives(run, bundle);
+    }
   }
 
   return run;
@@ -310,6 +382,11 @@ function resolveInitialRoomIndex(stage: StageData | undefined, debug: DebugConfi
   if (debug.entry === "reward") {
     const rewardIndex = stage.route.findIndex((room) => room.type === "reward");
     return rewardIndex >= 0 ? rewardIndex : 0;
+  }
+
+  if (debug.entry === "event") {
+    const eventIndex = stage.route.findIndex((room) => room.type === "event");
+    return eventIndex >= 0 ? eventIndex : 0;
   }
 
   if (debug.entry === "rune_bench") {
@@ -337,7 +414,7 @@ function createInitialCombatForPhase(
       ?? bundle.bosses.find((item) => item.id === pooledBossId)
       ?? bundle.bosses.find((item) => item.id === getStage(bundle, run)?.bossId)
       ?? bundle.bosses[0];
-    return boss ? {
+    return boss ? applyDebugCombatHp({
       enemyId: boss.id,
       enemyKind: "boss",
       enemyHp: boss.maxHp,
@@ -349,7 +426,7 @@ function createInitialCombatForPhase(
       defeated: false,
       bossPhaseTriggered: false,
       pendingAttackBonus: 0
-    } : undefined;
+    }, debug) : undefined;
   }
 
   const room = getCurrentRoom(bundle, run);
@@ -358,7 +435,7 @@ function createInitialCombatForPhase(
     ?? bundle.enemies.find((item) => item.id === pooledEnemyId)
     ?? bundle.enemies[0];
 
-  return enemy ? {
+  return enemy ? applyDebugCombatHp({
     enemyId: enemy.id,
     enemyKind: "enemy",
     enemyHp: enemy.maxHp,
@@ -370,7 +447,37 @@ function createInitialCombatForPhase(
     defeated: false,
     bossPhaseTriggered: false,
     pendingAttackBonus: 0
-  } : undefined;
+  }, debug) : undefined;
+}
+
+function clampDebugHp(value: number | undefined, maxHp: number): number {
+  if (typeof value !== "number" || !Number.isFinite(value)) return maxHp;
+  return Math.max(1, Math.min(maxHp, Math.floor(value)));
+}
+
+function applyDebugCombatHp(combat: SliceCombatState, debug: DebugConfig): SliceCombatState {
+  if (typeof debug.enemyHp !== "number" || !Number.isFinite(debug.enemyHp)) return combat;
+  return {
+    ...combat,
+    enemyHp: Math.max(1, Math.min(combat.enemyMaxHp, Math.floor(debug.enemyHp)))
+  };
+}
+
+function ensureCardsInDeck(deck: ContentId[], requiredCards: ContentId[]): ContentId[] {
+  if (requiredCards.length === 0) return deck;
+
+  const adjusted = [...deck];
+  const deckCounts = countCards(adjusted);
+  const requiredCounts = countCards(requiredCards);
+
+  for (const [cardId, requiredCount] of requiredCounts) {
+    const existingCount = deckCounts.get(cardId) ?? 0;
+    for (let index = existingCount; index < requiredCount; index += 1) {
+      adjusted.push(cardId);
+    }
+  }
+
+  return adjusted;
 }
 
 function countCards(cards: ContentId[]): Map<ContentId, number> {

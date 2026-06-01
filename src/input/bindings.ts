@@ -1,5 +1,6 @@
 import type Phaser from "phaser";
 import type { InputAction } from "./actions";
+import type { SettingsState } from "../data/schema";
 
 export const KEYBOARD_BINDINGS: Record<string, InputAction> = {
   ArrowUp: "move_up",
@@ -21,10 +22,15 @@ export const KEYBOARD_BINDINGS: Record<string, InputAction> = {
 
 export function bindKeyboardActions(
   scene: Phaser.Scene,
-  onAction: (action: InputAction) => void
+  onAction: (action: InputAction) => void,
+  settings?: Pick<SettingsState, "spaceConfirm">
 ): void {
   scene.input.keyboard?.removeAllListeners("keydown");
   scene.input.keyboard?.on("keydown", (event: KeyboardEvent) => {
+    if (event.code === "Space" && settings?.spaceConfirm === false) {
+      return;
+    }
+
     const action = KEYBOARD_BINDINGS[event.code];
     if (action) {
       onAction(action);

@@ -1,6 +1,8 @@
 import { readdir, readFile, stat } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { enemyReleaseQualityFindings } from "./enemy-release-quality.mjs";
+import { visualProductionFindings } from "./visual-production-quality.mjs";
 
 const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const dataDir = path.join(rootDir, "src", "data", "ko");
@@ -25,11 +27,10 @@ const [cards, gems, enemies, stages, events, achievements] = await Promise.all([
 ]);
 
 const assetFiles = await listFiles(rootDir, /\.(png|jpg|jpeg|webp|gif|avif)$/i);
-const appSource = await readFile(path.join(rootDir, "src", "app.js"), "utf8");
-const cssSource = await readFile(path.join(rootDir, "src", "styles", "app.css"), "utf8");
+const visualFindings = await visualProductionFindings(rootDir);
 
 const findings = [
-  auditVisuals(assetFiles, appSource, cssSource),
+  visualFindings,
   auditCards(cards),
   auditGems(gems),
   auditEnemies(enemies),
@@ -69,40 +70,6 @@ async function readJson(fileName) {
   return JSON.parse(await readFile(path.join(dataDir, fileName), "utf8"));
 }
 
-function auditVisuals(files, source, styles) {
-  const cssVisualClasses = [
-    ".card-art",
-    ".monster-portrait",
-    ".stage-key-art",
-    ".event-scene",
-    ".gem-icon",
-    ".item-icon"
-  ];
-  const renderFunctions = [
-    "renderCardArt",
-    "renderMonsterPortrait",
-    "renderStageKeyArt",
-    "renderCharacterPortrait",
-    "renderEventSceneGraphic",
-    "renderItemIcon"
-  ];
-  const hasCssOnlyVisuals =
-    cssVisualClasses.every((className) => styles.includes(className)) &&
-    renderFunctions.every((functionName) => source.includes(functionName));
-
-  if (files.length > 0 && !hasCssOnlyVisuals) return [];
-
-  return [{
-    area: "visuals",
-    message: "No production bitmap asset pipeline is present; major game visuals are CSS/DOM placeholders.",
-    evidence: [
-      `bitmap assets found: ${files.length}`,
-      `CSS visual classes found: ${cssVisualClasses.filter((className) => styles.includes(className)).join(", ")}`,
-      `DOM render functions found: ${renderFunctions.filter((functionName) => source.includes(functionName)).join(", ")}`
-    ]
-  }];
-}
-
 function auditCards(rows) {
   const visibleRows = rows.filter((card) => !["curse", "temp"].includes(card.type));
   const repeatedEffects = repeated(countBy(visibleRows, (card) => effectShape(card.effects)), 10);
@@ -140,25 +107,7 @@ function auditGems(rows) {
 }
 
 function auditEnemies(rows) {
-  const repeatedIntentShapes = repeated(countBy(rows, (enemy) => intentShape(enemy.intents)), 8);
-  const rankCounts = countBy(rows, (enemy) => enemy.rank);
-  const findings = [];
-
-  if (repeatedIntentShapes.length > 0) {
-    findings.push({
-      area: "enemies",
-      message: "Enemy intent patterns repeat heavily; monsters need unique combat identities before expansion.",
-      evidence: repeatedIntentShapes.map(([shape, count]) => `${count}x ${shape}`)
-    });
-  }
-
-  findings.push({
-    area: "enemies",
-    message: "Enemy set is still best treated as generated coverage, not final monster content.",
-    evidence: [`rank counts: ${formatCounts(rankCounts)}`]
-  });
-
-  return findings;
+  return enemyReleaseQualityFindings(rows);
 }
 
 function auditStages(rows) {

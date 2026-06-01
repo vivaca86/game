@@ -10,12 +10,18 @@
       {
         "type": "attack",
         "amount": 5,
-        "label": "장난 공격"
+        "label": "솜털 박치기"
+      },
+      {
+        "type": "special",
+        "effect": "fortify_all",
+        "amount": 3,
+        "label": "몽실 숨기"
       },
       {
         "type": "guard",
         "amount": 4,
-        "label": "동글 방어"
+        "label": "구름 폭신막"
       }
     ],
     "rewards": {
@@ -35,15 +41,21 @@
     "block": 1,
     "intents": [
       {
-        "type": "attack",
-        "amount": 4,
-        "label": "폴짝 치기"
-      },
-      {
         "type": "debuff",
         "status": "mark",
         "amount": 1,
-        "label": "장난 표식"
+        "label": "안개 표식"
+      },
+      {
+        "type": "attack",
+        "amount": 4,
+        "label": "구름 콕"
+      },
+      {
+        "type": "special",
+        "effect": "fortify_all",
+        "amount": 2,
+        "label": "장난 숨기"
       }
     ],
     "rewards": {
@@ -65,12 +77,18 @@
       {
         "type": "attack",
         "amount": 6,
-        "label": "장난 공격"
+        "label": "접힌 모서리"
+      },
+      {
+        "type": "debuff",
+        "status": "mark",
+        "amount": 1,
+        "label": "부적 표식"
       },
       {
         "type": "guard",
         "amount": 4,
-        "label": "동글 방어"
+        "label": "종이 겹막"
       }
     ],
     "rewards": {
@@ -92,13 +110,20 @@
       {
         "type": "attack",
         "amount": 5,
-        "label": "폴짝 치기"
+        "label": "부적 튕기기"
       },
       {
         "type": "debuff",
         "status": "weak",
         "amount": 1,
-        "label": "장난 표식"
+        "label": "종이 흔들기"
+      },
+      {
+        "type": "special",
+        "effect": "add_temp_card",
+        "cardId": "card_temp_dust",
+        "amount": 1,
+        "label": "접힌 먼지"
       }
     ],
     "rewards": {
@@ -120,12 +145,18 @@
       {
         "type": "attack",
         "amount": 7,
-        "label": "장난 공격"
+        "label": "새싹 찌르기"
+      },
+      {
+        "type": "special",
+        "effect": "heal_self",
+        "amount": 5,
+        "label": "새싹 돋기"
       },
       {
         "type": "guard",
         "amount": 5,
-        "label": "동글 방어"
+        "label": "잎사귀 가림"
       }
     ],
     "rewards": {
@@ -145,15 +176,21 @@
     "block": 3,
     "intents": [
       {
+        "type": "special",
+        "effect": "heal_self",
+        "amount": 6,
+        "label": "몰래 돋기"
+      },
+      {
         "type": "attack",
         "amount": 6,
-        "label": "폴짝 치기"
+        "label": "덩굴 콕"
       },
       {
         "type": "debuff",
         "status": "mark",
         "amount": 1,
-        "label": "장난 표식"
+        "label": "잎맥 표식"
       }
     ],
     "rewards": {
@@ -173,14 +210,20 @@
     "block": 0,
     "intents": [
       {
+        "type": "debuff",
+        "status": "mark",
+        "amount": 1,
+        "label": "반짝 표식"
+      },
+      {
         "type": "attack",
         "amount": 8,
-        "label": "장난 공격"
+        "label": "등불 톡"
       },
       {
         "type": "guard",
         "amount": 5,
-        "label": "동글 방어"
+        "label": "빛막 두르기"
       }
     ],
     "rewards": {
@@ -202,13 +245,19 @@
       {
         "type": "attack",
         "amount": 7,
-        "label": "폴짝 치기"
+        "label": "등불 깜빡"
+      },
+      {
+        "type": "special",
+        "effect": "pierce_attack",
+        "amount": 4,
+        "label": "빛살 관통"
       },
       {
         "type": "debuff",
         "status": "weak",
         "amount": 1,
-        "label": "장난 표식"
+        "label": "눈부심"
       }
     ],
     "rewards": {
@@ -230,12 +279,18 @@
       {
         "type": "attack",
         "amount": 9,
-        "label": "장난 공격"
+        "label": "사탕 튕기기"
+      },
+      {
+        "type": "special",
+        "effect": "reduce_energy",
+        "amount": 1,
+        "label": "달콤한 현기증"
       },
       {
         "type": "guard",
         "amount": 6,
-        "label": "동글 방어"
+        "label": "설탕막"
       }
     ],
     "rewards": {
@@ -255,15 +310,21 @@
     "block": 1,
     "intents": [
       {
-        "type": "attack",
-        "amount": 8,
-        "label": "폴짝 치기"
+        "type": "special",
+        "effect": "reduce_energy",
+        "amount": 1,
+        "label": "설탕 현기증"
       },
       {
         "type": "debuff",
         "status": "mark",
         "amount": 1,
-        "label": "장난 표식"
+        "label": "반짝 조준"
+      },
+      {
+        "type": "attack",
+        "amount": 8,
+        "label": "별사탕 툭"
       }
     ],
     "rewards": {
@@ -283,14 +344,21 @@
     "block": 2,
     "intents": [
       {
+        "type": "special",
+        "effect": "chain_down",
+        "amount": 2,
+        "costIncrease": 1,
+        "label": "리본 헝클기"
+      },
+      {
         "type": "attack",
         "amount": 10,
-        "label": "장난 공격"
+        "label": "리본 찰싹"
       },
       {
         "type": "guard",
         "amount": 6,
-        "label": "동글 방어"
+        "label": "매듭 방어"
       }
     ],
     "rewards": {
@@ -312,13 +380,20 @@
       {
         "type": "attack",
         "amount": 9,
-        "label": "폴짝 치기"
+        "label": "리본 튕김"
+      },
+      {
+        "type": "special",
+        "effect": "chain_down",
+        "amount": 2,
+        "costIncrease": 1,
+        "label": "매듭 꼬기"
       },
       {
         "type": "debuff",
         "status": "weak",
         "amount": 1,
-        "label": "장난 표식"
+        "label": "헝클 약화"
       }
     ],
     "rewards": {
@@ -340,12 +415,19 @@
       {
         "type": "attack",
         "amount": 11,
-        "label": "장난 공격"
+        "label": "방울 튀기기"
+      },
+      {
+        "type": "special",
+        "effect": "add_temp_card",
+        "cardId": "card_temp_dust",
+        "amount": 1,
+        "label": "방울 먼지"
       },
       {
         "type": "guard",
         "amount": 7,
-        "label": "동글 방어"
+        "label": "비눗방울막"
       }
     ],
     "rewards": {
@@ -365,15 +447,22 @@
     "block": 3,
     "intents": [
       {
+        "type": "special",
+        "effect": "add_temp_card",
+        "cardId": "card_temp_dust",
+        "amount": 1,
+        "label": "거품 먼지"
+      },
+      {
         "type": "attack",
         "amount": 10,
-        "label": "폴짝 치기"
+        "label": "방울 펑"
       },
       {
         "type": "debuff",
         "status": "mark",
         "amount": 1,
-        "label": "장난 표식"
+        "label": "물방울 표식"
       }
     ],
     "rewards": {
@@ -393,14 +482,20 @@
     "block": 1,
     "intents": [
       {
-        "type": "attack",
-        "amount": 12,
-        "label": "장난 공격"
-      },
-      {
         "type": "guard",
         "amount": 7,
-        "label": "동글 방어"
+        "label": "말랑 쿠션"
+      },
+      {
+        "type": "special",
+        "effect": "fortify_all",
+        "amount": 4,
+        "label": "푹신 숨기"
+      },
+      {
+        "type": "attack",
+        "amount": 12,
+        "label": "말랑 박치기"
       }
     ],
     "rewards": {
@@ -420,15 +515,21 @@
     "block": 4,
     "intents": [
       {
-        "type": "attack",
-        "amount": 11,
-        "label": "폴짝 치기"
-      },
-      {
         "type": "debuff",
         "status": "weak",
         "amount": 1,
-        "label": "장난 표식"
+        "label": "폭신 압박"
+      },
+      {
+        "type": "special",
+        "effect": "fortify_all",
+        "amount": 5,
+        "label": "말랑 버티기"
+      },
+      {
+        "type": "attack",
+        "amount": 11,
+        "label": "쿠션 밀기"
       }
     ],
     "rewards": {
@@ -441,7 +542,7 @@
   },
   {
     "id": "enemy_prism_buddy",
-    "name": "무지개 프리즘 친구",
+    "name": "프리즘 색연 친구",
     "rank": "normal",
     "family": "프리즘",
     "maxHp": 62,
@@ -450,12 +551,19 @@
       {
         "type": "attack",
         "amount": 13,
-        "label": "장난 공격"
+        "label": "분광 콕"
       },
       {
-        "type": "guard",
-        "amount": 8,
-        "label": "동글 방어"
+        "type": "debuff",
+        "status": "mark",
+        "amount": 1,
+        "label": "색연필 조준"
+      },
+      {
+        "type": "special",
+        "effect": "pierce_attack",
+        "amount": 5,
+        "label": "무지개 빛살"
       }
     ],
     "rewards": {
@@ -468,22 +576,29 @@
   },
   {
     "id": "enemy_prism_trick",
-    "name": "무지개 프리즘 장난꾼",
+    "name": "프리즘 눈부심 장난꾼",
     "rank": "normal",
     "family": "프리즘",
     "maxHp": 76,
     "block": 1,
     "intents": [
       {
-        "type": "attack",
-        "amount": 12,
-        "label": "폴짝 치기"
+        "type": "debuff",
+        "status": "weak",
+        "amount": 1,
+        "label": "눈부심"
       },
       {
-        "type": "debuff",
-        "status": "mark",
+        "type": "attack",
+        "amount": 12,
+        "label": "반사 튕김"
+      },
+      {
+        "type": "special",
+        "effect": "add_temp_card",
+        "cardId": "card_temp_dust",
         "amount": 1,
-        "label": "장난 표식"
+        "label": "색종이 파편"
       }
     ],
     "rewards": {
@@ -496,21 +611,27 @@
   },
   {
     "id": "enemy_moon_buddy",
-    "name": "졸린 달빛 친구",
+    "name": "달빛 이불 친구",
     "rank": "normal",
     "family": "달빛",
     "maxHp": 67,
     "block": 0,
     "intents": [
       {
-        "type": "attack",
-        "amount": 14,
-        "label": "장난 공격"
+        "type": "guard",
+        "amount": 9,
+        "label": "달빛 이불"
       },
       {
-        "type": "guard",
-        "amount": 8,
-        "label": "동글 방어"
+        "type": "special",
+        "effect": "reduce_energy",
+        "amount": 1,
+        "label": "졸음 하품"
+      },
+      {
+        "type": "attack",
+        "amount": 14,
+        "label": "초승달 툭"
       }
     ],
     "rewards": {
@@ -523,22 +644,28 @@
   },
   {
     "id": "enemy_moon_trick",
-    "name": "졸린 달빛 장난꾼",
+    "name": "달빛 낮잠 장난꾼",
     "rank": "normal",
     "family": "달빛",
     "maxHp": 82,
     "block": 2,
     "intents": [
       {
-        "type": "attack",
-        "amount": 13,
-        "label": "폴짝 치기"
-      },
-      {
         "type": "debuff",
         "status": "weak",
         "amount": 1,
-        "label": "장난 표식"
+        "label": "졸음가루"
+      },
+      {
+        "type": "special",
+        "effect": "heal_self",
+        "amount": 7,
+        "label": "달빛 낮잠"
+      },
+      {
+        "type": "attack",
+        "amount": 13,
+        "label": "달조각 밀기"
       }
     ],
     "rewards": {
@@ -551,7 +678,7 @@
   },
   {
     "id": "enemy_peach_buddy",
-    "name": "분홍 복숭아 친구",
+    "name": "복숭아 과즙 친구",
     "rank": "normal",
     "family": "복숭아",
     "maxHp": 72,
@@ -560,12 +687,18 @@
       {
         "type": "attack",
         "amount": 15,
-        "label": "장난 공격"
+        "label": "복숭아 씨앗"
+      },
+      {
+        "type": "special",
+        "effect": "heal_self",
+        "amount": 6,
+        "label": "달콤 과즙"
       },
       {
         "type": "guard",
         "amount": 9,
-        "label": "동글 방어"
+        "label": "말랑 껍질"
       }
     ],
     "rewards": {
@@ -578,22 +711,29 @@
   },
   {
     "id": "enemy_peach_trick",
-    "name": "분홍 복숭아 장난꾼",
+    "name": "복숭아 잼 장난꾼",
     "rank": "normal",
     "family": "복숭아",
     "maxHp": 88,
     "block": 3,
     "intents": [
       {
+        "type": "special",
+        "effect": "chain_down",
+        "amount": 2,
+        "costIncrease": 1,
+        "label": "끈적잼 꼬임"
+      },
+      {
         "type": "attack",
         "amount": 14,
-        "label": "폴짝 치기"
+        "label": "잼 튕김"
       },
       {
         "type": "debuff",
         "status": "mark",
         "amount": 1,
-        "label": "장난 표식"
+        "label": "분홍 표식"
       }
     ],
     "rewards": {
@@ -606,21 +746,28 @@
   },
   {
     "id": "enemy_toy_buddy",
-    "name": "딸깍 장난감 친구",
+    "name": "태엽 장난감 친구",
     "rank": "normal",
     "family": "장난감",
     "maxHp": 77,
     "block": 2,
     "intents": [
       {
+        "type": "special",
+        "effect": "add_temp_card",
+        "cardId": "card_temp_dust",
+        "amount": 1,
+        "label": "태엽 부품"
+      },
+      {
         "type": "attack",
         "amount": 16,
-        "label": "장난 공격"
+        "label": "딸깍 펀치"
       },
       {
         "type": "guard",
         "amount": 9,
-        "label": "동글 방어"
+        "label": "장난감 방패"
       }
     ],
     "rewards": {
@@ -633,7 +780,7 @@
   },
   {
     "id": "enemy_toy_trick",
-    "name": "딸깍 장난감 장난꾼",
+    "name": "태엽 스프링 장난꾼",
     "rank": "normal",
     "family": "장난감",
     "maxHp": 94,
@@ -642,13 +789,19 @@
       {
         "type": "attack",
         "amount": 15,
-        "label": "폴짝 치기"
+        "label": "스프링 기습"
+      },
+      {
+        "type": "special",
+        "effect": "reduce_energy",
+        "amount": 1,
+        "label": "태엽 뻑뻑"
       },
       {
         "type": "debuff",
         "status": "weak",
         "amount": 1,
-        "label": "장난 표식"
+        "label": "삐걱 약화"
       }
     ],
     "rewards": {
@@ -661,21 +814,27 @@
   },
   {
     "id": "enemy_leaf_buddy",
-    "name": "살랑 잎사귀 친구",
+    "name": "잎맥 가림 친구",
     "rank": "normal",
     "family": "잎사귀",
     "maxHp": 82,
     "block": 0,
     "intents": [
       {
-        "type": "attack",
-        "amount": 17,
-        "label": "장난 공격"
-      },
-      {
         "type": "guard",
         "amount": 10,
-        "label": "동글 방어"
+        "label": "잎맥 가림막"
+      },
+      {
+        "type": "attack",
+        "amount": 17,
+        "label": "잎사귀 베기"
+      },
+      {
+        "type": "special",
+        "effect": "fortify_all",
+        "amount": 5,
+        "label": "바람 숨기"
       }
     ],
     "rewards": {
@@ -688,22 +847,28 @@
   },
   {
     "id": "enemy_leaf_trick",
-    "name": "살랑 잎사귀 장난꾼",
+    "name": "낙엽 바람 장난꾼",
     "rank": "normal",
     "family": "잎사귀",
     "maxHp": 100,
     "block": 1,
     "intents": [
       {
-        "type": "attack",
-        "amount": 16,
-        "label": "폴짝 치기"
+        "type": "special",
+        "effect": "pierce_attack",
+        "amount": 6,
+        "label": "잎끝 관통"
       },
       {
         "type": "debuff",
         "status": "mark",
         "amount": 1,
-        "label": "장난 표식"
+        "label": "바람 표식"
+      },
+      {
+        "type": "attack",
+        "amount": 16,
+        "label": "낙엽 휘두르기"
       }
     ],
     "rewards": {
@@ -716,7 +881,7 @@
   },
   {
     "id": "enemy_star_buddy",
-    "name": "반짝 별빛 친구",
+    "name": "별가루막 친구",
     "rank": "normal",
     "family": "별빛",
     "maxHp": 87,
@@ -725,12 +890,19 @@
       {
         "type": "attack",
         "amount": 18,
-        "label": "장난 공격"
+        "label": "별빛 콕"
+      },
+      {
+        "type": "special",
+        "effect": "add_temp_card",
+        "cardId": "card_temp_dust",
+        "amount": 1,
+        "label": "반짝 먼지"
       },
       {
         "type": "guard",
         "amount": 10,
-        "label": "동글 방어"
+        "label": "별가루막"
       }
     ],
     "rewards": {
@@ -743,22 +915,28 @@
   },
   {
     "id": "enemy_star_trick",
-    "name": "반짝 별빛 장난꾼",
+    "name": "혜성 현기증 장난꾼",
     "rank": "normal",
     "family": "별빛",
     "maxHp": 106,
     "block": 2,
     "intents": [
       {
+        "type": "special",
+        "effect": "reduce_energy",
+        "amount": 1,
+        "label": "별빛 현기증"
+      },
+      {
         "type": "attack",
         "amount": 17,
-        "label": "폴짝 치기"
+        "label": "혜성 툭"
       },
       {
         "type": "debuff",
         "status": "weak",
         "amount": 1,
-        "label": "장난 표식"
+        "label": "눈부신 약화"
       }
     ],
     "rewards": {
@@ -771,21 +949,27 @@
   },
   {
     "id": "enemy_cookie_buddy",
-    "name": "바삭 쿠키 친구",
+    "name": "쿠키 접시 친구",
     "rank": "normal",
     "family": "쿠키",
     "maxHp": 92,
     "block": 2,
     "intents": [
       {
-        "type": "attack",
-        "amount": 19,
-        "label": "장난 공격"
-      },
-      {
         "type": "guard",
         "amount": 11,
-        "label": "동글 방어"
+        "label": "쿠키 접시막"
+      },
+      {
+        "type": "attack",
+        "amount": 19,
+        "label": "바삭 깨물기"
+      },
+      {
+        "type": "special",
+        "effect": "heal_self",
+        "amount": 8,
+        "label": "부스러기 줍기"
       }
     ],
     "rewards": {
@@ -798,7 +982,7 @@
   },
   {
     "id": "enemy_cookie_trick",
-    "name": "바삭 쿠키 장난꾼",
+    "name": "초코칩 부스러기 장난꾼",
     "rank": "normal",
     "family": "쿠키",
     "maxHp": 112,
@@ -807,13 +991,20 @@
       {
         "type": "attack",
         "amount": 18,
-        "label": "폴짝 치기"
+        "label": "쿠키 조각비"
+      },
+      {
+        "type": "special",
+        "effect": "chain_down",
+        "amount": 2,
+        "costIncrease": 1,
+        "label": "부스러기 꼬임"
       },
       {
         "type": "debuff",
         "status": "mark",
         "amount": 1,
-        "label": "장난 표식"
+        "label": "초코칩 표식"
       }
     ],
     "rewards": {
@@ -835,18 +1026,24 @@
       {
         "type": "attack",
         "amount": 10,
-        "label": "커다란 장난"
+        "label": "구름 대장 박치기"
       },
       {
         "type": "guard",
         "amount": 9,
-        "label": "대장 방어"
+        "label": "넓은 구름막"
       },
       {
         "type": "special",
-        "effect": "add_temp_card",
+        "effect": "fortify_all",
+        "amount": 6,
+        "label": "대장 은폐"
+      },
+      {
+        "type": "debuff",
+        "status": "mark",
         "amount": 1,
-        "label": "특별 장난"
+        "label": "안개 조준"
       }
     ],
     "rewards": {
@@ -869,18 +1066,18 @@
       {
         "type": "attack",
         "amount": 11,
-        "label": "커다란 장난"
-      },
-      {
-        "type": "guard",
-        "amount": 10,
-        "label": "대장 방어"
+        "label": "부적 대장 일격"
       },
       {
         "type": "special",
         "effect": "reduce_energy",
         "amount": 1,
-        "label": "특별 장난"
+        "label": "부적 압박"
+      },
+      {
+        "type": "guard",
+        "amount": 10,
+        "label": "겹부적 방어"
       }
     ],
     "rewards": {
@@ -901,20 +1098,20 @@
     "block": 7,
     "intents": [
       {
+        "type": "special",
+        "effect": "heal_self",
+        "amount": 9,
+        "label": "대장 새싹 회복"
+      },
+      {
         "type": "attack",
         "amount": 12,
-        "label": "커다란 장난"
+        "label": "굵은 덩굴"
       },
       {
         "type": "guard",
         "amount": 11,
-        "label": "대장 방어"
-      },
-      {
-        "type": "special",
-        "effect": "add_temp_card",
-        "amount": 1,
-        "label": "특별 장난"
+        "label": "잎사귀 성벽"
       }
     ],
     "rewards": {
@@ -937,18 +1134,19 @@
       {
         "type": "attack",
         "amount": 13,
-        "label": "커다란 장난"
-      },
-      {
-        "type": "guard",
-        "amount": 12,
-        "label": "대장 방어"
+        "label": "등불 대장 충돌"
       },
       {
         "type": "special",
-        "effect": "reduce_energy",
+        "effect": "pierce_attack",
+        "amount": 6,
+        "label": "직선 빛살"
+      },
+      {
+        "type": "debuff",
+        "status": "mark",
         "amount": 1,
-        "label": "특별 장난"
+        "label": "강한 조명"
       }
     ],
     "rewards": {
@@ -969,20 +1167,20 @@
     "block": 9,
     "intents": [
       {
-        "type": "attack",
-        "amount": 14,
-        "label": "커다란 장난"
-      },
-      {
         "type": "guard",
         "amount": 13,
-        "label": "대장 방어"
+        "label": "설탕 결정막"
       },
       {
         "type": "special",
-        "effect": "add_temp_card",
+        "effect": "reduce_energy",
         "amount": 1,
-        "label": "특별 장난"
+        "label": "달콤한 압박"
+      },
+      {
+        "type": "attack",
+        "amount": 14,
+        "label": "별사탕 충돌"
       }
     ],
     "rewards": {
@@ -1005,18 +1203,19 @@
       {
         "type": "attack",
         "amount": 15,
-        "label": "커다란 장난"
+        "label": "리본 대장 채찍"
+      },
+      {
+        "type": "special",
+        "effect": "chain_down",
+        "amount": 3,
+        "costIncrease": 1,
+        "label": "거대 매듭"
       },
       {
         "type": "guard",
         "amount": 14,
-        "label": "대장 방어"
-      },
-      {
-        "type": "special",
-        "effect": "reduce_energy",
-        "amount": 1,
-        "label": "특별 장난"
+        "label": "묶음 방어"
       }
     ],
     "rewards": {
@@ -1037,20 +1236,21 @@
     "block": 11,
     "intents": [
       {
+        "type": "special",
+        "effect": "add_temp_card",
+        "cardId": "card_temp_dust",
+        "amount": 2,
+        "label": "거품 먼지비"
+      },
+      {
         "type": "attack",
         "amount": 16,
-        "label": "커다란 장난"
+        "label": "큰 방울 펑"
       },
       {
         "type": "guard",
         "amount": 15,
-        "label": "대장 방어"
-      },
-      {
-        "type": "special",
-        "effect": "add_temp_card",
-        "amount": 1,
-        "label": "특별 장난"
+        "label": "비눗막 대형"
       }
     ],
     "rewards": {
@@ -1071,20 +1271,21 @@
     "block": 12,
     "intents": [
       {
-        "type": "attack",
-        "amount": 17,
-        "label": "커다란 장난"
-      },
-      {
-        "type": "guard",
-        "amount": 16,
-        "label": "대장 방어"
+        "type": "debuff",
+        "status": "weak",
+        "amount": 1,
+        "label": "말랑 압박"
       },
       {
         "type": "special",
-        "effect": "reduce_energy",
-        "amount": 1,
-        "label": "특별 장난"
+        "effect": "fortify_all",
+        "amount": 7,
+        "label": "대장 쿠션"
+      },
+      {
+        "type": "attack",
+        "amount": 17,
+        "label": "푹신 돌진"
       }
     ],
     "rewards": {
@@ -1098,7 +1299,7 @@
   },
   {
     "id": "enemy_prism_elite",
-    "name": "무지개 프리즘 대장",
+    "name": "프리즘 색분리 대장",
     "rank": "elite",
     "family": "프리즘",
     "maxHp": 164,
@@ -1107,18 +1308,24 @@
       {
         "type": "attack",
         "amount": 18,
-        "label": "커다란 장난"
+        "label": "색분리 강타"
+      },
+      {
+        "type": "special",
+        "effect": "pierce_attack",
+        "amount": 7,
+        "label": "분광 관통"
+      },
+      {
+        "type": "debuff",
+        "status": "mark",
+        "amount": 1,
+        "label": "굴절 조준"
       },
       {
         "type": "guard",
         "amount": 17,
-        "label": "대장 방어"
-      },
-      {
-        "type": "special",
-        "effect": "add_temp_card",
-        "amount": 1,
-        "label": "특별 장난"
+        "label": "프리즘 장벽"
       }
     ],
     "rewards": {
@@ -1132,27 +1339,33 @@
   },
   {
     "id": "enemy_moon_elite",
-    "name": "졸린 달빛 대장",
+    "name": "달빛 수면 대장",
     "rank": "elite",
     "family": "달빛",
     "maxHp": 176,
     "block": 14,
     "intents": [
       {
-        "type": "attack",
-        "amount": 19,
-        "label": "커다란 장난"
-      },
-      {
         "type": "guard",
         "amount": 18,
-        "label": "대장 방어"
+        "label": "달빛 커튼"
       },
       {
         "type": "special",
         "effect": "reduce_energy",
         "amount": 1,
-        "label": "특별 장난"
+        "label": "깊은 졸음"
+      },
+      {
+        "type": "debuff",
+        "status": "weak",
+        "amount": 1,
+        "label": "몽롱한 약화"
+      },
+      {
+        "type": "attack",
+        "amount": 19,
+        "label": "보름달 밀치기"
       }
     ],
     "rewards": {
@@ -1166,27 +1379,34 @@
   },
   {
     "id": "enemy_peach_elite",
-    "name": "분홍 복숭아 대장",
+    "name": "복숭아 과수원 대장",
     "rank": "elite",
     "family": "복숭아",
     "maxHp": 188,
     "block": 15,
     "intents": [
       {
+        "type": "special",
+        "effect": "heal_self",
+        "amount": 10,
+        "label": "과즙 회복"
+      },
+      {
         "type": "attack",
         "amount": 20,
-        "label": "커다란 장난"
+        "label": "씨앗 폭격"
+      },
+      {
+        "type": "special",
+        "effect": "chain_down",
+        "amount": 3,
+        "costIncrease": 1,
+        "label": "잼 덫"
       },
       {
         "type": "guard",
         "amount": 19,
-        "label": "대장 방어"
-      },
-      {
-        "type": "special",
-        "effect": "add_temp_card",
-        "amount": 1,
-        "label": "특별 장난"
+        "label": "복숭아 울타리"
       }
     ],
     "rewards": {
@@ -1200,27 +1420,34 @@
   },
   {
     "id": "enemy_toy_elite",
-    "name": "딸깍 장난감 대장",
+    "name": "장난감 태엽 대장",
     "rank": "elite",
     "family": "장난감",
     "maxHp": 200,
     "block": 16,
     "intents": [
       {
-        "type": "attack",
-        "amount": 21,
-        "label": "커다란 장난"
+        "type": "special",
+        "effect": "add_temp_card",
+        "cardId": "card_temp_dust",
+        "amount": 2,
+        "label": "태엽 부품비"
       },
       {
-        "type": "guard",
-        "amount": 20,
-        "label": "대장 방어"
+        "type": "attack",
+        "amount": 21,
+        "label": "망치 딸깍"
       },
       {
         "type": "special",
         "effect": "reduce_energy",
         "amount": 1,
-        "label": "특별 장난"
+        "label": "태엽 역회전"
+      },
+      {
+        "type": "guard",
+        "amount": 20,
+        "label": "목마 방어"
       }
     ],
     "rewards": {
@@ -1234,27 +1461,33 @@
   },
   {
     "id": "enemy_leaf_elite",
-    "name": "살랑 잎사귀 대장",
+    "name": "잎사귀 바람 대장",
     "rank": "elite",
     "family": "잎사귀",
     "maxHp": 212,
     "block": 17,
     "intents": [
       {
+        "type": "special",
+        "effect": "fortify_all",
+        "amount": 8,
+        "label": "숲바람 엄폐"
+      },
+      {
+        "type": "special",
+        "effect": "pierce_attack",
+        "amount": 8,
+        "label": "잎끝 비"
+      },
+      {
         "type": "attack",
         "amount": 22,
-        "label": "커다란 장난"
+        "label": "가지 휘두르기"
       },
       {
         "type": "guard",
         "amount": 21,
-        "label": "대장 방어"
-      },
-      {
-        "type": "special",
-        "effect": "add_temp_card",
-        "amount": 1,
-        "label": "특별 장난"
+        "label": "잎맥 성벽"
       }
     ],
     "rewards": {
@@ -1268,27 +1501,35 @@
   },
   {
     "id": "enemy_star_elite",
-    "name": "반짝 별빛 대장",
+    "name": "별빛 관측 대장",
     "rank": "elite",
     "family": "별빛",
     "maxHp": 224,
     "block": 18,
     "intents": [
       {
-        "type": "attack",
-        "amount": 23,
-        "label": "커다란 장난"
-      },
-      {
-        "type": "guard",
-        "amount": 22,
-        "label": "대장 방어"
+        "type": "debuff",
+        "status": "mark",
+        "amount": 1,
+        "label": "별자리 조준"
       },
       {
         "type": "special",
         "effect": "reduce_energy",
         "amount": 1,
-        "label": "특별 장난"
+        "label": "현기성 섬광"
+      },
+      {
+        "type": "attack",
+        "amount": 23,
+        "label": "별똥 강타"
+      },
+      {
+        "type": "special",
+        "effect": "add_temp_card",
+        "cardId": "card_temp_dust",
+        "amount": 1,
+        "label": "반짝 잔해"
       }
     ],
     "rewards": {
@@ -1302,27 +1543,34 @@
   },
   {
     "id": "enemy_cookie_elite",
-    "name": "바삭 쿠키 대장",
+    "name": "쿠키 오븐 대장",
     "rank": "elite",
     "family": "쿠키",
     "maxHp": 236,
     "block": 19,
     "intents": [
       {
-        "type": "attack",
-        "amount": 24,
-        "label": "커다란 장난"
+        "type": "special",
+        "effect": "heal_self",
+        "amount": 11,
+        "label": "오븐 데우기"
       },
       {
         "type": "guard",
         "amount": 23,
-        "label": "대장 방어"
+        "label": "접시 성벽"
       },
       {
         "type": "special",
-        "effect": "add_temp_card",
-        "amount": 1,
-        "label": "특별 장난"
+        "effect": "chain_down",
+        "amount": 3,
+        "costIncrease": 1,
+        "label": "초코칩 함정"
+      },
+      {
+        "type": "attack",
+        "amount": 24,
+        "label": "바삭 파편"
       }
     ],
     "rewards": {
@@ -1347,8 +1595,17 @@
         "addIntent": {
           "type": "special",
           "effect": "summon",
-          "enemyId": "enemy_cloud_buddy",
-          "label": "친구 부르기"
+          "enemyId": "enemy_cloud_trick",
+          "label": "햇살 문지기 호출"
+        }
+      },
+      {
+        "hpBelowRatio": 0.25,
+        "addIntent": {
+          "type": "special",
+          "effect": "fortify_all",
+          "amount": 12,
+          "label": "현관 장벽 넓히기"
         }
       }
     ],
@@ -1356,19 +1613,25 @@
       {
         "type": "attack",
         "amount": 14,
-        "label": "왕방울 쿵"
+        "label": "현관 왕방울 쿵"
       },
       {
         "type": "guard",
         "amount": 12,
-        "label": "동그란 잠금"
+        "label": "문틈 잠금"
       },
       {
         "type": "special",
         "effect": "add_temp_card",
         "cardId": "card_temp_dust",
         "amount": 1,
-        "label": "장난 카드"
+        "label": "먼지 장난"
+      },
+      {
+        "type": "special",
+        "effect": "fortify_all",
+        "amount": 10,
+        "label": "현관 장벽"
       }
     ],
     "rewards": {
@@ -1392,9 +1655,18 @@
         "hpBelowRatio": 0.5,
         "addIntent": {
           "type": "special",
+          "effect": "reduce_energy",
+          "amount": 1,
+          "label": "라벤더 향기 압박"
+        }
+      },
+      {
+        "hpBelowRatio": 0.25,
+        "addIntent": {
+          "type": "special",
           "effect": "summon",
-          "enemyId": "enemy_paper_buddy",
-          "label": "친구 부르기"
+          "enemyId": "enemy_paper_trick",
+          "label": "접힌 복도 조수 호출"
         }
       }
     ],
@@ -1402,19 +1674,24 @@
       {
         "type": "attack",
         "amount": 16,
-        "label": "왕방울 쿵"
+        "label": "복도 왕방울 쿵"
+      },
+      {
+        "type": "special",
+        "effect": "reduce_energy",
+        "amount": 1,
+        "label": "라벤더 압박"
       },
       {
         "type": "guard",
         "amount": 14,
-        "label": "동그란 잠금"
+        "label": "향기 잠금"
       },
       {
-        "type": "special",
-        "effect": "add_temp_card",
-        "cardId": "card_temp_dust",
+        "type": "debuff",
+        "status": "weak",
         "amount": 1,
-        "label": "장난 카드"
+        "label": "라벤더 졸음"
       }
     ],
     "rewards": {
@@ -1435,32 +1712,40 @@
     "block": 14,
     "phaseRules": [
       {
-        "hpBelowRatio": 0.5,
+        "hpBelowRatio": 0.45,
         "addIntent": {
           "type": "special",
           "effect": "summon",
-          "enemyId": "enemy_sprout_buddy",
-          "label": "친구 부르기"
+          "enemyId": "enemy_sprout_trick",
+          "label": "정원 새싹 호출"
+        }
+      },
+      {
+        "hpBelowRatio": 0.2,
+        "addIntent": {
+          "type": "special",
+          "effect": "heal_self",
+          "amount": 18,
+          "label": "민트 온실 재생"
         }
       }
     ],
     "intents": [
       {
+        "type": "special",
+        "effect": "heal_self",
+        "amount": 12,
+        "label": "정원 재생"
+      },
+      {
         "type": "attack",
         "amount": 18,
-        "label": "왕방울 쿵"
+        "label": "민트 왕방울 쿵"
       },
       {
         "type": "guard",
         "amount": 16,
-        "label": "동그란 잠금"
-      },
-      {
-        "type": "special",
-        "effect": "add_temp_card",
-        "cardId": "card_temp_dust",
-        "amount": 1,
-        "label": "장난 카드"
+        "label": "덩굴 잠금"
       }
     ],
     "rewards": {
@@ -1484,9 +1769,18 @@
         "hpBelowRatio": 0.5,
         "addIntent": {
           "type": "special",
+          "effect": "pierce_attack",
+          "amount": 12,
+          "label": "수로 복숭아 물살"
+        }
+      },
+      {
+        "hpBelowRatio": 0.25,
+        "addIntent": {
+          "type": "special",
           "effect": "summon",
-          "enemyId": "enemy_lantern_buddy",
-          "label": "친구 부르기"
+          "enemyId": "enemy_peach_trick",
+          "label": "잼 수로 조수 호출"
         }
       }
     ],
@@ -1494,19 +1788,19 @@
       {
         "type": "attack",
         "amount": 20,
-        "label": "왕방울 쿵"
-      },
-      {
-        "type": "guard",
-        "amount": 18,
-        "label": "동그란 잠금"
+        "label": "운하 왕방울 쿵"
       },
       {
         "type": "special",
-        "effect": "add_temp_card",
-        "cardId": "card_temp_dust",
+        "effect": "pierce_attack",
+        "amount": 8,
+        "label": "복숭아 물살"
+      },
+      {
+        "type": "debuff",
+        "status": "mark",
         "amount": 1,
-        "label": "장난 카드"
+        "label": "물결 조준"
       }
     ],
     "rewards": {
@@ -1527,32 +1821,40 @@
     "block": 18,
     "phaseRules": [
       {
-        "hpBelowRatio": 0.5,
+        "hpBelowRatio": 0.45,
+        "addIntent": {
+          "type": "special",
+          "effect": "fortify_all",
+          "amount": 14,
+          "label": "옥상 구름 장벽"
+        }
+      },
+      {
+        "hpBelowRatio": 0.25,
         "addIntent": {
           "type": "special",
           "effect": "summon",
-          "enemyId": "enemy_candy_buddy",
-          "label": "친구 부르기"
+          "enemyId": "enemy_cloud_buddy",
+          "label": "구름 난간 친구 호출"
         }
       }
     ],
     "intents": [
       {
-        "type": "attack",
-        "amount": 22,
-        "label": "왕방울 쿵"
-      },
-      {
         "type": "guard",
         "amount": 20,
-        "label": "동그란 잠금"
+        "label": "지붕 구름막"
       },
       {
         "type": "special",
-        "effect": "add_temp_card",
-        "cardId": "card_temp_dust",
-        "amount": 1,
-        "label": "장난 카드"
+        "effect": "fortify_all",
+        "amount": 12,
+        "label": "하늘 장벽"
+      },
+      {
+        "type": "attack",
+        "amount": 22,
+        "label": "낙하 쿵"
       }
     ],
     "rewards": {
@@ -1573,12 +1875,22 @@
     "block": 20,
     "phaseRules": [
       {
-        "hpBelowRatio": 0.5,
+        "hpBelowRatio": 0.45,
+        "addIntent": {
+          "type": "special",
+          "effect": "chain_down",
+          "amount": 4,
+          "costIncrease": 1,
+          "label": "개찰구 리본 봉인"
+        }
+      },
+      {
+        "hpBelowRatio": 0.2,
         "addIntent": {
           "type": "special",
           "effect": "summon",
-          "enemyId": "enemy_ribbon_buddy",
-          "label": "친구 부르기"
+          "enemyId": "enemy_ribbon_trick",
+          "label": "매듭 역무원 호출"
         }
       }
     ],
@@ -1586,19 +1898,19 @@
       {
         "type": "attack",
         "amount": 24,
-        "label": "왕방울 쿵"
+        "label": "정거장 왕방울 쿵"
+      },
+      {
+        "type": "special",
+        "effect": "chain_down",
+        "amount": 4,
+        "costIncrease": 1,
+        "label": "개찰구 매듭"
       },
       {
         "type": "guard",
         "amount": 22,
-        "label": "동그란 잠금"
-      },
-      {
-        "type": "special",
-        "effect": "add_temp_card",
-        "cardId": "card_temp_dust",
-        "amount": 1,
-        "label": "장난 카드"
+        "label": "리본 차단문"
       }
     ],
     "rewards": {
@@ -1622,29 +1934,39 @@
         "hpBelowRatio": 0.5,
         "addIntent": {
           "type": "special",
+          "effect": "add_temp_card",
+          "cardId": "card_temp_dust",
+          "amount": 2,
+          "label": "사탕 동굴 먼지비"
+        }
+      },
+      {
+        "hpBelowRatio": 0.25,
+        "addIntent": {
+          "type": "special",
           "effect": "summon",
-          "enemyId": "enemy_bubble_buddy",
-          "label": "친구 부르기"
+          "enemyId": "enemy_candy_trick",
+          "label": "별사탕 광부 호출"
         }
       }
     ],
     "intents": [
       {
+        "type": "special",
+        "effect": "add_temp_card",
+        "cardId": "card_temp_dust",
+        "amount": 2,
+        "label": "사탕 먼지비"
+      },
+      {
         "type": "attack",
         "amount": 26,
-        "label": "왕방울 쿵"
+        "label": "동굴 왕방울 쿵"
       },
       {
         "type": "guard",
         "amount": 24,
-        "label": "동그란 잠금"
-      },
-      {
-        "type": "special",
-        "effect": "add_temp_card",
-        "cardId": "card_temp_dust",
-        "amount": 1,
-        "label": "장난 카드"
+        "label": "결정 잠금"
       }
     ],
     "rewards": {
@@ -1668,29 +1990,38 @@
         "hpBelowRatio": 0.5,
         "addIntent": {
           "type": "special",
+          "effect": "pierce_attack",
+          "amount": 12,
+          "label": "칠판 분광 빛살"
+        }
+      },
+      {
+        "hpBelowRatio": 0.2,
+        "addIntent": {
+          "type": "special",
           "effect": "summon",
-          "enemyId": "enemy_plush_buddy",
-          "label": "친구 부르기"
+          "enemyId": "enemy_prism_trick",
+          "label": "프리즘 짝꿍 호출"
         }
       }
     ],
     "intents": [
       {
-        "type": "attack",
-        "amount": 28,
-        "label": "왕방울 쿵"
-      },
-      {
-        "type": "guard",
-        "amount": 26,
-        "label": "동그란 잠금"
+        "type": "debuff",
+        "status": "weak",
+        "amount": 1,
+        "label": "프리즘 압박"
       },
       {
         "type": "special",
-        "effect": "add_temp_card",
-        "cardId": "card_temp_dust",
-        "amount": 1,
-        "label": "장난 카드"
+        "effect": "pierce_attack",
+        "amount": 10,
+        "label": "교실 빛살"
+      },
+      {
+        "type": "attack",
+        "amount": 28,
+        "label": "칠판 쿵"
       }
     ],
     "rewards": {
@@ -1704,39 +2035,53 @@
   },
   {
     "id": "boss_moon_attic",
-    "name": "달빛 다락 왕방울",
+    "name": "달빛 다락 졸음왕",
     "rank": "boss",
-    "family": "왕방울",
-    "maxHp": 240,
+    "family": "달빛 왕방울",
+    "maxHp": 300,
     "block": 10,
     "phaseRules": [
+      {
+        "hpBelowRatio": 0.45,
+        "addIntent": {
+          "type": "special",
+          "effect": "summon",
+          "enemyId": "enemy_moon_trick",
+          "label": "달빛 그림자 호출"
+        }
+      },
       {
         "hpBelowRatio": 0.2,
         "addIntent": {
           "type": "special",
-          "effect": "summon",
-          "enemyId": "enemy_prism_buddy",
-          "label": "친구 부르기"
+          "effect": "pierce_attack",
+          "amount": 12,
+          "label": "다락 창문 빛살"
         }
       }
     ],
     "intents": [
       {
-        "type": "attack",
-        "amount": 20,
-        "label": "왕방울 쿵"
-      },
-      {
         "type": "guard",
-        "amount": 16,
-        "label": "동그란 잠금"
+        "amount": 18,
+        "label": "달빛 커튼"
       },
       {
         "type": "special",
-        "effect": "add_temp_card",
-        "cardId": "card_temp_dust",
+        "effect": "reduce_energy",
         "amount": 1,
-        "label": "장난 카드"
+        "label": "긴 하품"
+      },
+      {
+        "type": "debuff",
+        "status": "weak",
+        "amount": 1,
+        "label": "다락 졸음"
+      },
+      {
+        "type": "attack",
+        "amount": 24,
+        "label": "초승달 낙하"
       }
     ],
     "rewards": {
@@ -1750,9 +2095,9 @@
   },
   {
     "id": "boss_sprout_fort",
-    "name": "새싹 요새 왕방울",
+    "name": "새싹 요새 뿌리왕",
     "rank": "boss",
-    "family": "왕방울",
+    "family": "새싹 왕방울",
     "maxHp": 392,
     "block": 22,
     "phaseRules": [
@@ -1760,29 +2105,43 @@
         "hpBelowRatio": 0.5,
         "addIntent": {
           "type": "special",
+          "effect": "fortify_all",
+          "amount": 12,
+          "label": "요새 덩굴 장벽"
+        }
+      },
+      {
+        "hpBelowRatio": 0.25,
+        "addIntent": {
+          "type": "special",
           "effect": "summon",
-          "enemyId": "enemy_moon_buddy",
-          "label": "친구 부르기"
+          "enemyId": "enemy_sprout_trick",
+          "label": "몰래 새싹 호출"
         }
       }
     ],
     "intents": [
       {
-        "type": "attack",
-        "amount": 28,
-        "label": "왕방울 쿵"
+        "type": "special",
+        "effect": "heal_self",
+        "amount": 16,
+        "label": "요새 뿌리 회복"
       },
       {
         "type": "guard",
-        "amount": 25,
-        "label": "동그란 잠금"
+        "amount": 28,
+        "label": "새싹 성벽"
+      },
+      {
+        "type": "attack",
+        "amount": 30,
+        "label": "줄기 돌진"
       },
       {
         "type": "special",
-        "effect": "add_temp_card",
-        "cardId": "card_temp_dust",
-        "amount": 1,
-        "label": "장난 카드"
+        "effect": "summon",
+        "enemyId": "enemy_leaf_buddy",
+        "label": "잎사귀 보초 호출"
       }
     ],
     "rewards": {
@@ -1796,9 +2155,9 @@
   },
   {
     "id": "boss_bubble_port",
-    "name": "방울 항구 왕방울",
+    "name": "방울 항구 조류왕",
     "rank": "boss",
-    "family": "왕방울",
+    "family": "방울 왕방울",
     "maxHp": 480,
     "block": 30,
     "phaseRules": [
@@ -1807,28 +2166,44 @@
         "addIntent": {
           "type": "special",
           "effect": "summon",
-          "enemyId": "enemy_peach_buddy",
-          "label": "친구 부르기"
+          "enemyId": "enemy_bubble_trick",
+          "label": "거품 선원 호출"
+        }
+      },
+      {
+        "hpBelowRatio": 0.25,
+        "addIntent": {
+          "type": "special",
+          "effect": "add_temp_card",
+          "cardId": "card_temp_dust",
+          "amount": 2,
+          "label": "항구 물안개"
         }
       }
     ],
     "intents": [
       {
-        "type": "attack",
-        "amount": 34,
-        "label": "왕방울 쿵"
+        "type": "special",
+        "effect": "add_temp_card",
+        "cardId": "card_temp_dust",
+        "amount": 2,
+        "label": "거품 화물"
+      },
+      {
+        "type": "special",
+        "effect": "pierce_attack",
+        "amount": 13,
+        "label": "물방울 관통"
       },
       {
         "type": "guard",
         "amount": 32,
-        "label": "동그란 잠금"
+        "label": "항구 방파제"
       },
       {
-        "type": "special",
-        "effect": "add_temp_card",
-        "cardId": "card_temp_dust",
-        "amount": 1,
-        "label": "장난 카드"
+        "type": "attack",
+        "amount": 34,
+        "label": "파도 밀치기"
       }
     ],
     "rewards": {
@@ -1842,9 +2217,9 @@
   },
   {
     "id": "boss_plush_theater",
-    "name": "말랑 극장 왕방울",
+    "name": "말랑 극장 커튼왕",
     "rank": "boss",
-    "family": "왕방울",
+    "family": "말랑 왕방울",
     "maxHp": 514,
     "block": 32,
     "phaseRules": [
@@ -1853,28 +2228,42 @@
         "addIntent": {
           "type": "special",
           "effect": "summon",
-          "enemyId": "enemy_toy_buddy",
-          "label": "친구 부르기"
+          "enemyId": "enemy_toy_trick",
+          "label": "무대 소품 호출"
+        }
+      },
+      {
+        "hpBelowRatio": 0.25,
+        "addIntent": {
+          "type": "special",
+          "effect": "fortify_all",
+          "amount": 16,
+          "label": "두꺼운 커튼막"
         }
       }
     ],
     "intents": [
       {
+        "type": "debuff",
+        "status": "weak",
+        "amount": 1,
+        "label": "커튼 졸림"
+      },
+      {
+        "type": "special",
+        "effect": "fortify_all",
+        "amount": 14,
+        "label": "무대 쿠션막"
+      },
+      {
         "type": "attack",
         "amount": 36,
-        "label": "왕방울 쿵"
+        "label": "인형 무대 추락"
       },
       {
         "type": "guard",
         "amount": 34,
-        "label": "동그란 잠금"
-      },
-      {
-        "type": "special",
-        "effect": "add_temp_card",
-        "cardId": "card_temp_dust",
-        "amount": 1,
-        "label": "장난 카드"
+        "label": "분장실 방어"
       }
     ],
     "rewards": {
@@ -1888,9 +2277,9 @@
   },
   {
     "id": "boss_morning_observatory",
-    "name": "아침 관측소 왕방울",
+    "name": "아침 관측소 별자리왕",
     "rank": "boss",
-    "family": "왕방울",
+    "family": "별빛 왕방울",
     "maxHp": 548,
     "block": 34,
     "phaseRules": [
@@ -1899,28 +2288,43 @@
         "addIntent": {
           "type": "special",
           "effect": "summon",
-          "enemyId": "enemy_leaf_buddy",
-          "label": "친구 부르기"
+          "enemyId": "enemy_star_trick",
+          "label": "별자리 조수 호출"
+        }
+      },
+      {
+        "hpBelowRatio": 0.25,
+        "addIntent": {
+          "type": "special",
+          "effect": "pierce_attack",
+          "amount": 18,
+          "label": "태양 렌즈 집중"
         }
       }
     ],
     "intents": [
       {
-        "type": "attack",
-        "amount": 38,
-        "label": "왕방울 쿵"
-      },
-      {
-        "type": "guard",
-        "amount": 36,
-        "label": "동그란 잠금"
+        "type": "debuff",
+        "status": "mark",
+        "amount": 1,
+        "label": "망원경 조준"
       },
       {
         "type": "special",
-        "effect": "add_temp_card",
-        "cardId": "card_temp_dust",
+        "effect": "pierce_attack",
+        "amount": 15,
+        "label": "관측 빛살"
+      },
+      {
+        "type": "attack",
+        "amount": 38,
+        "label": "해돋이 강타"
+      },
+      {
+        "type": "special",
+        "effect": "reduce_energy",
         "amount": 1,
-        "label": "장난 카드"
+        "label": "새벽 현기증"
       }
     ],
     "rewards": {
@@ -1934,9 +2338,9 @@
   },
   {
     "id": "boss_dream_arcade",
-    "name": "꿈빛 오락실 왕방울",
+    "name": "꿈빛 오락실 점수왕",
     "rank": "boss",
-    "family": "왕방울",
+    "family": "장난감 왕방울",
     "maxHp": 582,
     "block": 36,
     "phaseRules": [
@@ -1944,29 +2348,45 @@
         "hpBelowRatio": 0.5,
         "addIntent": {
           "type": "special",
+          "effect": "reduce_energy",
+          "amount": 1,
+          "label": "기계 과열"
+        }
+      },
+      {
+        "hpBelowRatio": 0.25,
+        "addIntent": {
+          "type": "special",
           "effect": "summon",
-          "enemyId": "enemy_star_buddy",
-          "label": "친구 부르기"
+          "enemyId": "enemy_toy_trick",
+          "label": "태엽 조수 호출"
         }
       }
     ],
     "intents": [
       {
+        "type": "special",
+        "effect": "add_temp_card",
+        "cardId": "card_temp_dust",
+        "amount": 2,
+        "label": "삐걱 토큰"
+      },
+      {
+        "type": "special",
+        "effect": "chain_down",
+        "amount": 4,
+        "costIncrease": 1,
+        "label": "콤보 리셋"
+      },
+      {
         "type": "attack",
         "amount": 40,
-        "label": "왕방울 쿵"
+        "label": "핀볼 강타"
       },
       {
         "type": "guard",
         "amount": 38,
-        "label": "동그란 잠금"
-      },
-      {
-        "type": "special",
-        "effect": "add_temp_card",
-        "cardId": "card_temp_dust",
-        "amount": 1,
-        "label": "장난 카드"
+        "label": "점수판 방어"
       }
     ],
     "rewards": {
@@ -1980,9 +2400,9 @@
   },
   {
     "id": "boss_rainbow_keep",
-    "name": "무지개 성채 왕방울",
+    "name": "무지개 성채 관문왕",
     "rank": "boss",
-    "family": "왕방울",
+    "family": "프리즘 왕방울",
     "maxHp": 616,
     "block": 38,
     "phaseRules": [
@@ -1990,9 +2410,19 @@
         "hpBelowRatio": 0.5,
         "addIntent": {
           "type": "special",
+          "effect": "chain_down",
+          "amount": 5,
+          "costIncrease": 1,
+          "label": "성문 연쇄 봉인"
+        }
+      },
+      {
+        "hpBelowRatio": 0.25,
+        "addIntent": {
+          "type": "special",
           "effect": "summon",
-          "enemyId": "enemy_cookie_buddy",
-          "label": "친구 부르기"
+          "enemyId": "enemy_cookie_trick",
+          "label": "마지막 간식병 호출"
         }
       }
     ],
@@ -2000,19 +2430,25 @@
       {
         "type": "attack",
         "amount": 42,
-        "label": "왕방울 쿵"
-      },
-      {
-        "type": "guard",
-        "amount": 40,
-        "label": "동그란 잠금"
+        "label": "성채 무지개 강타"
       },
       {
         "type": "special",
-        "effect": "add_temp_card",
-        "cardId": "card_temp_dust",
-        "amount": 1,
-        "label": "장난 카드"
+        "effect": "pierce_attack",
+        "amount": 18,
+        "label": "일곱빛 관통"
+      },
+      {
+        "type": "special",
+        "effect": "fortify_all",
+        "amount": 18,
+        "label": "색유리 성벽"
+      },
+      {
+        "type": "special",
+        "effect": "summon",
+        "enemyId": "enemy_prism_trick",
+        "label": "굴절 경비 호출"
       }
     ],
     "rewards": {

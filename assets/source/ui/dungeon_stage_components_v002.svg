@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080">
+  <rect width="1920" height="1080" fill="#f8efd8"/>
+  <rect x="118" y="140" width="1684" height="842" fill="#fff8e8" stroke="#b98c34" stroke-width="6" opacity=".48"/>
+  <polygon points="168,198 336,264 358,856 168,926 86,856 110,258" fill="#5d8d86" stroke="#3f6f68" stroke-width="5" opacity=".28"/>
+  <polygon points="1752,198 1810,258 1834,856 1752,926 1562,856 1584,264" fill="#6c8fd6" stroke="#4c659d" stroke-width="5" opacity=".28"/>
+
+  <g id="dungeon-ribbon">
+    <rect x="568" y="66" width="784" height="120" rx="14" fill="#fff8e8" stroke="#5a4539" stroke-width="7"/>
+    <rect x="604" y="104" width="712" height="56" fill="#fff6df" stroke="#c6a65e" stroke-width="3" opacity=".75"/>
+    <circle cx="610" cy="126" r="17" fill="#c6a65e" stroke="#fff3b0" stroke-width="4"/>
+    <circle cx="1310" cy="126" r="17" fill="#c6a65e" stroke="#fff3b0" stroke-width="4"/>
+    <text x="960" y="114" font-family="Arial" font-size="42" font-weight="700" text-anchor="middle" fill="#1e2a3e">Dungeon sight</text>
+    <text x="960" y="154" font-family="Arial" font-size="22" font-weight="700" text-anchor="middle" fill="#805845">Stage / room progress</text>
+  </g>
+
+  <g id="exploration-ledger">
+    <rect x="196" y="324" width="470" height="586" rx="14" fill="#fff8e8" stroke="#5a4539" stroke-width="7"/>
+    <rect x="236" y="374" width="390" height="496" fill="none" stroke="#d9c999" stroke-width="5" opacity=".52"/>
+    <text x="236" y="386" font-family="Arial" font-size="31" font-weight="700" fill="#32415a">Exploration ledger</text>
+    <text x="236" y="424" font-family="Arial" font-size="20" font-weight="700" fill="#805845">Current, next intel, boss distance</text>
+    <g id="ledger-row-current">
+      <rect x="252" y="436" width="358" height="52" rx="8" fill="#fffbef" stroke="#fff2a7" stroke-width="6"/>
+      <rect x="252" y="444" width="358" height="36" rx="8" fill="none" stroke="#5a4539" stroke-width="4"/>
+      <text x="282" y="462" font-family="Arial" font-size="16" font-weight="700" fill="#805845">current</text>
+      <text x="382" y="462" font-family="Arial" font-size="19" font-weight="700" fill="#1e2a3e">combat</text>
+    </g>
+    <g id="ledger-row-next-revealed">
+      <rect x="252" y="562" width="358" height="52" rx="8" fill="#fffbef" stroke="#f5c26b" stroke-width="5"/>
+      <rect x="252" y="570" width="358" height="36" rx="8" fill="none" stroke="#5a4539" stroke-width="4"/>
+      <text x="282" y="588" font-family="Arial" font-size="16" font-weight="700" fill="#805845">next</text>
+      <text x="382" y="588" font-family="Arial" font-size="19" font-weight="700" fill="#1e2a3e">elite revealed</text>
+    </g>
+    <rect x="252" y="812" width="356" height="82" fill="#fff6df" stroke="#c6a65e" stroke-width="3" opacity=".72"/>
+    <text x="274" y="842" font-family="Arial" font-size="17" font-weight="700" fill="#1f8a70">Compass copy lives here when active.</text>
+  </g>
+
+  <g id="corridor-stage">
+    <rect x="640" y="324" width="838" height="586" rx="14" fill="#fff8e8" stroke="#5a4539" stroke-width="7"/>
+    <rect x="678" y="370" width="762" height="500" fill="none" stroke="#d9c999" stroke-width="5" opacity=".48"/>
+    <text x="690" y="384" font-family="Arial" font-size="32" font-weight="700" fill="#32415a">Paper corridor</text>
+    <text x="1212" y="406" font-family="Arial" font-size="20" font-weight="700" text-anchor="middle" fill="#805845">boss distance</text>
+    <polygon points="660,780 1420,780 1248,456 832,456" fill="#32415a" opacity=".1" stroke="#8d6a2a" stroke-width="6"/>
+    <polygon points="820,780 1260,780 1162,614 918,614" fill="#f5c26b" opacity=".14"/>
+    <polygon points="740,458 914,516 874,780 698,808 658,526" fill="#6c8fd6" opacity=".23" stroke="#4c659d" stroke-width="5"/>
+    <polygon points="1340,458 1422,526 1382,808 1206,780 1166,516" fill="#5d8d86" opacity=".23" stroke="#3f6f68" stroke-width="5"/>
+    <rect x="870" y="490" width="340" height="238" rx="8" fill="#fff2d6" stroke="#8d6a2a" stroke-width="7"/>
+    <rect x="932" y="536" width="216" height="150" rx="8" fill="#5d8d86" stroke="#fff3b0" stroke-width="5"/>
+    <rect x="908" y="458" width="264" height="38" fill="#fff6df" stroke="#c6a65e" stroke-width="3" opacity=".72"/>
+    <text x="1040" y="482" font-family="Arial" font-size="18" font-weight="700" text-anchor="middle" fill="#805845">current door</text>
+    <rect x="846" y="550" width="330" height="66" rx="8" fill="#32415a" stroke="#f5c26b" stroke-width="5"/>
+    <text x="1010" y="592" font-family="Arial" font-size="25" font-weight="700" text-anchor="middle" fill="#fff8e8">enter room</text>
+    <rect x="650" y="704" width="300" height="72" fill="#fff6df" stroke="#c6a65e" stroke-width="4" opacity=".72"/>
+    <text x="708" y="730" font-family="Arial" font-size="17" font-weight="700" fill="#1e2a3e">current marker card</text>
+    <rect x="990" y="704" width="300" height="72" fill="#fff6df" stroke="#f5c26b" stroke-width="4" opacity=".72"/>
+    <text x="1048" y="730" font-family="Arial" font-size="17" font-weight="700" fill="#1e2a3e">next revealed card</text>
+    <rect x="780" y="814" width="520" height="48" fill="#fff6df" stroke="#c6a65e" stroke-width="3" opacity=".52"/>
+  </g>
+
+  <g id="route-ledger">
+    <rect x="1294" y="328" width="372" height="582" rx="14" fill="#fff8e8" stroke="#5a4539" stroke-width="7"/>
+    <rect x="1338" y="372" width="288" height="498" fill="none" stroke="#d9c999" stroke-width="5" opacity=".52"/>
+    <text x="1320" y="386" font-family="Arial" font-size="31" font-weight="700" fill="#32415a">Room route</text>
+    <line x1="1350" y1="450" x2="1350" y2="754" stroke="#8d6a2a" stroke-width="5" opacity=".45"/>
+    <g id="route-current">
+      <circle cx="1350" cy="474" r="24" fill="#5d8d86" stroke="#fff3b0" stroke-width="5"/>
+      <text x="1390" y="480" font-family="Arial" font-size="20" font-weight="700" fill="#1e2a3e">combat</text>
+      <text x="1506" y="480" font-family="Arial" font-size="15" font-weight="700" fill="#1f8a70">current</text>
+    </g>
+    <g id="route-next">
+      <circle cx="1350" cy="530" r="18" fill="#ce5869" stroke="#fff" stroke-width="3"/>
+      <text x="1390" y="536" font-family="Arial" font-size="17" font-weight="700" fill="#805845">elite</text>
+      <text x="1506" y="536" font-family="Arial" font-size="15" font-weight="700" fill="#805845">next</text>
+    </g>
+    <rect x="1328" y="800" width="306" height="82" fill="#fff6df" stroke="#c6a65e" stroke-width="3" opacity=".55"/>
+    <text x="1342" y="832" font-family="Arial" font-size="18" font-weight="700" fill="#805845">Confirm opens the current door.</text>
+  </g>
+</svg>

@@ -7,14 +7,15 @@ import { gemAudit } from "../src/core/gem-roles.js";
 import { buildItemAudit } from "../src/core/build-roles.js";
 import { eventAudit } from "../src/core/event-roles.js";
 import { rewardOptionInsightAudit } from "../src/core/reward-insights.js";
-import { cleanseDisruption, playCard, endTurn } from "../src/core/combat.js";
+import { checkAchievements } from "../src/core/achievements.js";
+import { cleanseDisruption, playCard, endTurn, startCombat } from "../src/core/combat.js";
 import { startRun, advanceRoom } from "../src/core/progression.js";
 import { applyEventChoice, applyRewardOption } from "../src/core/rewards.js";
 import { cardCost } from "../src/core/card-effects.js";
 import { equipGemToCard, grantGem, openSocketForCard, socketCapacity } from "../src/core/gems.js";
 import { createSaveSnapshot, restoreRunState } from "../src/core/persistence.js";
 import { createRewardOptions } from "../src/core/rewards.js";
-import { grantArcana, grantRelic } from "../src/core/run-modifiers.js";
+import { adjustedRewardCost, grantArcana, grantRelic } from "../src/core/run-modifiers.js";
 import { createDefaultProfile, finalizeRunProfile } from "../src/core/profile.js";
 
 const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -92,7 +93,7 @@ const characterDiscountState = startRun(index, {
   seed: 20260603,
   profile
 });
-const discountedAttack = index.cards.get("card_cloud_tap");
+const discountedAttack = index.cards.get("card_cloud_pillowtap");
 if (cardCost(discountedAttack, characterDiscountState, index) !== Math.max(0, discountedAttack.cost - 1)) {
   throw new Error("캐릭터 첫 타입 비용 감소 패시브 검증 실패");
 }
@@ -120,6 +121,59 @@ if (eventCombatState.phase !== "room_complete" || eventCombatState.status.eventC
 if (!advanceRoom(eventCombatState, index)) throw new Error("이벤트 추가 전투 진입 실패");
 if (eventCombatState.phase !== "combat" || eventCombatState.enemies[0]?.id !== "enemy_cloud_buddy") throw new Error("이벤트 추가 전투 적 배치 실패");
 
+const achievementBatchState = startRun(index, {
+  characterId: "char_haru",
+  stageId: "stage_sunny_gate",
+  seed: 20260606,
+  profile
+});
+achievementBatchState.inventory.unlockedCards = data.cards.slice(0, 48).map((card) => card.id);
+checkAchievements(achievementBatchState, index, "collect_cards");
+if (!achievementBatchState.inventory.achievements.includes("ach_picnic_goal_001")) throw new Error("release achievement card collection trigger failed");
+if (!achievementBatchState.inventory.achievements.includes("ach_picnic_goal_004")) throw new Error("release achievement card relic milestone failed");
+if (!achievementBatchState.inventory.relics.includes("relic_bubble_lens")) throw new Error("release achievement unlockRelicId reward failed");
+achievementBatchState.inventory.gems = data.gems.slice(0, 12).map((gem) => gem.id);
+checkAchievements(achievementBatchState, index, "collect_gems");
+if (!achievementBatchState.inventory.achievements.includes("ach_picnic_goal_009")) throw new Error("release achievement gem collection trigger failed");
+if (!achievementBatchState.inventory.gems.includes("gem_peach_spark")) throw new Error("release achievement unlockGemId reward failed");
+achievementBatchState.inventory.relics = data.relics.slice(0, 8).map((relic) => relic.id);
+checkAchievements(achievementBatchState, index, "collect_relics");
+if (!achievementBatchState.inventory.achievements.includes("ach_picnic_goal_017")) throw new Error("release achievement relic collection trigger failed");
+if (!achievementBatchState.inventory.gems.includes("gem_prism_edge")) throw new Error("release achievement relic reward bridge failed");
+achievementBatchState.inventory.arcanas = data.arcanas.slice(0, 9).map((arcana) => arcana.id);
+checkAchievements(achievementBatchState, index, "collect_arcanas");
+if (!achievementBatchState.inventory.achievements.includes("ach_picnic_goal_023")) throw new Error("release achievement arcana collection trigger failed");
+if (!achievementBatchState.inventory.gems.includes("gem_rainbow_bridge")) throw new Error("release achievement arcana reward bridge failed");
+achievementBatchState.status.chain = 18;
+checkAchievements(achievementBatchState, index, "reach_chain");
+if (!achievementBatchState.inventory.achievements.includes("ach_picnic_goal_028")) throw new Error("release achievement chain trigger failed");
+if (!achievementBatchState.inventory.relics.includes("relic_prism_stamp")) throw new Error("release achievement chain reward bridge failed");
+
+const enemyBatch2WeakState = startRun(index, {
+  characterId: "char_haru",
+  stageId: "stage_moon_attic",
+  seed: 20260607,
+  profile
+});
+startCombat(enemyBatch2WeakState, index, "combat", { enemyIds: ["enemy_prism_trick"], label: "release enemy batch 2" });
+if (enemyBatch2WeakState.enemies[0]?.intents[0]?.status !== "weak") {
+  throw new Error("release enemy batch 2 weak intent not first for prism trick");
+}
+const enemyBatch2TempState = startRun(index, {
+  characterId: "char_haru",
+  stageId: "stage_moon_attic",
+  seed: 20260608,
+  profile
+});
+enemyBatch2TempState.player.maxHp = 999;
+enemyBatch2TempState.player.hp = 999;
+startCombat(enemyBatch2TempState, index, "combat", { enemyIds: ["enemy_toy_buddy"], label: "release enemy batch 2" });
+endTurn(enemyBatch2TempState, index);
+if (![enemyBatch2TempState.hand, enemyBatch2TempState.drawPile, enemyBatch2TempState.discardPile, enemyBatch2TempState.exhaustPile]
+  .some((pile) => pile.includes("card_temp_dust"))) {
+  throw new Error("release enemy batch 2 temp-card intent did not enter a card zone");
+}
+
 const state = startRun(index, {
   characterId: "char_haru",
   stageId: "stage_sunny_gate",
@@ -138,7 +192,7 @@ const interactionState = startRun(index, {
 interactionState.player.maxHp = 999;
 interactionState.player.hp = 999;
 interactionState.player.energy = 20;
-const promiseCard = index.cards.get("card_morning_promise");
+const promiseCard = index.cards.get("card_morning_goldenrule");
 const matchingColorCard = data.cards.find((card) => card.color === promiseCard.color && card.id !== promiseCard.id && !["curse", "temp"].includes(card.type));
 interactionState.hand = [promiseCard.id, matchingColorCard.id];
 const ruleShieldBefore = interactionState.player.shield;
@@ -226,6 +280,26 @@ const firstCardId = state.deck[0];
 const firstCard = index.cards.get(firstCardId);
 const discountGem = grantGem(state, "gem_sky_discount");
 const equipResult = equipGemToCard(state, index, discountGem.instanceId, firstCardId);
+const gemBatchState = startRun(index, {
+  characterId: "char_haru",
+  stageId: "stage_sunny_gate",
+  seed: 20260603,
+  profile
+});
+gemBatchState.player.energy = 20;
+gemBatchState.hand = ["card_sunbean_punch"];
+gemBatchState.enemies[0].hp = 100;
+gemBatchState.enemies[0].maxHp = 100;
+gemBatchState.enemies[0].block = 0;
+const edgeGem = grantGem(gemBatchState, "gem_morning_edge");
+if (!equipGemToCard(gemBatchState, index, edgeGem.instanceId, "card_sunbean_punch").ok) {
+  throw new Error("release gem batch equip failed");
+}
+const gemBatchHpBefore = gemBatchState.enemies[0].hp;
+if (!playCard(gemBatchState, index, 0)) throw new Error("release gem batch card play failed");
+const gemBatchDamage = gemBatchHpBefore - gemBatchState.enemies[0].hp;
+if (gemBatchDamage < 10) throw new Error(`release gem batch damage modifier failed: ${gemBatchDamage}`);
+if (!gemBatchState.status.preserveNextChain) throw new Error("release gem batch preserve-chain effect failed");
 if (!equipResult.ok) throw new Error("보석 장착 검증 실패");
 if (socketCapacity(state, index, firstCardId) < 1) throw new Error("카드 소켓 검증 실패");
 if (cardCost(firstCard, state, index) > Math.max(0, firstCard.cost - 1)) throw new Error("보석 비용 감소 검증 실패");
@@ -265,7 +339,13 @@ while (state.phase !== "stage_clear" && state.phase !== "defeat" && safety < 240
     continue;
   }
   if (state.phase === "event") {
-    applyEventChoice(state, index, 0);
+    const choiceIndex = firstAffordableEventChoiceIndex(state, index);
+    if (choiceIndex < 0) {
+      throw new Error(`No affordable event choice: ${state.pendingEvent?.id || "unknown"}`);
+    }
+    if (!applyEventChoice(state, index, choiceIndex)) {
+      throw new Error(`Event choice application failed: ${state.pendingEvent?.id || "unknown"}#${choiceIndex}`);
+    }
     continue;
   }
   if (state.phase === "reward") {
@@ -309,6 +389,24 @@ const nextRun = startRun(index, {
 });
 if (nextRun.stageId !== "stage_lavender_hall") throw new Error("해금 스테이지 새 런 시작 실패");
 if (!nextRun.enemies.some((enemy) => enemy.role && enemy.intents.length >= 3)) throw new Error("적 역할/추가 패턴 검증 실패");
+
+function firstAffordableEventChoiceIndex(state, index) {
+  const event = state.pendingEvent;
+  if (!event?.choices?.length) return -1;
+  return event.choices.findIndex((choice) => {
+    const cost = adjustedRewardCost(state, index, choice.cost || {}, {
+      source: event.type,
+      reward: choice.reward || {}
+    });
+    return canPayEventCost(state, cost);
+  });
+}
+
+function canPayEventCost(state, cost = {}) {
+  if (cost.gold && state.player.gold < cost.gold) return false;
+  if (cost.hp && state.player.hp <= cost.hp) return false;
+  return true;
+}
 
 const familyIntentLabels = new Set();
 const familyRoles = new Set();

@@ -3,10 +3,12 @@ import { BootScene } from "../phaser/scenes/BootScene";
 import { BossScene } from "../phaser/scenes/BossScene";
 import { CombatScene } from "../phaser/scenes/CombatScene";
 import { DungeonScene } from "../phaser/scenes/DungeonScene";
+import { EventScene } from "../phaser/scenes/EventScene";
 import { PreloadScene } from "../phaser/scenes/PreloadScene";
 import { ResultScene } from "../phaser/scenes/ResultScene";
 import { RewardScene } from "../phaser/scenes/RewardScene";
 import { RuneBenchScene } from "../phaser/scenes/RuneBenchScene";
+import { SettingsScene } from "../phaser/scenes/SettingsScene";
 import { TownScene } from "../phaser/scenes/TownScene";
 import { WorldMapScene } from "../phaser/scenes/WorldMapScene";
 
@@ -34,11 +36,13 @@ export function buildGameConfig(): Phaser.Types.Core.GameConfig {
       TownScene,
       WorldMapScene,
       DungeonScene,
+      EventScene,
       CombatScene,
       RewardScene,
       RuneBenchScene,
       BossScene,
-      ResultScene
+      ResultScene,
+      SettingsScene
     ]
   };
 }

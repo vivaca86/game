@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080" role="img" aria-label="Settings UI source components v001">
+  <rect width="1920" height="1080" fill="#f8efd8"/>
+  <rect x="120" y="140" width="1680" height="840" fill="#fff8e8" opacity=".50" stroke="#b98c34" stroke-width="6"/>
+  <polygon points="168,198 336,264 358,856 168,926 86,856 110,252" fill="#6c8fd6" opacity=".24" stroke="#4c659d" stroke-width="5"/>
+  <polygon points="1752,198 1810,252 1834,856 1752,926 1562,856 1584,264" fill="#5d8d86" opacity=".24" stroke="#3f6f68" stroke-width="5"/>
+  <g id="title-ribbon">
+    <rect x="560" y="60" width="800" height="132" rx="14" fill="#fff8e8" stroke="#5c4a3d" stroke-width="8"/>
+    <rect x="600" y="82" width="720" height="78" fill="#fff6df" stroke="#c6a65e" stroke-width="3"/>
+    <circle cx="610" cy="126" r="18" fill="#c6a65e"/>
+    <circle cx="1310" cy="126" r="18" fill="#c6a65e"/>
+    <rect x="600" y="181" width="720" height="18" fill="#f5c26b" opacity=".70"/>
+    <text x="960" y="118" font-family="Arial" font-size="42" font-weight="700" text-anchor="middle" fill="#1e2a3e">Settings Ledger</text>
+    <text x="960" y="156" font-family="Arial" font-size="22" font-weight="700" text-anchor="middle" fill="#805845">audio / display / controls</text>
+  </g>
+  <g id="hanging-tags">
+    <line x1="365" y1="132" x2="365" y2="310" stroke="#6a7b8e" stroke-width="5" opacity=".36"/>
+    <line x1="595" y1="132" x2="595" y2="310" stroke="#6a7b8e" stroke-width="5" opacity=".36"/>
+    <line x1="1325" y1="132" x2="1325" y2="310" stroke="#6a7b8e" stroke-width="5" opacity=".36"/>
+    <line x1="1555" y1="132" x2="1555" y2="310" stroke="#6a7b8e" stroke-width="5" opacity=".36"/>
+    <rect x="336" y="216" width="58" height="88" rx="10" fill="#fff3b0" stroke="#b4b0a8" stroke-width="5"/>
+    <rect x="566" y="216" width="58" height="88" rx="10" fill="#e8e7b8" stroke="#b4b0a8" stroke-width="5"/>
+    <rect x="1296" y="216" width="58" height="88" rx="10" fill="#fff3b0" stroke="#b4b0a8" stroke-width="5"/>
+    <rect x="1526" y="216" width="58" height="88" rx="10" fill="#e8e7b8" stroke="#b4b0a8" stroke-width="5"/>
+  </g>
+  <g id="settings-board">
+    <rect x="360" y="335" width="1200" height="370" fill="#fff6df" opacity=".24" stroke="#c6a65e" stroke-width="5"/>
+    <line x1="960" y1="340" x2="960" y2="870" stroke="#8d6a2a" stroke-width="4" opacity=".22"/>
+    <line x1="640" y1="356" x2="1240" y2="856" stroke="#8d6a2a" stroke-width="4" opacity=".18"/>
+    <line x1="1280" y1="356" x2="700" y2="856" stroke="#8d6a2a" stroke-width="4" opacity=".18"/>
+  </g>
+  <g id="save-stamp">
+    <rect x="240" y="423" width="360" height="430" rx="14" fill="#fff8e8" stroke="#5c4a3d" stroke-width="8"/>
+    <text x="274" y="472" font-family="Arial" font-size="31" font-weight="700" fill="#32415a">Save stamp</text>
+    <rect x="285" y="503" width="270" height="38" fill="#fff6df" opacity=".60" stroke="#c6a65e" stroke-width="3"/>
+    <rect x="285" y="555" width="270" height="38" fill="#fff6df" opacity=".60" stroke="#c6a65e" stroke-width="3"/>
+    <rect x="285" y="607" width="270" height="38" fill="#fff6df" opacity=".60" stroke="#c6a65e" stroke-width="3"/>
+    <rect x="285" y="659" width="270" height="38" fill="#fff6df" opacity=".60" stroke="#c6a65e" stroke-width="3"/>
+    <rect x="285" y="711" width="270" height="38" fill="#fff6df" opacity=".60" stroke="#c6a65e" stroke-width="3"/>
+    <rect x="285" y="768" width="270" height="72" fill="#fff6df" opacity=".50" stroke="#c6a65e" stroke-width="3"/>
+  </g>
+  <g id="audio-ledger">
+    <rect x="710" y="423" width="560" height="430" rx="14" fill="#fff8e8" stroke="#5c4a3d" stroke-width="8"/>
+    <text x="760" y="472" font-family="Arial" font-size="32" font-weight="700" fill="#32415a">Audio</text>
+    <text x="760" y="505" font-family="Arial" font-size="18" font-weight="700" fill="#805845">language and volume rows</text>
+    <rect x="760" y="503" width="460" height="54" rx="8" fill="#fffbef" stroke="#c6a65e" stroke-width="4"/>
+    <rect x="760" y="568" width="460" height="54" rx="8" fill="#fffbef" stroke="#c6a65e" stroke-width="4"/>
+    <rect x="760" y="633" width="460" height="54" rx="8" fill="#fffbef" stroke="#c6a65e" stroke-width="4"/>
+    <rect x="760" y="698" width="460" height="54" rx="8" fill="#fffbef" stroke="#c6a65e" stroke-width="4"/>
+    <circle cx="1072" cy="595" r="25" fill="#fff8e8" stroke="#b98c34" stroke-width="4"/>
+    <circle cx="1146" cy="595" r="25" fill="#fff8e8" stroke="#b98c34" stroke-width="4"/>
+    <circle cx="1072" cy="660" r="25" fill="#fff8e8" stroke="#b98c34" stroke-width="4"/>
+    <circle cx="1146" cy="660" r="25" fill="#fff8e8" stroke="#b98c34" stroke-width="4"/>
+    <circle cx="1072" cy="725" r="25" fill="#fff8e8" stroke="#b98c34" stroke-width="4"/>
+    <circle cx="1146" cy="725" r="25" fill="#fff8e8" stroke="#b98c34" stroke-width="4"/>
+  </g>
+  <g id="accessibility-ledger">
+    <rect x="1170" y="423" width="560" height="430" rx="14" fill="#fff8e8" stroke="#5c4a3d" stroke-width="8"/>
+    <text x="1220" y="472" font-family="Arial" font-size="32" font-weight="700" fill="#32415a">Display / Controls</text>
+    <text x="1220" y="505" font-family="Arial" font-size="18" font-weight="700" fill="#805845">mode toggles</text>
+    <rect x="1220" y="503" width="460" height="54" rx="8" fill="#fffbef" stroke="#c6a65e" stroke-width="4"/>
+    <rect x="1220" y="568" width="460" height="54" rx="8" fill="#fffbef" stroke="#c6a65e" stroke-width="4"/>
+    <rect x="1220" y="633" width="460" height="54" rx="8" fill="#fffbef" stroke="#c6a65e" stroke-width="4"/>
+    <rect x="1220" y="698" width="460" height="54" rx="8" fill="#fffbef" stroke="#c6a65e" stroke-width="4"/>
+    <rect x="1562" y="506" width="96" height="48" rx="8" fill="#fff8e8" stroke="#b98c34" stroke-width="4"/>
+    <rect x="1562" y="571" width="96" height="48" rx="8" fill="#fff8e8" stroke="#b98c34" stroke-width="4"/>
+    <rect x="1562" y="636" width="96" height="48" rx="8" fill="#fff8e8" stroke="#b98c34" stroke-width="4"/>
+    <rect x="1562" y="701" width="96" height="48" rx="8" fill="#fff8e8" stroke="#b98c34" stroke-width="4"/>
+  </g>
+  <g id="bottom-actions">
+    <rect x="810" y="781" width="820" height="70" rx="10" fill="#fff8e8" stroke="#8d6a2a" stroke-width="4"/>
+    <rect x="675" y="871" width="290" height="58" rx="10" fill="#32415a" stroke="#f5c26b" stroke-width="5"/>
+    <text x="820" y="908" font-family="Arial" font-size="22" font-weight="700" text-anchor="middle" fill="#fff5d7">설정 초기화</text>
+    <rect x="1015" y="871" width="290" height="58" rx="10" fill="#32415a" stroke="#f5c26b" stroke-width="5"/>
+    <text x="1160" y="908" font-family="Arial" font-size="22" font-weight="700" text-anchor="middle" fill="#fff5d7">저장 초기화</text>
+    <rect x="1355" y="871" width="290" height="58" rx="10" fill="#32415a" stroke="#f5c26b" stroke-width="5"/>
+    <text x="1500" y="908" font-family="Arial" font-size="22" font-weight="700" text-anchor="middle" fill="#fff5d7">마을로</text>
+  </g>
+</svg>

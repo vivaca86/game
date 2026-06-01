@@ -261,6 +261,41 @@
       "styleKey": "premium_popup_book"
     },
     {
+      "key": "ui_button_primary_9slice",
+      "type": "image",
+      "path": "assets/runtime/ui/ui_button_primary_9slice_v001.png",
+      "nativeSize": { "w": 256, "h": 96 },
+      "styleKey": "premium_popup_book"
+    },
+    {
+      "key": "ui_button_secondary_9slice",
+      "type": "image",
+      "path": "assets/runtime/ui/ui_button_secondary_9slice_v001.png",
+      "nativeSize": { "w": 256, "h": 96 },
+      "styleKey": "premium_popup_book"
+    },
+    {
+      "key": "ui_slot_reward_9slice",
+      "type": "image",
+      "path": "assets/runtime/ui/ui_slot_reward_9slice_v001.png",
+      "nativeSize": { "w": 512, "h": 128 },
+      "styleKey": "premium_popup_book"
+    },
+    {
+      "key": "ui_slot_choice_9slice",
+      "type": "image",
+      "path": "assets/runtime/ui/ui_slot_choice_9slice_v001.png",
+      "nativeSize": { "w": 512, "h": 128 },
+      "styleKey": "premium_popup_book"
+    },
+    {
+      "key": "ui_tooltip_paper_9slice",
+      "type": "image",
+      "path": "assets/runtime/ui/ui_tooltip_paper_9slice_v001.png",
+      "nativeSize": { "w": 384, "h": 128 },
+      "styleKey": "premium_popup_book"
+    },
+    {
       "key": "ui_panel_paper_9slice",
       "type": "image",
       "path": "assets/runtime/ui/ui_panel_paper_9slice_v001.png",

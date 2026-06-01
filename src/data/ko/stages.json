@@ -50,8 +50,8 @@
     "bossEnemyId": "boss_lavender_hall",
     "rooms": [
       "combat",
-      "combat",
       "event",
+      "combat",
       "elite",
       "reward",
       "rest",
@@ -85,10 +85,10 @@
     "rooms": [
       "combat",
       "combat",
-      "event",
-      "elite",
-      "reward",
       "rest",
+      "elite",
+      "event",
+      "reward",
       "boss"
     ],
     "clearRewards": {
@@ -118,11 +118,11 @@
     "bossEnemyId": "boss_peach_canal",
     "rooms": [
       "combat",
-      "combat",
       "event",
+      "combat",
       "elite",
-      "reward",
       "rest",
+      "reward",
       "boss"
     ],
     "clearRewards": {
@@ -154,8 +154,8 @@
       "combat",
       "combat",
       "event",
-      "elite",
       "reward",
+      "elite",
       "rest",
       "boss"
     ],
@@ -222,13 +222,13 @@
     "bossEnemyId": "boss_candy_cavern",
     "rooms": [
       "combat",
-      "event",
-      "combat",
       "shop",
-      "elite",
+      "combat",
       "event",
+      "elite",
       "reward",
       "rest",
+      "event",
       "boss"
     ],
     "clearRewards": {
@@ -259,12 +259,12 @@
     "rooms": [
       "combat",
       "event",
+      "elite",
       "combat",
       "shop",
-      "elite",
-      "event",
       "reward",
       "rest",
+      "event",
       "boss"
     ],
     "clearRewards": {
@@ -367,13 +367,13 @@
     "bossEnemyId": "boss_bubble_port",
     "rooms": [
       "combat",
-      "event",
       "combat",
+      "event",
       "shop",
       "rest",
       "elite",
-      "event",
       "reward",
+      "event",
       "rest",
       "boss"
     ],
@@ -405,8 +405,8 @@
     "rooms": [
       "combat",
       "event",
-      "combat",
       "shop",
+      "combat",
       "rest",
       "elite",
       "event",
@@ -441,13 +441,13 @@
     "bossEnemyId": "boss_morning_observatory",
     "rooms": [
       "combat",
+      "rest",
       "event",
       "combat",
       "shop",
-      "rest",
       "elite",
-      "event",
       "reward",
+      "event",
       "rest",
       "boss"
     ],
@@ -480,8 +480,8 @@
       "combat",
       "event",
       "combat",
-      "shop",
       "rest",
+      "shop",
       "elite",
       "event",
       "reward",
@@ -515,13 +515,14 @@
     "bossEnemyId": "boss_rainbow_keep",
     "rooms": [
       "combat",
+      "elite",
       "event",
       "combat",
       "shop",
       "rest",
       "elite",
-      "event",
       "reward",
+      "event",
       "rest",
       "boss"
     ],

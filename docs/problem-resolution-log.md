@@ -261,3 +261,332 @@
 - Resolution: Added deterministic transparent spritesheet candidates for the three effect assets. Added a combat feedback selector based on recent combat log state, rendered the selected spritesheet frame in Combat/Boss scenes, exposed `effect=` in the debug overlay, and extended smoke coverage with paper-slash, ink-splash, and stage-spotlight screenshots.
 - Prevention: Future effect work should keep simulation state serializable and derive renderer feedback from explicit state/log boundaries. Any new effect key should include an automated debug state or screenshot that proves it renders in context.
 - Resolution commit: `a0a15e1 Render combat effect feedback`
+
+### Problem: Character spritesheet assets existed but player combat scenes did not render them
+
+- Cause: The starter character data referenced `assetKeys.sprite`, and the manifest loaded `char_mina_pagehand_sprite`, but the Phaser scene shell only rendered the character portrait. The spritesheet file also used the generic generated placeholder branch rather than a scoped character sprite candidate.
+- Impact: The character sprite path could pass manifest, preload, and strict asset audits while the player-side combat presentation still ignored the character spritesheet.
+- Resolution: Added an exact-key deterministic transparent spritesheet candidate for `char_mina_pagehand_sprite`. Updated the shared Phaser scene shell to render the active character sprite as a player-side standee in Combat and Boss screens. Added `characterSprite=` to the debug overlay and smoke screenshots for the character sprite path.
+- Prevention: Character sprite work should include a screen-level debug state and screenshot from at least one real combat scene. Portrait completion must not be treated as character spritesheet completion.
+
+### Problem: UI panel asset existed but core Phaser panels still used flat rectangles
+
+- Cause: The manifest included `ui_panel_paper_9slice`, but shared status panels and Combat/Boss enemy panels were still drawn as plain Phaser rectangles with stroke colors. The generated file also used the generic placeholder branch rather than a scoped paper-panel candidate.
+- Impact: UI asset audits could pass while the visible game interface still looked like flat debug panels, and the 9-slice path could remain unproven.
+- Resolution: Added an exact-key deterministic candidate for `ui_panel_paper_9slice`. Added a shared `renderPaperPanel` helper that uses Phaser `nineslice` when the texture exists, with a rectangle fallback. Routed the shared scene status panel and Combat/Boss enemy panel through that helper, exposed `uiPanel=` in the debug overlay, and added smoke screenshots for the UI panel path.
+- Prevention: Reusable UI skin work should prove both texture generation and at least one real scene usage. Button skinning and state-specific UI assets should be tracked separately from the base panel pass.
+
+### Problem: Full catalog rows existed but Phaser still loaded only the slice fixture
+
+- Cause: `loadGameData()` imported only `fixtures/vertical-slice.v1.json`, so the browser game could pass all slice smoke checks while the 113-card/16-relic/15-stage catalog never entered the Phaser runtime.
+- Impact: Missing release content could be hidden behind a working slice. Counts in `src/data/ko` did not prove cards, relics, enemies, stages, or events were playable in the actual game.
+- Resolution: Added `?data=release` through `RuntimeFlags`, `loadGameData(mode)`, and `src/data/releaseCatalogAdapter.ts`. The adapter maps full local cards, gems-as-runes, relics, arcanas, characters, enemies, bosses, stages, events, encounter pools, and reward pools into the current runtime schema without replacing the default slice mode. Combat effect handling now covers the first wave of full-data ops needed for the first release hand, including `damage_front`, `damage_all`, `damage_random`, `gain_shield`, `draw`, chain/card-count bonus damage, marked-target bonus damage, `gain_energy`, and next-attack reduction bridges.
+- Prevention: `phaser:smoke` now includes a release catalog case that verifies `dataMode=release`, `cards=113`, `runesTotal=58`, `relicsTotal=16`, `stagesTotal=15`, `validation=ok`, the first release enemy/hand, and `card_sunbean_punch` reducing `enemy_cloud_buddy` from 22 HP to 14 HP. This is connectivity proof only; release readiness still requires the release checklist gates to move from `Not done` through implementation and verification.
+
+### Problem: The full card set had visible family x template repetition
+
+- Cause: The generated full card data used 12 families multiplied by 8 repeated template suffixes and effect structures. This produced repeated shapes such as 12x `damage_front + damage_bonus_if_chain_at_least`, 12x `gain_shield + reduce_next_attack`, and repeated id suffixes such as `*_tap`, `*_wave`, `*_pad`, `*_sparkle`, and `*_snack`.
+- Impact: The game could report 113 cards while still feeling like a small set stretched by templates. This directly violated the release-readiness rule that counts are not completion proof.
+- Resolution: Added `tools/curate-card-release-batch.mjs` and `tools/card-release-audit.mjs`. The first curation batch retired 32 template ids across morning/cloud/mint/peach, replaced them with distinct card ids, names, Korean rules text, effect structures, and illustration briefs, and updated references in characters, events, achievements, and smoke tests. Phaser release card handling was extended for full-data ops including random hit count, hand-size bonus, kill draw, battle rules, reflect, repeat, energy loss, cost increase, chain reset, and exhaust.
+- Prevention: `cards:release:audit` now fails if visible card effect structures or id suffixes repeat at 10 or more, if retired first-batch template ids reappear, or if card ops fall outside the release runtime handling list. `quality:audit:report` no longer reports the previous card repetition blockers, but card release readiness remains `Not done` until the remaining card families, upgrades/evolutions, art, and balance are verified.
+
+### Problem: The full gem set had visible single-effect template repetition
+
+- Cause: The generated full gem data repeated edge, guard, spark, and echo rows as single-effect family variants. `content-quality-audit` treated those as repeated release-blocking effect shapes even when numeric values differed.
+- Impact: The game could report 58 gems while still behaving like a small socket-modifier set stretched by templates. The release catalog also adapted gems as Phaser runes, but Phaser only handled the older flat slice rune modifiers before this pass.
+- Resolution: Added `tools/curate-gem-release-batch.mjs` and `tools/gem-release-audit.mjs`. The first curation batch keeps stable gem ids but gives 20 morning/cloud/mint/peach/lavender edge/guard/spark/echo gems distinct names, Korean rules text, and multi-effect structures. Phaser rune handling now supports release gem damage percent, shield percent, cost modification, heal-on-play, mark-on-play, bridge discount, preserve-chain logging, and basic echo behavior. Runtime smoke verifies a curated gem damage modifier plus preserve-chain behavior, and Phaser smoke verifies `gem_morning_edge` equipped as a release rune changes `card_sunbean_punch` damage in `?data=release`.
+- Prevention: `gems:release:audit` now fails if any gem effect shape repeats at 10 or more, if the curated batch is missing or still single-effect, if curated batch shapes are not distinct, or if gem ops fall outside the supported release gem op list. `quality:audit:report` no longer reports the previous gem repetition blocker, but gem/rune release readiness remains `Not done` until remaining families, UI/icon polish, acquisition pacing, and balance are verified.
+
+### Problem: The full enemy set had visible intent-template repetition
+
+- Cause: The generated enemy data repeated four intent templates across 15 normal buddy rows, 15 normal trick rows, 15 elite rows, and 15 boss rows. The release adapter also collapsed debuff and special intents into a generic next-card-cost penalty, so several distinct source intents were not mechanically distinct in Phaser.
+- Impact: The game could report 60 enemies while still feeling like four enemy patterns stretched across families. This violated the release-readiness rule that counts are not completion proof, and it also left release enemy behavior under-adapted in the Phaser path.
+- Resolution: Added `tools/curate-enemy-release-batch.mjs` and `tools/enemy-release-audit.mjs`. The first curation batch keeps stable ids while converting 32 early normal/trick/elite/boss rows into distinct intent structures with family-facing labels and supported special/debuff fields. The release adapter now maps debuffs and special intents into explicit effects, and Phaser combat handles player mark, player weak, temp-card discard, enemy heal, piercing damage, chain reduction, and summon logging.
+- Prevention: `enemies:release:audit` now fails if any enemy intent shape repeats at 8 or more, if the curated batch is missing or too shallow, if batch shape variety falls below 20, or if unsupported intent types/statuses/special effects appear. `quality:audit:report` no longer reports the previous enemy intent-pattern blocker, but enemy release readiness remains `Not done` until remaining identities, final art, reward/scaling balance, and boss completion are verified.
+
+### Problem: The full stage set reused a few route templates
+
+- Cause: The generated stage data repeated the same room-order patterns across several stage groups. Six stages shared one 10-room pattern, five stages shared one 7-room pattern, and three stages shared one 9-room pattern.
+- Impact: The game could report 15 stages while still feeling like a small set of route templates stretched across names. The release adapter could load those stages, but the route pacing was not distinct enough to treat stage content as release-ready.
+- Resolution: Added `tools/curate-stage-release-batch.mjs` and `tools/stage-release-audit.mjs`. The first route batch keeps stable stage ids while assigning all 15 stages distinct room patterns, preserving event rooms, elite rooms, and final boss rooms. The debug overlay now exposes the active stage route, and Phaser smoke verifies `stage_rainbow_keep` in `?data=release`.
+- Prevention: `stages:release:audit` now fails if repeated room patterns appear 3 or more times, if fewer than 12 unique route patterns exist, if routes are too short, if required event/elite/final boss coverage is missing, or if invalid room types appear. `quality:audit:report` no longer reports the previous stage room-pattern blocker, but stage release readiness remains `Not done` until background identity, stage-specific mechanics, boss/reward balance, and unlock flow are verified.
+
+### Problem: The full event set reused the same three-choice pattern
+
+- Cause: The generated event data used 10 events with exactly three choices each, repeated generic labels, and repeated cost/reward shapes such as gold-for-card, gold-for-relic, free combat/gold, and free heal/socket.
+- Impact: The game could report 10 events while still feeling like a small event template stretched across different names. The release adapter could load events, but the event rows did not yet prove varied choice pressure, reward identity, or runtime visibility.
+- Resolution: Added `tools/curate-event-release-batch.mjs` and `tools/event-release-audit.mjs`. The first event batch keeps stable ids while curating all 10 events into varied 3- and 4-choice structures, distinct labels/story text, mixed gold/hp/free costs, and card/gem/relic/arcana/heal/gold/combat/socket/upgrade outcomes. The release adapter now maps hp costs and rotates event pools by stage, the debug overlay exposes event id, choice count, cost profile, and reward profile, and Phaser smoke verifies `event_bubble_shop` in `?data=release`.
+- Prevention: `events:release:audit` now fails if all events have the same choice count, if total choices fall below 34, if event choice-shape profiles repeat, if generic labels repeat too often, if role/risk spread falls short, or if events lack a no-upfront-cost option. `quality:audit:report` no longer reports the previous event choice-shape blockers, but event release readiness remains `Not done` until dedicated EventScene, invalid-state handling, repeat rules, persistence, event art, and full choice execution are verified.
+
+### Problem: The achievement set was dominated by milestone and filler triggers
+
+- Cause: The generated achievement data included 31 `ach_picnic_goal_*` rows with generic `소풍 목표 N` names and repeated `clear_rooms_in_stage` triggers. Combined with generated enemy-count, character-unlock, stage-clear, and boss-defeat rows, the quality audit counted 115 of 161 achievements as milestone-like bulk triggers.
+- Impact: The game could report 161 achievements while still presenting a shallow checklist instead of meaningful goals. Worse, reward unlocks such as cards, gems, relics, arcanas, characters, and meta upgrades could look numerous without being tied to distinctive player behavior.
+- Resolution: Added `tools/curate-achievement-release-batch.mjs` and `tools/achievement-release-audit.mjs`. The first achievement batch keeps stable ids while converting all 31 `ach_picnic_goal_*` rows into card/gem/relic/arcana collection goals and chain mastery goals with thematic Korean copy and seven reward kinds, including `unlockRelicId` which was previously absent from reward-shape coverage. Runtime smoke now directly verifies curated achievement triggers and reward application paths.
+- Prevention: `achievements:release:audit` now fails if milestone-like triggers still dominate, if `clear_rooms_in_stage` filler remains, if generic picnic copy remains, if curated batch trigger/reward variety falls short, if exact trigger shapes repeat too much, or if collection thresholds exceed catalog caps. `quality:audit:report` no longer reports the previous achievement bulk-trigger blocker, but achievement release readiness remains `Not done` until full thematic review, UI goal surfacing, reward pacing, and long-run profile balance are verified.
+
+### Problem: The enemy quality audit still treated the full enemy set as generated coverage
+
+- Cause: After enemy intent batch 1, the remaining 28 enemy rows still used repeated generated labels and shallow two-intent structures, and the quality audit kept an unconditional enemy generated-coverage blocker. Several boss phase rules also still carried generic `친구 부르기` labels.
+- Impact: The game could report 60 enemies while still hiding late-family template rows behind the first curated batch. Removing the blocker without content work would have weakened the protective gate and repeated the count-as-completion mistake.
+- Resolution: Added `tools/curate-enemy-release-batch-2.mjs` and `tools/enemy-release-quality.mjs`. Batch 2 keeps stable ids while curating the remaining prism/moon/peach/toy/leaf/star/cookie normal, trick, elite, and late boss rows, plus relabeling the early boss phase sets. `tools/enemy-release-audit.mjs` and `tools/content-quality-audit.mjs` now share the same stricter criteria instead of using an unconditional blocker.
+- Prevention: `enemies:release:audit` now fails if the 60-id release coverage is incomplete, intent shapes repeat at 8 or more, any enemy has fewer than 3 intents, generic generated labels remain, supported special/debuff coverage falls short, boss phase coverage is incomplete, or unsupported effects/statuses appear. `quality:audit:report` no longer reports enemy generated coverage, but enemy release readiness remains `Not done` until art, reward/scaling balance, encounter pacing, and manual readability review are verified.
+
+### Problem: Release mode reused a tiny slice asset set across the full catalog
+
+- Cause: The release adapter loaded the full local catalog, but its visual keys reused a small slice asset set: 10 card illustrations modulo across 113 cards, 3 rune icons across 58 gems, one relic icon for relics/arcanas, one character portrait/sprite for 23 characters, one stage background/map icon across 15 stages, two regular enemy sprites across 45 enemies, one boss sprite across 15 bosses, and one event scene across 10 events.
+- Impact: The game could pass release data and smoke checks while visually looking like a stretched test slice. That directly risked the count-as-completion mistake the release checklist is meant to prevent.
+- Resolution: Added `tools/generate-release-visual-assets.mjs`, `tools/visual-production-quality.mjs`, and `tools/visual-production-audit.mjs`. The release adapter now imports `assetManifest.release.v1.json` and maps each full-catalog card, gem, relic, arcana, character, stage, enemy, boss, and event to its own release candidate key. The generator writes 358 manifest-backed PNGs under `public/assets/runtime/release`, and the visual audit verifies exact expected coverage, production metadata, file existence, and PNG dimensions.
+- Prevention: `quality:audit:report` now delegates visual judgment to the release visual production audit instead of old CSS/DOM placeholder heuristics. `assets:audit` now unions slice and release manifests so generated release files cannot be silently orphaned. Release visual coverage can remove the automated visual blocker, but final approval, readability, animation polish, originality/licensing review, and full UI skinning remain separate release gates.
+
+### Problem: Event rooms were not actual event gameplay screens
+
+- Cause: Phaser routed event rooms directly to `RuneBenchScene`, so release event data could be audited and exposed in debug output while the player never saw a dedicated event choice screen or paid/applied choices in the Phaser flow.
+- Impact: The event gate could look healthier than it was. Event choice counts and profiles were visible, but costs, rewards, event combat, and event scene art were not proven as player-facing gameplay.
+- Resolution: Added the `event` phase, `EventScene`, and `src/simulation/systems/events/eventSystem.ts`. Event choices now pay HP/gold costs, grant run-state rewards, route rune rewards to the rune bench, start event combat when a choice has `eventCombatEnemyId`, and persist `lastEventChoiceId` plus player gold. `phaser:smoke` now verifies both slice and release event execution paths and captures an EventScene screenshot.
+- Prevention: Future event work must prove screen rendering and state mutation together. Debug-only event metadata is not enough to move an event gate; smoke should verify at least one paid choice, one reward grant, and one branch transition.
+
+### Problem: Release relics and arcanas could be acquired without proving gameplay effects
+
+- Cause: Release mode exposed relic and arcana rows, and EventScene could grant them, but Phaser combat/reward systems did not yet apply most passive item effects. This made item counts and acquisition look healthier than the actual game behavior.
+- Impact: A player could receive a relic or arcana and see no meaningful change, repeating the exact count-as-completion risk called out in the release checklist.
+- Resolution: Added `src/simulation/systems/passives/passiveSystem.ts` and wired it into combat start, card play, combat victory, reward offer count, and currency reward grants. Added `grantArcana` plus deterministic debug HP overrides for smoke. `phaser:smoke` verifies batch-1 relic effects for start block/energy, after-combat heal, reward options, and gold rewards, plus arcana effects for zero-cost gold and defense-card damage.
+- Prevention: Future relic/arcana work must pair every supported passive op with a state-changing smoke or audit check. Acquisition alone is not enough evidence for a release item gate.
+
+### Problem: Several passive rows needed runtime state that did not exist yet
+
+- Cause: Batch-2 relics/arcanas depended on per-combat cost flags, turn-end retained cards, map lookahead, elite mixed rewards, defense-card counters, per-turn color counters, and shield carry. The existing passive hooks could not prove those effects without adding run-state fields and reward resolution support.
+- Impact: These items could have been incorrectly marked as implemented if only their rows were present or if reward option counts were tested in artificial card pools. `relic_elite_sticker` was especially risky because the actual elite room uses a relic pool, so adding a card reward required mixed-pool display and claim resolution.
+- Resolution: Added serializable passive state for first-expensive-card-free, guard counts, turn color counts, and prism trigger state. Added passive cost adjustment, turn-end retain, block carry, next-room reveal, three-defense heal, four-color draw, five-card damage, and heal-trigger mark behavior. Reward offers can now append supplemental card entries after elite sources and resolve/display reward ids across pools. Boss victory now routes through the stage-clear reward pool before Result so boss reward passives are not debug-only. Debug `handCard` setup was added only for deterministic smoke states.
+- Prevention: Passive completion must keep using state-changing smoke cases, not data-row presence. Mixed reward effects must be tested in the actual source-room/pool shape they will encounter in release mode.
+
+### Problem: Input coverage existed for the main slice path but not for every Phaser screen
+
+- Cause: `phaser:smoke` covered keyboard flow and a small click path through Town, WorldMap, Dungeon, Combat, and End Turn, but Reward, Event, RuneBench, Boss, Result, and release event/reward click paths were not audited as explicit input cases. `entry=rune_bench` also defaulted to the first combat room, so a RuneBench test could advance to the wrong next room while still looking like an input issue.
+- Impact: The release checklist could not honestly mark Input as done. A screen could be visible and keyboard-accessible while mouse/click behavior or feedback was unproven.
+- Resolution: Added full-screen click coverage to `tools/phaser-smoke-test.mjs` for Town, WorldMap, Dungeon, Combat, Reward, Event, RuneBench, Boss, Result, release event choice, and release reward claim paths. Fixed `createDebugConfig()` so `entry=rune_bench` starts from the first rest room or event bench source instead of the first combat room. Added hover/down feedback for shared action buttons, Combat/Boss End Turn buttons, combat cards, and affordable event choices, then added pixel-change smoke checks for representative hover states.
+- Prevention: Input gate changes must continue to pair visible controls with a state-changing smoke check and a feedback check where practical. Debug entry shortcuts must not be allowed to hide incorrect room indices or artificial flow assumptions.
+
+### Problem: Current Phaser screens still carried English placeholder UI text and weak text-fit evidence
+
+- Cause: Several Phaser scene titles, buttons, status labels, reward labels, and combat labels were still English placeholders such as `World Map`, `End Turn`, `Claim Reward`, and `Intent`. Existing screenshot smoke proved screens rendered, but it did not inspect Phaser text-object bounds or severe text overlap.
+- Impact: The Text quality gate could not honestly be marked done. A screenshot could be nonblank while a label remained untranslated, off-screen, or overlapped by another text object.
+- Resolution: Converted the current Phaser screen chrome to Korean fixed UI text, including scene titles, buttons, combat labels, reward/event labels, route/status labels, and manifest/status labels. Exposed the Phaser game object to browser smoke and added text-object layout checks for scene bounds, severe overlap, replacement characters, and old English placeholder labels across the current Town, WorldMap, Dungeon, Combat, Reward, Event, RuneBench, Boss, and Result screens.
+- Prevention: Any new Phaser screen or UI label should be covered by `phaser:smoke` text layout checks before the Text quality gate remains green. This gate is screen-fit/consistency proof only and must not be used as final copywriting approval for all release content rows.
+
+### Problem: Core run loop proof covered victory slices but not release full-loop clear and defeat recovery
+
+- Cause: Existing smoke covered the slice scene flow and a boss result flow, but it did not prove a release-mode run from Town across repeated rooms to boss clear and Town return. Player HP reaching 0 also did not route into a result/return/retry flow, so failure could silently stay inside combat state.
+- Impact: The Core run loop gate could not honestly move to Done. The game could appear playable in the winning path while lacking a real failure/retry loop, and release-mode route progression could remain under-tested.
+- Resolution: Added player defeat handling to combat damage resolution: lethal damage now sets `phase=result`, clears pending rewards, records `combat:defeat:*`, and prevents the next turn from starting. Result now distinguishes clear versus defeat. `phaser:smoke` gained a release `stage_sunny_gate` tracked playthrough that visits repeated combats, Event, elite, Reward, rest/RuneBench, Boss, stage-clear reward, Result, and Town return. It also verifies a 1-HP defeat path to Result, no completed-stage credit, Town return, and new world-map start.
+- Prevention: Core loop changes must keep both clear and defeat/retry smoke coverage. A boss clear alone is not enough evidence for the release loop, and combat HP reaching zero must always have a visible recovery path.
+
+### Problem: Save recovery and reset were only partially proven
+
+- Cause: Earlier save smoke verified mid-combat reload and completed-stage reload, but it did not prove legacy migration, corrupt save recovery, unsupported future-version handling, clear/defeat result consistency, or a player-facing reset/delete path in the current Phaser runtime. Relying on debug `resetSave=1` alone was not enough for the release checklist requirement.
+- Impact: A damaged localStorage save or future incompatible save could silently break boot, old saves could be discarded instead of migrated, defeat could accidentally persist clear credit, and the project could claim a save system without a real in-game reset/delete route.
+- Resolution: Added supported-version detection in `saveCodec` so v1 saves load, recognizable v0/unversioned saves migrate through normalization, unsupported future versions fall back to an initial save, and corrupt JSON recovers safely. Added `clearStoredSave()` and a Town `저장 초기화` action that clears the active save key and reboots into an initial save. Extended `phaser:smoke` to cover legacy migration with invalid-field normalization, corrupt JSON recovery, future-version recovery, clear-result and defeat-result save consistency, debug reset, production save key creation, and production reset through the Town action.
+- Prevention: Save-system completion must prove both debug and production storage paths, successful reloads, schema migration, failure recovery, result-state consistency, and a player-facing reset/delete action. Broader progression and settings completion must remain separate gates.
+
+### Problem: Settings were stored only as raw defaults and had no player-facing surface
+
+- Cause: `SaveData.settings` only carried volume defaults, no Phaser screen exposed them, and keyboard controls did not read any saved setting. Town had a save reset button, but there was no release-facing place for audio/display/language/control/accessibility options.
+- Impact: The settings gate could not honestly move to Done. Players had no way to adjust or verify settings, and a saved setting could not be proven to survive reload or alter gameplay input.
+- Resolution: Added `SettingsScene`, extended `SettingsState` with display mode, large text, reduced motion, and Space-confirm behavior, and normalized those fields through `saveCodec`. Town now links to Settings. The shared scene shell applies master volume and high-contrast/large-text presentation, and keyboard bindings respect `spaceConfirm=false`. Settings includes default reset and save reset actions.
+- Prevention: Settings completion must prove screen rendering, persistence, reload survival, reset-to-default behavior, and at least one setting that changes real input or presentation. Audio settings do not complete the separate `Sound/music` gate until actual music/SFX assets and playback behavior exist.
+
+### Problem: UI skinning still relied on flat rectangles after the panel proof
+
+- Cause: The earlier UI panel pass proved only `ui_panel_paper_9slice`. Shared action buttons, Reward rows, Event choices, Settings controls, tooltip/hint surfaces, disabled state, and focus state still used mostly plain Phaser rectangles or had no dedicated skin asset.
+- Impact: The project could claim a UI asset path while the actual game still looked like a prototype. This was the same count-as-completion risk as content rows: having one panel asset did not mean the whole interface was skinned.
+- Resolution: Added dedicated 9-slice candidate assets for primary buttons, secondary buttons, reward slots, event choice slots, and tooltip paper in both slice and release manifests/generators. Added shared skinned UI helpers in `sceneShell`, routed current Phaser buttons/slots/settings/event choices through them, exposed `uiSkin=button+slot+tooltip`, and extended smoke to verify hover/down feedback, disabled event choice non-advancement, Settings control hover, and screenshots. Manual screenshot review found cramped Event choice text and Reward/debug overlap, so the Event rows and Reward layout were tightened before rerunning smoke.
+- Prevention: UI skin completion requires actual screen use plus smoke and screenshot evidence for controls, slots, tooltips, disabled/focus/hover/down states. A generated asset key alone is not enough evidence, and final art approval plus broad visual QA remain separate gates.
+
+### Problem: UI skin was incorrectly reported as complete after a technical-only pass
+
+- Cause: The 9-slice/runtime-helper pass proved that Phaser can load and render skinned UI components, but it did not use the approved concept/source pipeline and did not meet the art bible's premium popup-book fantasy standard. Codex treated technical integration evidence as if it were final visual quality evidence.
+- Impact: The release checklist said `UI skin` was `Done` even though the visible Reward/Event result still looked like a prototype to manual review. This repeated the false-completion risk the project rules explicitly forbid.
+- Resolution: Downgraded the release checklist so `UI technical skin path` is `Done` and `UI skin` is `Not done`. Added a dedicated visual-quality rubric requirement for concept/source evidence, art-bible fidelity, screen composition, production component states, and debug-less screenshot acceptance before the UI skin gate can move back to `Done`.
+- Prevention: UI completion claims must now cite `docs/ui-visual-quality-rubric.md`, current screen scores, red-line blocker status, and screenshot evidence. Automated smoke, generated 9-slice assets, or debug screenshots cannot by themselves complete `UI skin`.
+
+### Problem: Reward choices looked selectable but only first-reward confirmation was wired
+
+- Cause: RewardScene displayed multiple reward options, but the runtime claim path only claimed `offeredRewards[0]` through the confirm action. Number/click choice behavior was not wired to a reward index.
+- Impact: A player could read the screen as a real choice while the game silently granted only the first reward. This is both a gameplay trust issue and a UI quality issue.
+- Resolution: Added `claimRewardAtIndex`, changed `claimRewardAndAdvance` to accept a reward index, and routed Reward `card_1` through `card_5` actions to claim the matching reward. Reward cards now have click targets, and `phaser:smoke` checks hover plus selected reward-card click flow.
+- Prevention: Reward UI changes must prove that visible choices mutate the matching gameplay state. A visual choice card is not acceptable unless the input path and reward grant path agree.
+
+### Problem: First Reward/Event concept rebuild still read too much like small menu cards
+
+- Cause: The first rebuild introduced paper-stage structure, but the selectable Reward cards and Event choices were still visually small inside the stage, and Event did not separate story scene, event art, and choices strongly enough. The result improved technically but did not meet the popup-book visual standard.
+- Impact: The UI could pass smoke while still failing manual visual acceptance. This risked repeating the earlier false-completion mistake where technical evidence was mistaken for shippable UI quality.
+- Resolution: Enlarged Reward cards and their art/detail hierarchy, added more stage threads/folded-corner paper treatment, and changed Event into a diorama layout with scene art, story panel, and separate choice cards. Captured debug-less screenshots after the pass and rescored Reward/Event in `docs/ui-visual-quality-rubric.md`.
+- Prevention: Reward/Event are now tracked by explicit numeric scores and red-line blockers. Even with passing smoke/check/audit evidence, the UI remains `Not done` until critical screens reach at least 85 and the full UI skin gate reaches the 95/100 completion rule.
+
+### Problem: Reward/Event had concept evidence but not enough source-component traceability
+
+- Cause: The visual direction had a generated concept image and runtime Phaser drawing, but there was no separate source component sheet showing the reusable UI parts behind the stage, reward cards, event choices, pins, folds, ribbons, and diorama panels.
+- Impact: The UI could drift into hand-tuned runtime shapes without a traceable source language. That weakens the concept/source pipeline requirement and makes it easier to overstate candidate visuals as final art.
+- Resolution: Added `assets/source/ui/reward_event_stage_components_v001.svg` and `assets/source/ui/reward_event_stage_components_v001.md`, then mapped Reward/Event runtime pieces back to those source components. Also removed extra immersive info chrome from Reward/Event so the source stage composition owns the screen.
+- Prevention: Future UI skin work should add or update source component evidence before claiming visual gates, then capture debug-less screenshots and score against the rubric. Source evidence alone still does not complete the UI gate.
+
+### Problem: Combat first rebuild created a crowded top stack
+
+- Cause: The initial immersive Combat pass moved the screen away from the old header, but the large player status panel and route strip were still placed across the top ribbon area. They visually collided with the title and made the screen look like stacked UI panels instead of a clear combat stage.
+- Impact: Combat could not be scored as a critical-screen pass because the title, route, and player state competed for the same space. This was a manual visual blocker even though the technical paths still compiled.
+- Resolution: Added `assets/source/ui/combat_stage_components_v001.svg` and its note file, then moved the player status panel into the left playfield side and compressed the route strip below the title ribbon. The 1920 debug-less screenshot `tmp/ui-quality/combat-1920-debugless-v2.png` confirms the top collision is removed, and smoke/check/audit commands passed after the change.
+- Prevention: Combat UI changes must be reviewed with debug-less screenshots before any completion language. Preserving input coordinates and smoke coverage is necessary but not enough; the title, route, player status, enemy intent, and card hand each need visible non-overlap and clear hierarchy.
+
+### Problem: Combat v2 screenshot introduced new local label placement defects
+
+- Cause: The second Combat polish pass added a central combat-flow lane and compact stat tags, but the first screenshot placed the flow text behind the player standee and put the gold label below the player panel boundary.
+- Impact: The screen looked more crafted, but it introduced new visible defects that would have been easy to miss if only automated smoke was checked. This would have inflated the score without real visual evidence.
+- Resolution: Treated `tmp/ui-quality/combat-1920-debugless-v3.png` as a failed visual checkpoint, moved the gold label back inside the player panel, shortened and shifted the central lane text, and recaptured `tmp/ui-quality/combat-1920-debugless-v4.png`. Typecheck, smoke, check, data validation, quality report, release visual audit, and diff check all passed afterward.
+- Prevention: Every visual polish pass needs screenshot review before scoring. If the screenshot reveals a new defect, the pass is not accepted until the defect is fixed and a new screenshot is captured.
+
+### Problem: Event release four-choice layout had a bottom-button collision
+
+- Cause: The Event v2 choice-card polish was reviewed first on the three-choice slice event. The release event can render four choices in two rows, and the confirm button at the bottom still occupied the same vertical space as the lower row.
+- Impact: The release four-choice screenshot showed the button overlapping the lower choices. This would make the release Event surface visually untrustworthy even if the default slice Event looked improved.
+- Resolution: Captured `tmp/ui-quality/event-release-1920-debugless-v5.png`, treated the overlap as a failed visual checkpoint, moved and reduced the confirm button, and recaptured `tmp/ui-quality/event-release-1920-debugless-v6.png`. The follow-up screenshot no longer has the button covering the lower choice cards, and smoke/check/audit commands passed after the fix.
+- Prevention: Event UI scoring must include both default/slice and release four-choice screenshot evidence. A single Event screenshot is not enough when the screen has multiple choice-count layouts.
+
+### Problem: Reward v5 release screenshots exposed English titles and a hidden shelf label
+
+- Cause: The Reward visual pass was first checked against the slice reward pool, while release reward pools in `src/data/releaseCatalogAdapter.ts` still had English `displayNameKo` values. The new shelf label was also placed behind the bottom of the reward cards, so it became partially hidden in both three-card and four-card screenshots.
+- Impact: Reward could have been over-scored based on the default slice screenshot while the release Reward header still showed English copy and one decorative label was visibly obscured. That would violate the text quality and screenshot-review rules even though smoke still passed.
+- Resolution: Captured v5 slice, release-card, and release-rune screenshots, treated the English titles and hidden shelf label as failed visual checkpoints, localized the release reward-pool titles to Korean, removed the obscured label, and recaptured v6 screenshots at 1920x1080 and 1280x720. Typecheck, smoke, check, data validation, quality report, asset audits, release visual audit, and diff check passed afterward.
+- Prevention: Reward UI scoring must include release reward-pool screenshots, not only the slice pool. Any new decorative label must be inspected in both three-option and four-option layouts before a score is recorded.
+
+### Problem: Combat v3 polish initially relied on duplicate overlay layers and missed a long-name text overlap
+
+- Cause: The first v3 Combat attempt drew improved header, route, player, and enemy components on top of older runtime components instead of replacing the old layer. That made some labels and enemy text bleed through visually. After the duplicate layers were removed, the first smoke rerun also found that the release enemy name `프리즘 눈부심 장난꾼` overlapped the HP row.
+- Impact: Combat could have been over-scored based on a better-looking default screenshot while release enemies or the shared Boss combat panel still had hidden text defects. It also risked preserving a fragile UI implementation where old and new layers both existed.
+- Resolution: Removed the old Combat title/player/route/flow drawing from the base theater, made the v3 stage polish the single source for those components, replaced the old enemy panel body with one enemy intent ledger, added route label backplates, and added an enemy-name font-size guard for long Korean release names. Captured v7 debug-less screenshots for slice Combat, 1280 Combat, release Combat, and the Boss shared-panel view. Verification passed with typecheck, smoke, check, data validation, quality report, asset audits, release visual audit, and diff check.
+- Prevention: Future visual rebuilds must replace obsolete layers instead of hiding them behind translucent panels. Release-mode long names and any shared component consumers, such as Boss using the Combat enemy panel, must be included before a critical-screen score is raised.
+
+### Problem: Event release choice cards hid useful outcomes behind cramped long text
+
+- Cause: The Event v2 layout rendered release four-choice rewards by listing individual item names in a narrow result row. After the first v3 adjustment, the cost/result label chips were added, but the value text still started too close to the label text.
+- Impact: The default three-choice Event looked acceptable, but the release four-choice screen could still look like a compressed data table. That would make the Event score depend on the easy slice case instead of the real release layout.
+- Resolution: Added `assets/source/ui/event_stage_components_v003.svg` and changed dense two-column Event cards to show compact reward summaries such as `카드 3`, `룬 2 / 회복 +3`, and `유물 / 골드 +12`. The v7 screenshots exposed label/value crowding, so the value columns were shifted right and v8 slice/release screenshots were captured at 1920x1080 and 1280x720. Smoke, check, data validation, quality report, asset audits, release visual audit, and diff check passed afterward.
+- Prevention: Event UI scoring must include the release four-choice layout and 1280 capture. Reward/result rows should summarize dense rewards instead of trying to display every item name in compressed UI space.
+
+### Problem: Boss screen still read like a standard shell with a combat panel
+
+- Cause: Boss reused the standard screen shell around the shared combat panel instead of presenting a boss-specific source-backed stage. The first rebuild also placed the boss phase ledger too close to hand card numbers, and release boss intent telegraph text was too long for the compact right-side action area.
+- Impact: Boss could have been counted as visually covered just because the shared Combat panel worked, while the actual Boss screen still lacked boss-scene composition and had text crowding risks. That would overstate UI coverage and repeat the technical-proof-as-final-UI mistake.
+- Resolution: Added `assets/source/ui/boss_stage_components_v001.svg`, switched Boss to an immersive purple/brass paper-theater stage, rendered the Combat v3 theater family directly, added a boss phase ledger, moved that ledger after smoke caught overlap, and compacted boss intent labels for release bosses. Captured v4 debug-less screenshots for 1920, 1280, and release Boss views. Typecheck, smoke, check, data validation, quality report, asset audits, release visual audit, and diff check passed afterward.
+- Prevention: Boss UI scoring must include boss-specific source evidence plus slice, release, and 1280 debug-less screenshots. Shared Combat panel evidence is not enough to score the Boss screen, and release long text must stay in the screenshot/smoke path.
+
+### Problem: Town first screen still looked like a standard shell with buttons
+
+- Cause: Town used the shared standard shell and then placed unlocked/completed counts plus three action buttons on top. That proved input and save/reset behavior, but it did not make the first screen feel like a game hub or follow the source-backed paper-theater UI standard.
+- Impact: The first screen could undercut the visual direction even if Reward/Event/Combat/Boss looked stronger. It also risked implying the Town/meta gate was complete because buttons existed, while actual Town systems remain incomplete.
+- Resolution: Added `assets/source/ui/town_stage_components_v001.svg`, switched Town to an immersive paper-theater village hub, and rendered a village diorama, player passport, expedition board, route markers, save-derived record slot, and the same smoke-covered world-map/reset/settings buttons. Screenshot review caught route markers under the world-map button, crowded village/passport text, and shortcut-like tooltip copy; v4 screenshots fixed those issues. Typecheck, smoke, check, data validation, quality report, asset audits, release visual audit, and diff check passed afterward.
+- Prevention: Town UI scoring must separate visual hub quality from Town/meta system completion. Future Town changes need both slice/release/1280 screenshots and a clear note that visual polish does not complete character unlocks, shops, museums, or progression systems.
+
+### Problem: WorldMap looked like a functional route screen instead of a source-backed map stage
+
+- Cause: WorldMap previously relied on the shared shell and a single `던전으로` action, so it technically connected the flow but did not look like an unfolded in-world map. The first rebuild also put the right record ledger and tooltip too close to the route nodes, and v2 still left later release route nodes near the ledger edge.
+- Impact: WorldMap could have been incorrectly counted as visually covered because the click path worked. That would repeat the same technical-proof-as-final-UI mistake and hide a real release-mode layout risk.
+- Resolution: Added `assets/source/ui/world_map_stage_components_v001.svg`, rebuilt the screen into a paper-theater map with a left map drawer, center folded route, right record ledger, route nodes, and current-stage icon. v1/v2 screenshots were treated as failed visual checkpoints; v3 rerouted later nodes away from the record panel and replaced the clipping tooltip with a simple ledger line. Typecheck, smoke, check, data validation, quality report, asset audits, release visual audit, and diff check passed afterward.
+- Prevention: WorldMap scoring must include slice 1920, slice 1280, and release 1920 debug-less screenshots. The screen must stay labeled as visual progress only until the actual multi-stage selection/unlock system and final map art are proven separately.
+
+### Problem: Dungeon first rebuild hid a room number behind the primary button
+
+- Cause: The Dungeon corridor pass preserved the existing `방 입장` button coordinate, but the center room number was still placed in the same vertical band as that button. The first release-route screenshot also showed the route helper area could crowd the visible route entries.
+- Impact: The screen looked more like a dungeon stage, but it still had a real text-overlap defect. If only the 1920 screenshot had been accepted by eye, the screen could have been over-scored while `phaser:smoke` correctly rejected it.
+- Resolution: Limited the visible route ledger to six entries, recaptured v2 screenshots, then moved the center room number above the button after `phaser:smoke` failed on `text overlap "1" with "방 입장"`. v3 screenshots cover slice 1920, slice 1280, and release 1920, and the rerun smoke passed.
+- Prevention: Dungeon scoring must include automated text-overlap smoke plus debug-less screenshots at slice 1920, slice 1280, and release 1920. Preserving the action coordinate is required, but all decorative room labels must be checked against the primary button area before scoring.
+
+### Problem: RuneBench first rebuild exposed a button/card collision and internal effect names
+
+- Cause: The first RuneBench workbench pass preserved the existing `룬 장착` button coordinate, but the target-card preview still sat under the button. The effect summary also displayed raw implementation op names such as `modify_damage_percent`.
+- Impact: The screen looked more like a rune workbench, but it still exposed implementation language and hid part of the target card behind the action button. That would make the UI feel unfinished even with smoke passing.
+- Resolution: Moved the target-card preview left while preserving the `1010,742` action coordinate, replaced internal op names with Korean effect summaries such as `피해 +15%`, and recaptured v3 slice, 1280, and release screenshots.
+- Prevention: RuneBench scoring must include screenshot review for both slice and release rune text. Any player-facing line must be Korean gameplay copy, not schema/effect op names, and the preserved action coordinate must be checked against card preview bounds.
+
+### Problem: Result first rebuild could be over-counted from a neutral entry only
+
+- Cause: Result can be entered as a neutral debug/result surface, a real defeat, a slice boss clear, or a release boss clear. Judging only the default `entry=result` view would miss tone-specific copy, completed-stage counts, collection counts, and route progress text.
+- Impact: Result could be scored as visually covered while the actual clear or defeat paths still had text hierarchy or layout risks. That would repeat the mistake of treating a narrow technical path as final UI evidence.
+- Resolution: Added `assets/source/ui/result_stage_components_v001.svg`, captured neutral 1920/1280, real defeat, slice-clear, and release-clear debug-less screenshots, and verified the screen through typecheck, Phaser smoke, check, data validation, quality report, asset audits, release visual audit, and diff check.
+- Prevention: Result scoring must include at least neutral, defeat, clear, release-clear, and 1280 evidence. Any future Result changes must preserve the `1010,742` `마을로` action and rerun text-overlap smoke before a score is recorded.
+
+### Problem: Settings v1 used oversized row labels and crowded headings
+
+- Cause: The first Settings ledger pass kept the existing smoke-covered control coordinates, but used row typography that was too large for the dense settings rows. Panel headings also sat too close to the panel borders.
+- Impact: The screen technically kept the controls working, but visually it looked crowded and unfinished. Counting that first capture as acceptable would have inflated the Settings score while hiding a visible UI polish defect.
+- Resolution: Reduced row label/value typography, moved section headings down, reduced small-button type size, and recaptured v2 1920, 1280, release, and high-contrast screenshots. The control coordinates remained unchanged and `phaser:smoke` passed.
+- Prevention: Settings scoring must include 1280 and toggled/high-contrast screenshots, not only the default 1920 view. The smoke-covered click coordinates are mandatory, but typography still has to be judged visually before recording a score.
+
+### Problem: WorldMap first rebuild still looked selectable without proving selection
+
+- Cause: The first WorldMap rebuild made the screen look like an unfolded map, but the drawer was still effectively a current-stage display and did not prove a release clear would unlock a next stage or that a player could select it from the map.
+- Impact: The screen could be over-scored as a finished map UI because it looked more thematic, while the real game behavior was still only the current `던전으로` path. That would repeat the exact false-completion risk the user called out.
+- Resolution: Added `assets/source/ui/world_map_stage_components_v002.svg`, implemented `selectWorldMapStage`, synced completed stages into profile completed/unlocked lists, unlocked the next ordered stage after clear, added `unlockedStages=` debug evidence, and extended `phaser:smoke` to clear `stage_sunny_gate`, verify `stage_lavender_hall` unlock, click the second map row, and verify `flow:stage_select:stage_lavender_hall`.
+- Prevention: WorldMap scoring must separate visual map presentation from actual progression behavior. A map row is not accepted as meaningful unless smoke or manual evidence proves the row is driven by save/profile state and changes the selected stage.
+
+### Problem: WorldMap v4 stage drawer and right ledger still had compact text defects
+
+- Cause: The v4 functional drawer added real row states, but some status labels such as `클리어 / 선택 가능` were too long for the compact drawer, and the right ledger helper sat too close to the bottom border.
+- Impact: The new functional proof could have been accepted while visible text still looked cramped, especially in the release map screenshots. That would make the score improvement too generous.
+- Resolution: Shortened row status labels, changed the right ledger helper to a shorter line, and recaptured v5 screenshots for slice 1920, slice 1280, release default, release unlocked, and release selected states. v5 no longer shows the v4 bottom clipping defect.
+- Prevention: Any future map/progression UI work must capture both default and progressed release states. The accepted screenshot set must include the selected-stage state, not only the easiest default entry.
+
+### Problem: Dungeon v1 corridor did not expose enough real progression information
+
+- Cause: The first Dungeon rebuild made the screen thematic, but the visible state still leaned on current-room presentation. It did not strongly surface the next-room uncertainty/reveal, boss distance, resource pressure, or route-state labels in a way that made the screen feel like an active dungeon-progression decision surface.
+- Impact: Dungeon could have been over-scored because it looked more like a paper corridor while still behaving visually like a mostly static room entry screen. That would repeat the user's concern that a thin visual pass might be called complete.
+- Resolution: Added `assets/source/ui/dungeon_stage_components_v002.svg`, added current/next intel cards, boss-distance and resource rows, route-row state labels, and copy that changes when `relic_soft_compass` reveals the next room. `phaser:smoke` verifies the soft-compass reveal and writes `tmp/phaser-dungeon-release-soft-compass.png`.
+- Prevention: Dungeon scoring must separate visual corridor polish from actual progression/readability proof. Any future Dungeon score increase must include state-driven evidence for route decisions, not only a better-looking door scene.
+
+### Problem: Dungeon v4 next-room intel card overlapped the route panel
+
+- Cause: The first v2 layout placed the next-room intel card too far right while preserving the center door and right route ledger positions.
+- Impact: The new compass/reveal information was technically present, but the release screenshots showed the card sitting under the route panel edge. Accepting v4 would have hidden a visible layout defect behind a functionality pass.
+- Resolution: Reduced the intel-card width, moved the next-room card left, and recaptured v5 screenshots for slice 1920, slice 1280, release default, and release soft-compass states. v5 removes the route-panel overlap while preserving the smoke-covered `방 입장` coordinate.
+- Prevention: Dungeon v2+ changes must include both default and `relic_soft_compass` release screenshots. New center-stage cards must be inspected against the right route panel at 1920 and 1280 before a score is raised.
+
+### Problem: RuneBench first pass showed the target but not enough attachment consequence
+
+- Cause: The first RuneBench pass showed the selected rune, target card, socket connector, and ledger counts, but it did not clearly show what would change on the card after attachment or why the card was a valid target.
+- Impact: The screen could be scored as visually thematic while still failing as a buildcraft surface. A player could see that a rune would attach, but not easily judge whether the attachment was meaningful.
+- Resolution: Added `assets/source/ui/rune_bench_stage_components_v002.svg`, added before/after cost/damage/block preview cards, compatibility proof copy, recommendation text, and a right-ledger change row. The preview uses current rune runtime helpers for existing attached stats and applies the selected rune as a non-mutating after-preview.
+- Prevention: RuneBench score increases must prove decision readability, not just visual workbench polish. The accepted evidence set must show the target, compatibility, and at least one before/after stat change.
+
+### Problem: RuneBench v4 introduced a decorative label overlap
+
+- Cause: The v2 workbench added stat preview cards and moved the connector label, but kept a decorative `룬` label near the rune stone. That label overlapped the existing socket-type label rendered by the rune stone.
+- Impact: The new before/after preview improved the screen, but the visible overlap would make the result unscorable as a clean UI pass. The defect was caught by `phaser:smoke` text-overlap auditing before documentation scoring.
+- Resolution: Removed the decorative `룬` label, reran `phaser:smoke`, and recaptured v5 slice, 1280, and release screenshots. v5 keeps the state-driven preview while avoiding the socket-label overlap.
+- Prevention: New decorative labels around existing component labels must be treated as overlap risks. Smoke text auditing and a recaptured debug-less screenshot set are required before any RuneBench v2+ score increase.
+
+### Problem: Town v1 hub looked thematic but did not show enough save/profile progression
+
+- Cause: The first Town rebuild made the village feel like a paper-theater hub, but the expedition board still leaned on simple counts and current-stage presentation. It did not clearly show the next expedition, completed-stage stamp, route preview, or next locked chapter from the save/profile state.
+- Impact: Town could have been over-scored as visually covered while still failing as a progression hub. That would repeat the false-completion risk where a screen looks nicer but does not communicate the actual game state.
+- Resolution: Added `assets/source/ui/town_stage_components_v002.svg`, changed the expedition board into a save/profile-driven dossier, and surfaced unlocked/completed/remaining counts, next expedition, completed stamps, route preview, and next-sealed status. Captured slice, 1280, release, and progressed-release screenshots before scoring.
+- Prevention: Future Town score increases must prove state readability, not only village theming. Evidence must include a progressed save state when progression copy or counts are changed.
+
+### Problem: Town v2 next-sealed information crowded the route board before v8
+
+- Cause: v5 placed next-sealed information as a separate card near the route preview, and v6 moved it to the board bottom. v7 moved it upward but still left it too close to the next-expedition slot in the progressed release capture.
+- Impact: The new progression information was technically present, but accepting those captures would hide visible crowding in the exact area meant to clarify progression.
+- Resolution: Shortened the next-sealed label, moved it inside the remaining-stage stat area, recaptured v8 slice, 1280, release, and progressed-release screenshots, then reran typecheck, Phaser smoke, check, data validation, quality report, asset audits, release visual audit, and diff check.
+- Prevention: Town v2+ changes must include both default and progressed release screenshots. Any new summary line near the route preview has to be checked at 1920 and 1280 before a score is raised.
+
+### Problem: Result first pass looked like a certificate but did not expose enough run consequence
+
+- Cause: The first Result rebuild made the screen thematic, but the center certificate still leaned on outcome, HP/gold, completed count, and collection totals. It did not clearly show route composition, next action, or deck/collection deltas as a player-facing run recap.
+- Impact: Result could be over-scored because it looked more polished while still failing to answer what happened in the run and what changes next. That is the same false-completion risk as calling a pretty shell a finished game screen.
+- Resolution: Added `assets/source/ui/result_stage_components_v002.svg`, added route progress and route-composition display, added a next-record row, changed the deck row to total plus newly added cards, and added a compact preservation summary.
+- Prevention: Result score increases must prove run consequence readability, not only curtain-call styling. Evidence must include neutral, defeat, clear, release-clear, and 1280 screenshots.
+
+### Problem: Result v2-v4 next-action layout failed before v5
+
+- Cause: v2 placed the next-action ticket too far right, where release-clear screenshots hid it under the collection ledger. v3 moved it into a top ribbon but left longer copy cramped. v4 widened the ribbon enough to read, but then it visually collided with the central result title.
+- Impact: Each version improved one defect while creating another visible layout problem. Accepting any of those captures would have inflated the score and hidden a real UI polish defect.
+- Resolution: Treated v2, v3, and v4 as failed visual checkpoints. v5 moved next-action copy into the lower record row, kept the central title clean, preserved the `마을로` coordinate, and recaptured neutral 1920/1280, defeat, slice-clear, and release-clear screenshots.
+- Prevention: Result v2+ scoring must include release-clear and 1280 screenshot review after every placement change. A new summary surface is not accepted until it avoids both side-panel overlap and title/action crowding.

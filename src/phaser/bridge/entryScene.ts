@@ -5,6 +5,7 @@ const ENTRY_TO_SCENE: Record<EntryKey, string> = {
   world_map: "WorldMapScene",
   dungeon: "DungeonScene",
   combat: "CombatScene",
+  event: "EventScene",
   reward: "RewardScene",
   rune_bench: "RuneBenchScene",
   boss: "BossScene",

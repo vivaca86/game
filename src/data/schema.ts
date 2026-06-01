@@ -48,6 +48,7 @@ export interface EffectValue {
   amount?: number;
   percent?: number;
   duration?: number;
+  minCost?: number;
   target?: "self" | "front_enemy" | "all_enemies" | "random_enemy" | "card" | "run";
 }
 
@@ -219,6 +220,7 @@ export interface EventChoice {
   descriptionKo: string;
   cost?: GameEffect[];
   rewards?: RewardEntry[];
+  eventCombatEnemyId?: ContentId;
   nextRoomOverride?: RoomType;
   riskKey?: string;
 }
@@ -322,6 +324,7 @@ export type SavePhase =
   | "world_map"
   | "dungeon"
   | "combat"
+  | "event"
   | "reward"
   | "rune_bench"
   | "boss"
@@ -363,11 +366,18 @@ export interface RunState {
   relics: ContentId[];
   arcanas: ContentId[];
   completedStages: ContentId[];
+  lastEventChoiceId?: ContentId;
   nextCardDiscount: number;
   nextCardCostPenalty: number;
   nextDamageReduction: number;
   nextRewardBonus: number;
   chainCount: number;
+  firstExpensiveCardFreeAvailable?: boolean;
+  guardCardsPlayedThisCombat?: number;
+  colorsPlayedThisTurn?: ContentId[];
+  prismPathTriggeredThisTurn?: boolean;
+  playerMark?: number;
+  playerWeak?: number;
   log: string[];
   hp: number;
   maxHp: number;
@@ -379,6 +389,10 @@ export interface SettingsState {
   volumeMaster: number;
   volumeMusic: number;
   volumeSfx: number;
+  displayMode: "standard" | "high_contrast";
+  largeText: boolean;
+  reducedMotion: boolean;
+  spaceConfirm: boolean;
 }
 
 export interface SaveData {

@@ -33,13 +33,47 @@ export function getAttachedRuneBonus(
   cardId: string,
   bonusOp: "modify_attached_card_damage" | "modify_attached_card_block"
 ): number {
-  return (run.equippedRunes[cardId] ?? []).reduce((total, runeId) => {
-    const rune = bundle.runes.find((item) => item.id === runeId);
-    const amount = rune?.effects
-      .filter((effect) => effect.op === bonusOp)
-      .reduce((sum, effect) => sum + (effect.value.amount ?? 0), 0) ?? 0;
-    return total + amount;
-  }, 0);
+  return getAttachedRuneEffects(run, bundle, cardId, bonusOp)
+    .reduce((total, effect) => total + (effect.value.amount ?? 0), 0);
+}
+
+export function getAttachedRuneEffects(
+  run: SliceRunState,
+  bundle: GameDataBundle,
+  cardId: string,
+  op: string
+): RuneData["effects"] {
+  return (run.equippedRunes[cardId] ?? [])
+    .flatMap((runeId) => bundle.runes.find((item) => item.id === runeId)?.effects ?? [])
+    .filter((effect) => effect.op === op);
+}
+
+export function getAttachedRuneModifiedAmount(
+  run: SliceRunState,
+  bundle: GameDataBundle,
+  cardId: string,
+  baseAmount: number,
+  kind: "damage" | "block"
+): number {
+  const legacyOp = kind === "damage" ? "modify_attached_card_damage" : "modify_attached_card_block";
+  const percentOp = kind === "damage" ? "modify_damage_percent" : "modify_shield_percent";
+  const flatAmount = baseAmount + getAttachedRuneBonus(run, bundle, cardId, legacyOp);
+
+  return getAttachedRuneEffects(run, bundle, cardId, percentOp).reduce((value, effect) => {
+    const percent = effect.value.amount ?? effect.value.percent ?? 0;
+    return Math.max(1, Math.ceil(value * (1 + percent / 100)));
+  }, flatAmount);
+}
+
+export function getAttachedRuneModifiedCost(
+  run: SliceRunState,
+  bundle: GameDataBundle,
+  cardId: string,
+  baseCost: number
+): number {
+  return getAttachedRuneEffects(run, bundle, cardId, "modify_cost").reduce((cost, effect) => {
+    return Math.max(0, cost + (effect.value.amount ?? 0));
+  }, baseCost);
 }
 
 function findRuneTarget(
@@ -63,4 +97,3 @@ function findRuneTarget(
 function slotMatches(slotType: string, runeType: string): boolean {
   return slotType === "any" || runeType === "any" || slotType === runeType;
 }
-

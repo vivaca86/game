@@ -12,6 +12,17 @@ import type {
 export const SAVE_STORAGE_KEY = "paper_theater_card_crawler_save_v1";
 export const DEBUG_SAVE_STORAGE_KEY = "paper_theater_card_crawler_debug_save_v1";
 
+const DEFAULT_SETTINGS: SettingsState = {
+  language: "ko",
+  volumeMaster: 0.8,
+  volumeMusic: 0.6,
+  volumeSfx: 0.8,
+  displayMode: "standard",
+  largeText: false,
+  reducedMotion: false,
+  spaceConfirm: true
+};
+
 interface SaveStorageOptions {
   debug: boolean;
   resetSave?: boolean;
@@ -52,23 +63,27 @@ export function createInitialSave(bundle: GameDataBundle): SaveData {
       relics: [],
       arcanas: [],
       completedStages: [],
+      lastEventChoiceId: undefined,
       nextCardDiscount: 0,
       nextCardCostPenalty: 0,
       nextDamageReduction: 0,
       nextRewardBonus: 0,
       chainCount: 0,
+      firstExpensiveCardFreeAvailable: true,
+      guardCardsPlayedThisCombat: 0,
+      colorsPlayedThisTurn: [],
+      prismPathTriggeredThisTurn: false,
       log: ["boot:town"],
       hp: character.maxHp,
       maxHp: character.maxHp,
-      currency: 0
+      currency: 80
     } : undefined,
-    settings: {
-      language: "ko",
-      volumeMaster: 0.8,
-      volumeMusic: 0.6,
-      volumeSfx: 0.8
-    }
+    settings: createDefaultSettings()
   };
+}
+
+export function createDefaultSettings(): SettingsState {
+  return { ...DEFAULT_SETTINGS };
 }
 
 export function loadSave(bundle: GameDataBundle, options: SaveStorageOptions): SaveData {
@@ -101,6 +116,10 @@ export function persistSave(save: SaveData, options: SaveStorageOptions): void {
   storage.setItem(key, JSON.stringify(normalizeSave(save, createInitialSaveFromSave(save))));
 }
 
+export function clearStoredSave(options: Pick<SaveStorageOptions, "debug">): void {
+  getStorage()?.removeItem(resolveSaveStorageKey(options));
+}
+
 export function resolveSaveStorageKey(options: Pick<SaveStorageOptions, "debug">): string {
   return options.debug ? DEBUG_SAVE_STORAGE_KEY : SAVE_STORAGE_KEY;
 }
@@ -109,12 +128,20 @@ function decodeSave(raw: string, bundle: GameDataBundle): SaveData | undefined {
   try {
     const parsed = JSON.parse(raw) as unknown;
     if (!isRecord(parsed)) return undefined;
-    if (parsed.saveVersion !== 1) return undefined;
+    if (!isSupportedSaveVersion(parsed.saveVersion, parsed)) return undefined;
 
     return normalizeSave(parsed, createInitialSave(bundle));
   } catch {
     return undefined;
   }
+}
+
+function isSupportedSaveVersion(version: unknown, record: Record<string, unknown>): boolean {
+  if (version === 1) return true;
+  if (version === 0 || version === undefined) {
+    return Boolean(record.profile || record.currentRun || record.settings);
+  }
+  return false;
 }
 
 function normalizeSave(value: unknown, fallback: SaveData): SaveData {
@@ -166,11 +193,20 @@ function normalizeRun(value: unknown, fallback: RunState | undefined): RunState 
     relics: asStringArray(record.relics, fallback.relics),
     arcanas: asStringArray(record.arcanas, fallback.arcanas),
     completedStages: asStringArray(record.completedStages, fallback.completedStages),
+    lastEventChoiceId: asOptionalString(record.lastEventChoiceId, fallback.lastEventChoiceId),
     nextCardDiscount: asNumber(record.nextCardDiscount, fallback.nextCardDiscount),
     nextCardCostPenalty: asNumber(record.nextCardCostPenalty, fallback.nextCardCostPenalty),
     nextDamageReduction: asNumber(record.nextDamageReduction, fallback.nextDamageReduction),
     nextRewardBonus: asNumber(record.nextRewardBonus, fallback.nextRewardBonus),
     chainCount: asNumber(record.chainCount, fallback.chainCount),
+    firstExpensiveCardFreeAvailable: typeof record.firstExpensiveCardFreeAvailable === "boolean"
+      ? record.firstExpensiveCardFreeAvailable
+      : fallback.firstExpensiveCardFreeAvailable,
+    guardCardsPlayedThisCombat: asNumber(record.guardCardsPlayedThisCombat, fallback.guardCardsPlayedThisCombat ?? 0),
+    colorsPlayedThisTurn: asStringArray(record.colorsPlayedThisTurn, fallback.colorsPlayedThisTurn ?? []),
+    prismPathTriggeredThisTurn: typeof record.prismPathTriggeredThisTurn === "boolean"
+      ? record.prismPathTriggeredThisTurn
+      : fallback.prismPathTriggeredThisTurn,
     log: asStringArray(record.log, fallback.log),
     hp: asNumber(record.hp, fallback.hp),
     maxHp: asNumber(record.maxHp, fallback.maxHp),
@@ -214,9 +250,13 @@ function normalizeSettings(value: unknown, fallback: SettingsState): SettingsSta
   const record = isRecord(value) ? value : {};
   return {
     language: "ko",
-    volumeMaster: asNumber(record.volumeMaster, fallback.volumeMaster),
-    volumeMusic: asNumber(record.volumeMusic, fallback.volumeMusic),
-    volumeSfx: asNumber(record.volumeSfx, fallback.volumeSfx)
+    volumeMaster: asVolume(record.volumeMaster, fallback.volumeMaster),
+    volumeMusic: asVolume(record.volumeMusic, fallback.volumeMusic),
+    volumeSfx: asVolume(record.volumeSfx, fallback.volumeSfx),
+    displayMode: record.displayMode === "high_contrast" ? "high_contrast" : fallback.displayMode,
+    largeText: asBoolean(record.largeText, fallback.largeText),
+    reducedMotion: asBoolean(record.reducedMotion, fallback.reducedMotion),
+    spaceConfirm: asBoolean(record.spaceConfirm, fallback.spaceConfirm)
   };
 }
 
@@ -253,8 +293,17 @@ function asNumber(value: unknown, fallback: number): number {
   return typeof value === "number" && Number.isFinite(value) ? value : fallback;
 }
 
+function asVolume(value: unknown, fallback: number): number {
+  const numberValue = asNumber(value, fallback);
+  return Math.max(0, Math.min(1, numberValue));
+}
+
 function asOptionalNumber(value: unknown, fallback: number | undefined): number | undefined {
   return typeof value === "number" && Number.isFinite(value) ? value : fallback;
+}
+
+function asBoolean(value: unknown, fallback: boolean): boolean {
+  return typeof value === "boolean" ? value : fallback;
 }
 
 function asStringArray(value: unknown, fallback: ContentId[]): ContentId[] {
@@ -276,6 +325,6 @@ function asStringArrayRecord(
 }
 
 function asPhase(value: unknown, fallback: SavePhase): SavePhase {
-  const phases: SavePhase[] = ["town", "world_map", "dungeon", "combat", "reward", "rune_bench", "boss", "result"];
+  const phases: SavePhase[] = ["town", "world_map", "dungeon", "combat", "event", "reward", "rune_bench", "boss", "result"];
   return phases.includes(value as SavePhase) ? value as SavePhase : fallback;
 }

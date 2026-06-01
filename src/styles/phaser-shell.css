@@ -4,7 +4,10 @@ body {
   height: 100%;
   margin: 0;
   overflow: hidden;
-  background: #263246;
+  background:
+    linear-gradient(90deg, rgba(47, 107, 104, 0.32) 0 12%, rgba(255, 248, 230, 0) 12% 88%, rgba(165, 72, 63, 0.26) 88% 100%),
+    repeating-linear-gradient(0deg, rgba(128, 88, 69, 0.08) 0 1px, rgba(255, 248, 230, 0) 1px 18px),
+    #f5e7ca;
   color: #fff8e6;
   font-family: Arial, sans-serif;
 }

@@ -50,6 +50,19 @@ const candidateProgressIconKeys = new Set([
   "char_mina_pagehand_portrait"
 ]);
 
+const candidateCharacterSpriteKeys = new Set([
+  "char_mina_pagehand_sprite"
+]);
+
+const candidateUiPanelKeys = new Set([
+  "ui_button_primary_9slice",
+  "ui_button_secondary_9slice",
+  "ui_slot_reward_9slice",
+  "ui_slot_choice_9slice",
+  "ui_tooltip_paper_9slice",
+  "ui_panel_paper_9slice"
+]);
+
 const candidateEffectSpriteKeys = new Set([
   "effect_stage_spotlight",
   "effect_paper_slash",
@@ -190,6 +203,27 @@ function paletteFor(asset) {
   if (asset.key === "char_mina_pagehand_portrait") {
     return { base: [248, 236, 210], accent: [82, 143, 150], dark: [58, 65, 89] };
   }
+  if (asset.key === "char_mina_pagehand_sprite") {
+    return { base: [248, 236, 210], accent: [82, 143, 150], dark: [58, 65, 89] };
+  }
+  if (asset.key === "ui_panel_paper_9slice") {
+    return { base: [255, 244, 218], accent: [198, 160, 82], dark: [76, 62, 58] };
+  }
+  if (asset.key === "ui_button_primary_9slice") {
+    return { base: [54, 70, 98], accent: [245, 194, 107], dark: [30, 42, 62] };
+  }
+  if (asset.key === "ui_button_secondary_9slice") {
+    return { base: [255, 248, 226], accent: [198, 160, 82], dark: [76, 62, 58] };
+  }
+  if (asset.key === "ui_slot_reward_9slice") {
+    return { base: [255, 246, 220], accent: [88, 143, 129], dark: [76, 62, 58] };
+  }
+  if (asset.key === "ui_slot_choice_9slice") {
+    return { base: [255, 249, 232], accent: [198, 139, 74], dark: [76, 62, 58] };
+  }
+  if (asset.key === "ui_tooltip_paper_9slice") {
+    return { base: [255, 242, 208], accent: [112, 139, 164], dark: [76, 62, 58] };
+  }
   if (asset.key === "effect_stage_spotlight") {
     return { base: [255, 241, 195], accent: [232, 183, 80], dark: [90, 69, 82] };
   }
@@ -216,6 +250,8 @@ function paintFor(asset) {
   if (candidateMonsterSpriteKeys.has(asset.key)) return paintMonsterSprite(asset);
   if (candidateBossSpriteKeys.has(asset.key)) return paintBossSprite(asset);
   if (candidateProgressIconKeys.has(asset.key)) return paintProgressIcon(asset);
+  if (candidateCharacterSpriteKeys.has(asset.key)) return paintCharacterSprite(asset);
+  if (candidateUiPanelKeys.has(asset.key)) return paintUiPanel(asset);
   if (candidateEffectSpriteKeys.has(asset.key)) return paintEffectSprite(asset);
 
   const palette = paletteFor(asset);
@@ -617,6 +653,255 @@ function paintBackground(asset) {
 
     if (x < 18 || y < 18 || x >= width - 18 || y >= height - 18) {
       color = mix(color, [darkR, darkG, darkB, 255], 0.55);
+    }
+
+    return color;
+  };
+}
+
+function paintUiPanel(asset) {
+  if (asset.key === "ui_button_primary_9slice" || asset.key === "ui_button_secondary_9slice") {
+    return paintUiButton(asset);
+  }
+  if (asset.key === "ui_slot_reward_9slice" || asset.key === "ui_slot_choice_9slice") {
+    return paintUiSlot(asset);
+  }
+  if (asset.key === "ui_tooltip_paper_9slice") {
+    return paintUiTooltip(asset);
+  }
+
+  const palette = paletteFor(asset);
+  const seed = hash(asset.key);
+  return (x, y, width, height) => {
+    const [paperR, paperG, paperB] = palette.base;
+    const [accentR, accentG, accentB] = palette.accent;
+    const [darkR, darkG, darkB] = palette.dark;
+    const grain = ((x * 19 + y * 11 + seed) % 37) < 8 ? -7 : 0;
+    const paper = [paperR + grain, paperG + grain, paperB + grain, 248];
+    const accent = [accentR, accentG, accentB, 255];
+    const dark = [darkR, darkG, darkB, 255];
+
+    if (!insideRoundedRect(x, y, 8, 8, width - 16, height - 16, 20)) {
+      return [0, 0, 0, 0];
+    }
+
+    let color = paper;
+    if (!insideRoundedRect(x, y, 14, 14, width - 28, height - 28, 16)) {
+      color = dark;
+    } else if (!insideRoundedRect(x, y, 22, 22, width - 44, height - 44, 12)) {
+      color = mix(accent, dark, 0.18);
+    } else if (!insideRoundedRect(x, y, 30, 30, width - 60, height - 60, 10)) {
+      color = mix(paper, accent, 0.28);
+    }
+
+    const foldInset = 38;
+    if (distanceToSegment(x, y, foldInset, 48, width - foldInset, 48) < 2
+      || distanceToSegment(x, y, foldInset, height - 48, width - foldInset, height - 48) < 2
+      || distanceToSegment(x, y, 48, foldInset, 48, height - foldInset) < 2
+      || distanceToSegment(x, y, width - 48, foldInset, width - 48, height - foldInset) < 2) {
+      color = mix(color, dark, 0.18);
+    }
+
+    for (const [cx, cy] of [
+      [34, 34],
+      [width - 34, 34],
+      [34, height - 34],
+      [width - 34, height - 34]
+    ]) {
+      const pinDistance = Math.hypot(x - cx, y - cy);
+      if (pinDistance < 12) color = dark;
+      if (pinDistance < 7) color = accent;
+      if (pinDistance < 3) color = [255, 236, 157, 255];
+    }
+
+    if ((x > 54 && x < width - 54 && y > 54 && y < height - 54)
+      && ((Math.floor((x + seed) / 29) + Math.floor(y / 41)) % 9 === 0)) {
+      color = mix(color, [255, 255, 235, 255], 0.18);
+    }
+
+    return color;
+  };
+}
+
+function paintUiButton(asset) {
+  const palette = paletteFor(asset);
+  const seed = hash(asset.key);
+  const isPrimary = asset.key === "ui_button_primary_9slice";
+  return (x, y, width, height) => {
+    const [paperR, paperG, paperB] = palette.base;
+    const [accentR, accentG, accentB] = palette.accent;
+    const [darkR, darkG, darkB] = palette.dark;
+    const grain = ((x * 17 + y * 13 + seed) % 31) < 6 ? -6 : 0;
+    if (!insideRoundedRect(x, y, 4, 4, width - 8, height - 8, 18)) return [0, 0, 0, 0];
+
+    let color = isPrimary
+      ? [paperR + grain, paperG + grain, paperB + grain, 255]
+      : [255 + grain, 248 + grain, 226 + grain, 255];
+    if (!insideRoundedRect(x, y, 8, 8, width - 16, height - 16, 14)) {
+      color = [darkR, darkG, darkB, 255];
+    } else if (!insideRoundedRect(x, y, 15, 15, width - 30, height - 30, 10)) {
+      color = [accentR, accentG, accentB, 255];
+    }
+    if (insideRoundedRect(x, y, 25, 18, width - 50, Math.max(8, height * 0.18), 7)) {
+      color = mix(color, isPrimary ? [255, 255, 235, 255] : [255, 236, 170, 255], isPrimary ? 0.16 : 0.22);
+    }
+    if (distanceToSegment(x, y, 24, height - 17, width - 24, height - 17) < 2) {
+      color = mix(color, [255, 239, 157, 255], 0.6);
+    }
+    for (const [cx, cy] of [[20, 20], [width - 20, 20], [20, height - 20], [width - 20, height - 20]]) {
+      if (Math.abs(x - cx) + Math.abs(y - cy) < 8) color = [accentR, accentG, accentB, 255];
+      if (Math.abs(x - cx) + Math.abs(y - cy) < 4) color = [255, 240, 154, 255];
+    }
+    return color;
+  };
+}
+
+function paintUiSlot(asset) {
+  const palette = paletteFor(asset);
+  const seed = hash(asset.key);
+  const isReward = asset.key === "ui_slot_reward_9slice";
+  return (x, y, width, height) => {
+    const [paperR, paperG, paperB] = palette.base;
+    const [accentR, accentG, accentB] = palette.accent;
+    const [darkR, darkG, darkB] = palette.dark;
+    const grain = ((x * 19 + y * 7 + seed) % 37) < 8 ? -7 : 0;
+    if (!insideRoundedRect(x, y, 6, 6, width - 12, height - 12, 20)) return [0, 0, 0, 0];
+
+    let color = [paperR + grain, paperG + grain, paperB + grain, 250];
+    if (!insideRoundedRect(x, y, 12, 12, width - 24, height - 24, 15)) {
+      color = [darkR, darkG, darkB, 255];
+    } else if (!insideRoundedRect(x, y, 20, 20, width - 40, height - 40, 11)) {
+      color = mix([accentR, accentG, accentB, 255], [darkR, darkG, darkB, 255], 0.16);
+    }
+
+    const medallionX = isReward ? 54 : 38;
+    if (Math.hypot(x - medallionX, y - height / 2) < (isReward ? 28 : 18)) {
+      color = [darkR, darkG, darkB, 255];
+    }
+    if (Math.hypot(x - medallionX, y - height / 2) < (isReward ? 20 : 11)) {
+      color = [accentR, accentG, accentB, 255];
+    }
+    if (!isReward && x > width - 56 && y < 48 && x + y > width - 44) {
+      color = mix([accentR, accentG, accentB, 255], [255, 241, 180, 255], 0.28);
+    }
+    if (distanceToSegment(x, y, isReward ? 92 : 66, 30, width - 38, 30) < 2
+      || distanceToSegment(x, y, isReward ? 92 : 66, height - 30, width - 38, height - 30) < 2) {
+      color = mix(color, [255, 255, 235, 255], 0.32);
+    }
+    return color;
+  };
+}
+
+function paintUiTooltip(asset) {
+  const palette = paletteFor(asset);
+  const seed = hash(asset.key);
+  return (x, y, width, height) => {
+    const [paperR, paperG, paperB] = palette.base;
+    const [accentR, accentG, accentB] = palette.accent;
+    const [darkR, darkG, darkB] = palette.dark;
+    const grain = ((x * 11 + y * 17 + seed) % 41) < 9 ? -6 : 0;
+    if (!insideRoundedRect(x, y, 6, 6, width - 12, height - 12, 18)) return [0, 0, 0, 0];
+
+    let color = [paperR + grain, paperG + grain, paperB + grain, 248];
+    if (!insideRoundedRect(x, y, 12, 12, width - 24, height - 24, 13)) {
+      color = [darkR, darkG, darkB, 255];
+    } else if (!insideRoundedRect(x, y, 20, 20, width - 40, height - 40, 9)) {
+      color = mix([accentR, accentG, accentB, 255], [255, 241, 180, 255], 0.3);
+    }
+    if (distanceToSegment(x, y, 34, 32, width - 34, 32) < 2) color = mix(color, [255, 255, 235, 255], 0.34);
+    if (Math.abs(x - 31) + Math.abs(y - height / 2) < 12) color = [accentR, accentG, accentB, 255];
+    return color;
+  };
+}
+
+function paintCharacterSprite(asset) {
+  const palette = paletteFor(asset);
+  const seed = hash(asset.key);
+  return (x, y, width, height) => {
+    const frameWidth = asset.frameSize?.w ?? width;
+    const frameHeight = asset.frameSize?.h ?? height;
+    const columns = Math.max(1, Math.floor(width / frameWidth));
+    const frameIndex = Math.floor(y / frameHeight) * columns + Math.floor(x / frameWidth);
+    const fx = x % frameWidth;
+    const fy = y % frameHeight;
+    const bob = Math.round(Math.sin((frameIndex / 16) * Math.PI * 2) * 4);
+    const armSwing = Math.round(Math.cos((frameIndex / 16) * Math.PI * 2) * 6);
+    const [paperR, paperG, paperB] = palette.base;
+    const [accentR, accentG, accentB] = palette.accent;
+    const [darkR, darkG, darkB] = palette.dark;
+    const grain = ((fx * 13 + fy * 17 + seed + frameIndex * 19) % 43) < 7 ? -8 : 0;
+    const paper = [paperR + grain, paperG + grain, paperB + grain, 255];
+    const accent = [accentR, accentG, accentB, 255];
+    const dark = [darkR, darkG, darkB, 255];
+    const gold = [224, 174, 82, 255];
+    const centerX = 96;
+    const headY = 58 + bob;
+
+    if (insideEllipse(fx, fy, centerX, 170, 50, 12)) {
+      return [darkR, darkG, darkB, 70];
+    }
+
+    let color = [0, 0, 0, 0];
+    const cloak = pointInPolygon(fx, fy, [
+      [centerX - 35, 88 + bob],
+      [centerX + 35, 88 + bob],
+      [centerX + 50, 160],
+      [centerX - 50, 160]
+    ]);
+    const apron = pointInPolygon(fx, fy, [
+      [centerX - 21, 95 + bob],
+      [centerX + 21, 95 + bob],
+      [centerX + 30, 151],
+      [centerX - 30, 151]
+    ]);
+    const hair = insideEllipse(fx, fy, centerX, headY - 9, 31, 27)
+      || insideEllipse(fx, fy, centerX - 22, headY + 6, 15, 21)
+      || insideEllipse(fx, fy, centerX + 22, headY + 6, 15, 21);
+    const face = insideEllipse(fx, fy, centerX, headY + 3, 22, 24);
+
+    if (cloak) color = mix(accent, dark, 0.13);
+    if (apron) color = mix(paper, [255, 255, 236, 255], 0.24);
+    if (hair) color = dark;
+    if (face) color = paper;
+
+    const leftArm = distanceToSegment(fx, fy, centerX - 31, 101 + bob, centerX - 63 - armSwing, 135) < 7;
+    const rightArm = distanceToSegment(fx, fy, centerX + 31, 101 + bob, centerX + 62 - armSwing, 130) < 7;
+    if (leftArm || rightArm) color = dark;
+
+    const leftPage = pointInPolygon(fx, fy, [
+      [centerX - 78 - armSwing, 113],
+      [centerX - 49 - armSwing, 121],
+      [centerX - 53 - armSwing, 151],
+      [centerX - 83 - armSwing, 143]
+    ]);
+    const rightPage = pointInPolygon(fx, fy, [
+      [centerX + 47 - armSwing, 109],
+      [centerX + 80 - armSwing, 102],
+      [centerX + 85 - armSwing, 133],
+      [centerX + 52 - armSwing, 141]
+    ]);
+    if (leftPage || rightPage) color = paper;
+    if ((leftPage || rightPage) && ((fx + fy + frameIndex) % 23 < 2)) color = mix(color, gold, 0.34);
+
+    if (insideEllipse(fx, fy, centerX - 8, headY + 1, 3, 3)
+      || insideEllipse(fx, fy, centerX + 8, headY + 1, 3, 3)) {
+      color = [255, 226, 107, 255];
+    }
+    if (distanceToSegment(fx, fy, centerX - 8, headY + 14, centerX, headY + 19) < 2
+      || distanceToSegment(fx, fy, centerX, headY + 19, centerX + 8, headY + 14) < 2) {
+      color = dark;
+    }
+    if (Math.abs(fx - centerX) + Math.abs(fy - (headY - 36)) < 14) color = gold;
+    if (distanceToSegment(fx, fy, centerX - 20, 160, centerX - 33, 180) < 5
+      || distanceToSegment(fx, fy, centerX + 20, 160, centerX + 33, 180) < 5) {
+      color = dark;
+    }
+    if (insideRoundedRect(fx, fy, centerX - 43, 173, 28, 9, 5)
+      || insideRoundedRect(fx, fy, centerX + 15, 173, 28, 9, 5)) {
+      color = gold;
+    }
+    if ((cloak || apron || hair) && ((fx * 5 + fy + frameIndex) % 31 < 2)) {
+      color = mix(color, [255, 250, 220, 255], 0.22);
     }
 
     return color;

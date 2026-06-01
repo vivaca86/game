@@ -8,10 +8,10 @@
     "energy": 3,
     "starterDeck": [
       "card_sunbean_punch",
-      "card_morning_wave",
+      "card_morning_daybreak",
       "card_cloud_cushion",
       "card_mint_spark",
-      "card_morning_gift"
+      "card_morning_parcel"
     ],
     "passiveText": "전투마다 처음 쓰는 공격 카드의 피해 +3.",
     "passiveEffects": [
@@ -37,10 +37,10 @@
     "energy": 3,
     "starterDeck": [
       "card_peach_dash",
-      "card_morning_shower",
+      "card_morning_sunshower",
       "card_sprout_guard",
       "card_paper_charm",
-      "card_cloud_sparkle"
+      "card_cloud_doodles"
     ],
     "passiveText": "전투 시작 시 보호막 4.",
     "passiveEffects": [
@@ -66,10 +66,10 @@
     "energy": 3,
     "starterDeck": [
       "card_lantern_puff",
-      "card_cloud_tap",
+      "card_cloud_pillowtap",
       "card_round_mirror",
       "card_star_candy",
-      "card_cloud_snack"
+      "card_cloud_breeze"
     ],
     "passiveText": "한 턴에 카드 6장을 내면 카드 1장을 뽑습니다.",
     "passiveEffects": [
@@ -98,10 +98,10 @@
     "energy": 3,
     "starterDeck": [
       "card_pudding_wallop",
-      "card_cloud_wave",
-      "card_morning_pad",
+      "card_cloud_mistspill",
+      "card_morning_windowshade",
       "card_ribbon_loop",
-      "card_cloud_gift"
+      "card_cloud_floatbox"
     ],
     "passiveText": "체력이 처음 절반 이하가 되면 체력 6 회복.",
     "passiveEffects": [
@@ -129,11 +129,11 @@
     "maxHp": 80,
     "energy": 3,
     "starterDeck": [
-      "card_morning_tap",
-      "card_cloud_shower",
-      "card_cloud_pad",
+      "card_morning_sunhook",
+      "card_cloud_hailpop",
+      "card_cloud_blanketbank",
       "card_bubble_map",
-      "card_mint_sparkle"
+      "card_mint_notedrop"
     ],
     "passiveText": "연쇄 4을 달성하면 기운 1을 얻습니다.",
     "passiveEffects": [
@@ -161,11 +161,11 @@
     "maxHp": 84,
     "energy": 3,
     "starterDeck": [
-      "card_morning_wave",
-      "card_mint_tap",
-      "card_mint_pad",
-      "card_morning_sparkle",
-      "card_mint_snack"
+      "card_morning_daybreak",
+      "card_mint_leafjab",
+      "card_mint_vinescreen",
+      "card_morning_bellnote",
+      "card_mint_freshbreath"
     ],
     "passiveText": "정예 전투 승리 후 별사탕 3 추가.",
     "passiveEffects": [
@@ -191,11 +191,11 @@
     "maxHp": 70,
     "energy": 3,
     "starterDeck": [
-      "card_morning_shower",
-      "card_mint_wave",
-      "card_peach_pad",
-      "card_morning_snack",
-      "card_mint_gift"
+      "card_morning_sunshower",
+      "card_mint_gardensweep",
+      "card_peach_softguard",
+      "card_morning_breakfast",
+      "card_mint_workshop"
     ],
     "passiveText": "전투마다 처음 쓰는 공격 카드의 피해 +4.",
     "passiveEffects": [
@@ -221,11 +221,11 @@
     "maxHp": 74,
     "energy": 3,
     "starterDeck": [
-      "card_cloud_tap",
-      "card_mint_shower",
+      "card_cloud_pillowtap",
+      "card_mint_needlerain",
       "card_lavender_pad",
-      "card_morning_gift",
-      "card_peach_sparkle"
+      "card_morning_parcel",
+      "card_peach_sticker"
     ],
     "passiveText": "전투 시작 시 보호막 5.",
     "passiveEffects": [
@@ -251,11 +251,11 @@
     "maxHp": 78,
     "energy": 3,
     "starterDeck": [
-      "card_cloud_wave",
-      "card_peach_tap",
+      "card_cloud_mistspill",
+      "card_peach_blushdash",
       "card_bubble_pad",
-      "card_cloud_sparkle",
-      "card_peach_snack"
+      "card_cloud_doodles",
+      "card_peach_picnic"
     ],
     "passiveText": "한 턴에 카드 4장을 내면 카드 1장을 뽑습니다.",
     "passiveEffects": [
@@ -283,11 +283,11 @@
     "maxHp": 82,
     "energy": 3,
     "starterDeck": [
-      "card_cloud_shower",
-      "card_peach_wave",
+      "card_cloud_hailpop",
+      "card_peach_jamwave",
       "card_ribbon_pad",
-      "card_cloud_snack",
-      "card_peach_gift"
+      "card_cloud_breeze",
+      "card_peach_lunchbox"
     ],
     "passiveText": "체력이 처음 절반 이하가 되면 체력 7 회복.",
     "passiveEffects": [
@@ -314,10 +314,10 @@
     "maxHp": 86,
     "energy": 3,
     "starterDeck": [
-      "card_mint_tap",
-      "card_peach_shower",
+      "card_mint_leafjab",
+      "card_peach_pitscatter",
       "card_candy_pad",
-      "card_cloud_gift",
+      "card_cloud_floatbox",
       "card_lavender_sparkle"
     ],
     "passiveText": "연쇄 6을 달성하면 기운 1을 얻습니다.",
@@ -346,10 +346,10 @@
     "maxHp": 90,
     "energy": 3,
     "starterDeck": [
-      "card_mint_wave",
+      "card_mint_gardensweep",
       "card_lavender_tap",
       "card_sprout_pad",
-      "card_mint_sparkle",
+      "card_mint_notedrop",
       "card_lavender_snack"
     ],
     "passiveText": "정예 전투 승리 후 별사탕 4 추가.",
@@ -376,10 +376,10 @@
     "maxHp": 76,
     "energy": 3,
     "starterDeck": [
-      "card_mint_shower",
+      "card_mint_needlerain",
       "card_lavender_wave",
       "card_plush_pad",
-      "card_mint_snack",
+      "card_mint_freshbreath",
       "card_lavender_gift"
     ],
     "passiveText": "전투마다 처음 쓰는 공격 카드의 피해 +5.",
@@ -406,10 +406,10 @@
     "maxHp": 80,
     "energy": 3,
     "starterDeck": [
-      "card_peach_tap",
+      "card_peach_blushdash",
       "card_lavender_shower",
       "card_prism_pad",
-      "card_mint_gift",
+      "card_mint_workshop",
       "card_bubble_sparkle"
     ],
     "passiveText": "전투 시작 시 보호막 6.",
@@ -436,10 +436,10 @@
     "maxHp": 84,
     "energy": 3,
     "starterDeck": [
-      "card_peach_wave",
+      "card_peach_jamwave",
       "card_bubble_tap",
       "card_moon_pad",
-      "card_peach_sparkle",
+      "card_peach_sticker",
       "card_bubble_snack"
     ],
     "passiveText": "한 턴에 카드 6장을 내면 카드 1장을 뽑습니다.",
@@ -467,10 +467,10 @@
     "maxHp": 88,
     "energy": 3,
     "starterDeck": [
-      "card_peach_shower",
+      "card_peach_pitscatter",
       "card_bubble_wave",
       "card_cloud_cushion",
-      "card_peach_snack",
+      "card_peach_picnic",
       "card_bubble_gift"
     ],
     "passiveText": "체력이 처음 절반 이하가 되면 체력 3 회복.",
@@ -502,7 +502,7 @@
       "card_lavender_tap",
       "card_bubble_shower",
       "card_sprout_guard",
-      "card_peach_gift",
+      "card_peach_lunchbox",
       "card_ribbon_sparkle"
     ],
     "passiveText": "연쇄 4을 달성하면 기운 1을 얻습니다.",
@@ -563,7 +563,7 @@
     "starterDeck": [
       "card_lavender_shower",
       "card_ribbon_wave",
-      "card_morning_pad",
+      "card_morning_windowshade",
       "card_lavender_snack",
       "card_ribbon_gift"
     ],
@@ -593,7 +593,7 @@
     "starterDeck": [
       "card_bubble_tap",
       "card_ribbon_shower",
-      "card_cloud_pad",
+      "card_cloud_blanketbank",
       "card_lavender_gift",
       "card_candy_sparkle"
     ],
@@ -623,7 +623,7 @@
     "starterDeck": [
       "card_bubble_wave",
       "card_candy_tap",
-      "card_mint_pad",
+      "card_mint_vinescreen",
       "card_bubble_sparkle",
       "card_candy_snack"
     ],
@@ -655,7 +655,7 @@
     "starterDeck": [
       "card_bubble_shower",
       "card_candy_wave",
-      "card_peach_pad",
+      "card_peach_softguard",
       "card_bubble_snack",
       "card_candy_gift"
     ],

@@ -590,3 +590,601 @@ The user asked to make sure all work, including conversation logs, was uploaded 
 The final sync scope was limited to checking the current `main` branch, confirming whether any local code or documentation changes remained, recording this wrap-up checkpoint in `docs/conversation-log.md`, and pushing the resulting log commit to `origin/main` if the remote branch had not diverged.
 
 Before this wrap-up log entry, `main` was already aligned with `origin/main` at `8fde559 Record combat effect feedback pass`, meaning the effect spritesheet implementation and its documentation had already been pushed. No merge, rebase, reset, force push, cleanup, branch replacement, or unrelated file staging was included in the scope.
+
+### User
+The user asked to continue from the current cloned GitHub `game` repository state.
+
+### Codex
+
+The next scoped task was fixed as the starter character spritesheet pipeline pass. The included asset is `char_mina_pagehand_sprite`; final character art, motion-state animation polish, UI panel skinning, monster/boss/effect rework, Git push, and cleanup are excluded.
+
+The implementation adds an exact-key deterministic transparent spritesheet candidate for `char_mina_pagehand_sprite`, renders the active character spritesheet as a player-side standee in Combat and Boss scenes through the shared Phaser scene shell, exposes `characterSprite=` in the debug overlay, and extends `phaser:smoke` with character-sprite screenshots for Combat and Boss. This is intended to prove the character data-to-spritesheet-to-scene path only, not final approved character animation or art.
+
+Verification used `npm.cmd run assets:generate:dev`, `npm.cmd run assets:audit:strict`, `npm.cmd run check`, `npm.cmd run phaser:smoke` against a temporary Vite server, `git diff --check`, direct inspection of `public/assets/runtime/characters/char_mina_pagehand_sprite_v001.png`, and visual review of `tmp/phaser-character-sprite-CombatScene.png` and `tmp/phaser-character-sprite-BossScene.png`. All scoped checks passed; this remains a pipeline/candidate pass only.
+
+### User
+The user emphasized that they had clearly said to proceed and did not want a later reversal framed as a misunderstanding.
+
+### Codex
+
+The instruction was accepted as an explicit direction to keep moving on the foundation path without later reinterpreting the scope. The next scoped task was fixed as the UI panel 9-slice pass. Included: `ui_panel_paper_9slice` exact-key candidate generation, real Phaser panel rendering through the shared shell and Combat/Boss panel, debug/smoke evidence, and documentation logs. Excluded: final UI polish, button state skinning, broad layout redesign, Git push, and cleanup.
+
+The implementation adds a deterministic paper-panel candidate for `ui_panel_paper_9slice`, introduces a shared `renderPaperPanel` helper using Phaser `nineslice` with a rectangle fallback, routes the shared status panel and Combat/Boss enemy panel through it, exposes `uiPanel=` in debug output, and extends smoke screenshots for the UI panel path. This is a UI panel texture-path proof only, not final interface polish.
+
+Verification used `npm.cmd run assets:generate:dev`, `npm.cmd run assets:audit:strict`, `npm.cmd run check`, `npm.cmd run phaser:smoke` against a temporary Vite server, `git diff --check`, direct inspection of `public/assets/runtime/ui/ui_panel_paper_9slice_v001.png`, and visual review of `tmp/phaser-ui-panel-CombatScene.png` and `tmp/phaser-ui-panel-BossScene.png`. A first screenshot review found panel fold lines and boss phase text competing with readable text, so the panel interior line strength and Boss phase text placement were adjusted before rerunning verification. All scoped checks passed; release UI skinning remains `Not done`.
+
+### User
+The user clarified sharply that the target must not later be reframed as a small test when release-facing content is missing. Examples called out by the user included cards, relics, and other features. The user pointed back to the release-capable expectation and told Codex to handle it directly.
+
+### Codex
+
+The scope was reset from narrow foundation continuation to release-readiness tracking. Missing release-scope content must now be recorded as `Not done`, not explained away as "only a test." Added `docs/release-readiness-checklist.md` to track release gates for cards, gems/runes, relics, arcanas, characters, stages, enemies, bosses, events, town/meta, progression, save, settings, UI, art, animation/VFX, sound/music, balance, performance, build/deploy, QA, originality/legal, and store readiness. The document also records current full-data counts and explicitly states that counts are not completion proof.
+
+### User
+The user approved continuing to the next release-facing task.
+
+### Codex
+
+The next task was fixed as the full catalog runtime bridge. Included: `?data=release`, adapting the local full catalog into the current Phaser `GameDataBundle` schema, keeping the default slice data path intact, covering the first set of full-data card effect ops needed for an opening combat, adding debug count output, extending `phaser:smoke`, and updating release/checklist logs. Excluded: calling cards/relics/stages/events release-ready, final art, balance completion, full relic/arcana/passive systems, Git push, and cleanup.
+
+`src/data/releaseCatalogAdapter.ts` now maps 113 cards, 58 gems-as-runes, 16 relics, 12 arcanas, 23 characters, 45 non-boss enemies, 15 bosses, 15 stages, 10 events, adapted encounter pools, and adapted reward pools into runtime data. `src/app/runtimeFlags.ts`, `src/data/loadGameData.ts`, and `src/phaser/scenes/BootScene.ts` now support `?data=release`. `src/simulation/systems/combat/combatSystem.ts` now handles common full-data combat ops such as `damage_front`, `damage_all`, `damage_random`, `gain_shield`, `draw`, marked/chain/card-count bonus damage, `gain_energy`, and next-attack reduction bridges. The debug overlay exposes `dataMode`, `runesTotal`, `relicsTotal`, and `stagesTotal`.
+
+Verification used `npx.cmd tsc --noEmit`, `npm.cmd run check`, `npm.cmd run phaser:smoke` against a temporary Vite server, `npm.cmd run assets:audit:strict`, `npm.cmd run quality:audit:report`, `git diff --check`, and visual inspection of `tmp/phaser-release-catalog-combat.png`. The release smoke verifies `dataMode=release`, `cards=113`, `runesTotal=58`, `relicsTotal=16`, `stagesTotal=15`, `validation=ok`, `enemy=enemy_cloud_buddy`, the first release hand, and `card_sunbean_punch` reducing enemy HP from 22 to 14. `quality:audit:report` still reports major content-quality blockers, so release readiness remains `Not done`.
+
+### User
+The user asked Codex to proceed with the card-first release plan.
+
+### Codex
+
+The next task was fixed as card release batch 1. Included: inspecting the 113-card catalog and current quality blockers, adding an explicit card release audit, curating the first generated card block, updating references, expanding Phaser release-mode card op handling, and preserving release-readiness status. Excluded: claiming the full card set release-ready, completing final card art, completing upgrades/evolutions, completing full balance, Git push, cleanup, and non-card domains.
+
+The implementation added `tools/curate-card-release-batch.mjs` and `tools/card-release-audit.mjs`, plus package scripts `cards:curate:release-batch` and `cards:release:audit`. The curation script retired 32 template ids across morning/cloud/mint/peach cards and replaced them with distinct ids, names, Korean rules text, effects, upgrades, and illustration briefs. It also updated references in `characters.json`, `events.json`, `achievements.json`, `tools/phaser-smoke-test.mjs`, and `tools/runtime-smoke-test.mjs`. The Phaser release adapter now preserves random-hit count and battle-rule metadata, and the Phaser combat system handles additional full-data card ops instead of logging them as deferred.
+
+Verification showed `cards:release:audit` passing with `cards=113`, `visible=108`, `uniqueEffectShapes=47`, `maxRepeatedEffectShape=9`, and `maxRepeatedSuffix=8`. `quality:audit:report` no longer reports the previous card repetition blockers; remaining blockers are visuals, gems, enemies, stages, events, and achievements. `data:validate`, `npx.cmd tsc --noEmit`, `npm.cmd run check`, and `npm.cmd run phaser:smoke` passed before documentation updates. Card release readiness remains `Not done` because the remaining card families, upgrades/evolutions, art, and balance are not complete.
+
+### User
+The user told Codex to continue.
+
+### Codex
+
+The next task was fixed as gem/rune release batch 1. Included: inspecting gem data and runtime handling, adding an explicit gem release audit, curating the first generated gem block, extending Phaser release-rune behavior for the curated gem ops, keeping `?data=release` smoke green, and updating release/checklist logs. Excluded: calling the full gem/rune set release-ready, completing remaining gem families, final gem icons/UI, acquisition pacing, full balance, Git push, cleanup, and non-gem domains.
+
+The implementation added `tools/curate-gem-release-batch.mjs` and `tools/gem-release-audit.mjs`, plus package scripts `gems:curate:release-batch` and `gems:release:audit`. The curation script keeps stable ids while converting 20 morning/cloud/mint/peach/lavender edge/guard/spark/echo gems from single-template rows into distinct multi-effect socket modifiers with Korean names and rules text. Phaser rune handling now supports release gem damage percent, shield percent, cost modification, heal-on-play, mark-on-play, bridge discount, preserve-chain logging, and basic echo behavior.
+
+Verification showed `gems:release:audit` passing with `gems=58`, `curatedBatch=20`, and `maxRepeatedEffectShape=9`. `runtime:smoke` verifies `gem_morning_edge` increases `card_sunbean_punch` damage and applies preserve-chain behavior in the core runtime. `phaser:smoke` verifies `gem_morning_edge` equipped as a release rune in `?data=release` changes the first combat result from 22 HP to 12 HP after `card_sunbean_punch`. `quality:audit:report` no longer reports the previous gem repetition blocker; remaining blockers are visuals, enemies, stages, events, and achievements. Gem/rune release readiness remains `Not done` because remaining gem families, UI/icon polish, acquisition pacing, and balance are not complete.
+
+### User
+The user approved continuing to the next task.
+
+### Codex
+
+The next task was fixed as enemy intent release batch 1. Included: inspecting enemy intent repetition, adding an explicit enemy release audit, curating the first generated enemy block, extending Phaser release enemy intent handling, keeping release smoke green, and updating release/checklist logs. Excluded: calling the full enemy or boss set release-ready, completing final enemy art, completing every remaining enemy identity, balancing rewards/scaling, Git push, cleanup, and non-enemy domains.
+
+The implementation added `tools/curate-enemy-release-batch.mjs` and `tools/enemy-release-audit.mjs`, plus package scripts `enemies:curate:release-batch` and `enemies:release:audit`. The curation script keeps stable ids while converting 32 early normal/trick/elite/boss rows from repeated intent templates into distinct family-facing intent structures. `src/data/releaseCatalogAdapter.ts` now maps release debuff and special enemy intents into explicit runtime effects, and `src/simulation/systems/combat/combatSystem.ts` handles player mark, player weak, temp-card discard, enemy heal, piercing damage, chain reduction, and summon logging.
+
+Verification showed `enemies:release:audit` passing with `enemies=60`, `curatedBatch=32`, `uniqueBatchShapes=20`, and `maxRepeatedIntentShape=7`. `quality:audit:report` no longer reports the previous enemy intent-pattern blocker; remaining blockers are visuals, enemy generated-coverage judgment, stages, events, and achievements. `phaser:smoke` verifies `enemy_cloud_trick` applying `playerMark=1` and `enemy_ribbon_buddy` applying `nextCardCostPenalty=1` in `?data=release`. Enemy release readiness remains `Not done` because final art, all remaining enemy identities, reward/scaling balance, and full boss completion are not complete.
+
+### User
+The user approved continuing to the next task.
+
+### Codex
+
+The next task was fixed as stage route release batch 1. Included: inspecting repeated stage room patterns, adding an explicit stage release audit, curating all 15 stage room orders into distinct route patterns, exposing active routes in the debug overlay, keeping release smoke green, and updating release/checklist logs. Excluded: calling the full stage set release-ready, completing final stage art/background identity, completing stage-specific mechanics, balancing boss/reward pacing, completing unlock flow, Git push, cleanup, and non-stage domains.
+
+The implementation added `tools/curate-stage-release-batch.mjs` and `tools/stage-release-audit.mjs`, plus package scripts `stages:curate:release-batch` and `stages:release:audit`. The curation script keeps stable stage ids while assigning distinct room patterns to all 15 release stages. `src/debug/debugActions.ts` now exposes `route=` from the active runtime stage, and `tools/phaser-smoke-test.mjs` verifies the `stage_rainbow_keep` route under `?data=release`.
+
+Verification showed `stages:release:audit` passing with `stages=15`, `uniqueRoomPatterns=15`, and `maxRepeatedRoomPattern=1`. `data:validate`, `runtime:smoke`, `check`, and `phaser:smoke` passed. `quality:audit:report` no longer reports the previous stage room-pattern blocker; remaining blockers are visuals, enemy generated-coverage judgment, event choice repetition, and achievements. Stage release readiness remains `Not done` because final background identity, stage-specific mechanics, boss/reward balance, and unlock flow are not complete.
+
+### User
+The user told Codex to continue with the next release-facing task.
+
+### Codex
+
+The next task was fixed as event release batch 1. Included: inspecting event repetition, adding an explicit event release audit, curating all 10 generated event rows, extending release event adapter/debug visibility, keeping runtime and Phaser smoke green, and updating release/checklist logs. Excluded: calling the full event system release-ready, implementing a dedicated Phaser EventScene, final event art, invalid-state/repeat/persistence completion, Git push, cleanup, and non-event domains.
+
+The implementation added `tools/curate-event-release-batch.mjs` and `tools/event-release-audit.mjs`, plus package scripts `events:curate:release-batch` and `events:release:audit`. The curation script keeps stable event ids while converting the 10 generated three-choice templates into varied 3- and 4-choice structures with distinct labels, story text, gold/hp/free costs, and card/gem/relic/arcana/heal/gold/combat/socket/upgrade outcomes. `src/data/releaseCatalogAdapter.ts` now maps hp event costs and rotates event encounter pools by stage. `src/debug/debugActions.ts` exposes release event id, choice count, cost profile, and reward profile, and `tools/phaser-smoke-test.mjs` verifies that output under `?data=release`.
+
+Verification showed `events:release:audit` passing with `events=10`, `totalChoices=36`, `choiceCounts=4:6, 3:4`, `choiceRoles=7`, and `risks=4`. `events:audit`, `data:validate`, `runtime:smoke`, `check`, and `phaser:smoke` passed. `quality:audit:report` no longer reports the previous event choice-shape blocker; remaining blockers are visuals, enemy generated-coverage judgment, and achievements. Event release readiness remains `Not done` because dedicated EventScene, invalid-state handling, repeat rules, persistence, event art, and full choice execution are not complete.
+
+### User
+The user approved proceeding with the next blocker, while emphasizing trust, strict QA, and that the work must be treated as making a real game rather than rushing to show shallow results.
+
+### Codex
+
+The next task was fixed as achievement release batch 1. Included: inspecting achievement trigger/reward repetition, adding an explicit achievement release audit, curating the generated `ach_picnic_goal_*` filler rows, adding runtime reward checks, keeping Phaser smoke green, and updating release/checklist logs. Excluded: calling the full achievement/progression system release-ready, final UI goal surfacing, full reward pacing, long-run balance, Git push, cleanup, and non-achievement domains.
+
+The implementation added `tools/curate-achievement-release-batch.mjs` and `tools/achievement-release-audit.mjs`, plus package scripts `achievements:curate:release-batch` and `achievements:release:audit`. The curation script keeps stable ids while converting all 31 `ach_picnic_goal_*` rows from generic room-count filler into card/gem/relic/arcana collection goals and chain mastery goals with thematic Korean copy and varied rewards. `tools/runtime-smoke-test.mjs` now imports `checkAchievements` and verifies curated achievement triggers apply unlock rewards for card, gem, relic, arcana, and chain paths.
+
+Verification showed `achievements:release:audit` passing with `achievements=161`, `curatedBatch=31`, `milestoneLike=84`, batch triggers across `collect_cards`, `collect_gems`, `collect_relics`, `collect_arcanas`, and `reach_chain`, plus seven reward kinds. `data:validate`, `runtime:smoke`, `check`, and `phaser:smoke` passed. `quality:audit:report` no longer reports the previous achievement bulk-trigger blocker; remaining blockers are visuals and enemy generated-coverage judgment. Achievement release readiness remains `Not done` because full thematic review, UI goal surfacing, reward pacing, and long-run profile balance are not complete.
+
+### User
+
+The user approved continuing and reiterated that QA must be strict, the project is a real game, and Codex must not rush or later excuse missing release-scope content as a test set.
+
+### Codex
+
+The next task was fixed as enemy identity release batch 2. Included: inspecting the remaining enemy generated-coverage blocker, curating the remaining 28 enemy rows, replacing generic early boss phase labels, strengthening the enemy quality gate, adding runtime/Phaser checks for batch 2 behavior, and updating release/checklist logs. Excluded: claiming the full enemy or boss domain release-ready, completing final monster art, completing reward/scaling balance, full encounter pacing, manual readability review, Git push, cleanup, and non-enemy domains.
+
+The implementation added `tools/curate-enemy-release-batch-2.mjs` and `tools/enemy-release-quality.mjs`, added package script `enemies:curate:release-batch-2`, rewired `tools/enemy-release-audit.mjs` and `tools/content-quality-audit.mjs` to share the same stricter criteria, and extended `tools/runtime-smoke-test.mjs` plus `tools/phaser-smoke-test.mjs`. The curation keeps stable ids while giving the remaining prism/moon/peach/toy/leaf/star/cookie normal, trick, elite, and late boss rows distinct names and intent structures, and relabels the early boss phase rules so generic `친구 부르기` phase coverage is not silently accepted.
+
+Verification showed `enemies:release:audit` passing with `enemies=60`, `curatedCoverage=60/60`, `uniqueIntentShapes=37`, `maxRepeatedIntentShape=5`, `specialEffects=7`, `debuffStatuses=2`, and `bossPhaseCoverage=15/15`. `data:validate`, `runtime:smoke`, `check`, `phaser:smoke`, and `git diff --check` passed. `quality:audit:report` now reports only the visual production blocker; the enemy generated-coverage blocker is gone. Enemy release readiness remains `Not done` because final art, reward/scaling balance, full encounter pacing, and manual monster-readability review are still not complete.
+
+### User
+
+The user told Codex to proceed immediately with the next task.
+
+### Codex
+
+The next task was fixed as release visual coverage batch 1. Included: inspecting the remaining visual production blocker, replacing full-catalog visual key reuse in the release adapter, generating candidate PNG assets and synchronized release manifests, strengthening asset and quality audits, running Phaser screenshot smoke, and updating release/checklist logs. Excluded: claiming final approved art, final animation polish, manual visual/readability approval, originality/licensing approval, sound, balance, deploy, Git push, cleanup, and non-visual release gates.
+
+The implementation added `tools/generate-release-visual-assets.mjs`, `tools/visual-production-quality.mjs`, and `tools/visual-production-audit.mjs`, plus package scripts `assets:generate:release-visuals` and `assets:audit:release-visuals`. `src/data/releaseCatalogAdapter.ts` now imports `assetManifest.release.v1.json` and maps each full-catalog card, gem, relic, arcana, character, stage, non-boss enemy, boss, and event to its own release candidate key instead of reusing the small slice asset set. `tools/audit-asset-files.mjs` now audits slice and release manifest pairs together so release files cannot become orphaned, and `tools/content-quality-audit.mjs` now uses the release visual production audit instead of legacy CSS/DOM placeholder heuristics.
+
+Verification showed `assets:generate:release-visuals` generating 358 files for 113 cards, 58 gems, 16 relics, 12 arcanas, 23 characters, 60 enemies, 15 stages, and 10 events. `assets:audit:release-visuals` passed with `assets=358`, `expectedAssets=358`, and `existingFiles=358`. `assets:audit` passed with `manifestAssets=393`, `existingFiles=393`, `missingFiles=0`, and `orphanFiles=0`. `quality:audit:report` now reports no current automated quality blockers. `data:validate`, `runtime:smoke`, `check`, and `phaser:smoke` passed, and visual inspection of `tmp/phaser-release-catalog-combat.png` confirmed release-mode textures render in browser. This is release visual candidate coverage only; final art approval, manual readability review, originality/licensing review, animation polish, and full UI skinning remain not release-complete.
+
+### User
+
+The user told Codex to proceed with the next task.
+
+### Codex
+
+The next task was fixed as EventScene execution batch 1. Included: adding a dedicated `event` phase, a Phaser `EventScene`, player-facing event choice UI, HP/gold cost payment, card/rune/relic/arcana/currency/heal reward mutation, event-combat routing, save/debug state for player gold and last event choice, smoke coverage, screenshot review, and release/checklist logs. Excluded: final event balance, invalid-state UX, repeat rules, persistence edge-case completion, event art approval, full outcome coverage, Git push, cleanup, and non-event gates.
+
+The implementation added `src/simulation/systems/events/eventSystem.ts` and `src/phaser/scenes/EventScene.ts`, wired `event` into `SavePhase`, debug entry parsing, scene routing, and game config, and updated event room entry so events no longer go straight to `RuneBenchScene`. `RewardSystem` now has reusable reward grant logic and player gold is persisted through `currency`. Release event choices can carry `eventCombatEnemyId` so `event_bubble_shop` choice 3 starts the intended combat instead of only displaying debug metadata.
+
+Verification used `npx.cmd tsc --noEmit`, `npm.cmd run data:validate`, `npm.cmd run runtime:smoke`, `npm.cmd run quality:audit:report`, `npm.cmd run check`, `npm.cmd run phaser:smoke` against a temporary Vite server, `git diff --check`, and visual review of `tmp/phaser-event-release-bubble-shop.png` plus `tmp/phaser-1920-EventScene.png`. A first screenshot showed cramped/cut choice text, so the choice row layout was revised and smoke was rerun. Final smoke verifies slice `event_rune_bench`, release `event_bubble_shop` choice 3 starting `enemy_cloud_buddy` combat with `playerGold=104`, and choice 4 applying `playerHp=60`, `playerGold=92`, and `relics=relic_round_lantern`. Event release readiness remains `Not done` because invalid states, repeat rules, event balance, persistence edge cases, event art approval, and full outcome coverage are not complete.
+
+### User
+
+The user approved proceeding to the next task.
+
+### Codex
+
+The next task was fixed as relic/arcana passive execution batch 1. Included: implementing the first release passive hooks, proving acquired relics/arcanas change combat or reward state, adding debug grants for arcanas, adding deterministic smoke states, keeping existing release smoke green, and updating release/checklist logs. Excluded: claiming all relics/arcanas release-ready, completing every passive op, selection/unlock UI, final balance, full persistence edge cases, Git push, cleanup, and non-item domains.
+
+The implementation added `src/simulation/systems/passives/passiveSystem.ts` and wired it into combat start, card play, combat victory, reward offer generation, and currency reward grants. Batch-1 supported relic behavior includes start block, start energy, after-combat heal, card/rune reward option count adjustment, boss/stage-clear bonus plumbing, and gold reward percent adjustment. Batch-1 supported arcana behavior includes zero-cost card gold, defense-card damage, heal-trigger mark plumbing, and card-count damage plumbing. Debug mode now supports `grantArcana`, plus `playerHp` and `enemyHp` overrides for deterministic passive verification.
+
+Verification used `npx.cmd tsc --noEmit`, `npm.cmd run data:validate`, `npm.cmd run runtime:smoke`, `npm.cmd run quality:audit:report`, and `npm.cmd run phaser:smoke`. Phaser smoke directly verifies `relic_round_lantern`, `relic_cloud_socks`, `relic_mint_thermos`, `relic_ribbon_box`, `relic_candy_pouch`, `arcana_star_bakery`, and `arcana_cloud_parade` changing visible debug state. Relic and arcana release gates remain `Not done` because many effects, unlock/selection UI, acquisition pacing, balance, and persistence edge cases are still incomplete.
+
+### User
+
+The user asked what relic/arcana passive batch 2 contains, then approved proceeding.
+
+### Codex
+
+The next task was fixed as relic/arcana passive execution batch 2. Included: `relic_sun_cookie`, `relic_sleepy_pillow`, `relic_bubble_lens`, `relic_elite_sticker`, `relic_final_picnic`, `relic_soft_compass`, `arcana_ribbon_firework`, `arcana_mint_rest`, `arcana_prism_path`, `arcana_cloud_blanket`, and `arcana_sprout_song`. Excluded: shop/gem-cost passives, reward reroll, upgrade reward conversion, damage tracking, kill tracking, seven-card hand discount, final item balance, item selection/unlock UI, Git push, cleanup, and non-item domains.
+
+The implementation extended `passiveSystem` with passive card-cost adjustment, turn-end retain, block carry, room reveal, supplemental elite card rewards, defense-card counters, per-turn color counters, and heal-trigger handling. Run/save state now persists the new passive counters and flags. Reward display and reward claiming can resolve mixed-pool reward ids so an elite relic reward can append a card option without becoming display-only. Boss victory now routes through the stage-clear reward pool before Result, which lets boss reward passives run through the real flow. Debug mode now supports `handCard` URL setup for deterministic passive smoke hands.
+
+Verification used `npx.cmd tsc --noEmit` and `npm.cmd run phaser:smoke` during implementation. Phaser smoke now verifies all 11 batch-2 effects through visible debug state: first expensive card free, retained card, rune reward option count, elite card supplement, stage-clear reward count, actual boss-victory reward bonus, next-room reveal, five-card damage, three-defense heal, four-color draw, shield carry, and heal-trigger mark. Relic and arcana release gates remain `Not done` because other passive ops, unlock/selection UI, acquisition pacing, balance, and persistence edge cases are still incomplete.
+
+### User
+
+The user asked Codex to proceed according to the checklist. The next fastest release gate to complete was fixed as Input, while keeping the broader game and content domains out of completion claims.
+
+### Codex
+
+The next task was fixed as the Input release gate. Included: auditing keyboard/mouse support across the current Phaser gameplay and menu screens, adding missing click smoke coverage, fixing any input-state bug found during the audit, adding clear hover/down feedback where the current Phaser controls lacked it, keeping release smoke green, and updating release/checklist logs. Excluded: claiming the whole game release-ready, accessibility settings/remapping UI, final UI skin, final art polish, balance, deploy, Git push, cleanup, and non-input domains.
+
+The implementation extended `tools/phaser-smoke-test.mjs` with click coverage for Reward, Event, RuneBench, Boss, Result, release event choice, and release reward claim paths on top of the existing Town, WorldMap, Dungeon, Combat card, and End Turn click checks. `src/debug/debugEntry.ts` now routes `entry=rune_bench` to the first rest room or event bench source instead of silently using the first combat room. Phaser controls now expose direct visual feedback through shared press-state handling: action buttons, Combat/Boss End Turn, card hit targets, and affordable Event choices all get hover/down state changes. The smoke also pixel-checks representative hover states so feedback is not only asserted from code.
+
+Verification used `npx.cmd tsc --noEmit` and `npm.cmd run phaser:smoke` during implementation. The first smoke run caught the RuneBench debug-entry room-index mismatch, and the release gem/rune smoke was updated to declare its artificial room setup explicitly. Final smoke passed with hover pixel checks. Input is now marked `Done` in the release checklist for the current Phaser screens only. UI skin, accessibility/remapping, final control art, and broader release QA remain unfinished.
+
+### User
+
+The user told Codex to proceed with the next checklist item.
+
+### Codex
+
+The next task was fixed as the Text quality release gate for the current Phaser screens. Included: checking the current checklist state, translating fixed Phaser screen chrome from English placeholders to Korean, exposing Phaser text objects to browser smoke, adding automated bounds/overlap/placeholder checks, keeping release smoke green, and updating release/checklist logs. Excluded: claiming final writing quality for every content row, full translation/localization settings, final terminology review, UI skin completion, Git push, cleanup, and non-text domains.
+
+The implementation changed fixed UI labels across Town, WorldMap, Dungeon, Combat, Reward, Event, RuneBench, Boss, Result, and the shared scene shell. Examples include Korean scene titles, action buttons, combat stat labels, route labels, reward/event labels, result labels, and manifest/status labels. `src/main.ts` now exposes the Phaser game object for smoke-only layout inspection.
+
+`tools/phaser-smoke-test.mjs` now inspects visible Phaser text objects and fails on scene-bound overflow, severe text overlap, Unicode replacement characters, and old English placeholder labels such as `World Map`, `End Turn`, `Claim Reward`, `Intent`, and `Gold`. Verification used a data-string suspicious-character check, `npx.cmd tsc --noEmit`, and `npm.cmd run phaser:smoke` during implementation. Text quality is now marked `Done` for the current Phaser screens only. Final copywriting review for every release content row remains outside this gate and is still part of the broader incomplete content/domain work.
+
+### User
+
+The user told Codex to proceed with the next checklist item.
+
+### Codex
+
+The next task was fixed as the Core run loop release gate. Included: proving a release-mode start-to-finish clear flow, proving repeated rooms and intermediate rewards/events/rest are traversed, adding missing defeat routing, proving defeat can return to Town and start a new run flow, keeping smoke green, and updating release/checklist logs. Excluded: claiming the whole game release-ready, final balance, build diversity, full manual QA matrix, content-domain completion, Git push, cleanup, and non-core-loop gates.
+
+The implementation added lethal-player-damage handling in `src/simulation/systems/combat/combatSystem.ts`: when HP reaches 0, combat now routes to `result`, clears pending reward state, records `combat:defeat:*`, and avoids starting the next turn. `ResultScene` now distinguishes clear and defeat. `tools/phaser-smoke-test.mjs` now knows the release starter attack/support/guard cards well enough to run a deterministic release playthrough.
+
+Verification used `npx.cmd tsc --noEmit` and `npm.cmd run phaser:smoke` during implementation. Phaser smoke now plays release `stage_sunny_gate` from Town through repeated combats, Event, elite combat, Reward, rest/RuneBench, Boss, stage-clear reward, Result, and Town return, verifying `saveCompleted=stage_sunny_gate`. It also verifies a 1-HP defeat path reaches Result with `playerHp=0`, grants no completed-stage credit, returns to Town, and can start a new world-map flow. Core run loop is now marked `Done` for the current Phaser runtime only; balance, manual QA, and content/domain completion remain unfinished.
+
+### User
+
+The user told Codex to proceed immediately with the next checklist task.
+
+### Codex
+
+The next task was fixed as the Save system release gate. Included: durable save/load verification, legacy v0/unversioned migration, invalid-field normalization, corrupt JSON recovery, unsupported future-version recovery, clear/defeat result save consistency, reset/delete coverage, debug and production storage coverage, and release/checklist logs. Excluded: cloud/account save, broader progression balance, settings/options completion, Git push, cleanup, and non-save gates.
+
+The implementation updated `src/save/saveCodec.ts` so supported v1 saves load, recognizable v0/unversioned saves migrate through normalization, unsupported future versions reset to an initial save, and corrupt JSON falls back safely. It added `clearStoredSave()` and a Town `저장 초기화` action in `src/phaser/scenes/TownScene.ts`, clearing the active save key and rebooting to an initial save. `tools/phaser-smoke-test.mjs` now verifies mid-combat reload, completed-stage reload, legacy migration with bad fields normalized, corrupt/future recovery, clear-result and defeat-result save consistency, debug reset, production save key creation, and production reset through the Town action.
+
+Verification used `npx.cmd tsc --noEmit` and `npm.cmd run phaser:smoke` during implementation; both passed after adding the production save-reset smoke case. Save system is now marked `Done` for the current Phaser runtime. Progression, settings, cloud save, long-term unlock balance, and the whole game remain unfinished release gates.
+
+### User
+
+The user told Codex to proceed with the next task.
+
+### Codex
+
+The next task was fixed as the Settings release gate. Included: a Phaser settings surface, persisted settings schema, audio volume values, display/accessibility toggles, a control option that changes real keyboard behavior, settings reset, save reset access, smoke coverage, and release/checklist logs. Excluded: actual music/SFX assets, sound design, full key remapping UI, cloud save, broader accessibility polish, Git push, cleanup, and non-settings gates.
+
+The implementation added `src/phaser/scenes/SettingsScene.ts`, linked it from Town, added it to the Phaser scene list, extended `SettingsState` with `displayMode`, `largeText`, `reducedMotion`, and `spaceConfirm`, and normalized those fields through `saveCodec`. The shared scene shell now applies master volume plus high-contrast/large-text presentation, and keyboard bindings respect `spaceConfirm=false`, so the setting changes actual Town input behavior. Settings also exposes settings reset and save reset actions.
+
+Verification used `npx.cmd tsc --noEmit` and `npm.cmd run phaser:smoke` during implementation. Phaser smoke enters Settings from Town, verifies defaults, changes master/music/SFX volumes and display/accessibility/control options, validates the saved JSON shape, reloads to prove persistence, confirms Space no longer advances Town while `spaceConfirm=false`, resets settings to defaults, and confirms Space advances again. Settings is now marked `Done` for the current Phaser runtime. `Sound/music`, full key remapping, cloud save, broader accessibility polish, and the whole game remain unfinished.
+
+### User
+
+The user approved proceeding with checklist item 1, but explicitly challenged who would be responsible for quality and warned against doing a sloppy UI pass.
+
+### Codex
+
+The next task was fixed as the UI skin release gate. Included: themed assets for primary/secondary buttons, reward slots, event choice slots, tooltip paper, current screen wiring, disabled/focus/hover/down state proof, screenshot review, and release/checklist logs. Excluded: claiming final art approval, animation/VFX, sound, balance, deploy, broad visual QA, Git push, cleanup, and whole-game release completion.
+
+The implementation added `ui_button_primary_9slice`, `ui_button_secondary_9slice`, `ui_slot_reward_9slice`, `ui_slot_choice_9slice`, and `ui_tooltip_paper_9slice` to the slice and release asset paths. The dev and release generators now produce those assets, and release visual coverage increased to 363 files. `sceneShell` now has shared skinned button, slot, and tooltip helpers. Town/WorldMap/Dungeon/RuneBench/Result action buttons inherit the skinned button path, Combat/Boss End Turn use it directly, Reward rows use reward slots plus a tooltip, Event choices use choice slots with disabled/focus state, and Settings rows/buttons use skinned controls plus a tooltip.
+
+Verification used `npm.cmd run assets:generate:dev`, `npm.cmd run assets:generate:release-visuals`, `npm.cmd run assets:audit`, `npm.cmd run assets:audit:release-visuals`, `npx.cmd tsc --noEmit`, and `npm.cmd run phaser:smoke` during implementation. Smoke verifies `uiSkin=button+slot+tooltip`, hover/down pixel changes, Settings control hover, and disabled release Event choice non-advancement at 1 HP. Manual screenshot review checked Reward, Event, disabled Event, and Settings screenshots; the first review found cramped Event rows, so the Event choice text was tightened and smoke was rerun. UI skin is now marked `Done` for the current Phaser surfaces only. Final art approval, broad visual QA, animation/VFX, sound, balance, and the whole game remain unfinished.
+
+### User
+
+The user opened the Reward screen in the in-app browser and rejected the visible result as final UI. The user challenged why Codex called it complete when it was not produced from the earlier concept-art pipeline and did not visibly match the agreed concept direction.
+
+### Codex
+
+Codex acknowledged that the previous `UI skin` completion claim was wrong. The completed part was only a technical UI skin path: generated 9-slice PNGs, manifest wiring, shared Phaser helpers, state feedback, and smoke proof. It was not concept/source-backed final UI art and not shippable visual quality.
+
+The release checklist was corrected so `UI technical skin path` is `Done` and `UI skin` is `Not done`. The next standard was fixed as a concrete 100-point UI visual quality rubric with red-line blockers, required evidence, and current-screen scoring before any future UI completion claim.
+
+### User
+
+The user asked Codex to make the standard visible instead of describing it vaguely.
+
+### Codex
+
+Codex continued the active 100-point completion goal by moving to the next unscored primary UI screen: Town. The scope was Town visual quality progress, source evidence, slice/release screenshot inspection, regression checks, and documentation. Codex explicitly did not mark the UI skin, Town/meta systems, or the game complete.
+
+The implementation added `assets/source/ui/town_stage_components_v001.svg` and updated its note file. Town now uses an immersive paper-theater village hub instead of the old standard shell/button-list layout. It renders a pinned title ribbon, side paper wings, village diorama, player passport, expedition board, route markers, save-derived record slot, and the existing world-map, save-reset, and settings buttons at their smoke-covered coordinates.
+
+Debug-less screenshots were captured for slice Town at 1920x1080 and 1280x720, plus release Town at 1920x1080. The first screenshot passes exposed route markers behind the `세계 지도` button, village labels crowded by the passport panel, and tooltip copy that looked like a keyboard shortcut instruction. Codex moved the route markers, cleaned up the passport/footer text, rewrote the tooltip as in-world state text, and captured v4 screenshots at `tmp/ui-quality/town-1920-debugless-v4.png`, `tmp/ui-quality/town-1280-debugless-v4.png`, and `tmp/ui-quality/town-release-1920-debugless-v4.png`.
+
+Verification passed with `npx.cmd tsc --noEmit`, `npm.cmd run phaser:smoke`, `npm.cmd run check`, `npm.cmd run data:validate`, `npm.cmd run quality:audit:report`, `npm.cmd run assets:audit`, `npm.cmd run assets:audit:release-visuals`, and `git diff --check`. `npm.cmd run check` still reports the existing Vite large JS chunk warning, so Performance remains `Needs verification`.
+
+Codex updated the rubric with a Town first-rebuild score of 83/100. This is strong progress only. `UI skin` remains `Not done` because the total UI gate is below 95, no user acceptance exists, final production UI art/state polish is not approved, and WorldMap/Dungeon/RuneBench/Result/Settings still need matching scoring/rebuilds.
+
+### Codex
+
+Codex created `docs/ui-visual-quality-rubric.md` with a 100-point scoring table, red-line blockers, required evidence, score bands, and a baseline Reward score of 37/100. Codex also generated and saved a concept reference at `assets/concepts/ui/reward_event_ui_concept_v001.png` with a companion note file, then started a first Reward/Event rebuild against that visual direction.
+
+Reward was changed from a compact list into a paper-stage card layout. Event was changed into a paper-stage choice-card layout. Reward gameplay was also corrected so number keys and reward-card clicks claim the selected reward index instead of only claiming the first reward through confirm.
+
+Verification caught two problems during the pass. First, old smoke click coordinates no longer matched the rebuilt Reward/Event controls, so the smoke was updated to click the actual choice cards. Second, Event choice reward text overlapped the status badge, so the badge was removed and the disabled state is now conveyed through card styling and the remaining condition text. Final verification passed with `npm.cmd run phaser:smoke`, `npm.cmd run check`, and `git diff --check`.
+
+Codex recorded the result as improvement only, not completion: Reward is currently scored 60/100 and Event 58/100 in the rubric, both below the 85 critical-screen red line. `UI skin` remains `Not done`.
+
+### User
+
+The user kept the active goal as making the game complete to Codex's own 100-point standard, with the latest focus on making the UI standard visible and not falsely claiming completion.
+
+### Codex
+
+Codex rechecked the repository rules, current docs, worktree, and the active UI rubric before continuing. The immediate scope was limited to concrete progress toward the full goal: Reward/Event UI quality pass 2, screenshot evidence, regression checks, and honest status documentation. Codex explicitly kept `UI skin` as `Not done`.
+
+The implementation enlarged Reward choice cards, added stronger paper-stage details, added reward detail labels, and gave Event a story diorama section with scene art plus readable choice cards. The in-app browser captured debug-less screenshots at `tmp/ui-quality/reward-immersive-chrome-v3.png` and `tmp/ui-quality/event-immersive-chrome-v3.png`.
+
+Verification passed with `npx.cmd tsc --noEmit`, `npm.cmd run phaser:smoke`, `npm.cmd run check`, `npm.cmd run data:validate`, `npm.cmd run quality:audit:report`, `npm.cmd run assets:audit:release-visuals`, and `git diff --check`. The Vite build still reports a large JS chunk warning, so the Performance gate remains separate and not complete.
+
+Codex updated the rubric with the second rebuild scores: Reward 70/100 and Event 68/100. Both remain below the 85 critical-screen red line, and the broader game remains not release-ready.
+
+### User
+
+The active goal continued: keep working toward Codex's own 100-point completion standard, without narrowing the objective or marking the game complete prematurely.
+
+### Codex
+
+Codex continued the Reward/Event UI quality pass. The immediate scope was Reward/Event visual quality progress, source evidence, screenshots, regression checks, and honest documentation. Codex did not change the broader release judgment.
+
+The implementation added `assets/source/ui/reward_event_stage_components_v001.svg` and a note file so the Reward/Event UI component language is traceable as source evidence. Reward/Event now suppress the extra immersive info panels so the paper stage owns the screen. Event choice cards were enlarged and given clearer cost/reward/selection bands.
+
+Verification used debug-less in-app screenshots (`reward-immersive-chrome-v4.png`, `event-immersive-chrome-v4.png`), debug-less 1920 screenshots (`reward-1920-debugless-v4.png`, `event-1920-debugless-v4.png`), `npx.cmd tsc --noEmit`, `npm.cmd run phaser:smoke`, `npm.cmd run check`, `npm.cmd run data:validate`, `npm.cmd run quality:audit:report`, `npm.cmd run assets:audit:release-visuals`, and `git diff --check`. A standalone Playwright capture first failed because the default browser executable path was missing, then succeeded using the same executable-candidate approach as `tools/phaser-smoke-test.mjs`.
+
+Codex updated the rubric with conservative third-rebuild scores: Reward 76/100 and Event 75/100. Both remain below the 85 critical-screen red line. `UI skin` remains `Not done`; Combat and the remaining primary screens still need the same standard.
+
+### User
+
+The active goal continued: keep working toward Codex's own 100-point completion standard, with no narrower success definition and no premature completion claim.
+
+### Codex
+
+Codex continued with the next critical UI red-line: Combat. The immediate scope was Combat visual quality progress, source evidence, screenshots, regression checks, and honest documentation. Codex kept the broader `UI skin` and game release status as `Not done`.
+
+The implementation added `assets/source/ui/combat_stage_components_v001.svg` and its note file. Combat now uses the immersive paper-theater shell without the old standard header, renders a clearer title ribbon, moves the player status panel and route strip away from the top ribbon, keeps the enemy intent cluster and End Turn button usable, and renders the player standee inside the playfield.
+
+Verification used the in-app browser at `http://127.0.0.1:5173/?entry=combat&resetSave=1`, debug-less 1920 screenshots (`tmp/ui-quality/combat-1920-debugless-v1.png`, `tmp/ui-quality/combat-1920-debugless-v2.png`), `npx.cmd tsc --noEmit`, `npm.cmd run phaser:smoke`, `npm.cmd run check`, `npm.cmd run data:validate`, `npm.cmd run quality:audit:report`, `npm.cmd run assets:audit:release-visuals`, and `git diff --check`. The Vite large JS chunk warning still appears during `npm.cmd run check`, so Performance remains a separate `Needs verification` gate.
+
+Codex updated the rubric with a conservative Combat first-rebuild score: 72/100. Reward 76/100, Event 75/100, and Combat 72/100 are all below the 85 critical-screen red line, so `UI skin` remains `Not done`.
+
+### User
+
+The active goal continued: keep working toward Codex's own 100-point completion standard, preserving the full scope and not redefining success around partial UI progress.
+
+### Codex
+
+Codex continued with Combat UI rebuild checkpoint 2 because Combat was the lowest critical UI score at 72/100. The scope was Combat visual quality progress, source evidence, screenshot inspection, regression checks, and documentation. Codex did not mark UI or the game complete.
+
+The implementation added `assets/source/ui/combat_stage_components_v002.svg` and its note file, added side paper wings and hanging pins, changed the player panel into compact HP/energy/block stat tags, strengthened the route connector, and added a combat-flow lane while preserving smoke-covered card and End Turn click coordinates. The first new screenshot (`tmp/ui-quality/combat-1920-debugless-v3.png`) revealed a hidden central label and gold text outside the player panel, so Codex corrected those issues and captured `tmp/ui-quality/combat-1920-debugless-v4.png`.
+
+Verification passed with `npx.cmd tsc --noEmit`, `npm.cmd run phaser:smoke`, `npm.cmd run check`, `npm.cmd run data:validate`, `npm.cmd run quality:audit:report`, `npm.cmd run assets:audit:release-visuals`, and `git diff --check`. `npm.cmd run check` still reports the Vite large JS chunk warning, so Performance remains `Needs verification`.
+
+Codex updated the rubric with a conservative Combat second-rebuild score: 78/100. Reward 76/100, Event 75/100, and Combat 78/100 are all below the 85 critical-screen red line, so `UI skin` remains `Not done`.
+
+### User
+
+The active goal continued: keep working toward Codex's own 100-point completion standard, without narrowing the objective or marking the game complete.
+
+### Codex
+
+Codex moved to Event because it was the lowest critical UI score at 75/100. The scope was Event visual quality progress, source evidence, debug-less screenshot review, regression checks, and documentation. Codex explicitly kept `UI skin` as `Not done`.
+
+The implementation added `assets/source/ui/event_stage_components_v002.svg` and its note file, added side paper wings to the Event stage, added a story label band to the diorama, replaced the old meta helper line with in-world flavor text, and refined choice cards with header rails, description wells, and explicit cost/result rows. Codex captured `tmp/ui-quality/event-1920-debugless-v5.png` and `tmp/ui-quality/event-release-1920-debugless-v5.png`. The release four-choice screenshot showed the confirm button overlapping the lower choice row, so Codex moved/reduced the button and captured `tmp/ui-quality/event-1920-debugless-v6.png` plus `tmp/ui-quality/event-release-1920-debugless-v6.png`.
+
+Verification passed with `npx.cmd tsc --noEmit`, `npm.cmd run phaser:smoke`, `npm.cmd run check`, `npm.cmd run data:validate`, `npm.cmd run quality:audit:report`, `npm.cmd run assets:audit:release-visuals`, and `git diff --check`. `npm.cmd run check` still reports the Vite large JS chunk warning, so Performance remains `Needs verification`.
+
+Codex updated the rubric with a conservative Event fourth-rebuild score: 81/100. Reward 76/100, Event 81/100, and Combat 78/100 are all below the 85 critical-screen red line, so `UI skin` remains `Not done`.
+
+### User
+
+The active goal continued: make the game complete to Codex's own 100-point standard, preserving the full scope and continuing concrete progress instead of narrowing success.
+
+### Codex
+
+Codex moved back to Reward because it was the lowest critical UI score at 76/100. The scope was Reward visual quality progress, source evidence, slice/release screenshot inspection, regression checks, and documentation. Codex explicitly kept `UI skin` and the game release target as `Not done`.
+
+The implementation added `assets/source/ui/reward_stage_components_v002.svg` and its note file, rebuilt the Reward surface around a centered prize-stage header, input badge, side paper wings, reward shelf, stronger reward cards, type ribbons, numbered medallions, icon stamps, matted art windows, detail wells, footer action strips, and a default-selection tag. Release reward pool display names in `src/data/releaseCatalogAdapter.ts` were localized from English to Korean because the release screenshots showed English titles in the Reward header.
+
+Debug-less screenshots were captured for the slice Reward screen, release card rewards, release rune rewards, and 1280x720 layouts. The first v5 screenshot review found two defects: English release reward-pool titles and an obscured shelf label. Codex fixed both and recaptured v6 screenshots at `tmp/ui-quality/reward-1920-debugless-v6.png`, `tmp/ui-quality/reward-release-cards-1920-debugless-v6.png`, `tmp/ui-quality/reward-release-runes-1920-debugless-v6.png`, `tmp/ui-quality/reward-1280-debugless-v6.png`, and `tmp/ui-quality/reward-release-cards-1280-debugless-v6.png`.
+
+Verification passed with `npx.cmd tsc --noEmit`, `npm.cmd run phaser:smoke`, `npm.cmd run check`, `npm.cmd run data:validate`, `npm.cmd run quality:audit:report`, `npm.cmd run assets:audit`, `npm.cmd run assets:audit:release-visuals`, and `git diff --check`. The first `phaser:smoke` attempt timed out at the shorter command limit and was rerun with a longer limit, then passed. `npm.cmd run check` still reports the Vite large JS chunk warning, so Performance remains `Needs verification`.
+
+Codex updated the rubric with a Reward fifth-rebuild score of 85/100. This clears the internal Reward critical-screen threshold only; it is not a 95-point UI completion, not user acceptance, and not release readiness. Event 81/100 and Combat 78/100 remain below the 85 critical-screen red line, so `UI skin` remains `Not done`.
+
+### User
+
+The active goal continued: finish the game to Codex's own 100-point standard, without narrowing the objective, without premature completion language, and using current worktree evidence rather than memory.
+
+### Codex
+
+Codex rechecked `AGENTS.md`, `PROJECT_RULES.md`, the current release checklist, the UI rubric, and the game UI/playtest skills before continuing. The immediate scope stayed on concrete progress toward the full goal: raise Combat from 78/100, keep all completion claims strict, and verify through screenshots and smoke before updating scores.
+
+The implementation added the third Combat visual pass from `assets/source/ui/combat_stage_components_v003.svg`/`.md`. Combat now removes the previous duplicate overlay approach, uses the v3 title ribbon and turn badge as the single rendered header, rebuilds the player status as a ledger, gives the route labels readable backplates, and replaces the old enemy panel body with one intent ledger. The End Turn button and card click zones were kept in the existing smoke-covered areas.
+
+Debug-less screenshot review first captured v5 and found that overlay/label bleed-through was still visible, including in the shared Boss combat panel. Codex removed the old duplicate layers and recaptured v6/v7 screenshots. The first `phaser:smoke` rerun then failed on a release enemy long-name overlap: `프리즘 눈부심 장난꾼` overlapped `체력 76 / 76`. Codex added an enemy-name font-size guard and reran smoke successfully.
+
+Final evidence for this pass includes `tmp/ui-quality/combat-1920-debugless-v7.png`, `tmp/ui-quality/combat-1280-debugless-v7.png`, `tmp/ui-quality/combat-release-1920-debugless-v7.png`, and `tmp/ui-quality/boss-combat-panel-1920-debugless-v7.png`.
+
+Verification passed with `npx.cmd tsc --noEmit`, `npm.cmd run phaser:smoke`, `npm.cmd run check`, `npm.cmd run data:validate`, `npm.cmd run quality:audit:report`, `npm.cmd run assets:audit`, `npm.cmd run assets:audit:release-visuals`, and `git diff --check`. `npm.cmd run check` still reports the existing Vite large JS chunk warning, so Performance remains `Needs verification`.
+
+Codex updated the rubric with a Combat third-rebuild score of 85/100. This clears the internal Combat critical-screen threshold only. `UI skin` remains `Not done` because Event is still 81/100, Reward and Combat are not 95-point/user-accepted final UI, and the remaining primary screens still need matching rebuild/scoring.
+
+### User
+
+The active goal continued: keep moving toward Codex's own 100-point completion standard and do not stop at the first critical-screen improvement.
+
+### Codex
+
+Codex moved to Event because it was still the remaining critical UI screen below 85/100. The scope was Event visual quality progress, source evidence, slice/release screenshot inspection, regression checks, and documentation. Codex did not mark the UI skin or the game complete.
+
+The implementation added `assets/source/ui/event_stage_components_v003.svg` and its note file, kept the Event diorama/stage direction, tightened release four-choice cards with compact reward summaries, separated the bottom cost/result labels from values, and changed the fallback confirmation button label to `Enter 첫 선택`. Existing smoke-covered Event choice click areas were preserved.
+
+Debug-less screenshots were captured for slice and release Event at 1920x1080 and 1280x720. The first v7 screenshot review found cost/value crowding in the new label chips, so Codex shifted the value columns and recaptured v8 screenshots at `tmp/ui-quality/event-1920-debugless-v8.png`, `tmp/ui-quality/event-1280-debugless-v8.png`, `tmp/ui-quality/event-release-1920-debugless-v8.png`, and `tmp/ui-quality/event-release-1280-debugless-v8.png`.
+
+Verification passed with `npx.cmd tsc --noEmit`, `npm.cmd run phaser:smoke`, `npm.cmd run check`, `npm.cmd run data:validate`, `npm.cmd run quality:audit:report`, `npm.cmd run assets:audit`, `npm.cmd run assets:audit:release-visuals`, and `git diff --check`. `npm.cmd run check` still reports the existing Vite large JS chunk warning, so Performance remains `Needs verification`.
+
+Codex updated the rubric with an Event fifth-rebuild score of 85/100. Reward/Event/Combat are now all internal 85-point candidates, but this is still not 95-point UI completion, not user acceptance, and not release readiness. `UI skin` remains `Not done` because the rest of the primary screens still need matching scoring/rebuilds and final production art/state polish remains unfinished.
+
+### User
+
+The user challenged Codex to make the UI quality standard visible instead of describing it only in words. The user emphasized that "완성" must be backed by concrete criteria and evidence.
+
+### Codex
+
+Codex treated the response as both an accountability correction and active UI progress. The visible standard remains the 100-point rubric in `docs/ui-visual-quality-rubric.md`: 95/100 plus no red-line blocker is required before `UI skin` can become a completion candidate; 80-94 is progress only.
+
+The implementation moved Boss from the standard shell presentation into a source-backed paper-theater boss stage. It added `assets/source/ui/boss_stage_components_v001.svg` and updated the note file, reused the Combat v3 theater family, added purple/brass boss accents and a phase ledger, rendered the player standee and hand shelf, and compacted boss intent labels so release boss text does not crowd the End Turn area.
+
+The first smoke pass caught boss phase ledger overlap with hand-card numbers, so the ledger was moved upward and tightened. Screenshot review then exposed long release intent crowding, so boss intent labels were compacted before v4 screenshots. Final evidence for this pass includes `tmp/ui-quality/boss-1920-debugless-v4.png`, `tmp/ui-quality/boss-1280-debugless-v4.png`, and `tmp/ui-quality/boss-release-1920-debugless-v4.png`.
+
+Verification passed with `npx.cmd tsc --noEmit`, `npm.cmd run phaser:smoke`, `npm.cmd run check`, `npm.cmd run data:validate`, `npm.cmd run quality:audit:report`, `npm.cmd run assets:audit`, `npm.cmd run assets:audit:release-visuals`, and `git diff --check`. `npm.cmd run check` still reports the existing Vite large JS chunk warning, so Performance remains `Needs verification`.
+
+Codex updated the rubric with a Boss first-rebuild score of 84/100. This is strong progress only. `UI skin` remains `Not done` because the total UI gate is still below 95, Boss is not user-accepted final UI, and Town/WorldMap/Dungeon/RuneBench/Result/Settings still need source-backed scoring/rebuilds.
+
+### User
+
+The active goal continued: keep working until the game reaches Codex's own 100-point standard, and make the judging criteria visible instead of hiding behind verbal claims.
+
+### Codex
+
+Codex continued with WorldMap because Town had just been moved into the paper-theater family and WorldMap was still a primary screen without source-backed scoring. The scope was visual WorldMap progress, not full map-system completion. Codex kept `UI skin` and the game release target as `Not done`.
+
+The implementation added/used `assets/source/ui/world_map_stage_components_v001.svg` and updated its note file, switched WorldMap to an unfolded paper-map stage, added a left map drawer, center folded route sheet, current-stage icon, right record ledger, and preserved the smoke-covered `던전으로` action coordinate at `1010,512`.
+
+Debug-less screenshots were captured for slice 1920, slice 1280, and release 1920. The v1/v2 screenshot reviews exposed right-ledger/tooltip crowding, route nodes too close to the record panel, and non-in-world helper copy. Codex fixed those issues by rerouting later route nodes away from the ledger and replacing the tooltip with a simple in-ledger line, then captured v3 screenshots at `tmp/ui-quality/world-map-1920-debugless-v3.png`, `tmp/ui-quality/world-map-1280-debugless-v3.png`, and `tmp/ui-quality/world-map-release-1920-debugless-v3.png`.
+
+Verification passed with `npx.cmd tsc --noEmit`, `npm.cmd run phaser:smoke`, `npm.cmd run check`, `npm.cmd run data:validate`, `npm.cmd run quality:audit:report`, `npm.cmd run assets:audit`, `npm.cmd run assets:audit:release-visuals`, and `git diff --check`. `npm.cmd run check` still reports the existing Vite large JS chunk warning, so Performance remains `Needs verification`.
+
+Codex updated the rubric with a WorldMap first-rebuild score of 82/100. This is progress only: it is not a 95-point UI completion candidate, not user acceptance, and not a full multi-stage selectable map system. Remaining unscored UI screens are Dungeon, RuneBench, Result, and Settings.
+
+### User
+
+The active goal continued: finish the game to Codex's own 100-point standard, while keeping the visible quality standard strict and evidence-backed.
+
+### Codex
+
+Codex continued with Dungeon because it was still a primary screen without source-backed scoring. The scope was visual Dungeon progress, not full spatial dungeon navigation completion. Codex kept `UI skin` and the game release target as `Not done`.
+
+The implementation added/used `assets/source/ui/dungeon_stage_components_v001.svg` and updated its note file, switched Dungeon to a paper-theater corridor view, added a left exploration ledger, center room door, route rail, encounter plaque, and preserved the smoke-covered `방 입장` action coordinate at `1010,582`.
+
+Debug-less screenshots were captured for slice 1920, slice 1280, and release 1920. The v1/v2 screenshot reviews exposed route-helper crowding. After that, `phaser:smoke` failed on a real overlap between the room number `1` and the `방 입장` button. Codex moved the room number above the button, kept the button coordinate stable, and captured v3 screenshots at `tmp/ui-quality/dungeon-1920-debugless-v3.png`, `tmp/ui-quality/dungeon-1280-debugless-v3.png`, and `tmp/ui-quality/dungeon-release-1920-debugless-v3.png`.
+
+Verification passed with `npx.cmd tsc --noEmit`, `npm.cmd run phaser:smoke`, `npm.cmd run check`, `npm.cmd run data:validate`, `npm.cmd run quality:audit:report`, `npm.cmd run assets:audit`, `npm.cmd run assets:audit:release-visuals`, and `git diff --check`. `npm.cmd run check` still reports the existing Vite large JS chunk warning, so Performance remains `Needs verification`.
+
+Codex updated the rubric with a Dungeon first-rebuild score of 82/100. This is progress only: it is not a 95-point UI completion candidate, not user acceptance, and not a full spatial dungeon navigation system. Remaining unscored UI screens are RuneBench, Result, and Settings.
+
+### User
+
+The active goal continued: keep moving toward Codex's own 100-point completion standard, with the visible rubric and red-line rules still governing completion language.
+
+### Codex
+
+Codex continued with RuneBench because it was still a primary screen without source-backed scoring. The scope was visual RuneBench progress, not full rune-system completion. Codex kept `UI skin` and the game release target as `Not done`.
+
+The implementation added `assets/source/ui/rune_bench_stage_components_v001.svg` and its note file, switched RuneBench to an immersive paper workbench, added a rune inventory ledger, target-card preview, rune stone, socket connector, right tuning ledger, Korean effect summary, and preserved the smoke-covered `룬 장착` action coordinate at `1010,742`.
+
+Debug-less screenshots were captured for slice 1920, slice 1280, and release 1920. The v1 screenshot showed the `룬 장착` button covering the target-card preview, so Codex moved the card left and recaptured v2. The v2 screenshot then exposed internal op text such as `modify_damage_percent`, so Codex changed effect summaries to Korean copy and captured v3 screenshots at `tmp/ui-quality/rune-bench-1920-debugless-v3.png`, `tmp/ui-quality/rune-bench-1280-debugless-v3.png`, and `tmp/ui-quality/rune-bench-release-1920-debugless-v3.png`.
+
+Verification passed with `npx.cmd tsc --noEmit`, `npm.cmd run phaser:smoke`, `npm.cmd run check`, `npm.cmd run data:validate`, `npm.cmd run quality:audit:report`, `npm.cmd run assets:audit`, `npm.cmd run assets:audit:release-visuals`, and `git diff --check`. Codex updated the rubric with a RuneBench first-rebuild score of 82/100. This is progress only: it is not a 95-point UI completion candidate, not user acceptance, and not a full rune selection/socket progression/balance system. Remaining unscored UI screens are Result and Settings.
+
+### User
+
+The active goal continued: keep working toward Codex's own 100-point standard and make the criteria visible through evidence, not verbal claims.
+
+### Codex
+
+Codex continued with Result because it was still a primary screen without source-backed scoring. The scope was visual Result progress, not ending/progression completion. Codex kept `UI skin` and the game release target as `Not done`.
+
+The implementation added `assets/source/ui/result_stage_components_v001.svg` and its note file, switched Result to a paper-theater curtain-call certificate, added a return ledger, tone-colored clear/defeat/return seal, collection ledger, and preserved the smoke-covered `마을로` action coordinate at `1010,742`.
+
+Debug-less screenshots were captured for neutral Result at 1920 and 1280, real defeat Result, slice boss-clear Result, and release boss-clear Result: `tmp/ui-quality/result-1920-debugless-v1.png`, `tmp/ui-quality/result-1280-debugless-v1.png`, `tmp/ui-quality/result-defeat-1920-debugless-v1.png`, `tmp/ui-quality/result-clear-1920-debugless-v1.png`, and `tmp/ui-quality/result-release-clear-1920-debugless-v1.png`.
+
+Verification passed with `npx.cmd tsc --noEmit`, `npm.cmd run phaser:smoke`, `npm.cmd run check`, `npm.cmd run data:validate`, `npm.cmd run quality:audit:report`, `npm.cmd run assets:audit`, `npm.cmd run assets:audit:release-visuals`, and `git diff --check`. The first smoke run timed out at 184 seconds and was not counted; the longer rerun passed. Codex updated the rubric with a Result first-rebuild score of 83/100. This is progress only: it is not a 95-point UI completion candidate, not user acceptance, and not ending/progression completion. The remaining unscored UI screen is Settings.
+
+### User
+
+The active goal continued: keep moving toward the visible 100-point standard instead of stopping after Result.
+
+### Codex
+
+Codex continued with Settings because it was the last primary UI screen without source-backed visual scoring. The scope was Settings visual progress, not sound/music implementation or full accessibility completion. Codex kept `UI skin` and the game release target as `Not done`.
+
+The implementation added `assets/source/ui/settings_stage_components_v001.svg` and its note file, switched Settings to a paper-theater settings ledger with a save stamp, audio ledger, display/accessibility/control ledger, tooltip, and bottom action rail. The smoke-covered volume plus controls, display/accessibility toggles, reset actions, and `마을로` coordinate were preserved.
+
+Debug-less screenshots were captured at 1920, 1280, release, and high-contrast/toggled states. The first v1 screenshot showed oversized row labels and panel headings crowding the borders, so Codex reduced row typography and moved headings before capturing v2 screenshots: `tmp/ui-quality/settings-1920-debugless-v2.png`, `tmp/ui-quality/settings-1280-debugless-v2.png`, `tmp/ui-quality/settings-release-1920-debugless-v2.png`, and `tmp/ui-quality/settings-high-contrast-1920-debugless-v2.png`.
+
+Verification passed with `npx.cmd tsc --noEmit`, `npm.cmd run phaser:smoke`, `npm.cmd run check`, `npm.cmd run data:validate`, `npm.cmd run quality:audit:report`, `npm.cmd run assets:audit`, `npm.cmd run assets:audit:release-visuals`, and `git diff --check`. Codex updated the rubric with a Settings first-rebuild score of 84/100. All primary UI screens now have first-pass source-backed scoring evidence, but this is still progress only: the total `UI skin` gate is below 95, user acceptance is absent, final production UI art/state polish is missing, and the game is not release-ready.
+
+### User
+
+The active goal continued: keep working until the game reaches Codex's own 100-point standard, and keep the visible quality criteria strict enough that "완료" cannot mean a thin test surface.
+
+### Codex
+
+Codex continued with WorldMap v2 because the first WorldMap pass was still mostly visual and did not prove real stage selection or next-stage unlock. The scope was WorldMap progression/UI progress, not full world-atlas completion. Codex kept `UI skin`, `Stages`, `Progression`, and the game release target as `Not done`.
+
+The implementation added `assets/source/ui/world_map_stage_components_v002.svg` and its note file, added `selectWorldMapStage`, changed save sync so clearing a stage also records it in profile completed/unlocked lists and unlocks the next ordered stage, and added debug overlay evidence for `unlockedStages`. WorldMap now renders save-backed drawer rows for current/complete, selectable, and next-locked stages; clicking an unlocked non-current row persists a stage restart and reopens the WorldMap on that stage.
+
+Debug-less screenshots were captured for v4 and v5. The first v4 review proved the release unlocked/selected states, but the right ledger helper and row status labels were still too cramped. Codex shortened the labels and recaptured v5 screenshots: `tmp/ui-quality/world-map-1920-debugless-v5.png`, `tmp/ui-quality/world-map-1280-debugless-v5.png`, `tmp/ui-quality/world-map-release-1920-debugless-v5.png`, `tmp/ui-quality/world-map-release-unlocked-1920-debugless-v5.png`, and `tmp/ui-quality/world-map-release-selected-1920-debugless-v5.png`.
+
+Verification passed with `npx.cmd tsc --noEmit`, `npm.cmd run phaser:smoke`, `npm.cmd run check`, `npm.cmd run data:validate`, `npm.cmd run quality:audit:report`, `npm.cmd run assets:audit`, `npm.cmd run assets:audit:release-visuals`, and `git diff --check`. The smoke verifies `unlockedStages=stage_sunny_gate,stage_lavender_hall`, then clicks the second map row and verifies `stage=stage_lavender_hall` plus `log=flow:stage_select:stage_lavender_hall`.
+
+Codex updated the rubric with a WorldMap second-rebuild score of 86/100. This is progress only: it is not a 95-point UI completion candidate, not user acceptance, not full stage progression, and not a full 15-stage world atlas.
+
+### User
+
+The active goal continued: keep working until the game reaches Codex's own 100-point standard, but make the standard visible through score criteria and do not call candidate UI complete.
+
+### Codex
+
+Codex continued with Dungeon v2 because the first Dungeon pass was still too close to a static corridor and did not expose enough real progression state. The scope was Dungeon readability/game-state progress, not full spatial dungeon navigation completion. Codex kept `UI skin`, Dungeon completion, and the game release target as `Not done`.
+
+The implementation added `assets/source/ui/dungeon_stage_components_v002.svg` and updated its note file. Dungeon now displays current-room intel, sealed or revealed next-room intel, boss distance, HP/gold resources, and route state labels driven by the active stage route. The soft-compass reveal path uses `getRevealedNextRoomType`, so `relic_soft_compass` changes visible next-room text instead of being decorative.
+
+Debug-less screenshots were captured for v4 and v5. The v4 review exposed the next-room intel card overlapping the right route panel, so Codex reduced and moved the intel cards before capturing v5 screenshots: `tmp/ui-quality/dungeon-1920-debugless-v5.png`, `tmp/ui-quality/dungeon-1280-debugless-v5.png`, `tmp/ui-quality/dungeon-release-1920-debugless-v5.png`, and `tmp/ui-quality/dungeon-release-compass-1920-debugless-v5.png`. `phaser:smoke` also writes `tmp/phaser-dungeon-release-soft-compass.png` while verifying the release soft-compass reveal.
+
+Verification passed with `npx.cmd tsc --noEmit`, `npm.cmd run phaser:smoke`, `npm.cmd run check`, `npm.cmd run data:validate`, `npm.cmd run quality:audit:report`, `npm.cmd run assets:audit`, and `npm.cmd run assets:audit:release-visuals`. `npm.cmd run check` still reports the existing Vite large JS chunk warning, so Performance remains `Needs verification`. `git diff --check` is run after the document updates.
+
+Codex updated the rubric with a Dungeon second-rebuild score of 85/100. This is progress only: it is not a 95-point UI completion candidate, not user acceptance, not full dungeon navigation, and not final dungeon art. The next weakest UI target is RuneBench at 82/100.
+
+### User
+
+The active goal continued: keep working toward the 100-point/release-quality standard, and keep the score/rubric evidence honest instead of calling candidate UI complete.
+
+### Codex
+
+Codex continued with RuneBench v2 because RuneBench was the weakest current primary UI score at 82/100. The scope was RuneBench decision-readability progress, not full rune-system completion. Codex kept `UI skin`, RuneBench completion, and the game release target as `Not done`.
+
+The implementation added `assets/source/ui/rune_bench_stage_components_v002.svg` and its note file. RuneBench now renders before/after stat preview cards for the selected target card, a compatibility proof band, a recommendation line, and a right-ledger change row such as `피해 7 -> 9` or `피해 8 -> 10`. The preview is derived from the current run's selected rune and compatible card, and uses runtime rune helper logic for current attached stats before applying the selected rune as a non-mutating preview.
+
+Debug-less screenshots were captured for v4 and v5. The first v4 smoke rerun rejected the layout because a decorative `룬` label overlapped the rune stone's `공격 소켓` label. Codex removed that decorative label, reran smoke, and captured v5 screenshots at `tmp/ui-quality/rune-bench-1920-debugless-v5.png`, `tmp/ui-quality/rune-bench-1280-debugless-v5.png`, and `tmp/ui-quality/rune-bench-release-1920-debugless-v5.png`.
+
+Verification passed with `npx.cmd tsc --noEmit`, `npm.cmd run phaser:smoke`, `npm.cmd run check`, `npm.cmd run data:validate`, `npm.cmd run quality:audit:report`, `npm.cmd run assets:audit`, and `npm.cmd run assets:audit:release-visuals`. `npm.cmd run check` still reports the existing Vite large JS chunk warning, so Performance remains `Needs verification`. `git diff --check` is run after the document updates.
+
+Codex updated the rubric with a RuneBench second-rebuild score of 85/100. This is progress only: it is not a 95-point UI completion candidate, not user acceptance, not full rune selection/socket progression, and not final rune art. The next weakest UI targets are Town and Result at 83/100.
+
+### User
+
+The active goal continued: keep working toward Codex's own 100-point standard, but make the standard visible and do not hide behind verbal criteria.
+
+### Codex
+
+Codex restated the UI standard as a concrete 100-point rubric where 95/100 plus zero red-line blockers is required before `UI skin` can even become a completion candidate. Codex then continued with Town v2 because Town and Result were the weakest current UI scores at 83/100.
+
+The scope was Town save/profile readability progress, not Town/meta completion. The implementation added `assets/source/ui/town_stage_components_v002.svg` and updated its note file. Town now displays save/profile-driven unlocked, completed, and remaining stage counts, the next expedition, a completed-stage stamp, a route preview, and next-sealed status. The board uses Korean stage names instead of raw stage ids and can be checked against a progressed release save.
+
+Debug-less screenshots were captured for v5, v6, v7, and v8. v5 exposed route-board crowding from a separate next-sealed card. v6 moved that information to the lower board but left it too close to the bottom route area. v7 moved it upward but still crowded the next-expedition slot in the progressed release screenshot. v8 shortened the label and moved it inside the remaining-stage stat area. The accepted progress evidence is `tmp/ui-quality/town-1920-debugless-v8.png`, `tmp/ui-quality/town-1280-debugless-v8.png`, `tmp/ui-quality/town-release-1920-debugless-v8.png`, and `tmp/ui-quality/town-release-progress-1920-debugless-v8.png`.
+
+The first `phaser:smoke` rerun failed because the screenshot seeding step left a release-mode production save in localStorage, causing the later default slice smoke path to see too few Town text objects. Codex reset production save state and reran smoke with a longer timeout. Verification then passed with `npx.cmd tsc --noEmit`, `npm.cmd run phaser:smoke`, `npm.cmd run check`, `npm.cmd run data:validate`, `npm.cmd run quality:audit:report`, `npm.cmd run assets:audit`, `npm.cmd run assets:audit:release-visuals`, and `git diff --check`. `npm.cmd run check` still reports the existing Vite large JS chunk warning, so Performance remains `Needs verification`.
+
+Codex updated the rubric with a Town second-rebuild score of 86/100. This is progress only: it is not a 95-point UI completion candidate, not user acceptance, not Town/meta completion, and not release readiness. The next weakest UI target is Result at 83/100, followed by Boss/Settings at 84/100.
+
+### User
+
+The active goal continued: keep working until the game reaches Codex's own 100-point standard, and make the quality 기준 visible instead of relying on verbal claims.
+
+### Codex
+
+Codex made the standard explicit as a 100-point UI rubric where 95/100 plus zero red-line blockers is required before `UI skin` can be a completion candidate. Codex then continued with Result v2 because Result was the weakest current UI score at 83/100.
+
+The scope was Result run-recap readability progress, not ending/progression completion. The implementation added `assets/source/ui/result_stage_components_v002.svg` and updated its note file. Result now displays route progress, route composition, next action, saved clear count, deck delta, and preservation summary from runtime state while preserving the smoke-covered `마을로` action coordinate at `1010,742`.
+
+Debug-less screenshots were captured for v2, v3, v4, and v5. v2 exposed the next-action ticket being hidden under the release-clear collection ledger. v3 moved that information into a top ribbon but made the copy cramped. v4 widened the ribbon but visually collided with the result title. v5 moved the next-action copy into the lower record row and became the accepted progress evidence set: `tmp/ui-quality/result-1920-debugless-v5.png`, `tmp/ui-quality/result-1280-debugless-v5.png`, `tmp/ui-quality/result-defeat-1920-debugless-v5.png`, `tmp/ui-quality/result-clear-1920-debugless-v5.png`, and `tmp/ui-quality/result-release-clear-1920-debugless-v5.png`.
+
+Verification passed with `npx.cmd tsc --noEmit`, `npm.cmd run phaser:smoke`, `npm.cmd run check`, `npm.cmd run data:validate`, `npm.cmd run quality:audit:report`, `npm.cmd run assets:audit`, `npm.cmd run assets:audit:release-visuals`, and `git diff --check`. `npm.cmd run check` still reports the existing Vite large JS chunk warning, so Performance remains `Needs verification`.
+
+Codex updated the rubric with a Result second-rebuild score of 86/100. This is progress only: it is not a 95-point UI completion candidate, not user acceptance, not ending cinematics, not achievement surfacing, not long-term progression recap, not final result-state art, and not release readiness. The next weakest UI targets are Boss and Settings at 84/100.
+
+### User
+
+The user challenged Codex's previous quality claims after viewing the running Phaser UI in the browser. The user specifically objected that the visible UI was being treated as if it were a finished pipeline result even though it did not match the concept-art direction previously discussed. The user also pointed out that generated visual-pipeline planning had been part of the project foundation, so vector/shape-heavy placeholder presentation was not acceptable as final UI evidence.
+
+The user asked what standard Codex was actually using, asked whether the current UI was complete, asked to bring back the concept-art target, and warned that Codex must not later explain missing cards, relics, features, or art as "just test" when the stated target is release-capable quality.
+
+### Codex
+
+Codex acknowledged that the UI/art status had been overstated. The current Phaser UI was restated as implementation progress only, not concept-pipeline output, not final UI skin, not release-ready UI, and not user-accepted quality. Codex committed to separating technical/system progress from art-direction completion and to stop calling candidate surfaces complete without visual evidence, manual acceptance, and the documented rubric threshold.
+
+Codex re-audited the technical base instead of assuming prior claims were safe. The audit found that most data/runtime/content checks still passed, but the latest `phaser:smoke` failed in `BossScene` because the boss reward mini-panel text overlapped: `스테이지 클리어 보상` collided with `격파 시 스테이지 클리어`. This meant the current state could not be reported as fully verified until that blocker was fixed and smoke was rerun.
+
+Codex generated a first combat UI concept reference, saved it as `assets/concepts/ui/combat_ui_concept_v001.png`, and documented it in `assets/concepts/ui/combat_ui_concept_v001.md`. Codex also clarified that this is a concept target only, not runtime art and not proof that `UI skin` is complete.
+
+### User
+
+The user asked whether the combat concept implied only one monster would appear, and asked what the maximum enemy count is supposed to be. After Codex checked the code, the user asked for the necessary concept art at the same quality level.
+
+### Codex
+
+Codex checked the implementation and found a scope mismatch that must not be hidden. The current active Phaser combat state still supports a single active enemy, while the legacy combat implementation had support for multiple enemies in some paths. Codex therefore restated the visual target as normal combat supporting 1-3 enemy slots, and boss combat supporting a large boss with optional minion/summon slots where needed. This means the current Phaser combat implementation is not final multi-enemy combat.
+
+Codex then generated the UI concept set v001 as raster concept references for the major screens: normal combat with 1-3 enemies, boss combat, dungeon, world map, town, reward, event, rune bench, result, settings, and a reusable UI component sheet. The files were saved under `assets/concepts/ui/`, with a review contact sheet saved as `assets/concepts/ui/ui_concepts_contact_sheet_v001.png`, and documented in `assets/concepts/ui/ui_concept_set_v001.md`.
+
+Known limitations were recorded: the concept images are not final approved production art, not sliced runtime assets, not a Phaser implementation, not proof of `UI skin` completion, and not proof of release readiness. The component sheet still needs a cleaner no-text/slice-focused pass before production slicing because generated pseudo-text must not be baked into runtime UI.
+
+### User
+
+The user ended the day and instructed Codex to put everything on GitHub, including the conversation log, and then wrap up.
+
+### Codex
+
+Codex set the finalization scope as the current `game` repository only: commit and push the current code, docs, generated concept references, and conversation log to GitHub. Codex explicitly excluded the unrelated `pro` repository, force-push/reset/cleanup operations, and any claim that the UI or game is complete. Before committing, Codex fixed the known BossScene smoke blocker by increasing the boss mini-panel vertical spacing so the reward title and detail no longer overlap, then reran verification.

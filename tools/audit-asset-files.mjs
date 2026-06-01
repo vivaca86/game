@@ -3,8 +3,20 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const docsManifestPath = path.join(rootDir, "docs", "asset-manifest.slice.v1.json");
-const runtimeManifestPath = path.join(rootDir, "src", "data", "assetManifest.slice.v1.json");
+const manifestPairs = [
+  {
+    label: "slice",
+    docsPath: path.join(rootDir, "docs", "asset-manifest.slice.v1.json"),
+    runtimePath: path.join(rootDir, "src", "data", "assetManifest.slice.v1.json"),
+    optional: false
+  },
+  {
+    label: "release",
+    docsPath: path.join(rootDir, "docs", "asset-manifest.release.v1.json"),
+    runtimePath: path.join(rootDir, "src", "data", "assetManifest.release.v1.json"),
+    optional: true
+  }
+];
 const publicRoot = path.join(rootDir, "public");
 const runtimeAssetRoot = path.join(publicRoot, "assets", "runtime");
 const requireFiles = process.argv.includes("--require-files") || process.env.ASSET_AUDIT_REQUIRE_FILES === "1";
@@ -12,7 +24,7 @@ const requireFiles = process.argv.includes("--require-files") || process.env.ASS
 const errors = [];
 const warnings = [];
 const idPattern = /^[a-z][a-z0-9_]*$/;
-const allowedStatuses = new Set(["planned_manifest", "generated_manifest", "approved_manifest"]);
+const allowedStatuses = new Set(["planned_manifest", "generated_manifest", "production_candidate_manifest", "approved_manifest"]);
 const allowedTypes = new Set(["image", "spritesheet"]);
 
 function fail(message) {
@@ -88,26 +100,26 @@ function manifestMap(manifest, label) {
   return byKey;
 }
 
-function compareManifests(docsManifest, runtimeManifest) {
+function compareManifests(docsManifest, runtimeManifest, pairLabel) {
   if (stableStringify(docsManifest?.metadata) !== stableStringify(runtimeManifest?.metadata)) {
-    fail("docs and runtime asset manifest metadata differ");
+    fail(`${pairLabel}: docs and runtime asset manifest metadata differ`);
   }
 
-  const docsByKey = manifestMap(docsManifest, "docs manifest");
-  const runtimeByKey = manifestMap(runtimeManifest, "runtime manifest");
+  const docsByKey = manifestMap(docsManifest, `${pairLabel} docs manifest`);
+  const runtimeByKey = manifestMap(runtimeManifest, `${pairLabel} runtime manifest`);
 
   for (const key of docsByKey.keys()) {
     if (!runtimeByKey.has(key)) {
-      fail(`runtime manifest missing key from docs manifest: ${key}`);
+      fail(`${pairLabel}: runtime manifest missing key from docs manifest: ${key}`);
       continue;
     }
     if (stableStringify(docsByKey.get(key)) !== stableStringify(runtimeByKey.get(key))) {
-      fail(`runtime manifest entry differs from docs manifest: ${key}`);
+      fail(`${pairLabel}: runtime manifest entry differs from docs manifest: ${key}`);
     }
   }
 
   for (const key of runtimeByKey.keys()) {
-    if (!docsByKey.has(key)) fail(`runtime manifest has key not present in docs manifest: ${key}`);
+    if (!docsByKey.has(key)) fail(`${pairLabel}: runtime manifest has key not present in docs manifest: ${key}`);
   }
 
   return docsByKey;
@@ -149,8 +161,9 @@ async function readPngSize(filePath) {
   };
 }
 
-async function auditFiles(assetsByKey, manifestStatus) {
-  const shouldRequireFiles = requireFiles || manifestStatus !== "planned_manifest";
+async function auditFiles(assetsByKey, manifestStatuses) {
+  const statuses = Array.isArray(manifestStatuses) ? manifestStatuses : [manifestStatuses];
+  const shouldRequireFiles = requireFiles || statuses.some((status) => status !== "planned_manifest");
   const missing = [];
   let existing = 0;
 
@@ -205,20 +218,39 @@ async function auditFiles(assetsByKey, manifestStatus) {
   };
 }
 
-const docsManifest = await readJson(docsManifestPath);
-const runtimeManifest = await readJson(runtimeManifestPath);
-
 let fileSummary = { existing: 0, missing: 0, orphan: 0, strict: requireFiles };
 let assetCount = 0;
+const combinedAssetsByKey = new Map();
+const manifestStatuses = [];
 
-if (docsManifest && runtimeManifest) {
+for (const pair of manifestPairs) {
+  const docsExists = await fileExists(pair.docsPath);
+  const runtimeExists = await fileExists(pair.runtimePath);
+
+  if (pair.optional && !docsExists && !runtimeExists) continue;
+  if (!docsExists || !runtimeExists) {
+    fail(`${pair.label}: docs/runtime manifest pair is incomplete`);
+    continue;
+  }
+
+  const docsManifest = await readJson(pair.docsPath);
+  const runtimeManifest = await readJson(pair.runtimePath);
+  if (!docsManifest || !runtimeManifest) continue;
+
   const status = docsManifest.metadata?.status;
-  if (!allowedStatuses.has(status)) fail(`docs manifest metadata.status is unsupported: ${status}`);
-  if (runtimeManifest.metadata?.status !== status) fail("runtime manifest status differs from docs manifest status");
+  if (!allowedStatuses.has(status)) fail(`${pair.label}: docs manifest metadata.status is unsupported: ${status}`);
+  if (runtimeManifest.metadata?.status !== status) fail(`${pair.label}: runtime manifest status differs from docs manifest status`);
 
-  const assetsByKey = compareManifests(docsManifest, runtimeManifest);
-  assetCount = assetsByKey.size;
-  fileSummary = await auditFiles(assetsByKey, status);
+  const assetsByKey = compareManifests(docsManifest, runtimeManifest, pair.label);
+  manifestStatuses.push(status);
+  for (const [key, asset] of assetsByKey.entries()) {
+    combinedAssetsByKey.set(`${pair.label}:${key}`, asset);
+  }
+}
+
+if (combinedAssetsByKey.size > 0) {
+  assetCount = combinedAssetsByKey.size;
+  fileSummary = await auditFiles(combinedAssetsByKey, manifestStatuses);
 }
 
 warnings.forEach((message) => console.log(`Warning: ${message}`));
