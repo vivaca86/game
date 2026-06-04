@@ -6,9 +6,11 @@ import { findRewardEntryById, selectRewardEntries } from "../../simulation/state
 import { renderDebugOverlay } from "../../ui/overlays/debugOverlay";
 import { handleSceneAction } from "../bridge/sceneActions";
 import { requireBootContext } from "../bridge/sceneBridge";
-import { renderActionButton, renderPaperPanel, renderSceneShell, renderTooltip, renderUiSlot, textStyle } from "../view/sceneShell";
+import { renderActionButton, renderPaperPanel, renderRasterHoverHitTarget, renderSceneShell, renderTooltip, renderTransparentHitTarget, renderUiSlot, textStyle } from "../view/sceneShell";
 
 const REWARD_ACTIONS = ["card_1", "card_2", "card_3", "card_4", "card_5"] as const;
+const REWARD_RASTER_UNDERLAY_KEY = "reward_raster_underlay_concept";
+const REWARD_RASTER_HOVER_CHOICE_KEY = "ui_hover_choice_badge_concept";
 
 export class RewardScene extends Phaser.Scene {
   constructor() {
@@ -38,11 +40,63 @@ export class RewardScene extends Phaser.Scene {
         Math.max(1, context.run.offeredRewards.length)
       );
 
-    renderRewardStage(this, context, rewardPool?.displayNameKo ?? "보상 목록 없음", offers.slice(0, 4));
+    if (hasRewardRasterUnderlay(this)) {
+      renderRewardRasterStage(this, context, offers.slice(0, 4));
+    } else {
+      renderRewardStage(this, context, rewardPool?.displayNameKo ?? "보상 목록 없음", offers.slice(0, 4));
+    }
 
     bindKeyboardActions(this, (action) => handleSceneAction(this, context, action), context.save.settings);
     renderDebugOverlay(context, "RewardScene");
   }
+}
+
+function hasRewardRasterUnderlay(scene: Phaser.Scene): boolean {
+  return scene.textures.exists(REWARD_RASTER_UNDERLAY_KEY);
+}
+
+function renderRewardRasterStage(
+  scene: Phaser.Scene,
+  context: BootContext,
+  offers: RewardEntry[]
+): void {
+  scene.add.image(960, 540, REWARD_RASTER_UNDERLAY_KEY)
+    .setDisplaySize(1920, 1080)
+    .setDepth(0);
+
+  const cardXs = [528, 795, 1062, 1329];
+  offers.slice(0, 4).forEach((entry, index) => {
+    renderRewardRasterChoice(scene, context, entry, index, cardXs[index] ?? (528 + index * 267), 610);
+  });
+
+  renderRewardRasterConfirm(scene, context);
+}
+
+function renderRewardRasterChoice(
+  scene: Phaser.Scene,
+  context: BootContext,
+  entry: RewardEntry,
+  index: number,
+  x: number,
+  y: number
+): void {
+  const action = REWARD_ACTIONS[index];
+  renderRasterHoverHitTarget(scene, x, y + 20, 240, 486, () => handleSceneAction(scene, context, action), {
+    hoverKey: REWARD_RASTER_HOVER_CHOICE_KEY,
+    hoverX: x,
+    hoverY: y - 268,
+    hoverWidth: 112,
+    hoverHeight: 80,
+    downAlpha: 0.76
+  });
+}
+
+function renderRewardRasterConfirm(scene: Phaser.Scene, context: BootContext): void {
+  const x = 960;
+  const y = 908;
+  const width = 546;
+  const height = 86;
+  renderTransparentHitTarget(scene, x, y, width - 30, height - 10, () => handleSceneAction(scene, context, "confirm"));
 }
 
 function renderRewardStage(

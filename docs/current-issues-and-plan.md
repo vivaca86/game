@@ -83,3 +83,45 @@
 3. 카드/몬스터/스테이지/보석/업적은 대량 확장이 아니라 한 묶음씩 재기획한다.
 4. `content-quality-audit`의 실패 항목을 하나씩 줄인다.
 5. 다시 수량으로 완료를 말하지 않는다.
+## 2026-06-05 Current UI Concept-Art Plan
+
+Status: `Partially complete`.
+
+The current active goal is to make the game UI match the concept art at similar quality. This is not done.
+
+Detailed continuation handoff:
+
+- `docs/ui-concept-raster-handoff-2026-06-05.md`
+
+Current best estimate:
+
+- Overall active UI goal: about 58%.
+- Static first-view concept matching is ahead of interaction/dynamic-state work.
+- WorldMap state truth is still the most visible mismatch.
+
+Completed progress in this checkpoint:
+
+- Primary scenes now use raster concept-underlay paths instead of old procedural UI shells.
+- Shared raster hit targets now avoid visible Phaser vector rectangles on concept screens.
+- First bitmap hover/down/disabled/current-state assets exist and are registered.
+- WorldMap primary action moved to the visible bottom-right play button.
+- WorldMap current node now uses runtime marker, halo, and lower status badge from original concept art.
+
+Next recommended work:
+
+1. Add completed-stage raster overlay art for WorldMap completed nodes.
+2. Add locked-stage raster overlay art for WorldMap locked/next-locked nodes.
+3. Render those overlays from runtime save/profile state in `WorldMapScene`.
+4. Extend `tmp/ui-worldmap-action-hit-target-audit.mjs` to verify completed/locked/current overlays separately.
+5. Keep broad hover/down/smoke checks passing.
+6. Only then move to broader dynamic labels, focus states, accessibility-safe tooltips, and mobile review.
+
+Known unfinished scope:
+
+- Full WorldMap current/completed/locked recomposition.
+- Selected/focus/keyboard state art.
+- Broad disabled-state coverage.
+- Screen-specific pressed/down art.
+- Dynamic readability and accessibility-safe text strategy.
+- User acceptance.
+- Final 95% or release-ready UI.

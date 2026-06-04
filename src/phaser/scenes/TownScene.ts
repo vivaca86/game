@@ -6,7 +6,10 @@ import { clearStoredSave } from "../../save/saveCodec";
 import { renderDebugOverlay } from "../../ui/overlays/debugOverlay";
 import { handleSceneAction } from "../bridge/sceneActions";
 import { requireBootContext } from "../bridge/sceneBridge";
-import { renderActionButton, renderPaperPanel, renderSceneShell, renderTooltip, renderUiSlot, textStyle } from "../view/sceneShell";
+import { renderActionButton, renderPaperPanel, renderRasterHoverHitTarget, renderSceneShell, renderTooltip, renderUiSlot, textStyle } from "../view/sceneShell";
+
+const TOWN_RASTER_UNDERLAY_KEY = "town_raster_underlay_concept";
+const TOWN_RASTER_HOVER_ACTION_KEY = "ui_hover_action_seal_concept";
 
 export class TownScene extends Phaser.Scene {
   constructor() {
@@ -25,11 +28,52 @@ export class TownScene extends Phaser.Scene {
       showRoute: false
     });
 
-    renderTownTheater(this, context);
+    if (hasTownRasterUnderlay(this)) {
+      renderTownRasterStage(this, context);
+    } else {
+      renderTownTheater(this, context);
+    }
 
     bindKeyboardActions(this, (action) => handleSceneAction(this, context, action), context.save.settings);
     renderDebugOverlay(context, "TownScene");
   }
+}
+
+function hasTownRasterUnderlay(scene: Phaser.Scene): boolean {
+  return scene.textures.exists(TOWN_RASTER_UNDERLAY_KEY);
+}
+
+function renderTownRasterStage(scene: Phaser.Scene, context: BootContext): void {
+  scene.add.image(960, 540, TOWN_RASTER_UNDERLAY_KEY)
+    .setDisplaySize(1920, 1080)
+    .setDepth(0);
+
+  renderTownRasterHitTarget(scene, 1010, 642, 330, 66, 0xf5c26b, () => handleSceneAction(scene, context, "confirm"));
+  renderTownRasterHitTarget(scene, 1010, 724, 330, 58, 0xce5869, () => resetStoredSave(scene, context));
+  renderTownRasterHitTarget(scene, 1010, 806, 330, 58, 0x6c8fd6, () => scene.scene.start("SettingsScene", context));
+
+  renderTownRasterHitTarget(scene, 1208, 950, 120, 92, 0x6c8fd6, () => scene.scene.start("SettingsScene", context));
+  renderTownRasterHitTarget(scene, 514, 950, 130, 92, 0xce5869, () => resetStoredSave(scene, context));
+}
+
+function renderTownRasterHitTarget(
+  scene: Phaser.Scene,
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  _accent: number,
+  onClick: () => void
+): void {
+  const hoverSize = Math.min(104, Math.max(76, Math.min(width, height) * 1.08));
+  renderRasterHoverHitTarget(scene, x, y, width, height, onClick, {
+    hoverKey: TOWN_RASTER_HOVER_ACTION_KEY,
+    hoverX: x + width * 0.42,
+    hoverY: y - height * 0.28,
+    hoverWidth: hoverSize,
+    hoverHeight: hoverSize,
+    downAlpha: 0.76
+  });
 }
 
 function renderTownTheater(scene: Phaser.Scene, context: BootContext): void {

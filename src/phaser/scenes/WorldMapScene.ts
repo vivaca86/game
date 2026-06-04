@@ -8,7 +8,32 @@ import { sliceRunToSaveRun } from "../../simulation/state/runState";
 import { renderDebugOverlay } from "../../ui/overlays/debugOverlay";
 import { handleSceneAction } from "../bridge/sceneActions";
 import { requireBootContext, storeBootContext } from "../bridge/sceneBridge";
-import { renderActionButton, renderPaperPanel, renderSceneShell, renderUiSlot, textStyle } from "../view/sceneShell";
+import { renderActionButton, renderPaperPanel, renderRasterHoverHitTarget, renderSceneShell, renderUiSlot, textStyle } from "../view/sceneShell";
+
+const WORLD_MAP_RASTER_UNDERLAY_KEY = "world_map_raster_underlay_concept";
+const WORLD_MAP_RASTER_HOVER_NODE_KEY = "ui_hover_route_node_concept";
+const WORLD_MAP_RASTER_HOVER_PLAY_KEY = "ui_hover_world_map_play_button_concept";
+const WORLD_MAP_RASTER_DOWN_PLAY_KEY = "ui_down_world_map_play_button_concept";
+const WORLD_MAP_RASTER_CURRENT_MARKER_KEY = "ui_current_stage_marker_concept";
+const WORLD_MAP_RASTER_CURRENT_HALO_KEY = "ui_current_stage_halo_concept";
+const WORLD_MAP_RASTER_CURRENT_STATUS_KEY = "ui_current_stage_status_badge_concept";
+const WORLD_MAP_RASTER_STAGE_NODES: Array<{ x: number; y: number; width: number; height: number }> = [
+  { x: 586, y: 760, width: 150, height: 150 },
+  { x: 808, y: 756, width: 150, height: 150 },
+  { x: 1000, y: 744, width: 150, height: 150 },
+  { x: 1168, y: 704, width: 164, height: 164 },
+  { x: 1328, y: 574, width: 150, height: 150 },
+  { x: 1168, y: 462, width: 142, height: 142 },
+  { x: 914, y: 486, width: 142, height: 142 },
+  { x: 760, y: 496, width: 142, height: 142 },
+  { x: 606, y: 486, width: 142, height: 142 },
+  { x: 648, y: 264, width: 150, height: 150 },
+  { x: 790, y: 304, width: 142, height: 142 },
+  { x: 960, y: 304, width: 142, height: 142 },
+  { x: 1094, y: 304, width: 142, height: 142 },
+  { x: 1252, y: 166, width: 170, height: 170 },
+  { x: 1378, y: 306, width: 170, height: 170 }
+];
 
 interface StageMapRow {
   stage: StageData;
@@ -35,11 +60,118 @@ export class WorldMapScene extends Phaser.Scene {
       showRoute: false
     });
 
-    renderWorldMapTheater(this, context);
+    if (hasWorldMapRasterUnderlay(this)) {
+      renderWorldMapRasterStage(this, context);
+    } else {
+      renderWorldMapTheater(this, context);
+    }
 
     bindKeyboardActions(this, (action) => handleSceneAction(this, context, action), context.save.settings);
     renderDebugOverlay(context, "WorldMapScene");
   }
+}
+
+function hasWorldMapRasterUnderlay(scene: Phaser.Scene): boolean {
+  return scene.textures.exists(WORLD_MAP_RASTER_UNDERLAY_KEY);
+}
+
+function renderWorldMapRasterStage(scene: Phaser.Scene, context: BootContext): void {
+  scene.add.image(960, 540, WORLD_MAP_RASTER_UNDERLAY_KEY)
+    .setDisplaySize(1920, 1080)
+    .setDepth(0);
+
+  renderWorldMapRasterHitTarget(scene, 1576, 970, 280, 144, 0xf5c26b, () => handleSceneAction(scene, context, "confirm"));
+  renderWorldMapCurrentStageMarker(scene, context);
+  renderWorldMapRasterStageNodes(scene, context);
+}
+
+function renderWorldMapCurrentStageMarker(scene: Phaser.Scene, context: BootContext): void {
+  const currentStageIndex = context.dataBundle.stages.findIndex((stage) => stage.id === context.run.stageId);
+  const node = WORLD_MAP_RASTER_STAGE_NODES[currentStageIndex];
+  if (!node) return;
+
+  if (scene.textures.exists(WORLD_MAP_RASTER_CURRENT_HALO_KEY)) {
+    scene.add.image(node.x + 2, node.y + 4, WORLD_MAP_RASTER_CURRENT_HALO_KEY)
+      .setDisplaySize(node.width * 1.78, node.height * 1.9)
+      .setAlpha(0.76)
+      .setBlendMode(Phaser.BlendModes.ADD)
+      .setDepth(7);
+  }
+
+  if (scene.textures.exists(WORLD_MAP_RASTER_CURRENT_MARKER_KEY)) {
+    scene.add.image(node.x + 4, node.y - Math.max(88, node.height * 0.62), WORLD_MAP_RASTER_CURRENT_MARKER_KEY)
+      .setDisplaySize(76, 86)
+      .setAlpha(0.98)
+      .setDepth(8);
+  }
+
+  if (scene.textures.exists(WORLD_MAP_RASTER_CURRENT_STATUS_KEY)) {
+    scene.add.image(node.x + node.width * 0.1, node.y + node.height * 0.36, WORLD_MAP_RASTER_CURRENT_STATUS_KEY)
+      .setDisplaySize(72, 72)
+      .setAlpha(0.98)
+      .setDepth(8);
+  }
+}
+
+function renderWorldMapRasterStageNodes(scene: Phaser.Scene, context: BootContext): void {
+  const unlockedStageIds = new Set([...context.save.profile.unlockedStages, context.run.stageId]);
+  context.dataBundle.stages.forEach((stage, index) => {
+    const node = WORLD_MAP_RASTER_STAGE_NODES[index];
+    if (!node || !unlockedStageIds.has(stage.id)) return;
+    renderWorldMapRasterNodeHitTarget(
+      scene,
+      node.x,
+      node.y,
+      node.width,
+      node.height,
+      0x5eead4,
+      () => selectStageAndRestart(scene, context, stage.id)
+    );
+  });
+}
+
+function renderWorldMapRasterNodeHitTarget(
+  scene: Phaser.Scene,
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  _accent: number,
+  onClick: () => void
+): void {
+  renderRasterHoverHitTarget(scene, x, y, width, height, onClick, {
+    hoverKey: WORLD_MAP_RASTER_HOVER_NODE_KEY,
+    hoverX: x + 72,
+    hoverY: y - 62,
+    hoverWidth: 88,
+    hoverHeight: 88,
+    downAlpha: 0.76
+  });
+}
+
+function renderWorldMapRasterHitTarget(
+  scene: Phaser.Scene,
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  _accent: number,
+  onClick: () => void
+): void {
+  renderRasterHoverHitTarget(scene, x, y, width, height, onClick, {
+    hoverKey: WORLD_MAP_RASTER_HOVER_PLAY_KEY,
+    downKey: WORLD_MAP_RASTER_DOWN_PLAY_KEY,
+    hoverX: x,
+    hoverY: y,
+    downX: x,
+    downY: y,
+    hoverWidth: width,
+    hoverHeight: height,
+    downWidth: width,
+    downHeight: height,
+    hoverAlpha: 0.96,
+    downAlpha: 0.94
+  });
 }
 
 function renderWorldMapTheater(scene: Phaser.Scene, context: BootContext): void {
@@ -67,9 +199,9 @@ function renderWorldMapTheater(scene: Phaser.Scene, context: BootContext): void 
   renderFoldedRouteMap(scene, stage, context.run.roomIndex);
   renderStageDetailLedger(scene, context, stage, completed.has(stage?.id ?? ""));
 
-  renderActionButton(scene, 1010, 512, "던전으로", () => handleSceneAction(scene, context, "confirm"), {
-    width: 330,
-    height: 66,
+  renderActionButton(scene, 1576, 970, "던전으로", () => handleSceneAction(scene, context, "confirm"), {
+    width: 280,
+    height: 78,
     fontSize: 25,
     focus: true
   });

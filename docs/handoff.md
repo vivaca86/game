@@ -110,3 +110,21 @@
 4. 사용자가 샘플을 승인하지 않으면 본편 개발을 멈춘다.
 5. 사용자가 샘플을 승인하면 본편의 CSS 임시 그래픽을 실제 asset 기반 렌더링으로 교체한다.
 6. 카드/몬스터/스테이지/보석/업적은 수량 확장이 아니라 한 묶음씩 재기획하고 감사 스크립트를 통과시킨다.
+## 2026-06-05 UI Concept Raster Handoff
+
+Current status: `Partially complete`.
+
+The active UI concept-art goal is not complete. The current checkpoint is a WIP save point for continuation.
+
+Read the detailed handoff before continuing:
+
+- `docs/ui-concept-raster-handoff-2026-06-05.md`
+
+Most important continuation notes:
+
+- The user rejected vector/procedural-looking UI. Continue with raster concept art and concept-derived bitmap state assets.
+- Do not claim final UI, 95% similarity, release readiness, or user acceptance.
+- WorldMap is the current highest-priority mismatch area. It now has runtime current marker, halo, and status badge, but it still lacks full dynamic current/completed/locked state recomposition.
+- Latest useful WorldMap evidence screenshot: `tmp/ui-quality/worldmap/worldmap-play-button-action-hover-v1-1920.png`.
+- Latest passed checks included `npm.cmd run check`, `node tmp/ui-worldmap-action-hit-target-audit.mjs`, `node tmp/ui-raster-hover-audit.mjs`, `node tmp/ui-raster-down-audit.mjs`, and `node tmp/run-phaser-smoke-with-vite.mjs`.
+- `npm.cmd run check` still reports the existing Vite large JS chunk warning; do not treat that as newly solved.

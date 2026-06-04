@@ -5,9 +5,11 @@ import { bindKeyboardActions } from "../../input/bindings";
 import { clearStoredSave, createDefaultSettings, persistSave } from "../../save/saveCodec";
 import { renderDebugOverlay } from "../../ui/overlays/debugOverlay";
 import { requireBootContext, storeBootContext } from "../bridge/sceneBridge";
-import { renderActionButton, renderPaperPanel, renderSceneShell, renderTooltip, renderUiSlot, textStyle } from "../view/sceneShell";
+import { renderActionButton, renderPaperPanel, renderRasterHoverHitTarget, renderSceneShell, renderTooltip, renderUiSlot, textStyle } from "../view/sceneShell";
 
 type SettingsMutation = (settings: SettingsState) => void;
+const SETTINGS_RASTER_UNDERLAY_KEY = "settings_raster_underlay_concept";
+const SETTINGS_RASTER_HOVER_ACTION_KEY = "ui_hover_action_seal_concept";
 
 export class SettingsScene extends Phaser.Scene {
   constructor() {
@@ -26,7 +28,11 @@ export class SettingsScene extends Phaser.Scene {
       showRoute: false
     });
 
-    renderSettingsPanel(this, context);
+    if (hasSettingsRasterUnderlay(this)) {
+      renderSettingsRasterStage(this, context);
+    } else {
+      renderSettingsPanel(this, context);
+    }
     bindKeyboardActions(this, (action) => {
       if (action === "cancel") {
         this.scene.start("TownScene", context);
@@ -34,6 +40,62 @@ export class SettingsScene extends Phaser.Scene {
     }, context.save.settings);
     renderDebugOverlay(context, "SettingsScene");
   }
+}
+
+function hasSettingsRasterUnderlay(scene: Phaser.Scene): boolean {
+  return scene.textures.exists(SETTINGS_RASTER_UNDERLAY_KEY);
+}
+
+function renderSettingsRasterStage(scene: Phaser.Scene, context: BootContext): void {
+  scene.add.image(960, 540, SETTINGS_RASTER_UNDERLAY_KEY)
+    .setDisplaySize(1920, 1080)
+    .setDepth(0);
+
+  renderSettingsRasterHitTarget(scene, 840, 282, 380, 58, 0xf5c26b, () => updateSettings(scene, context, (next) => {
+    next.volumeMaster = stepVolume(next.volumeMaster, 0.1);
+  }));
+  renderSettingsRasterHitTarget(scene, 840, 372, 380, 58, 0xf5c26b, () => updateSettings(scene, context, (next) => {
+    next.volumeMusic = stepVolume(next.volumeMusic, 0.1);
+  }));
+  renderSettingsRasterHitTarget(scene, 840, 462, 380, 58, 0xf5c26b, () => updateSettings(scene, context, (next) => {
+    next.volumeSfx = stepVolume(next.volumeSfx, 0.1);
+  }));
+  renderSettingsRasterHitTarget(scene, 1360, 282, 340, 62, 0x5eead4, () => updateSettings(scene, context, (next) => {
+    next.displayMode = next.displayMode === "high_contrast" ? "standard" : "high_contrast";
+  }));
+  renderSettingsRasterHitTarget(scene, 1360, 372, 300, 62, 0x5eead4, () => updateSettings(scene, context, (next) => {
+    next.largeText = !next.largeText;
+  }));
+  renderSettingsRasterHitTarget(scene, 1360, 462, 300, 62, 0x5eead4, () => updateSettings(scene, context, (next) => {
+    next.reducedMotion = !next.reducedMotion;
+  }));
+  renderSettingsRasterHitTarget(scene, 1360, 640, 320, 62, 0x5eead4, () => updateSettings(scene, context, (next) => {
+    next.spaceConfirm = !next.spaceConfirm;
+  }));
+  renderSettingsRasterHitTarget(scene, 1626, 696, 300, 150, 0xf5c26b, () => resetSettings(scene, context));
+  renderSettingsRasterHitTarget(scene, 1626, 520, 300, 150, 0xce5869, () => resetStoredSave(scene, context));
+  renderSettingsRasterHitTarget(scene, 1570, 890, 270, 135, 0x5eead4, () => scene.scene.start("TownScene", context));
+}
+
+function renderSettingsRasterHitTarget(
+  scene: Phaser.Scene,
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  _accent: number,
+  onClick: () => void
+): void {
+  const largeTarget = width >= 180 || height >= 80;
+  const hoverSize = largeTarget ? 94 : 68;
+  renderRasterHoverHitTarget(scene, x, y, width, height, onClick, {
+    hoverKey: SETTINGS_RASTER_HOVER_ACTION_KEY,
+    hoverX: largeTarget ? x + width * 0.36 : x + width * 0.34,
+    hoverY: largeTarget ? y - height * 0.22 : y - height * 0.18,
+    hoverWidth: hoverSize,
+    hoverHeight: hoverSize,
+    downAlpha: 0.76
+  });
 }
 
 function renderSettingsPanel(scene: Phaser.Scene, context: BootContext): void {

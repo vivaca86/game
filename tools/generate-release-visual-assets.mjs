@@ -1,4 +1,4 @@
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { copyFile, mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { deflateSync } from "node:zlib";
@@ -8,6 +8,11 @@ const dataDir = path.join(rootDir, "src", "data", "ko");
 const publicRoot = path.join(rootDir, "public");
 const docsManifestPath = path.join(rootDir, "docs", "asset-manifest.release.v1.json");
 const runtimeManifestPath = path.join(rootDir, "src", "data", "assetManifest.release.v1.json");
+const sourcePassthroughAssets = new Map([
+  ["effect_stage_spotlight", path.join(rootDir, "assets", "source", "effects", "release", "effect_stage_spotlight_concept_v001.png")],
+  ["effect_paper_slash", path.join(rootDir, "assets", "source", "effects", "release", "effect_paper_slash_concept_v001.png")],
+  ["effect_ink_splash", path.join(rootDir, "assets", "source", "effects", "release", "effect_ink_splash_concept_v001.png")]
+]);
 
 const [cards, gems, relics, arcanas, characters, enemies, stages, events] = await Promise.all([
   readJson("cards.json"),
@@ -67,7 +72,12 @@ let generated = 0;
 for (const asset of assets) {
   const outputPath = path.join(publicRoot, asset.path);
   await mkdir(path.dirname(outputPath), { recursive: true });
-  await writeFile(outputPath, encodePng(asset.nativeSize.w, asset.nativeSize.h, paintFor(asset)));
+  const passthroughSource = sourcePassthroughAssets.get(asset.key);
+  if (passthroughSource) {
+    await copyFile(passthroughSource, outputPath);
+  } else {
+    await writeFile(outputPath, encodePng(asset.nativeSize.w, asset.nativeSize.h, paintFor(asset)));
+  }
   generated += 1;
 }
 

@@ -7,7 +7,10 @@ import { resolveCombatFeedbackEffectKey, resolveCombatFeedbackFrame } from "../.
 import { renderDebugOverlay } from "../../ui/overlays/debugOverlay";
 import { handleSceneAction } from "../bridge/sceneActions";
 import { requireBootContext } from "../bridge/sceneBridge";
-import { renderActionButton, renderCardHand, renderPaperPanel, renderSceneShell, textStyle } from "../view/sceneShell";
+import { renderActionButton, renderCardHand, renderPaperPanel, renderRasterHoverHitTarget, renderSceneShell, textStyle } from "../view/sceneShell";
+
+const COMBAT_RASTER_UNDERLAY_KEY = "combat_raster_underlay_concept";
+const COMBAT_RASTER_HOVER_SEAL_KEY = "ui_hover_gold_seal_concept";
 
 export class CombatScene extends Phaser.Scene {
   constructor() {
@@ -27,11 +30,18 @@ export class CombatScene extends Phaser.Scene {
       onCardClick: (index) => handleSceneAction(this, context, `card_${index + 1}` as InputAction)
     });
 
+    const rasterUnderlay = hasCombatRasterUnderlay(this, false);
     renderCombatTheater(this, context, false);
-    renderCombatPanel(this, context, 0xfffbef, 0x8f5b42, "#1e2a3e", "#805845");
-    renderCombatFeedbackEffect(this, context);
-    renderCombatPlayerStandee(this, context);
-    renderCardHand(this, context, (index) => handleSceneAction(this, context, `card_${index + 1}` as InputAction));
+    if (rasterUnderlay) {
+      renderCombatFeedbackEffect(this, context);
+      renderCombatRasterCardHand(this, context, (index) => handleSceneAction(this, context, `card_${index + 1}` as InputAction));
+    } else {
+      renderCombatFeedbackEffect(this, context);
+      renderCombatPanel(this, context, 0xfffbef, 0x8f5b42, "#1e2a3e", "#805845");
+      renderCombatPlayerStandee(this, context);
+      renderCombatEnemyStandee(this, context);
+      renderCardHand(this, context, (index) => handleSceneAction(this, context, `card_${index + 1}` as InputAction));
+    }
     renderCombatButtons(this, context);
     bindKeyboardActions(this, (action) => handleSceneAction(this, context, action), context.save.settings);
     renderDebugOverlay(context, "CombatScene");
@@ -39,11 +49,37 @@ export class CombatScene extends Phaser.Scene {
 }
 
 function renderCombatButtons(scene: Phaser.Scene, context: BootContext): void {
-  renderActionButton(scene, 1470, 616, "턴 종료", () => handleSceneAction(scene, context, "end_turn"), {
-    width: 210,
-    height: 58,
+  if (hasCombatRasterUnderlay(scene, false)) {
+    renderCombatRasterEndTurnButton(scene, context);
+    return;
+  }
+
+  renderActionButton(scene, 1630, 708, "턴 종료", () => handleSceneAction(scene, context, "end_turn"), {
+    width: 190,
+    height: 54,
     focus: true,
-    fontSize: 24
+    fontSize: 22
+  });
+}
+
+function hasCombatRasterUnderlay(scene: Phaser.Scene, boss: boolean): boolean {
+  return !boss && scene.textures.exists(COMBAT_RASTER_UNDERLAY_KEY);
+}
+
+function renderCombatRasterEndTurnButton(scene: Phaser.Scene, context: BootContext): void {
+  const x = 1660;
+  const y = 910;
+  const width = 300;
+  const height = 260;
+  renderRasterHoverHitTarget(scene, x, y, width, height, () => handleSceneAction(scene, context, "end_turn"), {
+    depth: 22,
+    hoverDepth: 24,
+    hoverKey: COMBAT_RASTER_HOVER_SEAL_KEY,
+    hoverX: x - 88,
+    hoverY: y - 118,
+    hoverWidth: 126,
+    hoverHeight: 126,
+    downAlpha: 0.78
   });
 }
 
@@ -57,6 +93,13 @@ export function renderCombatTheater(scene: Phaser.Scene, context: BootContext, b
   const accent = boss ? 0x3c3143 : 0xa5483f;
   const ribbon = boss ? 0x4d3a59 : 0xa5483f;
 
+  if (hasCombatRasterUnderlay(scene, boss)) {
+    scene.add.image(stageX, 540, COMBAT_RASTER_UNDERLAY_KEY)
+      .setDisplaySize(1920, 1080)
+      .setDepth(0);
+    return;
+  }
+
   scene.add.rectangle(stageX, stageY + 48, 1500, 680, 0x1e2a3e, 0.14);
   renderPaperPanel(scene, stageX, stageY, 1460, 650, { alpha: 0.88 });
   scene.add.rectangle(308, stageY + 62, 72, 560, accent, 0.12).setStrokeStyle(2, 0xc6a65e, 0.28);
@@ -67,6 +110,14 @@ export function renderCombatTheater(scene: Phaser.Scene, context: BootContext, b
   });
   scene.add.ellipse(stageX, stageY - 12, 990, 360, boss ? 0x3c3143 : 0x2f6b68, boss ? 0.18 : 0.16);
   scene.add.ellipse(stageX, stageY + 48, 740, 240, 0xf5c26b, 0.11);
+  scene.add.rectangle(stageX + 160, stageY + 86, 720, 150, 0x142234, 0.16)
+    .setStrokeStyle(2, 0xf5c26b, 0.2);
+  [1060, 1226, 1392].forEach((slotX, index) => {
+    const alpha = index === 1 ? 0.46 : 0.18;
+    scene.add.ellipse(slotX, stageY + 72, 150, 36, 0x1e2a3e, alpha);
+    scene.add.rectangle(slotX, stageY + 54, 132, 26, 0xfff1d0, 0.34)
+      .setStrokeStyle(2, 0xc6a65e, index === 1 ? 0.48 : 0.2);
+  });
   scene.add.rectangle(960, 650, 1220, 120, accent, boss ? 0.1 : 0.08)
     .setStrokeStyle(2, 0xc6a65e, 0.24);
   scene.add.rectangle(960, 714, 1260, 8, 0x805845, 0.18);
@@ -154,6 +205,82 @@ function renderCombatStatTag(scene: Phaser.Scene, x: number, y: number, width: n
     .setWordWrapWidth(width - 42);
 }
 
+function renderCombatRasterTopText(scene: Phaser.Scene, context: BootContext): void {
+  const stage = context.dataBundle.stages.find((item) => item.id === context.run.stageId)
+    ?? context.dataBundle.stages.find((item) => item.id === context.debug.stageId)
+    ?? context.dataBundle.stages[0];
+  const character = context.dataBundle.characters.find((item) => item.id === context.run.characterId)
+    ?? context.dataBundle.characters[0];
+  const combat = context.run.combat;
+
+  addRasterText(scene, 118, 188, character?.displayNameKo ?? "캐릭터 없음", 30, "#2f211a", true, 260);
+  addRasterText(scene, 162, 260, `체력 ${context.run.player.hp}/${context.run.player.maxHp}`, 23, "#fff5d7", true, 220);
+  addRasterText(scene, 162, 330, `기운 ${context.run.player.energy}/${context.run.player.maxEnergy}`, 23, "#fff5d7", true, 220);
+  addRasterText(scene, 162, 402, `방어 ${context.run.player.block}`, 23, "#fff5d7", true, 220);
+  addRasterText(scene, 118, 492, `골드 ${context.run.player.gold}`, 23, "#2f211a", true, 245);
+  addRasterText(scene, 118, 536, `턴 ${combat?.turn ?? 0}`, 23, "#2f211a", true, 245);
+  addRasterText(scene, 118, 580, stage?.displayNameKo ?? "스테이지 없음", 21, "#2f211a", true, 245);
+
+  const route = stage?.route ?? [];
+  route.slice(0, 5).forEach((room, index) => {
+    const x = 588 + index * 156;
+    addRasterText(scene, x, 136, roomTypeKo(room.type), 15, index === context.run.roomIndex ? "#5b2f40" : "#3a2a20", true, 80)
+      .setOrigin(0.5, 0)
+      .setAlign("center");
+  });
+}
+
+export function renderCombatRasterCardHand(
+  scene: Phaser.Scene,
+  context: BootContext,
+  onCardClick?: (index: number) => void
+): void {
+  const hand = context.run.hand.length > 0
+    ? context.run.hand
+    : context.save.currentRun?.hand ?? context.dataBundle.cards.slice(0, 5).map((card) => card.id);
+  const cards = hand
+    .map((id) => context.dataBundle.cards.find((card) => card.id === id))
+    .filter((card): card is NonNullable<typeof card> => Boolean(card))
+    .slice(0, 5);
+  const cardXs = [540, 760, 980, 1200, 1420];
+  const cardY = 836;
+  const cardWidth = 210;
+  const cardHeight = 324;
+
+  cards.forEach((_card, index) => {
+    const x = cardXs[index] ?? (540 + index * 220);
+    if (onCardClick) {
+      renderRasterHoverHitTarget(scene, x, cardY, cardWidth, cardHeight, () => onCardClick(index), {
+        hoverKey: COMBAT_RASTER_HOVER_SEAL_KEY,
+        hoverX: x + 12,
+        hoverY: cardY - 92,
+        hoverWidth: 82,
+        hoverHeight: 82,
+        downAlpha: 0.78
+      });
+    }
+  });
+}
+
+function addRasterText(
+  scene: Phaser.Scene,
+  x: number,
+  y: number,
+  value: string,
+  size: number,
+  color: string,
+  bold = false,
+  wrapWidth?: number
+): Phaser.GameObjects.Text {
+  const text = scene.add.text(x, y, value, textStyle(size, color, bold))
+    .setDepth(12)
+    .setShadow(1, 2, "rgba(20, 17, 22, 0.45)", 2);
+  if (wrapWidth) {
+    text.setWordWrapWidth(wrapWidth);
+  }
+  return text;
+}
+
 export function renderCombatPanel(
   scene: Phaser.Scene,
   context: BootContext,
@@ -185,39 +312,75 @@ function renderEnemyIntentLedger(
   const intentWrapWidth = isBoss ? 104 : 238;
   const intentLabel = isBoss ? compactBossIntentLabel(intent) : (intent?.telegraphKo ?? "없음");
   const intentText = isBoss ? intentLabel : `의도 ${intentLabel}`;
+  const panelX = isBoss ? 1518 : 1532;
+  const panelWidth = isBoss ? 394 : 364;
+  const left = panelX - panelWidth / 2;
 
-  renderPaperPanel(scene, 1380, 532, 456, 258, {
+  if (hasCombatRasterUnderlay(scene, isBoss)) {
+    renderCombatRasterEnemyInfo(scene, context);
+    return;
+  }
+
+  renderPaperPanel(scene, panelX, 532, panelWidth, 258, {
     alpha: 0.98,
     tint: fill === 0x3c3143 ? 0x4b4050 : undefined,
     fillFallback: fill,
     strokeFallback: stroke
   });
-  scene.add.rectangle(1380, 424, 410, 30, fill, 0.16).setStrokeStyle(2, stroke, 0.34);
-  scene.add.circle(1202, 424, 14, 0xf5c26b, 0.95).setStrokeStyle(3, 0x6d4a20, 0.85);
-  scene.add.text(1224, 412, isBoss ? "보스" : "적", textStyle(18, bodyColor, true));
-  scene.add.text(1204, 450, enemyName, textStyle(nameFontSize, titleColor, true)).setWordWrapWidth(300);
+  scene.add.rectangle(panelX, 424, panelWidth - 46, 30, fill, 0.16).setStrokeStyle(2, stroke, 0.34);
+  scene.add.circle(left + 28, 424, 14, 0xf5c26b, 0.95).setStrokeStyle(3, 0x6d4a20, 0.85);
+  scene.add.text(left + 50, 412, isBoss ? "보스" : "적", textStyle(18, bodyColor, true));
+  scene.add.text(left + 30, 450, enemyName, textStyle(nameFontSize, titleColor, true)).setWordWrapWidth(panelWidth - 132);
 
-  scene.add.rectangle(1302, 520, 196, 42, 0xfff8e8, 0.58).setStrokeStyle(2, 0xce5869, 0.62);
-  scene.add.text(1216, 506, `체력 ${combat?.enemyHp ?? "-"} / ${combat?.enemyMaxHp ?? "-"}`, textStyle(24, bodyColor, true));
-  scene.add.rectangle(1276, 562, 144, 34, 0xfff8e8, 0.44).setStrokeStyle(2, 0x5d8d86, 0.52);
-  scene.add.text(1216, 552, `방어 ${combat?.enemyBlock ?? 0}`, textStyle(20, bodyColor, true));
-  scene.add.rectangle(1446, 562, 144, 34, 0xfff8e8, 0.44).setStrokeStyle(2, 0x8f5b42, 0.52);
-  scene.add.text(1386, 552, `표식 ${combat?.enemyMark ?? 0}`, textStyle(20, bodyColor, true));
+  scene.add.rectangle(left + 130, 520, 196, 42, 0xfff8e8, 0.58).setStrokeStyle(2, 0xce5869, 0.62);
+  scene.add.text(left + 44, 506, `체력 ${combat?.enemyHp ?? "-"} / ${combat?.enemyMaxHp ?? "-"}`, textStyle(24, bodyColor, true));
+  scene.add.rectangle(left + 104, 562, 144, 34, 0xfff8e8, 0.44).setStrokeStyle(2, 0x5d8d86, 0.52);
+  scene.add.text(left + 44, 552, `방어 ${combat?.enemyBlock ?? 0}`, textStyle(20, bodyColor, true));
+  scene.add.rectangle(left + 262, 562, 122, 34, 0xfff8e8, 0.44).setStrokeStyle(2, 0x8f5b42, 0.52);
+  scene.add.text(left + 210, 552, `표식 ${combat?.enemyMark ?? 0}`, textStyle(19, bodyColor, true));
 
   if (spriteKey && scene.textures.exists(spriteKey)) {
-    scene.add.circle(1530, isBoss ? 502 : 496, isBoss ? 70 : 62, fill, 0.74).setStrokeStyle(3, stroke, 0.82);
-    scene.add.sprite(1530, isBoss ? 574 : 552, spriteKey, 0)
+    scene.add.circle(panelX + panelWidth / 2 - 60, isBoss ? 502 : 496, isBoss ? 48 : 40, fill, 0.54).setStrokeStyle(3, stroke, 0.62);
+    scene.add.sprite(panelX + panelWidth / 2 - 60, isBoss ? 554 : 542, spriteKey, 0)
       .setOrigin(0.5, 1)
-      .setDisplaySize(isBoss ? 138 : 114, isBoss ? 138 : 114);
+      .setDisplaySize(isBoss ? 92 : 78, isBoss ? 92 : 78);
   }
 
-  scene.add.rectangle(1320, 610, 236, 58, 0xfff1d0, 0.58).setStrokeStyle(2, stroke, 0.46);
+  scene.add.rectangle(left + 158, 610, panelWidth - 118, 58, 0xfff1d0, 0.58).setStrokeStyle(2, stroke, 0.46);
   if (intentIconKey && scene.textures.exists(intentIconKey)) {
-    scene.add.circle(1228, 610, 28, fill, 0.76).setStrokeStyle(2, stroke, 0.9);
-    scene.add.image(1228, 610, intentIconKey).setDisplaySize(48, 48);
+    scene.add.circle(left + 58, 610, 28, fill, 0.76).setStrokeStyle(2, stroke, 0.9);
+    scene.add.image(left + 58, 610, intentIconKey).setDisplaySize(48, 48);
   }
-  scene.add.text(1264, 592, intentText, textStyle(intentFontSize, bodyColor, true))
-    .setWordWrapWidth(intentWrapWidth);
+  scene.add.text(left + 96, 592, intentText, textStyle(intentFontSize, bodyColor, true))
+    .setWordWrapWidth(Math.min(intentWrapWidth, panelWidth - 130));
+}
+
+function renderCombatRasterEnemyInfo(
+  scene: Phaser.Scene,
+  context: BootContext
+): void {
+  const combat = context.run.combat;
+  const enemy = getCombatantData(context.run, context.dataBundle);
+  const intent = getActiveIntent(context.run, context.dataBundle);
+  const intentIconKey = resolveIntentIconKey(context);
+  const enemyName = enemy?.displayNameKo ?? "적 없음";
+  const nameFontSize = enemyName.length > 10 ? 24 : enemyName.length > 7 ? 27 : 30;
+  const intentText = intent?.telegraphKo ? `의도 ${intent.telegraphKo}` : "";
+
+  addRasterText(scene, 1694, 302, enemyName, Math.min(nameFontSize, 26), "#fff5d7", true, 210)
+    .setOrigin(0.5, 0)
+    .setAlign("center");
+  addRasterText(scene, 1626, 356, `체력 ${combat?.enemyHp ?? "-"} / ${combat?.enemyMaxHp ?? "-"}`, 22, "#fff5d7", true, 226);
+  addRasterText(scene, 1626, 416, `방어 ${combat?.enemyBlock ?? 0}`, 22, "#fff5d7", true, 226);
+  addRasterText(scene, 1626, 476, `표식 ${combat?.enemyMark ?? 0}`, 22, "#fff5d7", true, 226);
+  if (intentIconKey && scene.textures.exists(intentIconKey)) {
+    scene.add.image(1594, 538, intentIconKey)
+      .setDisplaySize(48, 48)
+      .setDepth(12);
+  }
+  if (intentText) {
+    addRasterText(scene, 1654, 586, intentText, 17, "#2f211a", true, 190);
+  }
 }
 
 function compactBossIntentLabel(intent: ReturnType<typeof getActiveIntent>): string {
@@ -266,15 +429,93 @@ export function renderCombatPlayerStandee(scene: Phaser.Scene, context: BootCont
   }
 
   const isBoss = context.run.combat?.enemyKind === "boss";
-  const baseY = isBoss ? 642 : 626;
-  const spriteSize = isBoss ? 146 : 168;
+  const raster = hasCombatRasterUnderlay(scene, isBoss);
+  const baseY = raster ? 654 : isBoss ? 642 : 626;
+  const spriteSize = raster ? 178 : isBoss ? 146 : 168;
+  const x = raster ? 590 : isBoss ? 768 : 792;
 
-  scene.add.ellipse(910, baseY + 4, isBoss ? 150 : 172, isBoss ? 30 : 34, 0x32415a, 0.16).setDepth(1);
-  scene.add.circle(910, isBoss ? 558 : 530, isBoss ? 72 : 84, 0xfff1d0, 0.28).setStrokeStyle(3, 0xc6a65e, 0.38);
-  scene.add.sprite(910, baseY, spriteKey, 0)
+  if (raster) {
+    scene.add.ellipse(x, baseY + 8, 198, 34, 0x05070a, 0.28).setDepth(2);
+    scene.add.sprite(x, baseY, spriteKey, 0)
+      .setOrigin(0.5, 1)
+      .setDisplaySize(spriteSize, spriteSize)
+      .setDepth(5);
+    return;
+  }
+
+  scene.add.ellipse(x, baseY + 4, isBoss ? 150 : 172, isBoss ? 30 : 34, 0x32415a, 0.16).setDepth(1);
+  scene.add.circle(x, isBoss ? 558 : 530, isBoss ? 72 : 84, 0xfff1d0, 0.28).setStrokeStyle(3, 0xc6a65e, 0.38);
+  scene.add.sprite(x, baseY, spriteKey, 0)
     .setOrigin(0.5, 1)
     .setDisplaySize(spriteSize, spriteSize)
     .setDepth(2);
+}
+
+export function renderCombatEnemyStandee(scene: Phaser.Scene, context: BootContext): void {
+  const combat = context.run.combat;
+  const enemy = getCombatantData(context.run, context.dataBundle);
+  const spriteKey = enemy?.assetKeys.sprite;
+  const isBoss = combat?.enemyKind === "boss";
+  const raster = hasCombatRasterUnderlay(scene, isBoss);
+  const activeX = raster ? 1178 : isBoss ? 1228 : 1226;
+  const baseY = raster ? 666 : isBoss ? 650 : 628;
+  const spriteSize = raster ? 198 : isBoss ? 238 : 178;
+  const slotXs = isBoss ? [1054, activeX, 1402] : [1060, activeX, 1392];
+
+  if (raster) {
+    scene.add.ellipse(activeX, baseY + 8, 220, 40, 0x05070a, 0.3).setDepth(2);
+    if (spriteKey && scene.textures.exists(spriteKey)) {
+      scene.add.sprite(activeX, baseY, spriteKey, 0)
+        .setOrigin(0.5, 1)
+        .setDisplaySize(spriteSize, spriteSize)
+        .setDepth(5);
+    }
+
+    const maxHp = combat?.enemyMaxHp ?? enemy?.maxHp ?? 1;
+    const hp = Math.max(0, combat?.enemyHp ?? maxHp);
+    const hpRatio = maxHp > 0 ? Math.max(0, Math.min(1, hp / maxHp)) : 1;
+    scene.add.rectangle(activeX, baseY + 38, 188, 9, 0x351e1e, 0.72).setDepth(6);
+    scene.add.rectangle(activeX - 94 + 94 * hpRatio, baseY + 38, 188 * hpRatio, 7, 0xa5483f, 0.9).setDepth(7);
+    return;
+  }
+
+  slotXs.forEach((slotX, index) => {
+    const active = slotX === activeX;
+    scene.add.ellipse(slotX, baseY + 8, active ? 190 : 124, active ? 38 : 24, 0x111827, active ? 0.24 : 0.12)
+      .setDepth(active ? 2 : 1);
+    scene.add.rectangle(slotX, baseY - 4, active ? 146 : 108, active ? 24 : 18, 0xfff1d0, active ? 0.52 : 0.2)
+      .setStrokeStyle(2, active ? 0xc6a65e : 0x8f8179, active ? 0.62 : 0.22)
+      .setDepth(active ? 2 : 1);
+    if (!active) {
+      scene.add.rectangle(slotX, baseY - 68, 74, 82, 0x1e2a3e, 0.1)
+        .setStrokeStyle(2, 0xc6a65e, 0.14)
+        .setDepth(1);
+    } else {
+      scene.add.rectangle(slotX, baseY - spriteSize - 28, 162, 34, isBoss ? 0x5b2f40 : 0xa5483f, 0.78)
+        .setStrokeStyle(2, 0xf5c26b, 0.58)
+        .setDepth(4);
+      scene.add.circle(slotX, baseY - spriteSize - 11, 17, 0xfff1d0, 0.92)
+        .setStrokeStyle(3, 0xc6a65e, 0.74)
+        .setDepth(5);
+    }
+    if (index === 0 || index === 2) {
+      scene.add.circle(slotX, baseY - 78, 8, 0xc6a65e, 0.28).setDepth(2);
+    }
+  });
+
+  if (spriteKey && scene.textures.exists(spriteKey)) {
+    scene.add.sprite(activeX, baseY, spriteKey, 0)
+      .setOrigin(0.5, 1)
+      .setDisplaySize(spriteSize, spriteSize)
+      .setDepth(5);
+  }
+
+  const maxHp = combat?.enemyMaxHp ?? enemy?.maxHp ?? 1;
+  const hp = Math.max(0, combat?.enemyHp ?? maxHp);
+  const hpRatio = maxHp > 0 ? Math.max(0, Math.min(1, hp / maxHp)) : 1;
+  scene.add.rectangle(activeX, baseY + 36, 190, 22, 0x1e2a3e, 0.74).setStrokeStyle(2, 0xc6a65e, 0.52).setDepth(6);
+  scene.add.rectangle(activeX - 95 + 95 * hpRatio, baseY + 36, 190 * hpRatio, 12, isBoss ? 0xce5869 : 0xa5483f, 0.9).setDepth(7);
+  scene.add.text(activeX - 76, baseY + 50, `${hp}/${maxHp}`, textStyle(17, "#fff5d7", true)).setDepth(7);
 }
 
 function resolveIntentIconKey(context: BootContext): string | undefined {
@@ -289,14 +530,14 @@ function resolveIntentIconKey(context: BootContext): string | undefined {
 
 function effectPlacement(effectKey: string, isBoss: boolean): { x: number; y: number; size: number; alpha: number; angle: number } {
   if (effectKey === "effect_paper_slash") {
-    return { x: 1500, y: isBoss ? 535 : 518, size: isBoss ? 188 : 166, alpha: 0.94, angle: -12 };
+    return { x: isBoss ? 1238 : 1228, y: isBoss ? 530 : 512, size: isBoss ? 218 : 176, alpha: 0.94, angle: -12 };
   }
 
   if (effectKey === "effect_ink_splash") {
-    return { x: 1508, y: isBoss ? 536 : 520, size: isBoss ? 186 : 164, alpha: 0.88, angle: 8 };
+    return { x: isBoss ? 1240 : 1230, y: isBoss ? 536 : 520, size: isBoss ? 214 : 174, alpha: 0.88, angle: 8 };
   }
 
-  return { x: 1530, y: isBoss ? 524 : 508, size: isBoss ? 194 : 168, alpha: 0.82, angle: 0 };
+  return { x: isBoss ? 1098 : 600, y: isBoss ? 472 : 570, size: isBoss ? 286 : 220, alpha: isBoss ? 0.84 : 0.78, angle: -2 };
 }
 
 function roomTypeKo(type: string): string {

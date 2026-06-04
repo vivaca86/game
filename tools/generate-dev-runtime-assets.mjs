@@ -1,4 +1,4 @@
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { copyFile, mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { deflateSync } from "node:zlib";
@@ -67,6 +67,39 @@ const candidateEffectSpriteKeys = new Set([
   "effect_stage_spotlight",
   "effect_paper_slash",
   "effect_ink_splash"
+]);
+
+const sourcePassthroughAssets = new Map([
+  ["ui_hover_gold_seal_concept", path.join(rootDir, "assets", "source", "ui", "ui_hover_gold_seal_concept_v001.png")],
+  ["ui_hover_boss_skull_stamp_concept", path.join(rootDir, "assets", "source", "ui", "ui_hover_boss_skull_stamp_concept_v001.png")],
+  ["ui_hover_route_node_concept", path.join(rootDir, "assets", "source", "ui", "ui_hover_route_node_concept_v001.png")],
+  ["ui_hover_choice_badge_concept", path.join(rootDir, "assets", "source", "ui", "ui_hover_choice_badge_concept_v001.png")],
+  ["ui_hover_action_seal_concept", path.join(rootDir, "assets", "source", "ui", "ui_hover_action_seal_concept_v001.png")],
+  ["ui_down_pressed_stamp_concept", path.join(rootDir, "assets", "source", "ui", "ui_down_pressed_stamp_concept_v001.png")],
+  ["ui_disabled_lock_stamp_concept", path.join(rootDir, "assets", "source", "ui", "ui_disabled_lock_stamp_concept_v001.png")],
+  ["ui_hover_world_map_play_button_concept", path.join(rootDir, "assets", "source", "ui", "ui_hover_world_map_play_button_concept_v001.png")],
+  ["ui_down_world_map_play_button_concept", path.join(rootDir, "assets", "source", "ui", "ui_down_world_map_play_button_concept_v001.png")],
+  ["ui_current_stage_marker_concept", path.join(rootDir, "assets", "source", "ui", "ui_current_stage_marker_concept_v001.png")],
+  ["ui_current_stage_halo_concept", path.join(rootDir, "assets", "source", "ui", "ui_current_stage_halo_concept_v001.png")],
+  ["ui_current_stage_status_badge_concept", path.join(rootDir, "assets", "source", "ui", "ui_current_stage_status_badge_concept_v001.png")],
+  ["combat_raster_underlay_concept", path.join(rootDir, "assets", "source", "ui", "combat_raster_underlay_concept_v001.png")],
+  ["boss_raster_underlay_concept", path.join(rootDir, "assets", "source", "ui", "boss_raster_underlay_concept_v001.png")],
+  ["reward_raster_underlay_concept", path.join(rootDir, "assets", "source", "ui", "reward_raster_underlay_concept_v001.png")],
+  ["event_raster_underlay_concept", path.join(rootDir, "assets", "source", "ui", "event_raster_underlay_concept_v001.png")],
+  ["town_raster_underlay_concept", path.join(rootDir, "assets", "source", "ui", "town_raster_underlay_concept_v001.png")],
+  ["world_map_raster_underlay_concept", path.join(rootDir, "assets", "source", "ui", "world_map_raster_underlay_concept_v001.png")],
+  ["dungeon_raster_underlay_concept", path.join(rootDir, "assets", "source", "ui", "dungeon_raster_underlay_concept_v001.png")],
+  ["rune_bench_raster_underlay_concept", path.join(rootDir, "assets", "source", "ui", "rune_bench_raster_underlay_concept_v001.png")],
+  ["result_raster_underlay_concept", path.join(rootDir, "assets", "source", "ui", "result_raster_underlay_concept_v001.png")],
+  ["settings_raster_underlay_concept", path.join(rootDir, "assets", "source", "ui", "settings_raster_underlay_concept_v001.png")],
+  ["effect_stage_spotlight", path.join(rootDir, "assets", "source", "effects", "effect_stage_spotlight_concept_v001.png")],
+  ["effect_paper_slash", path.join(rootDir, "assets", "source", "effects", "effect_paper_slash_concept_v001.png")],
+  ["effect_ink_splash", path.join(rootDir, "assets", "source", "effects", "effect_ink_splash_concept_v001.png")],
+  ["char_mina_pagehand_sprite", path.join(rootDir, "assets", "source", "characters", "char_mina_pagehand_sprite_raster_v001.png")],
+  ["monster_folded_sentry", path.join(rootDir, "assets", "source", "monsters", "monster_folded_sentry_sprite_raster_v001.png")],
+  ["card_art_sun_jab", path.join(rootDir, "assets", "source", "cards", "card_art_sun_jab_raster_v001.png")],
+  ["card_art_fold_guard", path.join(rootDir, "assets", "source", "cards", "card_art_fold_guard_raster_v001.png")],
+  ["card_art_page_step", path.join(rootDir, "assets", "source", "cards", "card_art_page_step_raster_v001.png")]
 ]);
 
 function crc32(buffer) {
@@ -676,30 +709,45 @@ function paintUiPanel(asset) {
     const [paperR, paperG, paperB] = palette.base;
     const [accentR, accentG, accentB] = palette.accent;
     const [darkR, darkG, darkB] = palette.dark;
-    const grain = ((x * 19 + y * 11 + seed) % 37) < 8 ? -7 : 0;
-    const paper = [paperR + grain, paperG + grain, paperB + grain, 248];
+    const grain = ((x * 19 + y * 11 + seed) % 37) < 8 ? -8 : 0;
+    const paper = [paperR + grain, paperG + grain, paperB + grain, 250];
     const accent = [accentR, accentG, accentB, 255];
     const dark = [darkR, darkG, darkB, 255];
 
-    if (!insideRoundedRect(x, y, 8, 8, width - 16, height - 16, 20)) {
+    if (!insideRoundedRect(x, y, 6, 6, width - 12, height - 12, 22)) {
       return [0, 0, 0, 0];
     }
 
     let color = paper;
-    if (!insideRoundedRect(x, y, 14, 14, width - 28, height - 28, 16)) {
+    if (!insideRoundedRect(x, y, 12, 12, width - 24, height - 24, 18)) {
       color = dark;
-    } else if (!insideRoundedRect(x, y, 22, 22, width - 44, height - 44, 12)) {
-      color = mix(accent, dark, 0.18);
-    } else if (!insideRoundedRect(x, y, 30, 30, width - 60, height - 60, 10)) {
-      color = mix(paper, accent, 0.28);
+    } else if (!insideRoundedRect(x, y, 21, 21, width - 42, height - 42, 14)) {
+      color = mix(accent, dark, 0.12);
+    } else if (!insideRoundedRect(x, y, 34, 34, width - 68, height - 68, 10)) {
+      color = mix(paper, accent, 0.22);
     }
 
-    const foldInset = 38;
-    if (distanceToSegment(x, y, foldInset, 48, width - foldInset, 48) < 2
-      || distanceToSegment(x, y, foldInset, height - 48, width - foldInset, height - 48) < 2
-      || distanceToSegment(x, y, 48, foldInset, 48, height - foldInset) < 2
-      || distanceToSegment(x, y, width - 48, foldInset, width - 48, height - foldInset) < 2) {
-      color = mix(color, dark, 0.18);
+    const brassCorners = [
+      [[7, 7], [78, 7], [7, 78]],
+      [[width - 8, 7], [width - 78, 7], [width - 8, 78]],
+      [[7, height - 8], [78, height - 8], [7, height - 78]],
+      [[width - 8, height - 8], [width - 78, height - 8], [width - 8, height - 78]]
+    ];
+    if (brassCorners.some((points) => pointInPolygon(x, y, points))) {
+      color = mix(accent, dark, 0.08);
+    }
+
+    const foldInset = 48;
+    const topStitch = distanceToSegment(x, y, foldInset, 52, width - foldInset, 52) < 2
+      && Math.floor((x + seed) / 18) % 2 === 0;
+    const bottomStitch = distanceToSegment(x, y, foldInset, height - 52, width - foldInset, height - 52) < 2
+      && Math.floor((x + seed) / 18) % 2 === 0;
+    const leftStitch = distanceToSegment(x, y, 52, foldInset, 52, height - foldInset) < 2
+      && Math.floor((y + seed) / 18) % 2 === 0;
+    const rightStitch = distanceToSegment(x, y, width - 52, foldInset, width - 52, height - foldInset) < 2
+      && Math.floor((y + seed) / 18) % 2 === 0;
+    if (topStitch || bottomStitch || leftStitch || rightStitch) {
+      color = mix(color, dark, 0.28);
     }
 
     for (const [cx, cy] of [
@@ -714,6 +762,12 @@ function paintUiPanel(asset) {
       if (pinDistance < 3) color = [255, 236, 157, 255];
     }
 
+    if (pointInPolygon(x, y, [[width - 82, 36], [width - 38, 36], [width - 38, 82]])) {
+      color = mix(color, [255, 255, 235, 255], 0.28);
+    }
+    if (pointInPolygon(x, y, [[36, height - 82], [36, height - 38], [82, height - 38]])) {
+      color = mix(color, dark, 0.08);
+    }
     if ((x > 54 && x < width - 54 && y > 54 && y < height - 54)
       && ((Math.floor((x + seed) / 29) + Math.floor(y / 41)) % 9 === 0)) {
       color = mix(color, [255, 255, 235, 255], 0.18);
@@ -731,24 +785,31 @@ function paintUiButton(asset) {
     const [paperR, paperG, paperB] = palette.base;
     const [accentR, accentG, accentB] = palette.accent;
     const [darkR, darkG, darkB] = palette.dark;
-    const grain = ((x * 17 + y * 13 + seed) % 31) < 6 ? -6 : 0;
-    if (!insideRoundedRect(x, y, 4, 4, width - 8, height - 8, 18)) return [0, 0, 0, 0];
+    const grain = ((x * 17 + y * 13 + seed) % 31) < 6 ? -8 : 0;
+    if (!insideRoundedRect(x, y, 4, 6, width - 8, height - 12, 20)) return [0, 0, 0, 0];
 
     let color = isPrimary
       ? [paperR + grain, paperG + grain, paperB + grain, 255]
       : [255 + grain, 248 + grain, 226 + grain, 255];
-    if (!insideRoundedRect(x, y, 8, 8, width - 16, height - 16, 14)) {
+    if (!insideRoundedRect(x, y, 9, 11, width - 18, height - 22, 15)) {
       color = [darkR, darkG, darkB, 255];
-    } else if (!insideRoundedRect(x, y, 15, 15, width - 30, height - 30, 10)) {
-      color = [accentR, accentG, accentB, 255];
+    } else if (!insideRoundedRect(x, y, 17, 18, width - 34, height - 36, 10)) {
+      color = isPrimary ? [accentR, accentG, accentB, 255] : mix([accentR, accentG, accentB, 255], [darkR, darkG, darkB, 255], 0.12);
+    } else if (isPrimary) {
+      color = mix(color, [33, 76, 78, 255], 0.28);
     }
-    if (insideRoundedRect(x, y, 25, 18, width - 50, Math.max(8, height * 0.18), 7)) {
+    if (insideRoundedRect(x, y, 25, 18, width - 50, Math.max(8, height * 0.2), 7)) {
       color = mix(color, isPrimary ? [255, 255, 235, 255] : [255, 236, 170, 255], isPrimary ? 0.16 : 0.22);
     }
-    if (distanceToSegment(x, y, 24, height - 17, width - 24, height - 17) < 2) {
+    if (distanceToSegment(x, y, 24, height - 18, width - 24, height - 18) < 2
+      && Math.floor((x + seed) / 15) % 2 === 0) {
       color = mix(color, [255, 239, 157, 255], 0.6);
     }
-    for (const [cx, cy] of [[20, 20], [width - 20, 20], [20, height - 20], [width - 20, height - 20]]) {
+    if (pointInPolygon(x, y, [[9, height / 2], [31, height / 2 - 18], [31, height / 2 + 18]])
+      || pointInPolygon(x, y, [[width - 9, height / 2], [width - 31, height / 2 - 18], [width - 31, height / 2 + 18]])) {
+      color = mix(isPrimary ? [accentR, accentG, accentB, 255] : [darkR, darkG, darkB, 255], [255, 226, 126, 255], 0.18);
+    }
+    for (const [cx, cy] of [[20, 22], [width - 20, 22], [20, height - 22], [width - 20, height - 22]]) {
       if (Math.abs(x - cx) + Math.abs(y - cy) < 8) color = [accentR, accentG, accentB, 255];
       if (Math.abs(x - cx) + Math.abs(y - cy) < 4) color = [255, 240, 154, 255];
     }
@@ -764,14 +825,16 @@ function paintUiSlot(asset) {
     const [paperR, paperG, paperB] = palette.base;
     const [accentR, accentG, accentB] = palette.accent;
     const [darkR, darkG, darkB] = palette.dark;
-    const grain = ((x * 19 + y * 7 + seed) % 37) < 8 ? -7 : 0;
-    if (!insideRoundedRect(x, y, 6, 6, width - 12, height - 12, 20)) return [0, 0, 0, 0];
+    const grain = ((x * 19 + y * 7 + seed) % 37) < 8 ? -8 : 0;
+    if (!insideRoundedRect(x, y, 5, 6, width - 10, height - 12, 22)) return [0, 0, 0, 0];
 
     let color = [paperR + grain, paperG + grain, paperB + grain, 250];
-    if (!insideRoundedRect(x, y, 12, 12, width - 24, height - 24, 15)) {
+    if (!insideRoundedRect(x, y, 11, 12, width - 22, height - 24, 16)) {
       color = [darkR, darkG, darkB, 255];
-    } else if (!insideRoundedRect(x, y, 20, 20, width - 40, height - 40, 11)) {
-      color = mix([accentR, accentG, accentB, 255], [darkR, darkG, darkB, 255], 0.16);
+    } else if (!insideRoundedRect(x, y, 21, 22, width - 42, height - 44, 11)) {
+      color = mix([accentR, accentG, accentB, 255], [darkR, darkG, darkB, 255], isReward ? 0.04 : 0.16);
+    } else if (isReward && insideRoundedRect(x, y, 38, 44, width - 76, height - 92, 12)) {
+      color = mix(color, [32, 52, 62, 255], 0.2);
     }
 
     const medallionX = isReward ? 54 : 38;
@@ -781,12 +844,20 @@ function paintUiSlot(asset) {
     if (Math.hypot(x - medallionX, y - height / 2) < (isReward ? 20 : 11)) {
       color = [accentR, accentG, accentB, 255];
     }
+    if (isReward && pointInPolygon(x, y, [[width / 2 - 34, 14], [width / 2, 0], [width / 2 + 34, 14], [width / 2, 46]])) {
+      color = mix([accentR, accentG, accentB, 255], [255, 230, 122, 255], 0.2);
+    }
     if (!isReward && x > width - 56 && y < 48 && x + y > width - 44) {
       color = mix([accentR, accentG, accentB, 255], [255, 241, 180, 255], 0.28);
     }
-    if (distanceToSegment(x, y, isReward ? 92 : 66, 30, width - 38, 30) < 2
-      || distanceToSegment(x, y, isReward ? 92 : 66, height - 30, width - 38, height - 30) < 2) {
+    if ((distanceToSegment(x, y, isReward ? 92 : 66, 30, width - 38, 30) < 2
+      || distanceToSegment(x, y, isReward ? 92 : 66, height - 30, width - 38, height - 30) < 2)
+      && Math.floor((x + seed) / 16) % 2 === 0) {
       color = mix(color, [255, 255, 235, 255], 0.32);
+    }
+    for (const [cx, cy] of [[25, 24], [width - 25, 24], [25, height - 24], [width - 25, height - 24]]) {
+      if (Math.hypot(x - cx, y - cy) < 8) color = [darkR, darkG, darkB, 255];
+      if (Math.hypot(x - cx, y - cy) < 5) color = [accentR, accentG, accentB, 255];
     }
     return color;
   };
@@ -799,7 +870,7 @@ function paintUiTooltip(asset) {
     const [paperR, paperG, paperB] = palette.base;
     const [accentR, accentG, accentB] = palette.accent;
     const [darkR, darkG, darkB] = palette.dark;
-    const grain = ((x * 11 + y * 17 + seed) % 41) < 9 ? -6 : 0;
+    const grain = ((x * 11 + y * 17 + seed) % 41) < 9 ? -7 : 0;
     if (!insideRoundedRect(x, y, 6, 6, width - 12, height - 12, 18)) return [0, 0, 0, 0];
 
     let color = [paperR + grain, paperG + grain, paperB + grain, 248];
@@ -808,8 +879,16 @@ function paintUiTooltip(asset) {
     } else if (!insideRoundedRect(x, y, 20, 20, width - 40, height - 40, 9)) {
       color = mix([accentR, accentG, accentB, 255], [255, 241, 180, 255], 0.3);
     }
-    if (distanceToSegment(x, y, 34, 32, width - 34, 32) < 2) color = mix(color, [255, 255, 235, 255], 0.34);
+    if (distanceToSegment(x, y, 34, 32, width - 34, 32) < 2
+      && Math.floor((x + seed) / 17) % 2 === 0) color = mix(color, [255, 255, 235, 255], 0.34);
     if (Math.abs(x - 31) + Math.abs(y - height / 2) < 12) color = [accentR, accentG, accentB, 255];
+    if (pointInPolygon(x, y, [[48, height - 16], [76, height - 16], [62, height - 2]])) {
+      color = mix([accentR, accentG, accentB, 255], [255, 241, 180, 255], 0.26);
+    }
+    for (const [cx, cy] of [[28, 26], [width - 28, 26]]) {
+      if (Math.hypot(x - cx, y - cy) < 8) color = [darkR, darkG, darkB, 255];
+      if (Math.hypot(x - cx, y - cy) < 5) color = [accentR, accentG, accentB, 255];
+    }
     return color;
   };
 }
@@ -1390,6 +1469,12 @@ for (const asset of manifest.assets) {
 
   const outputPath = path.join(outputRoot, asset.path);
   await mkdir(path.dirname(outputPath), { recursive: true });
+  const passthroughSource = sourcePassthroughAssets.get(asset.key);
+  if (passthroughSource) {
+    await copyFile(passthroughSource, outputPath);
+    generated += 1;
+    continue;
+  }
   await writeFile(outputPath, encodePng(width, height, paintFor(asset)));
   generated += 1;
 }

@@ -1,4 +1,4 @@
-import { mkdir } from "node:fs/promises";
+import { appendFile, mkdir } from "node:fs/promises";
 import { createRequire } from "node:module";
 import Module from "node:module";
 import path from "node:path";
@@ -29,6 +29,22 @@ const executableCandidates = [
   "C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe"
 ];
 const productionSaveKey = "paper_theater_card_crawler_save_v1";
+const shouldLogSmokeProgress = process.env.PHASER_SMOKE_PROGRESS === "1";
+const smokeProgressFile = process.env.PHASER_SMOKE_PROGRESS_FILE;
+const rasterOnlySceneUnderlays = {
+  BossScene: "boss_raster_underlay_concept",
+  CombatScene: "combat_raster_underlay_concept",
+  DungeonScene: "dungeon_raster_underlay_concept",
+  EventScene: "event_raster_underlay_concept",
+  RuneBenchScene: "rune_bench_raster_underlay_concept",
+  ResultScene: "result_raster_underlay_concept",
+  RewardScene: "reward_raster_underlay_concept",
+  SettingsScene: "settings_raster_underlay_concept",
+  TownScene: "town_raster_underlay_concept",
+  WorldMapScene: "world_map_raster_underlay_concept"
+};
+const rasterDownPressedImageKey = "ui_down_pressed_stamp_concept";
+const rasterDisabledImageKey = "ui_disabled_lock_stamp_concept";
 
 let browser;
 let launchError;
@@ -86,29 +102,39 @@ const cardCosts = new Map([
 ]);
 
 try {
-  await checkPage("/", "TownScene", false);
-  await checkPage("/?debug=1&entry=combat&resetSave=1", "CombatScene", true);
-  await checkPage("/?debug=1&entry=boss&resetSave=1", "BossScene", true);
-  await checkViewScreenshots();
-  await checkClickableControls();
-  await checkFullInputCoverage();
-  await checkSettingsSurface();
-  await checkUiSkinStates();
-  await checkSaveReload();
-  await checkProductionSaveReset();
-  await checkCombatActions();
-  await checkReleaseCatalogMode();
-  await checkReleaseGemRuneEffect();
-  await checkReleaseEnemyIntentBatch();
-  await checkReleaseStageRouteBatch();
-  await checkReleaseEventBatch();
-  await checkReleasePassiveBatch();
-  await checkCoreRunLoop();
-  await checkSceneFlowAndRuneEffect();
-  await checkBossResultFlow();
+  await runSmokeStep("checkPage TownScene", () => checkPage("/", "TownScene", false));
+  await runSmokeStep("checkPage CombatScene", () => checkPage("/?debug=1&entry=combat&resetSave=1", "CombatScene", true));
+  await runSmokeStep("checkPage BossScene", () => checkPage("/?debug=1&entry=boss&resetSave=1", "BossScene", true));
+  await runSmokeStep("checkViewScreenshots", checkViewScreenshots);
+  await runSmokeStep("checkClickableControls", checkClickableControls);
+  await runSmokeStep("checkFullInputCoverage", checkFullInputCoverage);
+  await runSmokeStep("checkSettingsSurface", checkSettingsSurface);
+  await runSmokeStep("checkUiSkinStates", checkUiSkinStates);
+  await runSmokeStep("checkSaveReload", checkSaveReload);
+  await runSmokeStep("checkProductionSaveReset", checkProductionSaveReset);
+  await runSmokeStep("checkCombatActions", checkCombatActions);
+  await runSmokeStep("checkReleaseCatalogMode", checkReleaseCatalogMode);
+  await runSmokeStep("checkReleaseGemRuneEffect", checkReleaseGemRuneEffect);
+  await runSmokeStep("checkReleaseEnemyIntentBatch", checkReleaseEnemyIntentBatch);
+  await runSmokeStep("checkReleaseStageRouteBatch", checkReleaseStageRouteBatch);
+  await runSmokeStep("checkReleaseEventBatch", checkReleaseEventBatch);
+  await runSmokeStep("checkReleasePassiveBatch", checkReleasePassiveBatch);
+  await runSmokeStep("checkCoreRunLoop", checkCoreRunLoop);
+  await runSmokeStep("checkSceneFlowAndRuneEffect", checkSceneFlowAndRuneEffect);
+  await runSmokeStep("checkBossResultFlow", checkBossResultFlow);
   console.log("Phaser smoke OK");
 } finally {
   await browser.close();
+}
+
+async function runSmokeStep(label, action) {
+  await logSmokeProgress(label);
+  await action();
+}
+
+async function logSmokeProgress(label) {
+  if (shouldLogSmokeProgress) console.log(`[smoke] ${label}`);
+  if (smokeProgressFile) await appendFile(smokeProgressFile, `[smoke] ${label}\n`, "utf8");
 }
 
 async function checkPage(pathname, expectedScene, expectDebugOverlay) {
@@ -396,23 +422,25 @@ async function checkReleaseCatalogMode() {
 
 async function checkClickableControls() {
   await withDebugPage("/?debug=1&entry=town&resetSave=1", "TownScene", async (page) => {
-    await assertHoverChangesCanvas(page, 1010, 642, "town-action-button");
+    await assertHoverUsesRasterImageOnly(page, 1010, 642, "town-action-button", "ui_hover_action_seal_concept", "TownScene");
     await clickScenePoint(page, 1010, 642);
     await waitForDebugValue(page, "phase", "world_map");
 
-    await clickScenePoint(page, 1010, 512);
+    await assertHoverUsesRasterImageOnly(page, 1576, 970, "world-map-confirm", "ui_hover_world_map_play_button_concept", "WorldMapScene", "ui_down_world_map_play_button_concept");
+    await clickScenePoint(page, 1576, 970);
     await waitForDebugValue(page, "phase", "dungeon");
 
+    await assertHoverUsesRasterImageOnly(page, 1010, 582, "dungeon-confirm", "ui_hover_route_node_concept", "DungeonScene");
     await clickScenePoint(page, 1010, 582);
     await waitForDebugValue(page, "phase", "combat");
 
-    await assertHoverChangesCanvas(page, 430, 790, "combat-card");
-    await clickScenePoint(page, 430, 790);
+    await assertHoverUsesRasterImageOnly(page, 540, 836, "combat-card", "ui_hover_gold_seal_concept");
+    await clickScenePoint(page, 540, 836);
     await waitForDebugValue(page, "enemyHp", "17");
     await waitForDebugValue(page, "playerEnergy", "2");
 
-    await assertHoverChangesCanvas(page, 1470, 616, "combat-end-turn");
-    await clickScenePoint(page, 1380, 638);
+    await assertHoverUsesRasterImageOnly(page, 1660, 910, "combat-end-turn", "ui_hover_gold_seal_concept");
+    await clickScenePoint(page, 1660, 910);
     await waitForDebugValue(page, "playerHp", "36");
     await waitForDebugValue(page, "turn", "2");
   });
@@ -420,37 +448,38 @@ async function checkClickableControls() {
 
 async function checkFullInputCoverage() {
   await withDebugPage("/?debug=1&entry=reward&resetSave=1", "RewardScene", async (page) => {
-    await assertHoverChangesCanvas(page, 630, 618, "reward-choice-card");
+    await assertHoverUsesRasterImageOnly(page, 630, 618, "reward-choice-card", "ui_hover_choice_badge_concept", "RewardScene");
     await clickScenePoint(page, 630, 618);
     await waitForDebugValue(page, "phase", "event");
   });
 
   await withDebugPage("/?debug=1&entry=event&resetSave=1", "EventScene", async (page) => {
-    await assertHoverChangesCanvas(page, 618, 722, "event-choice");
+    await assertHoverUsesRasterImageOnly(page, 618, 722, "event-choice", "ui_hover_choice_badge_concept", "EventScene");
     await clickScenePoint(page, 618, 722);
     await waitForDebugValue(page, "phase", "rune_bench");
   });
 
   await withDebugPage("/?debug=1&entry=rune_bench&resetSave=1&grantRune=rune_paper_spark", "RuneBenchScene", async (page) => {
-    await assertHoverChangesCanvas(page, 1010, 742, "rune-bench-action");
+    await assertHoverUsesRasterImageOnly(page, 1010, 742, "rune-bench-action", "ui_hover_action_seal_concept", "RuneBenchScene");
     await clickScenePoint(page, 1010, 742);
     await waitForDebugValue(page, "phase", "combat");
     await waitForDebugText(page, "equipped=card_sun_jab:rune_paper_spark");
   });
 
   await withDebugPage("/?debug=1&entry=boss&resetSave=1", "BossScene", async (page) => {
-    await assertHoverChangesCanvas(page, 1470, 616, "boss-end-turn");
-    await clickScenePoint(page, 1470, 616);
+    await assertHoverUsesRasterImageOnly(page, 1750, 960, "boss-end-turn", "ui_hover_boss_skull_stamp_concept", "BossScene");
+    await clickScenePoint(page, 1750, 960);
     await waitForDebugValue(page, "turn", "2");
   });
 
   await withDebugPage("/?debug=1&entry=result&resetSave=1", "ResultScene", async (page) => {
+    await assertHoverUsesRasterImageOnly(page, 1010, 742, "result-confirm", "ui_hover_action_seal_concept", "ResultScene");
     await clickScenePoint(page, 1010, 742);
     await waitForDebugValue(page, "phase", "town");
   });
 
   await withDebugPage("/?debug=1&data=release&entry=event&resetSave=1&stage=stage_sunny_gate", "EventScene", async (page) => {
-    await clickScenePoint(page, 705, 866);
+    await clickScenePoint(page, 1145, 866);
     await waitForDebugValue(page, "phase", "combat");
     await waitForDebugValue(page, "eventChoice", "event_bubble_shop_choice_3");
   });
@@ -477,19 +506,19 @@ async function checkSettingsSurface() {
     await waitForDebugValue(page, "settingReducedMotion", "false");
     await waitForDebugValue(page, "settingSpaceConfirm", "true");
 
-    await clickScenePoint(page, 1146, 595);
+    await clickScenePoint(page, 840, 282);
     await waitForDebugValue(page, "settingMaster", "90");
-    await clickScenePoint(page, 1146, 660);
+    await clickScenePoint(page, 840, 372);
     await waitForDebugValue(page, "settingMusic", "70");
-    await clickScenePoint(page, 1146, 725);
+    await clickScenePoint(page, 840, 462);
     await waitForDebugValue(page, "settingSfx", "90");
-    await clickScenePoint(page, 1610, 530);
+    await clickScenePoint(page, 1360, 282);
     await waitForDebugValue(page, "settingDisplay", "high_contrast");
-    await clickScenePoint(page, 1610, 595);
+    await clickScenePoint(page, 1360, 372);
     await waitForDebugValue(page, "settingLargeText", "true");
-    await clickScenePoint(page, 1610, 660);
+    await clickScenePoint(page, 1360, 462);
     await waitForDebugValue(page, "settingReducedMotion", "true");
-    await clickScenePoint(page, 1610, 725);
+    await clickScenePoint(page, 1360, 640);
     await waitForDebugValue(page, "settingSpaceConfirm", "false");
 
     const changedSave = await readDebugSave(page);
@@ -518,11 +547,11 @@ async function checkSettingsSurface() {
 
     await clickScenePoint(page, 1010, 806);
     await waitForDebugScene(page, "SettingsScene");
-    await clickScenePoint(page, 820, 900);
+    await clickScenePoint(page, 1626, 696);
     await waitForDebugValue(page, "settingMaster", "80");
     await waitForDebugValue(page, "settingDisplay", "standard");
     await waitForDebugValue(page, "settingSpaceConfirm", "true");
-    await clickScenePoint(page, 1500, 900);
+    await clickScenePoint(page, 1570, 890);
     await waitForDebugScene(page, "TownScene");
     await pressAndSettle(page, "Space");
     await waitForDebugValue(page, "phase", "world_map");
@@ -535,7 +564,28 @@ async function checkUiSkinStates() {
     await waitForDebugScene(page, "SettingsScene");
     await assertSceneTextLayout(page, "SettingsScene");
     await waitForDebugValue(page, "uiSkin", "button+slot+tooltip");
-    await assertHoverChangesCanvas(page, 1146, 595, "settings-secondary-button");
+    const settingsHoverTargets = [
+      { x: 840, y: 282, label: "settings-volume-master" },
+      { x: 840, y: 372, label: "settings-volume-music" },
+      { x: 840, y: 462, label: "settings-volume-sfx" },
+      { x: 1360, y: 282, label: "settings-display-mode" },
+      { x: 1360, y: 372, label: "settings-large-text" },
+      { x: 1360, y: 462, label: "settings-reduced-motion" },
+      { x: 1360, y: 640, label: "settings-space-confirm" },
+      { x: 1626, y: 696, label: "settings-reset-defaults" },
+      { x: 1626, y: 520, label: "settings-reset-save" },
+      { x: 1570, y: 890, label: "settings-return-town" }
+    ];
+    for (const target of settingsHoverTargets) {
+      await assertHoverUsesRasterImageOnly(
+        page,
+        target.x,
+        target.y,
+        target.label,
+        "ui_hover_action_seal_concept",
+        "SettingsScene"
+      );
+    }
     await captureUiSkinScreenshot(page, "settings-controls");
   });
 
@@ -543,8 +593,9 @@ async function checkUiSkinStates() {
     await waitForDebugValue(page, "uiSkin", "button+slot+tooltip");
     await waitForDebugValue(page, "event", "event_bubble_shop");
     await waitForDebugValue(page, "playerHp", "1");
+    await assertRasterImageVisibleOnly(page, "event-disabled-choice", rasterDisabledImageKey, "EventScene");
     await captureUiSkinScreenshot(page, "event-disabled-choice");
-    await clickScenePoint(page, 1320, 848);
+    await clickScenePoint(page, 1450, 848);
     await page.waitForTimeout(180);
     const state = await getDebugMap(page);
     if (state.phase !== "event" || state.eventChoice !== "none") {
@@ -557,11 +608,11 @@ async function checkSaveReload() {
   await withDebugPage("/?debug=1&entry=town&resetSave=1", "TownScene", async (page) => {
     await clickScenePoint(page, 1010, 642);
     await waitForDebugValue(page, "phase", "world_map");
-    await clickScenePoint(page, 1010, 512);
+    await clickScenePoint(page, 1576, 970);
     await waitForDebugValue(page, "phase", "dungeon");
     await clickScenePoint(page, 1010, 582);
     await waitForDebugValue(page, "phase", "combat");
-    await clickScenePoint(page, 430, 790);
+    await clickScenePoint(page, 540, 836);
     await waitForDebugValue(page, "enemyHp", "17");
 
     validateSaveSnapshot(await readDebugSave(page), "mid-combat save");
@@ -600,7 +651,7 @@ async function checkSaveReload() {
   });
 
   await withDebugPage("/?debug=1&entry=combat&resetSave=1", "CombatScene", async (page) => {
-    await clickScenePoint(page, 430, 790);
+    await clickScenePoint(page, 540, 836);
     await waitForDebugValue(page, "enemyHp", "17");
     const originalSave = await readDebugSave(page);
     validateSaveSnapshot(originalSave, "legacy migration source save");
@@ -781,10 +832,12 @@ async function checkReleaseStageRouteBatch() {
 }
 
 async function checkReleaseEventBatch() {
+  await logSmokeProgress("checkReleaseEventBatch first event page");
   await withDebugPage(
     "/?debug=1&data=release&entry=event&resetSave=1&stage=stage_sunny_gate",
     "EventScene",
     async (page) => {
+      await logSmokeProgress("checkReleaseEventBatch first page metadata");
       await waitForDebugValue(page, "dataMode", "release");
       await waitForDebugValue(page, "eventsTotal", "10");
       await waitForDebugValue(page, "phase", "event");
@@ -792,7 +845,9 @@ async function checkReleaseEventBatch() {
       await waitForDebugValue(page, "eventChoices", "4");
       await waitForDebugText(page, "eventCosts=spend_currency|spend_currency|free|spend_hp");
       await waitForDebugText(page, "eventRewards=card|rune+heal|currency|relic+currency");
+      await logSmokeProgress("checkReleaseEventBatch first page screenshot");
       await captureEventScreenshot(page, "release-bubble-shop");
+      await logSmokeProgress("checkReleaseEventBatch first page choose Digit3");
       await pressAndSettle(page, "Digit3");
       await waitForDebugValue(page, "phase", "combat");
       await waitForDebugValue(page, "eventChoice", "event_bubble_shop_choice_3");
@@ -801,11 +856,14 @@ async function checkReleaseEventBatch() {
     }
   );
 
+  await logSmokeProgress("checkReleaseEventBatch second event page");
   await withDebugPage(
     "/?debug=1&data=release&entry=event&resetSave=1&stage=stage_sunny_gate",
     "EventScene",
     async (page) => {
+      await logSmokeProgress("checkReleaseEventBatch second page metadata");
       await waitForDebugValue(page, "event", "event_bubble_shop");
+      await logSmokeProgress("checkReleaseEventBatch second page choose Digit4");
       await pressAndSettle(page, "Digit4");
       await waitForDebugValue(page, "eventChoice", "event_bubble_shop_choice_4");
       await waitForDebugValue(page, "playerHp", "60");
@@ -1080,7 +1138,7 @@ async function checkCoreRunLoop() {
       await waitForDebugText(page, "unlockedStages=stage_sunny_gate,stage_lavender_hall");
       await pressAndSettle(page, "Enter");
       await waitForDebugValue(page, "phase", "world_map");
-      await clickScenePoint(page, 430, 506);
+      await clickScenePoint(page, 808, 756);
       await waitForDebugValue(page, "stage", "stage_lavender_hall");
       await waitForDebugText(page, "log=flow:stage_select:stage_lavender_hall");
     }
@@ -1305,7 +1363,7 @@ async function clickScenePoint(page, sceneX, sceneY) {
   await page.waitForTimeout(120);
 }
 
-async function assertHoverChangesCanvas(page, sceneX, sceneY, label) {
+async function assertHoverKeepsCanvasStable(page, sceneX, sceneY, label) {
   const canvas = page.locator("canvas");
   const canvasBox = await canvas.boundingBox();
   if (!canvasBox) {
@@ -1325,8 +1383,226 @@ async function assertHoverChangesCanvas(page, sceneX, sceneY, label) {
     path: path.join(tmpDir, `phaser-hover-${label}.png`)
   });
   const delta = countByteDelta(before, after);
-  if (delta < 200) {
-    throw new Error(`${label}: hover feedback did not change the canvas enough; byteDelta=${delta}`);
+  if (delta > 200) {
+    throw new Error(`${label}: raster hover drew visible overlay; byteDelta=${delta}`);
+  }
+}
+
+async function assertHoverUsesRasterImageOnly(page, sceneX, sceneY, label, expectedImageKey, sceneName = "CombatScene", expectedDownImageKey = rasterDownPressedImageKey) {
+  const canvas = page.locator("canvas");
+  const canvasBox = await canvas.boundingBox();
+  if (!canvasBox) {
+    throw new Error(`${label}: missing Phaser canvas for raster hover smoke`);
+  }
+
+  await page.mouse.move(canvasBox.x + 8, canvasBox.y + 8);
+  await page.waitForTimeout(80);
+  const before = await canvas.screenshot();
+
+  await page.mouse.move(
+    canvasBox.x + (sceneX / 1920) * canvasBox.width,
+    canvasBox.y + (sceneY / 1080) * canvasBox.height
+  );
+  await page.waitForTimeout(120);
+  const after = await canvas.screenshot({
+    path: path.join(tmpDir, `phaser-hover-${label}.png`)
+  });
+  const delta = countByteDelta(before, after);
+  if (delta <= 200) {
+    throw new Error(`${label}: raster hover image did not visibly change canvas; byteDelta=${delta}`);
+  }
+
+  const audit = await page.evaluate(({ expectedImageKey, rasterOnlySceneUnderlays, sceneName }) => {
+    const game = window.__paperGame;
+    const activeScene = game?.scene?.getScenes?.(true)?.find((scene) => scene.scene?.key === sceneName)
+      ?? game?.scene?.getScene?.(sceneName);
+    if (!activeScene) {
+      return { ok: false, reason: `${sceneName} is not available for raster hover audit` };
+    }
+
+    const underlayKey = rasterOnlySceneUnderlays[sceneName];
+    const underlayDepth = Math.max(
+      -1,
+      ...activeScene.children.list
+        .filter((item) => item?.type === "Image" && item.texture?.key === underlayKey && item.visible !== false && item.alpha !== 0)
+        .map((item) => item.depth ?? 0)
+    );
+    const underlayIndex = activeScene.children.list.findIndex((item) => (
+      item?.type === "Image" && item.texture?.key === underlayKey && item.visible !== false && item.alpha !== 0
+    ));
+    const visibleTextCount = activeScene.children.list
+      .filter((item) => item?.type === "Text" && item.visible !== false && item.alpha !== 0 && String(item.text ?? "").trim().length > 0)
+      .length;
+    const visibleRectsAboveUnderlay = activeScene.children.list
+      .filter((item) => {
+        const fillAlpha = Number(item?.fillAlpha ?? item?.alpha ?? 1);
+        const strokeAlpha = Number(item?.strokeAlpha ?? item?.lineAlpha ?? 0);
+        const strokeWidth = Number(item?.lineWidth ?? item?.strokeWidth ?? 0);
+        return item?.type === "Rectangle"
+          && item.visible !== false
+          && ((item.depth ?? 0) > underlayDepth || activeScene.children.list.indexOf(item) > underlayIndex)
+          && (
+            (item?.isFilled && fillAlpha > 0.01)
+            || (item?.isStroked && strokeWidth > 0 && strokeAlpha > 0.01)
+          );
+      })
+      .length;
+    const hoverImages = activeScene.children.list
+      .filter((item) => item?.type === "Image" && item.texture?.key === expectedImageKey && item.visible !== false && (item.alpha ?? 1) > 0.05)
+      .length;
+
+    if (underlayDepth < 0) {
+      return { ok: false, reason: `${sceneName} raster underlay is not visible` };
+    }
+    if (hoverImages < 1) {
+      return { ok: false, reason: `${expectedImageKey} is not visible on hover` };
+    }
+    if (visibleTextCount !== 0) {
+      return { ok: false, reason: `${sceneName} hover exposed visible text objects: ${visibleTextCount}` };
+    }
+    if (visibleRectsAboveUnderlay !== 0) {
+      return { ok: false, reason: `${sceneName} hover exposed visible rectangles above underlay: ${visibleRectsAboveUnderlay}` };
+    }
+
+    return { ok: true, reason: "ok", hoverImages, visibleTextCount, visibleRectsAboveUnderlay };
+  }, { expectedImageKey, rasterOnlySceneUnderlays, sceneName });
+
+  if (!audit.ok) {
+    throw new Error(`${label}: ${audit.reason}`);
+  }
+
+  await page.mouse.down();
+  await page.waitForTimeout(120);
+  const downAfter = await canvas.screenshot({
+    path: path.join(tmpDir, `phaser-down-${label}.png`)
+  });
+  const downDelta = countByteDelta(before, downAfter);
+  if (downDelta <= 200) {
+    throw new Error(`${label}: raster down image did not visibly change canvas; byteDelta=${downDelta}`);
+  }
+
+  const downAudit = await page.evaluate(({ expectedImageKey, rasterOnlySceneUnderlays, sceneName }) => {
+    const game = window.__paperGame;
+    const activeScene = game?.scene?.getScenes?.(true)?.find((scene) => scene.scene?.key === sceneName)
+      ?? game?.scene?.getScene?.(sceneName);
+    if (!activeScene) {
+      return { ok: false, reason: `${sceneName} is not available for raster down audit` };
+    }
+
+    const underlayKey = rasterOnlySceneUnderlays[sceneName];
+    const underlayDepth = Math.max(
+      -1,
+      ...activeScene.children.list
+        .filter((item) => item?.type === "Image" && item.texture?.key === underlayKey && item.visible !== false && item.alpha !== 0)
+        .map((item) => item.depth ?? 0)
+    );
+    const underlayIndex = activeScene.children.list.findIndex((item) => (
+      item?.type === "Image" && item.texture?.key === underlayKey && item.visible !== false && item.alpha !== 0
+    ));
+    const visibleTextCount = activeScene.children.list
+      .filter((item) => item?.type === "Text" && item.visible !== false && item.alpha !== 0 && String(item.text ?? "").trim().length > 0)
+      .length;
+    const visibleRectsAboveUnderlay = activeScene.children.list
+      .filter((item) => {
+        const fillAlpha = Number(item?.fillAlpha ?? item?.alpha ?? 1);
+        const strokeAlpha = Number(item?.strokeAlpha ?? item?.lineAlpha ?? 0);
+        const strokeWidth = Number(item?.lineWidth ?? item?.strokeWidth ?? 0);
+        return item?.type === "Rectangle"
+          && item.visible !== false
+          && ((item.depth ?? 0) > underlayDepth || activeScene.children.list.indexOf(item) > underlayIndex)
+          && (
+            (item?.isFilled && fillAlpha > 0.01)
+            || (item?.isStroked && strokeWidth > 0 && strokeAlpha > 0.01)
+          );
+      })
+      .length;
+    const downImages = activeScene.children.list
+      .filter((item) => item?.type === "Image" && item.texture?.key === expectedImageKey && item.visible !== false && (item.alpha ?? 1) > 0.05)
+      .length;
+
+    if (underlayDepth < 0) {
+      return { ok: false, reason: `${sceneName} raster underlay is not visible` };
+    }
+    if (downImages < 1) {
+      return { ok: false, reason: `${expectedImageKey} is not visible on down` };
+    }
+    if (visibleTextCount !== 0) {
+      return { ok: false, reason: `${sceneName} down exposed visible text objects: ${visibleTextCount}` };
+    }
+    if (visibleRectsAboveUnderlay !== 0) {
+      return { ok: false, reason: `${sceneName} down exposed visible rectangles above underlay: ${visibleRectsAboveUnderlay}` };
+    }
+
+    return { ok: true, reason: "ok", downImages, visibleTextCount, visibleRectsAboveUnderlay };
+  }, { expectedImageKey: expectedDownImageKey, rasterOnlySceneUnderlays, sceneName });
+
+  await page.mouse.move(canvasBox.x + 8, canvasBox.y + 8);
+  await page.waitForTimeout(80);
+  await page.mouse.up();
+
+  if (!downAudit.ok) {
+    throw new Error(`${label}: ${downAudit.reason}`);
+  }
+}
+
+async function assertRasterImageVisibleOnly(page, label, expectedImageKey, sceneName) {
+  const audit = await page.evaluate(({ expectedImageKey, rasterOnlySceneUnderlays, sceneName }) => {
+    const game = window.__paperGame;
+    const activeScene = game?.scene?.getScenes?.(true)?.find((scene) => scene.scene?.key === sceneName)
+      ?? game?.scene?.getScene?.(sceneName);
+    if (!activeScene) {
+      return { ok: false, reason: `${sceneName} is not available for raster image audit` };
+    }
+
+    const underlayKey = rasterOnlySceneUnderlays[sceneName];
+    const underlayDepth = Math.max(
+      -1,
+      ...activeScene.children.list
+        .filter((item) => item?.type === "Image" && item.texture?.key === underlayKey && item.visible !== false && item.alpha !== 0)
+        .map((item) => item.depth ?? 0)
+    );
+    const underlayIndex = activeScene.children.list.findIndex((item) => (
+      item?.type === "Image" && item.texture?.key === underlayKey && item.visible !== false && item.alpha !== 0
+    ));
+    const visibleTextCount = activeScene.children.list
+      .filter((item) => item?.type === "Text" && item.visible !== false && item.alpha !== 0 && String(item.text ?? "").trim().length > 0)
+      .length;
+    const visibleRectsAboveUnderlay = activeScene.children.list
+      .filter((item) => {
+        const fillAlpha = Number(item?.fillAlpha ?? item?.alpha ?? 1);
+        const strokeAlpha = Number(item?.strokeAlpha ?? item?.lineAlpha ?? 0);
+        const strokeWidth = Number(item?.lineWidth ?? item?.strokeWidth ?? 0);
+        return item?.type === "Rectangle"
+          && item.visible !== false
+          && ((item.depth ?? 0) > underlayDepth || activeScene.children.list.indexOf(item) > underlayIndex)
+          && (
+            (item?.isFilled && fillAlpha > 0.01)
+            || (item?.isStroked && strokeWidth > 0 && strokeAlpha > 0.01)
+          );
+      })
+      .length;
+    const visibleImages = activeScene.children.list
+      .filter((item) => item?.type === "Image" && item.texture?.key === expectedImageKey && item.visible !== false && (item.alpha ?? 1) > 0.05)
+      .length;
+
+    if (underlayDepth < 0) {
+      return { ok: false, reason: `${sceneName} raster underlay is not visible` };
+    }
+    if (visibleImages < 1) {
+      return { ok: false, reason: `${expectedImageKey} is not visible` };
+    }
+    if (visibleTextCount !== 0) {
+      return { ok: false, reason: `${sceneName} exposed visible text objects: ${visibleTextCount}` };
+    }
+    if (visibleRectsAboveUnderlay !== 0) {
+      return { ok: false, reason: `${sceneName} exposed visible rectangles above underlay: ${visibleRectsAboveUnderlay}` };
+    }
+
+    return { ok: true, reason: "ok", visibleImages, visibleTextCount, visibleRectsAboveUnderlay };
+  }, { expectedImageKey, rasterOnlySceneUnderlays, sceneName });
+
+  if (!audit.ok) {
+    throw new Error(`${label}: ${audit.reason}`);
   }
 }
 
@@ -1346,12 +1622,9 @@ async function assertSceneTextLayout(page, sceneName) {
   await page.waitForFunction((expectedScene) => {
     const game = window.__paperGame;
     const activeScene = game?.scene?.getScenes?.(true)?.find((scene) => scene.scene?.key === expectedScene);
-    if (!activeScene) return false;
-    return activeScene.children.list
-      .filter((item) => item?.type === "Text" && item.visible !== false && item.alpha !== 0)
-      .some((item) => String(item.text ?? "").trim().length > 0);
+    return Boolean(activeScene && activeScene.children?.list?.length > 0);
   }, sceneName, { timeout: 10000 });
-  const result = await page.evaluate((expectedScene) => {
+  const result = await page.evaluate(({ expectedScene, rasterOnlySceneUnderlays }) => {
     const game = window.__paperGame;
     const activeScene = game?.scene?.getScenes?.(true)?.find((scene) => scene.scene?.key === expectedScene)
       ?? game?.scene?.getScene?.(expectedScene);
@@ -1361,6 +1634,17 @@ async function assertSceneTextLayout(page, sceneName) {
 
     const width = activeScene.scale.width;
     const height = activeScene.scale.height;
+    const rasterUnderlayKey = rasterOnlySceneUnderlays[expectedScene];
+    const hasRasterOnlyUnderlay = Boolean(
+      rasterUnderlayKey
+      && activeScene.textures.exists(rasterUnderlayKey)
+      && activeScene.children.list.some((item) => (
+        item?.type === "Image"
+        && item.texture?.key === rasterUnderlayKey
+        && item.visible !== false
+        && item.alpha !== 0
+      ))
+    );
     const texts = activeScene.children.list
       .filter((item) => item?.type === "Text" && item.visible !== false && item.alpha !== 0)
       .map((item, index) => {
@@ -1379,7 +1663,7 @@ async function assertSceneTextLayout(page, sceneName) {
       .filter((item) => item.text.trim().length > 0 && item.width > 0 && item.height > 0);
 
     const issues = [];
-    if (texts.length < 5) {
+    if (texts.length < 5 && !(texts.length === 0 && hasRasterOnlyUnderlay)) {
       issues.push(`${expectedScene}: too few visible text objects for layout audit: ${texts.length}`);
     }
     for (const text of texts) {
@@ -1413,7 +1697,7 @@ async function assertSceneTextLayout(page, sceneName) {
     }
 
     return { ok: issues.length === 0, reason: issues.slice(0, 6).join("; "), texts };
-  }, sceneName);
+  }, { expectedScene: sceneName, rasterOnlySceneUnderlays });
 
   if (!result.ok) {
     throw new Error(result.reason);

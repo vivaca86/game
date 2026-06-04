@@ -301,6 +301,160 @@
       "path": "assets/runtime/ui/ui_panel_paper_9slice_v001.png",
       "nativeSize": { "w": 256, "h": 256 },
       "styleKey": "premium_popup_book"
+    },
+    {
+      "key": "ui_hover_gold_seal_concept",
+      "type": "image",
+      "path": "assets/runtime/ui/ui_hover_gold_seal_concept_v001.png",
+      "nativeSize": { "w": 144, "h": 144 },
+      "styleKey": "premium_popup_book"
+    },
+    {
+      "key": "ui_hover_boss_skull_stamp_concept",
+      "type": "image",
+      "path": "assets/runtime/ui/ui_hover_boss_skull_stamp_concept_v001.png",
+      "nativeSize": { "w": 144, "h": 144 },
+      "styleKey": "premium_popup_book"
+    },
+    {
+      "key": "ui_hover_route_node_concept",
+      "type": "image",
+      "path": "assets/runtime/ui/ui_hover_route_node_concept_v001.png",
+      "nativeSize": { "w": 144, "h": 144 },
+      "styleKey": "premium_popup_book"
+    },
+    {
+      "key": "ui_hover_choice_badge_concept",
+      "type": "image",
+      "path": "assets/runtime/ui/ui_hover_choice_badge_concept_v001.png",
+      "nativeSize": { "w": 144, "h": 144 },
+      "styleKey": "premium_popup_book"
+    },
+    {
+      "key": "ui_hover_action_seal_concept",
+      "type": "image",
+      "path": "assets/runtime/ui/ui_hover_action_seal_concept_v001.png",
+      "nativeSize": { "w": 144, "h": 144 },
+      "styleKey": "premium_popup_book"
+    },
+    {
+      "key": "ui_down_pressed_stamp_concept",
+      "type": "image",
+      "path": "assets/runtime/ui/ui_down_pressed_stamp_concept_v001.png",
+      "nativeSize": { "w": 144, "h": 144 },
+      "styleKey": "premium_popup_book"
+    },
+    {
+      "key": "ui_disabled_lock_stamp_concept",
+      "type": "image",
+      "path": "assets/runtime/ui/ui_disabled_lock_stamp_concept_v001.png",
+      "nativeSize": { "w": 144, "h": 144 },
+      "styleKey": "premium_popup_book"
+    },
+    {
+      "key": "ui_hover_world_map_play_button_concept",
+      "type": "image",
+      "path": "assets/runtime/ui/ui_hover_world_map_play_button_concept_v001.png",
+      "nativeSize": { "w": 280, "h": 144 },
+      "styleKey": "premium_popup_book"
+    },
+    {
+      "key": "ui_down_world_map_play_button_concept",
+      "type": "image",
+      "path": "assets/runtime/ui/ui_down_world_map_play_button_concept_v001.png",
+      "nativeSize": { "w": 280, "h": 144 },
+      "styleKey": "premium_popup_book"
+    },
+    {
+      "key": "ui_current_stage_marker_concept",
+      "type": "image",
+      "path": "assets/runtime/ui/ui_current_stage_marker_concept_v001.png",
+      "nativeSize": { "w": 96, "h": 108 },
+      "styleKey": "premium_popup_book"
+    },
+    {
+      "key": "ui_current_stage_halo_concept",
+      "type": "image",
+      "path": "assets/runtime/ui/ui_current_stage_halo_concept_v001.png",
+      "nativeSize": { "w": 246, "h": 264 },
+      "styleKey": "premium_popup_book"
+    },
+    {
+      "key": "ui_current_stage_status_badge_concept",
+      "type": "image",
+      "path": "assets/runtime/ui/ui_current_stage_status_badge_concept_v001.png",
+      "nativeSize": { "w": 96, "h": 96 },
+      "styleKey": "premium_popup_book"
+    },
+    {
+      "key": "combat_raster_underlay_concept",
+      "type": "image",
+      "path": "assets/runtime/ui/combat_raster_underlay_concept_v001.png",
+      "nativeSize": { "w": 1672, "h": 941 },
+      "styleKey": "premium_popup_book"
+    },
+    {
+      "key": "boss_raster_underlay_concept",
+      "type": "image",
+      "path": "assets/runtime/ui/boss_raster_underlay_concept_v001.png",
+      "nativeSize": { "w": 1672, "h": 941 },
+      "styleKey": "premium_popup_book"
+    },
+    {
+      "key": "reward_raster_underlay_concept",
+      "type": "image",
+      "path": "assets/runtime/ui/reward_raster_underlay_concept_v001.png",
+      "nativeSize": { "w": 1672, "h": 941 },
+      "styleKey": "premium_popup_book"
+    },
+    {
+      "key": "event_raster_underlay_concept",
+      "type": "image",
+      "path": "assets/runtime/ui/event_raster_underlay_concept_v001.png",
+      "nativeSize": { "w": 1672, "h": 941 },
+      "styleKey": "premium_popup_book"
+    },
+    {
+      "key": "town_raster_underlay_concept",
+      "type": "image",
+      "path": "assets/runtime/ui/town_raster_underlay_concept_v001.png",
+      "nativeSize": { "w": 1672, "h": 941 },
+      "styleKey": "premium_popup_book"
+    },
+    {
+      "key": "world_map_raster_underlay_concept",
+      "type": "image",
+      "path": "assets/runtime/ui/world_map_raster_underlay_concept_v001.png",
+      "nativeSize": { "w": 1672, "h": 941 },
+      "styleKey": "premium_popup_book"
+    },
+    {
+      "key": "dungeon_raster_underlay_concept",
+      "type": "image",
+      "path": "assets/runtime/ui/dungeon_raster_underlay_concept_v001.png",
+      "nativeSize": { "w": 1672, "h": 941 },
+      "styleKey": "premium_popup_book"
+    },
+    {
+      "key": "rune_bench_raster_underlay_concept",
+      "type": "image",
+      "path": "assets/runtime/ui/rune_bench_raster_underlay_concept_v001.png",
+      "nativeSize": { "w": 1672, "h": 941 },
+      "styleKey": "premium_popup_book"
+    },
+    {
+      "key": "result_raster_underlay_concept",
+      "type": "image",
+      "path": "assets/runtime/ui/result_raster_underlay_concept_v001.png",
+      "nativeSize": { "w": 1672, "h": 941 },
+      "styleKey": "premium_popup_book"
+    },
+    {
+      "key": "settings_raster_underlay_concept",
+      "type": "image",
+      "path": "assets/runtime/ui/settings_raster_underlay_concept_v001.png",
+      "nativeSize": { "w": 1677, "h": 938 },
+      "styleKey": "premium_popup_book"
     }
-  ]
-}
+    ]
+  }

@@ -590,3 +590,444 @@
 - Impact: Each version improved one defect while creating another visible layout problem. Accepting any of those captures would have inflated the score and hidden a real UI polish defect.
 - Resolution: Treated v2, v3, and v4 as failed visual checkpoints. v5 moved next-action copy into the lower record row, kept the central title clean, preserved the `마을로` coordinate, and recaptured neutral 1920/1280, defeat, slice-clear, and release-clear screenshots.
 - Prevention: Result v2+ scoring must include release-clear and 1280 screenshot review after every placement change. A new summary surface is not accepted until it avoids both side-panel overlap and title/action crowding.
+
+### Problem: Combat concept-reset pass initially moved End Turn into enemy intent text
+
+- Cause: The concept-reset pass moved the enemy ledger farther right but left the End Turn button near the old intent area.
+- Impact: The screen looked closer to the concept art, but the action button overlapped the enemy intent text. Accepting that screenshot would have repeated the previous false-completion pattern where a visual pass hides a gameplay readability defect.
+- Resolution: `phaser:smoke` caught the overlap between `의도 공격 6` and `턴 종료`. Codex moved the Combat and Boss End Turn buttons to `1630,708`, then updated the smoke hover/click coordinates to match the new intentional placement.
+- Prevention: Any future Combat/Boss action-button move must update both the runtime button placement and the smoke-covered hover/click coordinates in the same pass.
+
+### Problem: UI panel generator produced cyan hatching after the concept reset
+
+- Cause: The UI generator added positive paper-grain values to colors that could already be 255. When written into the PNG buffer, values above 255 wrapped into bright cyan/green channel artifacts.
+- Impact: The runtime panels technically loaded and smoke passed, but debug-less review showed noisy cyan diagonal hatching across panels, which directly conflicted with the premium paper-theater concept target.
+- Resolution: Removed the positive grain branches from the UI panel, button, slot, and tooltip generators, regenerated dev runtime assets, inspected `ui_panel_paper_9slice_v001.png`, and recaptured `tmp/ui-quality/combat-1920-concept-reset-v5.png`.
+- Prevention: Future procedural color work must avoid channel overflow by clamping or by using only safe darkening grain. UI generator changes must include direct PNG inspection, not only smoke/check.
+
+### Problem: Combat still looked vector/procedural after the concept reset
+
+- Cause: The first concept-reset pass improved procedural panel material and layout, but it still relied on generated 9-slice/procedural sprites and card icons as if they were enough to prove the concept-art direction.
+- Impact: The user correctly rejected the result because the runtime screen did not visually justify the earlier concept-art work. Calling that state concept-matched would have repeated the false-completion pattern.
+- Resolution: Added a raster Combat underlay, raster player/enemy standee spritesheets, and raster starter card illustrations for `card_art_sun_jab`, `card_art_fold_guard`, and `card_art_page_step`. `CombatScene` now uses that raster path for the normal Combat first view.
+- Prevention: Combat visual-quality claims must be based on debug-less screenshots that include the actual runtime raster assets, not on procedural placeholder panels or code-native vector stand-ins.
+
+### Problem: Generated standee cutouts left green chroma remnants
+
+- Cause: The first chroma-key cleanup used border flood-fill, which removed connected background but missed internal holes in the folded sentry silhouette.
+- Impact: v2 screenshots showed bright green remnants under and inside the enemy standee, which made the new high-quality sprite look unfinished and broke the paper-theater illusion.
+- Resolution: Reprocessed the player and enemy generated PNGs with stricter global chroma-key removal for clear background hue pixels, then repacked the transparent 4x4 spritesheets. v3 screenshots removed the visible green remnants.
+- Prevention: Generated transparent sprites must be validated both by alpha statistics and by actual Phaser screenshots. Border-only keying is not sufficient for silhouettes with internal gaps.
+
+### Problem: Starter card art remained placeholder-like after standee replacement
+
+- Cause: The Combat hand used high-quality underlay card frames, but the card illustration assets for the visible starter hand were still deterministic icon-like placeholder images.
+- Impact: Even after replacing the stage and standees, the bottom hand still read as vector/test art and visibly conflicted with the concept-art target.
+- Resolution: Generated raster paper-theater card illustrations for `햇살 찌르기`, `접힌 방패`, and `책장 넘기기`, resized them to the manifest `520x360` card-art size, saved them under `assets/source/cards/`, and copied them to the existing runtime card-art paths.
+- Prevention: First-view Combat screenshot review must include the card interiors, not only the stage and side panels. Source passthrough entries must protect generated raster card art from dev asset regeneration.
+
+### Problem: Enemy panel copy floated over decorative art
+
+- Cause: Runtime enemy name and intent copy were initially overlaid on the raster underlay at coordinates that crossed the right-side shield decoration and intent rows.
+- Impact: The screen looked less like a composed concept-art UI and more like debug text placed over a painting.
+- Resolution: Moved the enemy name into the right-panel banner, separated health/block/mark y positions, hid empty intent copy, and kept actual intent copy small and low in the panel. v6 screenshots show the corrected first-view layout.
+- Prevention: Raster underlay text overlays must be placed only in reserved blank panel zones, and every coordinate change must be recaptured at 1920 and 1280 before acceptance as progress evidence.
+
+### Problem: Boss first view still used the procedural UI shell after Combat was rasterized
+
+- Cause: The normal Combat scene gained a raster underlay path, but BossScene still reused the old procedural theater, command board, enemy panel, player standee, and default card-hand renderer.
+- Impact: The game looked visually inconsistent: normal Combat moved toward the concept-art target, while Boss still looked like the vector/procedural candidate UI the user rejected. The upgraded card art also clashed with the older Boss shell.
+- Resolution: Added `boss_raster_underlay_concept` as a project-bound runtime/source asset, registered it in both slice manifests, protected it in `tools/generate-dev-runtime-assets.mjs`, and added a Boss raster render branch that uses the boss concept underlay with state overlays and a Boss-specific card/action layer.
+- Prevention: Concept-match progress must be checked screen by screen. Updating Combat does not prove Boss, Reward, Town, or other screens meet the same raster quality bar.
+
+### Problem: Boss raster v1 overlaid runtime art and text in the wrong zones
+
+- Cause: The first Boss raster pass reused the normal Combat raster card overlay and placed phase/reward text over the boss body instead of the right-side blank panels.
+- Impact: The screen had high-quality raster background art, but the extra overlays made it look like a debug layer pasted on top of concept art.
+- Resolution: Replaced the normal Combat card overlay with a Boss-specific overlay that does not draw duplicate card art, moved phase/reward text into right-panel zones, moved the End Turn action to the lower-right visual control area, and updated the smoke click/hover coordinate.
+- Prevention: Raster underlay reuse must still be layout-specific. Card overlays, action buttons, and text zones should be tuned per concept screen and recaptured before any checkpoint is recorded.
+
+### Problem: Reward first view still used the procedural UI shell after Combat and Boss were rasterized
+
+- Cause: The Reward concept art existed, but `RewardScene` still rendered the older generated paper-stage layout with code-drawn cards, panels, and decorative shapes.
+- Impact: The runtime Reward screen would repeat the exact mismatch the user rejected: the project had a high-quality concept target, but the playable UI still looked like a procedural candidate rather than concept-matched art.
+- Resolution: Added `reward_raster_underlay_concept` as a project-bound runtime/source asset, registered it in both slice manifests, protected it in `tools/generate-dev-runtime-assets.mjs`, and added a Reward raster render branch that uses the concept underlay with minimal text and hit-target overlays.
+- Prevention: Reward visual-quality claims must be based on screenshots that show the actual raster concept underlay in runtime. The old procedural Reward fallback remains only as a fallback path, not as evidence of meeting the concept-art goal.
+
+### Problem: Reward raster v1 placed guidance text outside the intended panel zone
+
+- Cause: The first raster Reward pass placed the right-side reward guidance too close to the center card area, so the text floated over the underlay boundary instead of sitting inside the right ledger panel.
+- Impact: Even though the raster background was present, the overlay still looked pasted on top of the concept art and would have hidden a real composition defect if accepted as the checkpoint.
+- Resolution: Moved the right-panel copy into the panel body, narrowed it to the concept-safe area, and removed an unnecessary top stage label in v3. Recaptured 1920 and 1280 screenshots after the adjustment.
+- Prevention: Raster underlay text overlays must be checked against the concept's reserved blank zones. Each primary screen should get at least one 1920 and one 1280 debug-less capture before it is recorded as progress.
+
+### Problem: Event first view still used the procedural UI shell after Combat, Boss, and Reward were rasterized
+
+- Cause: The Event concept art existed, but `EventScene` still rendered the older code-drawn paper stage, choice slots, and decorative card structure.
+- Impact: Event would have remained a visible exception to the user's explicit rejection of vector/procedural-looking UI, even though the project already had a higher-quality raster concept target for the screen.
+- Resolution: Added `event_raster_underlay_concept` as a project-bound runtime/source asset, registered it in both slice manifests, protected it in `tools/generate-dev-runtime-assets.mjs`, and added an Event raster render branch with minimal title, record, choice, and transparent hit-target overlays.
+- Prevention: Event visual-quality claims must show the actual runtime raster underlay in 1920 and 1280 screenshots. The old procedural Event renderer is fallback only, not evidence that Event meets the concept-art goal.
+
+### Problem: Release Event still fell back to procedural UI after the slice Event raster pass
+
+- Cause: Release mode builds its runtime bundle from `assetManifest.release.v1.json`, while the new shared UI raster underlays were only added to the slice manifest. `hasEventRasterUnderlay` therefore returned false in release mode.
+- Impact: `?data=release&entry=event` still showed the rejected procedural Event UI even after slice Event looked correct. This would have hidden a mode-specific visual regression behind slice-only screenshots.
+- Resolution: `releaseCatalogAdapter` now merges the shared Combat/Boss/Reward/Event raster UI underlay assets from the slice manifest into the release runtime bundle without modifying the strict release visual manifest. Release Event screenshots now use the raster underlay, and smoke coordinates were updated to the visible four-card raster layout.
+- Prevention: Every raster UI checkpoint that affects gameplay scenes must be checked in both slice and release mode when release smoke covers that scene. A slice-only screenshot is not enough evidence.
+
+### Problem: Event raster overlays initially crowded concept art zones
+
+- Cause: Early Event raster passes placed left status text over the concept's icon rows and placed cost/result labels over the card-bottom icon area.
+- Impact: The screen had the correct raster artwork, but the overlays still looked pasted onto the painting and weakened the concept match.
+- Resolution: Removed redundant left status text and moved cost/result details to the right-side record panel only. v5 screenshots keep the card-bottom concept icons clean while preserving choice descriptions and click targets.
+- Prevention: Raster UI overlays should prefer fewer, better-placed runtime labels. If the concept already communicates a surface with icons or art, runtime text should not duplicate it unless readability requires it.
+
+### Problem: Town first view still used the procedural village shell after adjacent screens were rasterized
+
+- Cause: The Town concept art existed, but `TownScene` still rendered code-drawn buildings, side panels, stat cards, and stacked action buttons.
+- Impact: Town is a high-frequency hub screen, so leaving it procedural would make the game feel visually inconsistent immediately after Combat/Boss/Reward/Event moved toward the concept-art target.
+- Resolution: Added `town_raster_underlay_concept` as a project-bound runtime/source asset, registered it in both slice manifests, protected it in `tools/generate-dev-runtime-assets.mjs`, added it to the release shared UI raster bundle, and added a Town raster render branch with minimal side-panel overlays and transparent hit targets.
+- Prevention: Hub screens must be checked under the same raster/source-art standard as combat screens. A polished procedural hub cannot be treated as concept-matched if a higher-quality raster concept exists.
+
+### Problem: Town raster v1 placed text over portrait and side-panel icons
+
+- Cause: The first Town raster pass reused functional labels that were too close to the portrait and right-side badge column.
+- Impact: The Town background art was correct, but the labels made the screen read like runtime text pasted over concept art.
+- Resolution: Moved the character name into the left nameplate, reduced the left status rows to numeric values, and moved stage/progression copy to the right-side blank rows. v2 screenshots show the cleaner placement.
+- Prevention: Town overlays should be anchored to blank side-panel labels or existing toolbar affordances. Text should not sit on top of portraits, building art, badge icons, or decorative route artwork.
+
+### Problem: WorldMap still used the procedural map shell after adjacent screens were rasterized
+
+- Cause: The WorldMap concept art existed, but `WorldMapScene` still rendered the older code-drawn unfolded map, ledgers, panels, and stage rows.
+- Impact: WorldMap remained visibly out of sync with the user's concept-art target and would have repeated the rejected vector/procedural UI look between Town and Dungeon.
+- Resolution: Added `world_map_raster_underlay_concept` as a project-bound runtime/source asset, registered it in both slice manifests, protected it in `tools/generate-dev-runtime-assets.mjs`, added it to the release shared UI raster bundle, and added a WorldMap raster render branch that uses the concept underlay.
+- Prevention: Map visual-quality claims must show the actual runtime raster concept art in slice and release screenshots. A thematic procedural fallback is not evidence of meeting the concept-art goal.
+
+### Problem: WorldMap raster text overlays weakened the concept match
+
+- Cause: Early WorldMap raster passes kept runtime character/stage labels over the concept portrait and right ledger.
+- Impact: The background was raster, but the overlays made the screen read like text pasted over a painting instead of a composed concept-art UI.
+- Resolution: Removed the WorldMap raster text overlays and kept the raster path to concept art plus transparent hit targets only. Latest evidence is `tmp/ui-quality/world-map-raster-underlay-v6-node-hit-1280.png` and `tmp/ui-quality/world-map-raster-underlay-release-v6-node-hit-1920.png`.
+- Prevention: Raster concept screens should use no runtime text unless the concept has a safe blank label zone and the capture proves it does not collide with portrait, map, icon, or panel art.
+
+### Problem: Removing the procedural WorldMap row list broke proven stage selection
+
+- Cause: The old stage selection behavior was tied to procedural row hit targets. The first raster WorldMap path only preserved the confirm/play hit target, so the release-run smoke could no longer click a second-stage row after unlock.
+- Impact: The raster map looked closer to the concept, but stage selection behavior regressed. Accepting only the visual screenshot would have hidden a real progression UX failure.
+- Resolution: Added invisible hit targets over the concept map's numbered stage nodes and updated smoke to click node 2 at `808,756` after `stage_sunny_gate` clears. The smoke now verifies `stage=stage_lavender_hall` and `log=flow:stage_select:stage_lavender_hall`.
+- Prevention: When replacing a procedural UI with raster concept art, every previous gameplay action must be remapped to concept-native hit zones and verified through smoke or manual click probes.
+
+### Problem: Dungeon still used the procedural dungeon shell after adjacent screens were rasterized
+
+- Cause: The Dungeon concept art existed, but `DungeonScene` still rendered the older code-drawn dungeon theater, ledgers, route rail, and action button.
+- Impact: Dungeon remained visually inconsistent with the new raster concept direction, especially because it sits immediately after WorldMap in the main loop.
+- Resolution: Added `dungeon_raster_underlay_concept` as a project-bound runtime/source asset, registered it in both slice manifests, protected it in `tools/generate-dev-runtime-assets.mjs`, added it to the release shared UI raster bundle, and added a Dungeon raster render branch that uses the concept underlay.
+- Prevention: Main-loop transition screens must be audited together. Town, WorldMap, and Dungeon should not mix raster concept art with procedural fallback visuals unless the fallback is explicitly being tested as fallback only.
+
+### Problem: Dungeon raster v1 pasted text over the concept panels and door art
+
+- Cause: The first Dungeon raster pass tried to preserve runtime labels on top of the full-screen concept image.
+- Impact: The labels crowded the left ledger, right route panel, and central door composition. This made the screen less faithful to the concept than using the concept image cleanly.
+- Resolution: Removed Dungeon raster runtime text overlays and kept only transparent hit targets for the legacy smoke coordinate and the visible bottom-center concept action. v3 slice and release screenshots show the clean concept-first layout.
+- Prevention: Dungeon runtime state labels need a later, deliberate pass using safe blank panel zones. Until that pass is designed, textless concept underlay is the cleaner progress checkpoint.
+
+### Problem: Phaser smoke assumed every scene had visible Phaser text
+
+- Cause: `assertSceneTextLayout` waited for visible Phaser text and required at least five text objects. Raster-only WorldMap and Dungeon intentionally moved visible UI information into the concept image and kept Phaser text at zero.
+- Impact: The first smoke rerun failed even though the raster-only screen was intentionally textless. Leaving the test unchanged would force new procedural labels back onto the concept art.
+- Resolution: Narrowed the text-layout exception to raster-only `DungeonScene`, `WorldMapScene`, `RuneBenchScene`, `ResultScene`, and later `SettingsScene`, and only when the matching raster underlay texture is present as a visible scene image.
+- Prevention: Smoke tests should distinguish text-layout audits from raster concept-art audits. Textless screens are allowed only when the intended raster underlay is actually loaded and visible.
+
+### Problem: RuneBench still used the procedural workbench shell after the raster-screen pass
+
+- Cause: The RuneBench concept art existed, but `RuneBenchScene` still rendered the older code-drawn paper panels, rune slots, card preview, stat preview cards, and action button.
+- Impact: RuneBench looked especially far from the concept target: the concept was a rich raster workbench, while the runtime screen was a bright procedural layout. This would have kept a major buildcraft screen visibly below the user's stated quality bar.
+- Resolution: Added `rune_bench_raster_underlay_concept` as a project-bound runtime/source asset, registered it in both slice manifests, protected it in `tools/generate-dev-runtime-assets.mjs`, added it to the release shared UI raster bundle, and added a RuneBench raster render branch that uses the concept underlay.
+- Prevention: Prior "second rebuild" scores cannot be reused under the current no-procedural-final-UI standard. Each screen with an approved concept target must be checked for actual runtime concept-underlay usage.
+
+### Problem: RuneBench text-layout smoke would reject the intended textless raster path
+
+- Cause: After the raster RuneBench pass, the visible UI information comes from the concept image and Phaser text is intentionally absent. The smoke text audit only allowed Dungeon and WorldMap as raster-only exceptions.
+- Impact: Keeping the test unchanged would push runtime labels back onto the concept art or make the smoke fail despite the intended visual direction.
+- Resolution: Added `RuneBenchScene: "rune_bench_raster_underlay_concept"` to the narrow raster-only smoke exception. The exception still requires the matching underlay to be loaded and visible.
+- Prevention: Textless raster exceptions must be per-scene and tied to a specific underlay key. They should not become a broad bypass for layout problems on text-heavy screens.
+
+### Problem: Result still used the procedural certificate shell after the raster-screen pass
+
+- Cause: The Result concept art existed, but `ResultScene` still rendered the older code-drawn certificate, side ledgers, collection panel, and action button.
+- Impact: Result remained visually inconsistent with the user's concept-art target. A run could end on a screen that looked like the earlier procedural UI the user explicitly rejected.
+- Resolution: Added `result_raster_underlay_concept` as a project-bound runtime/source asset, registered it in both slice manifests, protected it in `tools/generate-dev-runtime-assets.mjs`, added it to the release shared UI raster bundle, and added a Result raster render branch that uses the concept underlay.
+- Prevention: End-state screens need the same raster/source-art standard as the main loop. A readable procedural result screen is not accepted as concept-matched when a full result concept exists.
+
+### Problem: Result text-layout smoke would reject the intended textless raster path
+
+- Cause: After the raster Result pass, the visible UI information comes from the concept image and Phaser text is intentionally absent. The smoke text audit needed a scene-specific raster exception.
+- Impact: Keeping the test unchanged would push labels back over the concept art or make the smoke fail even though the raster path is intentional.
+- Resolution: Added `ResultScene: "result_raster_underlay_concept"` to the narrow raster-only smoke exception. The exception still requires the matching underlay to be loaded and visible.
+- Prevention: Result needs a later state/readability pass with safe zones if dynamic labels are reintroduced. The textless smoke exception should not be treated as final result UX approval.
+
+### Problem: Settings still used the procedural options shell after the raster-screen pass
+
+- Cause: The Settings concept art existed, but `SettingsScene` still rendered the older code-drawn options panels, controls, tooltip, and action buttons.
+- Impact: Settings remained visually inconsistent with the user's concept-art target and would still look like the rejected procedural UI when opened from the raster Town hub.
+- Resolution: Added `settings_raster_underlay_concept` as a project-bound runtime/source asset, registered it in both slice manifests, protected it in `tools/generate-dev-runtime-assets.mjs`, added it to the release shared UI raster bundle, and added a Settings raster render branch that uses the concept underlay.
+- Prevention: Utility screens are still part of the visible UI skin. They should not be exempted from concept-art matching just because they are functional/options-heavy.
+
+### Problem: Settings raster path risked breaking existing settings controls
+
+- Cause: Unlike Dungeon or Result, Settings has many smoke-covered controls for volume increments, display mode, accessibility toggles, settings reset, save reset, and return-to-town.
+- Impact: A pure image-only replacement would visually match the concept but break actual settings behavior and persistence.
+- Resolution: Remapped the existing smoke-covered Settings controls to transparent hit targets over the concept art while keeping the same `updateSettings`, `resetSettings`, `resetStoredSave`, and return-to-town logic.
+- Prevention: Textless raster UI replacement must still preserve every gameplay/control coordinate covered by smoke. If a screen has many controls, the transparent hit-target map must be verified before visual progress is recorded.
+
+### Problem: Settings concept PNG native size was entered incorrectly
+
+- Cause: Most UI concepts used `1672x941`, but `settings_ui_concept_v001.png` is actually `1677x938`. The new manifest entry initially reused the common size without checking.
+- Impact: `npm.cmd run check` failed in `assets:audit` with a native-size mismatch. If not caught, the manifest would have documented wrong source dimensions.
+- Resolution: Corrected both slice and docs manifest native sizes for `settings_raster_underlay_concept` to `1677x938`, then reran `npm.cmd run check` successfully.
+- Prevention: Every new raster underlay must be audited by `assets:audit`; do not assume all concept images share identical dimensions.
+
+### Problem: Settings text-layout smoke would reject the intended textless raster path
+
+- Cause: After the raster Settings pass, the visible UI information comes from the concept image and Phaser text is intentionally absent. The smoke text audit needed a scene-specific raster exception.
+- Impact: Keeping the test unchanged would push labels back over the concept art or make the smoke fail even though the raster path is intentional.
+- Resolution: Added `SettingsScene: "settings_raster_underlay_concept"` to the narrow raster-only smoke exception. The exception still requires the matching underlay to be loaded and visible.
+- Prevention: Settings needs a later accessibility/readability pass with safe dynamic labels, but the concept-match checkpoint should not reintroduce procedural panels simply to satisfy a text-count audit.
+
+### Problem: Combat still looked vector/procedural despite loading a raster underlay
+
+- Cause: The Combat scene had a raster underlay texture, but the runtime still drew placeholder standees, card art, card labels, enemy/player text overlays, icons, and temporary combat effects over it. The runtime underlay file was also a clean empty UI template, not the full approved Combat concept image.
+- Impact: The screen contradicted the user's stated standard. It technically loaded a raster asset, but visually it still looked like a vector/procedural composite rather than the concept art that had been selected.
+- Resolution: Replaced the Combat runtime/source underlay with `assets/concepts/ui/combat_ui_concept_v001.png` so concept, source, and runtime hashes match. Updated `CombatScene` so the raster path shows the full concept art and keeps only transparent hit targets for card and end-turn actions. Removed visible placeholder standees, card art/text/icon overlays, dynamic raster-mode text, and placeholder combat effects from the raster path. Added `CombatScene: "combat_raster_underlay_concept"` to the narrow smoke raster-only exception.
+- Prevention: A raster underlay is not enough evidence. For concept-match claims, inspect the full scene child list and screenshot: visible runtime Text/Sprite/Image overlays must not dilute the approved concept unless they are matching-quality raster assets intentionally designed for that screen.
+
+### Problem: Combat smoke screenshot was taken after card play and exposed placeholder effect art
+
+- Cause: `checkReleaseCatalogMode` captures `tmp/phaser-release-catalog-combat.png` after pressing a card. The first corrected pass hid card and standee overlays, but still rendered a temporary combat effect sprite over the concept monster.
+- Impact: Even after the main overlay cleanup, the verification screenshot still contained a non-concept effect mark, making the evidence weaker and risking the same "why vector?" complaint.
+- Resolution: Combat raster mode now suppresses placeholder combat effect rendering until matching-quality raster effect art exists. The debug state still records the effect for functional tests, and `phaser:smoke` verifies that combat flow still works.
+- Prevention: Verification screenshots should be reviewed in the same state that automated smoke captures. If automation clicks before capture, post-click transient effects must meet the same concept-art standard or be hidden from concept-match checkpoints.
+
+### Problem: Boss raster source was correct but runtime overlays still diluted the concept art
+
+- Cause: Boss concept/source/runtime hashes already matched, but `BossScene` still drew dynamic text, card labels, and a visible end-turn rectangle on top of `boss_raster_underlay_concept`.
+- Impact: Boss looked closer than the old procedural fallback, but it still repeated the same pattern the user rejected: a high-quality raster concept with code-drawn overlays pasted on top.
+- Resolution: Added an underlay-only Boss raster route that renders the concept image and preserves card/end-turn interaction through transparent hit targets only. Added `BossScene: "boss_raster_underlay_concept"` to the scene-specific raster-only smoke exception.
+- Prevention: For each rasterized screen, verify not only that the underlay hash is correct, but also that the active scene child list has no visible Text/Sprite/procedural overlay objects unless they are approved matching-quality raster assets.
+
+### Problem: Reward, Event, and Town still treated concept art as a background layer
+
+- Cause: Earlier raster passes preserved functional Phaser text on top of the full-screen concept images. The intent was readability, but visually it still pasted code-drawn UI over the selected concept art.
+- Impact: The screens no longer used the old procedural shells, but they still failed the user's comparison standard because the runtime text layer made the concept art look like an underlay rather than the actual UI.
+- Resolution: Removed visible raster-path Phaser text from Reward, Event, and Town. Each scene now renders the full raster concept underlay as the visible first-view UI and keeps interaction through transparent hit targets with hover/down feedback. The procedural/text-heavy renderers remain only as fallback when the raster underlay is absent.
+- Prevention: A concept-match checkpoint must check `textCount` and visible overlays, not just asset loading. If a raster path is meant to show the concept art, runtime text should be zero unless a later approved safe-zone text pass proves it matches the art quality.
+
+### Problem: Smoke text-layout audit would force text back onto Reward, Event, and Town
+
+- Cause: The smoke text audit historically required visible Phaser text for every scene unless the scene was already registered as raster-only. Reward, Event, and Town were not yet in that exception list.
+- Impact: Keeping the test unchanged would either fail the intended textless concept screens or pressure future work to add procedural labels back onto the art just to satisfy the old text-count rule.
+- Resolution: Added `RewardScene`, `EventScene`, and `TownScene` to the narrow raster-only smoke exception, tied to `reward_raster_underlay_concept`, `event_raster_underlay_concept`, and `town_raster_underlay_concept`. The exception only applies when the matching underlay image exists and is visible.
+- Prevention: Textless exceptions must stay scene-specific and underlay-specific. They are not proof of final UX; they only prevent automated tests from reintroducing the rejected procedural overlay layer during concept-match checkpoints.
+
+### Problem: Raster hover states still drew vector-like rectangles over the concept art
+
+- Cause: Transparent raster hit targets still used the shared `attachPressFeedback` helper. At rest they were invisible, but pointer hover/down changed an invisible rectangle into a visible Phaser stroke or tint.
+- Impact: The first-view screenshots looked concept-matched, but actual interaction could still expose the rejected code-drawn overlay style on cards, buttons, map nodes, and settings controls.
+- Resolution: Added `renderTransparentHitTarget` for concept-underlay paths and replaced raster hover-frame feedback in Combat, Boss, Reward, Event, Town, WorldMap, Dungeon, RuneBench, Result, and Settings. Smoke now asserts raster hover keeps the canvas stable, while click/state checks still prove the hit targets work.
+- Prevention: Concept-match QA must include interaction states, not only idle screenshots. Until matching-quality raster hover/selected art exists, raster concept screens should not draw Phaser rectangle strokes over the underlay.
+
+### Problem: Previous smoke checks encouraged procedural hover feedback on raster screens
+
+- Cause: `assertHoverChangesCanvas` expected a canvas pixel change on hover for several main actions. That was useful for procedural UI but misaligned with the raster concept-art standard.
+- Impact: The test would push future changes toward adding visible hover strokes back onto concept art just to make the canvas change.
+- Resolution: Replaced those raster checks with `assertHoverKeepsCanvasStable`, which fails if hover visibly alters the canvas above the concept art. Existing click and state assertions remain the functional proof.
+- Prevention: Automated tests must reflect the current visual target. For raster-only scenes, hover stability is the correct guard until bespoke raster state art is designed and approved.
+
+### Problem: Raster interaction cleanup removed bad hover feedback but left no final state art
+
+- Cause: The no-vector hover pass intentionally made raster hit-target feedback invisible. That solved the immediate vector-rectangle complaint, but it did not create a concept-quality hover/selected/down state.
+- Impact: The UI became visually cleaner, but interaction states were still incomplete. A player could click functional areas without seeing a matching-quality material response.
+- Resolution: Added a first Combat bitmap hover state using `ui_hover_gold_seal_concept`, extracted from the approved `ui_component_sheet_concept_v001.png` component sheet. Combat card slots and the visible end-turn button now reveal this raster seal on hover/down through `renderRasterHoverHitTarget`, with no visible Phaser text or rectangle overlay.
+- Prevention: Future interaction-state work should use registered bitmap assets derived from concept/source art, then verify `visibleHoverImages` rather than accepting invisible feedback or procedural rectangle effects.
+
+### Problem: Combat raster end-turn hit target still followed the old procedural button coordinate
+
+- Cause: The transparent raster end-turn hit target used the old `1630,708`-style procedural control area rather than the large crossed-swords button visible in the Combat concept art.
+- Impact: Hover feedback appeared on the right ledger area instead of the button the user would visually target. This made the raster state feel pasted on rather than aligned to the concept UI.
+- Resolution: Moved the Combat raster end-turn hit target and smoke click/hover coordinate to the actual bottom-right button area around `1660,910`, and placed the raster hover seal near that button.
+- Prevention: Every transparent hit target added over a raster concept must be checked against the visible concept control, not inherited from the old procedural layout.
+
+### Problem: Boss raster controls had no matching visible interaction-state art
+
+- Cause: The no-vector hover cleanup intentionally removed visible Phaser rectangle feedback from Boss. That avoided the rejected procedural overlay, but left Boss controls without concept-quality visual response.
+- Impact: Boss could look clean at rest, but interaction still did not meet the user's concept-art quality target because hover/down state art was missing.
+- Resolution: Added `ui_hover_boss_skull_stamp_concept`, extracted as a bitmap from the approved `ui_component_sheet_concept_v001.png` component sheet, registered it in source/runtime manifests and release shared UI assets, and wired Boss card/end-turn controls through `renderRasterHoverHitTarget`.
+- Prevention: Raster concept screens need explicit bitmap hover/selected/focus assets. Removing procedural feedback is only a temporary cleanup step, not final interaction-state design.
+
+### Problem: First Boss hover candidate was technically raster but visually too weak
+
+- Cause: The first Boss hover crop came from the lower stamp area of the component sheet and was dark, partial, and too small once placed over the Boss concept screen. The initial placement also treated hover coordinates like top-left values even though Phaser image positions are center-based.
+- Impact: Automated checks could pass while the screenshot still looked visually unconvincing, which would repeat the user's complaint that the implementation did not actually match the concept art.
+- Resolution: Re-cropped the Boss hover asset from the sharper red skull route-node token in the same approved component sheet, enlarged the card hover state, and corrected Boss card/end-turn hover placement using center coordinates. Targeted Boss screenshots were reviewed after the change.
+- Prevention: Interaction-state checkpoints require both object-level audit data (`visibleHoverImages`, no text/rect overlays) and visual comparison screenshots. Passing automation alone is not enough for concept-art quality claims.
+
+### Problem: WorldMap and Dungeon still had invisible raster interaction feedback
+
+- Cause: After the no-vector cleanup, WorldMap and Dungeon used transparent hit targets with no visible hover state. This removed bad rectangle feedback but did not provide concept-quality response for map nodes or progress buttons.
+- Impact: The screens remained clean at rest, but interaction still felt unfinished compared with the approved route-node-heavy concept art.
+- Resolution: Added `ui_hover_route_node_concept`, extracted from the approved component sheet's `Route Nodes` row, registered it as a shared raster UI asset, and wired WorldMap/Dungeon raster controls through `renderRasterHoverHitTarget`.
+- Prevention: Navigation/map screens should use their own route-node material language for interaction states rather than borrowing combat seals or leaving feedback invisible.
+
+### Problem: First route-node hover pass covered important WorldMap concept information
+
+- Cause: The initial WorldMap stage-node hover placed the new route-node texture directly over the selected map node. It was raster and passed object-level checks, but it covered the concept node's number/check mark.
+- Impact: The feedback looked like an overlay pasted on top of the concept rather than a state embellishment integrated with it.
+- Resolution: Split WorldMap node hover from button hover. Stage nodes now show the route-node texture as a smaller corner badge, while confirm/progress buttons keep centered bitmap feedback. The targeted screenshot was reviewed after repositioning.
+- Prevention: Bitmap state art still needs layout review. A matching raster asset can be wrong if it hides baked concept information or changes the intended reading order.
+
+### Problem: Reward and Event choice cards still lacked visible concept-quality hover state
+
+- Cause: Reward and Event had been converted to clean textless raster-underlay screens, but their selectable cards still used transparent hit targets with no final bitmap state art.
+- Impact: The screens looked closer to the concept art at rest, but choice interaction remained unfinished and could feel unresponsive compared with the card-heavy concept screens.
+- Resolution: Added `ui_hover_choice_badge_concept`, extracted from the approved component sheet's Event Choice Card badge, registered it as a shared raster UI asset, and wired Reward/Event selectable cards through `renderRasterHoverHitTarget`.
+- Prevention: Choice-card screens need their own card/tab material state assets. A no-vector invisible hover pass is only a stopgap.
+
+### Problem: First choice-badge hover placement covered art or floated off the card
+
+- Cause: The first Reward placement put the badge over the main card illustration, and the first Event placement floated too high into the diorama area. Both passed automated bitmap checks but were visually weaker than the concept target.
+- Impact: The interaction state looked pasted onto the artwork instead of integrated with the card frame, risking the same mismatch the user objected to.
+- Resolution: Repositioned and slightly reduced the choice badge so Reward uses the upper card frame and Event uses the top card header area. Re-ran targeted screenshots and click-transition checks after the adjustment.
+- Prevention: For every bitmap hover state, inspect screenshots for occlusion and visual anchoring. `visibleHoverImages=1` is necessary but not sufficient for concept-quality comparison.
+
+### Problem: Town, RuneBench, Result, and Settings still had invisible representative hover feedback
+
+- Cause: After the no-vector hover cleanup, these raster concept paths kept interactions functional through transparent hit targets, but their representative action/settings controls did not yet show matching-quality bitmap state art.
+- Impact: The screens avoided the rejected Phaser rectangle/vector look, but interaction still felt unfinished and below the concept-art quality target.
+- Resolution: Added `ui_hover_action_seal_concept`, extracted from the approved bitmap component sheet, registered it as shared raster UI art, and wired Town, RuneBench, Result, and Settings representative controls through `renderRasterHoverHitTarget`.
+- Prevention: After removing procedural hover feedback, each major raster screen needs an explicit bitmap hover-state pass rather than staying invisible indefinitely.
+
+### Problem: Settings representative hover audit is not full Settings state coverage
+
+- Cause: Settings has many controls, while the current action-seal audit checks one representative settings row/control after entering Settings from Town.
+- Impact: The audit proves the new raster hover mechanism works on Settings, but it does not prove every volume, display, accessibility, reset, save-reset, and return target has final state art.
+- Resolution: Preserved existing smoke-covered Settings behavior and added a representative raster action-seal hover state. Full per-control state coverage remains explicitly unfinished.
+- Prevention: Do not treat a representative Settings hover audit as full Settings UX approval. Later Settings work needs a per-control matrix for hover, selected, disabled, focus, persistence, and return behavior.
+
+### Problem: Bitmap hover art can still be visually wrong if it covers baked concept information
+
+- Cause: A state asset can be raster and still fail the concept comparison if it sits on top of important baked labels, icons, card art, or route information.
+- Impact: Automation can pass with `visibleHoverImages=1` while the screenshot still looks pasted on or obscures the visual hierarchy.
+- Resolution: Reviewed the Town, RuneBench, Result, and Settings action-seal screenshots. The current placements are acceptable as first-pass candidates because they do not introduce Phaser vector overlays or block the main baked concept information.
+- Prevention: Every new bitmap state asset needs screenshot review in addition to DOM/object audits. The next passes should keep badges anchored to frames, buttons, tabs, or seals rather than covering illustrations or critical baked UI.
+
+### Problem: Settings raster hover coordinates still followed the old procedural layout
+
+- Cause: The first Settings action-seal pass reused several legacy SettingsScene coordinates. The feedback was a bitmap seal, but some controls were still anchored to the previous code-drawn options layout rather than to the visible sliders, toggles, side panels, and confirmation button in the Settings concept art.
+- Impact: The screen could pass the no-vector audit while still feeling wrong under the user's actual comparison standard: the interaction state did not consistently belong to the concept-art controls.
+- Resolution: Remapped Settings raster hit targets to the visible concept controls: left-page audio sliders, right-page display/accessibility controls, right-side skull and gear panels, and bottom-right confirmation. Existing settings logic and persistence behavior were preserved.
+- Prevention: For concept-underlay screens, hit targets must be placed from the concept art, not inherited from old procedural UI coordinates. Smoke and screenshot evidence should name the visual control each coordinate represents.
+
+### Problem: Settings hover proof was representative-only instead of per-control
+
+- Cause: `tools/phaser-smoke-test.mjs` previously checked only one Settings raster hover coordinate, even though Settings has many smoke-covered controls.
+- Impact: A regression could leave some Settings controls with invisible or misaligned feedback while the single representative hover assertion still passed.
+- Resolution: Added raster hover assertions for all ten major Settings controls: three audio controls, four display/accessibility/control toggles, settings reset, save reset, and return-to-town. Added a temporary debugless 1920 coverage audit that captures every Settings hover target.
+- Prevention: Dense utility screens need per-control interaction-state coverage. A representative audit is acceptable for early proof only, not for continued concept-quality claims.
+
+### Problem: Combat/Boss raster paths had no visible effect feedback after suppressing vector-like placeholders
+
+- Cause: The old effect spritesheets were PNG files, but they were deterministic placeholder art with flat, vector-like slash/splash/spotlight shapes. To avoid violating the concept-art direction, raster Combat/Boss paths had suppressed those effects entirely.
+- Impact: The screens avoided bad placeholder overlays, but card impact, mark feedback, and boss phase changes felt unfinished compared with the concept-art target.
+- Resolution: Replaced the effect assets with concept-source-derived bitmap spritesheets extracted from approved card/component concept art, then re-enabled `renderCombatFeedbackEffect` on Combat and Boss raster paths as sprite-only overlays.
+- Prevention: File format is not enough. Raster UI effects must be checked for visual source/fidelity, not merely for being PNGs. Generated placeholder effects should stay out of concept-underlay paths unless they are replaced or clearly marked as temporary.
+
+### Problem: Concept-derived effects can still look pasted on if crop, mask, or placement is wrong
+
+- Cause: The first `effect_ink_splash` crop included card-frame edges and unrelated baked UI fragments. The first attempts were technically bitmap assets, but screenshot review showed they would look like mis-cropped art rather than intentional state feedback.
+- Impact: Automated object checks could have passed while the user-facing screen still failed the concept comparison standard.
+- Resolution: Iterated the crop/mask until the visible artifact was reduced to a standalone purple bitmap component. Added `tmp/raster-effect-concept-audit.mjs` to verify effect sprite presence, no Phaser text, and no visible rectangles on raster effect screenshots.
+- Prevention: Every effect extraction needs both source review and in-scene screenshot review. `visibleEffectSprites=1` proves wiring only; it does not prove final art quality.
+
+### Problem: Boss stage feedback used the wrong concept source even though it was raster
+
+- Cause: The first `effect_stage_spotlight` replacement was extracted from `card_art_fold_guard`. It was a real bitmap spritesheet, but the visible motif was shield/card-fragment art, not a boss phase or theatrical spotlight cue.
+- Impact: The Boss screen could pass the no-vector object audit while still failing the user's actual comparison standard: it did not look like the approved Boss/UI concept language and appeared pasted near the lower combat area.
+- Resolution: Re-sourced `effect_stage_spotlight` from the Special card starburst in `assets/concepts/ui/ui_component_sheet_concept_v001.png`, regenerated slice/release spritesheets, and moved Boss placement to the boss body/phase focal area.
+- Prevention: Raster replacement work must check semantic source fit, not only file type. A bitmap from the wrong concept area should stay candidate-level until screenshot review confirms it belongs on that screen.
+
+### Problem: New stage spotlight crop initially produced a circular card-fragment token
+
+- Cause: The first Special-card crop retained too much card frame, parchment, and circular masked background. It was concept-derived but still looked like a cut-out token rather than a starburst effect.
+- Impact: It risked repeating the same mismatch: technically raster but visually wrong in scene.
+- Resolution: Iterated crop coordinates and tightened the alpha mask so the final sheet keeps warm gold starburst strokes and removes the round background/card-frame strip.
+- Prevention: Effect source extraction should include at least one direct spritesheet inspection before browser screenshot tests. If the sheet itself looks like a UI fragment, do not rely on in-scene blending to hide it.
+
+### Problem: Raster hit target down state reused hover art instead of its own concept state
+
+- Cause: `renderRasterHoverHitTarget` used the hover bitmap for both hover and pointer-down states, changing only alpha. That avoided Phaser rectangles, but it did not provide a distinct concept-art-quality pressed state.
+- Impact: The screen could pass hover no-vector checks while the actual click moment still felt weak, ambiguous, or unverified against the component-sheet state language.
+- Resolution: Added `ui_down_pressed_stamp_concept`, a darkened wax-stamp bitmap extracted from the approved component sheet, and changed raster hit targets to show this separate image while the pointer is held down.
+- Prevention: Hover and pressed/down states need separate visual evidence. A shared texture plus alpha change is not enough for continued concept-quality claims unless screenshot review proves it reads as an intentional state.
+
+### Problem: Pointer-down actions made pressed-state screenshots impossible
+
+- Cause: Raster hit targets fired gameplay actions on `pointerdown`, so holding the pointer on a control could immediately transition scenes or mutate combat before the pressed state could be observed.
+- Impact: Down-state proof was indirect; tests could click controls successfully without ever proving a visible pressed state existed in the original scene.
+- Resolution: `renderRasterHoverHitTarget` now shows the down image on `pointerdown` and fires the action on `pointerup`. Smoke and the down audit hold the pointer down, capture/inspect the pressed image, then move outside before releasing when they only need visual proof.
+- Prevention: Interaction-state tests should distinguish visual-state capture from action execution. Pressed-state audits should not rely on click completion as visual evidence.
+
+### Problem: Event disabled choices were functional but visually absent on the raster concept screen
+
+- Cause: `EventScene` used a transparent inert hit target for unaffordable raster choices. That preserved behavior, but it did not add any concept-art-quality disabled state.
+- Impact: The Event UI could look like a baked concept mockup with no clear disabled/locked feedback, and it did not answer the user's objection that state art must come from the concept language rather than invisible or vector-like overlays.
+- Resolution: Added `ui_disabled_lock_stamp_concept`, extracted from the approved component sheet's Rune Socket lock, registered it as shared raster UI art, and introduced `renderRasterDisabledHitTarget` so Event unaffordable choices show a bitmap lock while remaining non-interactive.
+- Prevention: Disabled-state work must have visible bitmap evidence, not only a disabled click result. Future disabled audits should verify visible raster state art and inert behavior together.
+
+### Problem: Choice state badges were horizontally offset from the baked card badge axis
+
+- Cause: The first Reward/Event choice hover placements used `x + 64` or `x + 72` offsets inherited from early positioning passes. The bitmap state assets were visible, but they drifted off the card header badge area in screenshots.
+- Impact: Automated checks passed because the assets were PNG images and no vector overlays were visible, but the placement looked pasted on and weaker than the concept art comparison target.
+- Resolution: Recentered Reward choice hover badges to the card header axis and applied an Event-specific `x - 32` badge-axis correction for hover/down/disabled state art. Re-ran smoke and a 1920 disabled audit after screenshot review.
+- Prevention: State art placement must be compared against the baked concept control, not just against the clickable hit target. Passing `visibleHoverImages=1` or `visibleLockImages=1` is necessary but not sufficient.
+
+### Problem: WorldMap had a hidden center confirm target that did not match the concept art
+
+- Cause: The raster WorldMap retained an old confirm hit target at `1010,512`, a coordinate from the previous procedural layout. On the concept underlay, that point sits in the map illustration rather than on the visible play button.
+- Impact: Hover feedback appeared as route-node art in the middle of the map, and clicking the map center advanced to Dungeon. This contradicted the concept screen, where the obvious primary action is the bottom-right play button.
+- Resolution: Removed the center confirm target, first kept confirm on the bottom-right play button at `1512,950`, changed that button's hover art to `ui_hover_action_seal_concept`, and updated smoke/audits to verify the visible play button instead of the hidden center coordinate. The next WorldMap problem entry supersedes the shared-seal state art with button-specific textures.
+- Prevention: Concept-underlay hit targets must be placed from the visible control in the concept art. Legacy procedural coordinates should be treated as suspicious until screenshot review proves they still align.
+
+### Problem: WorldMap play button state art still looked pasted on after moving the hit target
+
+- Cause: The previous WorldMap correction moved the primary action to the visible bottom-right button, but it reused the shared action seal and shared pressed stamp. Those were bitmap assets, but their wax-stamp shape did not match the teal play button drawn in the WorldMap concept art.
+- Impact: The UI could pass the no-vector audit while still failing the user's actual comparison standard: the state feedback looked like a generic overlay pasted onto the concept instead of the concept button responding.
+- Resolution: Added `ui_hover_world_map_play_button_concept` and `ui_down_world_map_play_button_concept`, both cropped from `assets/source/ui/world_map_raster_underlay_concept_v001.png`, then wired the WorldMap play button at `1576,970` to those button-specific textures. The no-underlay fallback button coordinate was also moved to the same bottom-right action area.
+- Prevention: Raster state art must match the specific control when a clear control exists in the concept. Shared stamps remain candidate-level only; screenshot review should compare semantic fit, source fit, and placement fit, not just file type.
+
+### Problem: WorldMap current stage was still visually fixed by the static concept underlay
+
+- Cause: The WorldMap raster underlay bakes a bright stage-4 glow/path into the image, while the actual runtime `context.run.stageId` can be a different stage such as `stage_lantern_foyer`.
+- Impact: The screen looked like high-quality concept art, but it could still communicate the wrong selected/current stage. That undermines the concept-quality target because polish without state truth is misleading UI.
+- Resolution: Added `ui_current_stage_marker_concept`, extracted from the WorldMap underlay's cyan diamond marker, and rendered it above the node that matches `context.run.stageId`. The dedicated audit now verifies `visibleCurrentMarkerImages=1` and `markerAtCurrentStage=true`.
+- Prevention: Static raster underlays need runtime-state overlays or recomposed variants for stateful screens. A beautiful baked underlay is not enough when the underlying game state changes.
+
+### Problem: WorldMap baked progress colors still overpowered the runtime current marker
+
+- Cause: The static WorldMap concept underlay carried saturated green completed check marks and cyan current/path colors in the map region. After adding the runtime current-stage marker, those baked colors still read as stronger state information than the real current stage.
+- Impact: The screen used raster concept art, but the state language remained misleading. The user-facing result could still look wrong because the old baked progress state visually competed with the runtime marker.
+- Resolution: Added a `world_map_neutral_underlay` extraction branch that regenerates `world_map_raster_underlay_concept_v001.png` from `assets/concepts/ui/world_map_ui_concept_v001.png` and mutes the baked green/cyan progress samples toward neutral parchment/map colors. After screenshot review still showed too much gray stage-4 glow silhouette, the extraction pass was strengthened to reduce bright glow remnants as well as color dominance. The play-button hover/down and current-stage marker extractions now source from the original concept image so those state assets keep their intended saturation.
+- Prevention: Stateful concept underlays need either neutral runtime-ready versions or full per-state recomposition. A marker overlay alone is not enough if baked state colors remain stronger than runtime state. Audits should sample known baked-state pixels in addition to verifying overlay visibility.
+
+### Problem: WorldMap current marker was too small to overcome remaining baked state geometry
+
+- Cause: After neutralizing the static underlay, the actual current stage had only a small diamond marker while the baked map still retained faint completed-check and stage-4 node/glow shapes.
+- Impact: The runtime state was technically correct, but the visual hierarchy still risked looking wrong when compared against the concept art: old baked state geometry could compete with the real current stage.
+- Resolution: Added `ui_current_stage_halo_concept`, extracted from the original WorldMap concept's cyan current-node glow. The extraction removes the baked `4` node plate and parchment fragments, then `WorldMapScene` renders the halo and diamond marker together at the node matching `context.run.stageId`. The underlay extraction also gained a stronger small-symbol cover pass for completed-check samples and the old stage-4 marker sample area.
+- Prevention: On stateful concept-underlay screens, correct state needs both a neutralized background and strong runtime state art at the real target. A tiny marker is not enough when the baked underlay still contains readable old-state geometry.
+
+### Problem: WorldMap current node still read partially completed because the lower baked check remained
+
+- Cause: The static WorldMap underlay retained completed-check badge geometry in the lower part of the first nodes. The marker and halo fixed the top/current emphasis but did not fully cover the lower completed-state read.
+- Impact: The runtime current stage could still look like a completed stage in screenshot comparison, even though the actual `context.run.stageId` was `stage_lantern_foyer`.
+- Resolution: Added `ui_current_stage_status_badge_concept`, cropped from the original WorldMap concept's gold current-status diamond/check area. `WorldMapScene` renders it on the lower area of the current node, and the dedicated audit now verifies `visibleCurrentStatusImages=1` and `statusAtCurrentStage=true`.
+- Prevention: Stateful concept-underlay screens need a full state-read stack or recomposed variants. For WorldMap, the minimum current-node stack is now top marker plus halo plus lower status badge; a single marker is not enough when baked completed/current geometry remains.

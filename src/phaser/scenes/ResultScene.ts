@@ -6,9 +6,11 @@ import { getStage } from "../../simulation/state/runState";
 import { renderDebugOverlay } from "../../ui/overlays/debugOverlay";
 import { handleSceneAction } from "../bridge/sceneActions";
 import { requireBootContext } from "../bridge/sceneBridge";
-import { renderActionButton, renderPaperPanel, renderSceneShell, renderUiSlot, textStyle } from "../view/sceneShell";
+import { renderActionButton, renderPaperPanel, renderRasterHoverHitTarget, renderSceneShell, renderUiSlot, textStyle } from "../view/sceneShell";
 
 type ResultTone = "clear" | "defeat" | "return";
+const RESULT_RASTER_UNDERLAY_KEY = "result_raster_underlay_concept";
+const RESULT_RASTER_HOVER_ACTION_KEY = "ui_hover_action_seal_concept";
 
 export class ResultScene extends Phaser.Scene {
   constructor() {
@@ -27,11 +29,48 @@ export class ResultScene extends Phaser.Scene {
       showRoute: false
     });
 
-    renderResultTheater(this, context);
+    if (hasResultRasterUnderlay(this)) {
+      renderResultRasterStage(this, context);
+    } else {
+      renderResultTheater(this, context);
+    }
 
     bindKeyboardActions(this, (action) => handleSceneAction(this, context, action), context.save.settings);
     renderDebugOverlay(context, "ResultScene");
   }
+}
+
+function hasResultRasterUnderlay(scene: Phaser.Scene): boolean {
+  return scene.textures.exists(RESULT_RASTER_UNDERLAY_KEY);
+}
+
+function renderResultRasterStage(scene: Phaser.Scene, context: BootContext): void {
+  scene.add.image(960, 540, RESULT_RASTER_UNDERLAY_KEY)
+    .setDisplaySize(1920, 1080)
+    .setDepth(0);
+
+  renderResultRasterHitTarget(scene, 1010, 742, 330, 66, 0xf5c26b, () => handleSceneAction(scene, context, "confirm"));
+  renderResultRasterHitTarget(scene, 960, 944, 440, 120, 0x5eead4, () => handleSceneAction(scene, context, "confirm"));
+}
+
+function renderResultRasterHitTarget(
+  scene: Phaser.Scene,
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  _accent: number,
+  onClick: () => void
+): void {
+  const hoverSize = Math.min(108, Math.max(80, Math.min(width, height) * 1.12));
+  renderRasterHoverHitTarget(scene, x, y, width, height, onClick, {
+    hoverKey: RESULT_RASTER_HOVER_ACTION_KEY,
+    hoverX: x + width * 0.38,
+    hoverY: y - height * 0.24,
+    hoverWidth: hoverSize,
+    hoverHeight: hoverSize,
+    downAlpha: 0.76
+  });
 }
 
 function renderResultTheater(scene: Phaser.Scene, context: BootContext): void {

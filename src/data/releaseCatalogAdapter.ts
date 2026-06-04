@@ -1,4 +1,5 @@
 import assetManifestJson from "./assetManifest.release.v1.json";
+import sliceAssetManifestJson from "./assetManifest.slice.v1.json";
 import arcanasJson from "./ko/arcanas.json";
 import cardsJson from "./ko/cards.json";
 import charactersJson from "./ko/characters.json";
@@ -152,6 +153,32 @@ interface RawEvent {
 }
 
 const manifest = assetManifestJson as ManifestEnvelope;
+const sliceManifest = sliceAssetManifestJson as ManifestEnvelope;
+const sharedUiRasterAssetKeys = new Set([
+  "ui_hover_gold_seal_concept",
+  "ui_hover_boss_skull_stamp_concept",
+  "ui_hover_route_node_concept",
+  "ui_hover_choice_badge_concept",
+  "ui_hover_action_seal_concept",
+  "ui_down_pressed_stamp_concept",
+  "ui_disabled_lock_stamp_concept",
+  "ui_hover_world_map_play_button_concept",
+  "ui_down_world_map_play_button_concept",
+  "ui_current_stage_marker_concept",
+  "ui_current_stage_halo_concept",
+  "ui_current_stage_status_badge_concept",
+  "combat_raster_underlay_concept",
+  "boss_raster_underlay_concept",
+  "reward_raster_underlay_concept",
+  "event_raster_underlay_concept",
+  "town_raster_underlay_concept",
+  "world_map_raster_underlay_concept",
+  "dungeon_raster_underlay_concept",
+  "rune_bench_raster_underlay_concept",
+  "result_raster_underlay_concept",
+  "settings_raster_underlay_concept"
+]);
+const sharedUiRasterAssets = sliceManifest.assets.filter((asset) => sharedUiRasterAssetKeys.has(asset.key));
 
 export function buildReleaseCatalogBundle(): GameDataBundle {
   const cards = (cardsJson as RawCard[]).map(mapCard);
@@ -186,7 +213,10 @@ export function buildReleaseCatalogBundle(): GameDataBundle {
     unlocks: [],
     evolutions: [],
     powerUps: [],
-    assets: manifest.assets
+    assets: [
+      ...manifest.assets,
+      ...sharedUiRasterAssets
+    ]
   };
 }
 

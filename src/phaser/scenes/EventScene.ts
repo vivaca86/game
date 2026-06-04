@@ -6,9 +6,11 @@ import { canPayEventChoice, getCurrentEvent } from "../../simulation/systems/eve
 import { renderDebugOverlay } from "../../ui/overlays/debugOverlay";
 import { handleSceneAction } from "../bridge/sceneActions";
 import { requireBootContext } from "../bridge/sceneBridge";
-import { renderActionButton, renderPaperPanel, renderSceneShell, renderUiSlot, textStyle } from "../view/sceneShell";
+import { renderActionButton, renderPaperPanel, renderRasterDisabledHitTarget, renderRasterHoverHitTarget, renderSceneShell, renderUiSlot, textStyle } from "../view/sceneShell";
 
 const CHOICE_ACTIONS = ["card_1", "card_2", "card_3", "card_4", "card_5"] as const;
+const EVENT_RASTER_UNDERLAY_KEY = "event_raster_underlay_concept";
+const EVENT_RASTER_HOVER_CHOICE_KEY = "ui_hover_choice_badge_concept";
 
 export class EventScene extends Phaser.Scene {
   constructor() {
@@ -28,17 +30,75 @@ export class EventScene extends Phaser.Scene {
       showRoute: false
     });
 
-    renderEventStage(this, context, event);
-    renderActionButton(this, 960, 1052, "Enter 첫 선택", () => handleSceneAction(this, context, "confirm"), {
-      focus: true,
-      width: 300,
-      height: 44,
-      fontSize: 20
-    });
+    if (hasEventRasterUnderlay(this)) {
+      renderEventRasterStage(this, context, event);
+    } else {
+      renderEventStage(this, context, event);
+      renderActionButton(this, 960, 1052, "Enter 첫 선택", () => handleSceneAction(this, context, "confirm"), {
+        focus: true,
+        width: 300,
+        height: 44,
+        fontSize: 20
+      });
+    }
 
     bindKeyboardActions(this, (action) => handleSceneAction(this, context, action), context.save.settings);
     renderDebugOverlay(context, "EventScene");
   }
+}
+
+function hasEventRasterUnderlay(scene: Phaser.Scene): boolean {
+  return scene.textures.exists(EVENT_RASTER_UNDERLAY_KEY);
+}
+
+function renderEventRasterStage(
+  scene: Phaser.Scene,
+  context: BootContext,
+  event: EventData | undefined
+): void {
+  scene.add.image(960, 540, EVENT_RASTER_UNDERLAY_KEY)
+    .setDisplaySize(1920, 1080)
+    .setDepth(0);
+
+  const cardXs = [530, 835, 1145, 1450];
+  (event?.choices ?? []).slice(0, 4).forEach((choice, index) => {
+    renderEventRasterChoice(scene, context, choice, index, cardXs[index] ?? (530 + index * 305), 770);
+  });
+}
+
+function renderEventRasterChoice(
+  scene: Phaser.Scene,
+  context: BootContext,
+  choice: EventChoice,
+  index: number,
+  x: number,
+  y: number
+): void {
+  const affordable = canPayEventChoice(context.run, choice);
+  const action = CHOICE_ACTIONS[index];
+  const badgeX = x - 32;
+
+  if (!affordable) {
+    renderRasterDisabledHitTarget(scene, x, y, 276, 430, {
+      disabledX: badgeX,
+      disabledY: y - 178,
+      disabledWidth: 112,
+      disabledHeight: 112,
+      disabledAlpha: 0.92
+    });
+    return;
+  }
+
+  renderRasterHoverHitTarget(scene, x, y, 276, 430, () => {
+    if (affordable && action) handleSceneAction(scene, context, action);
+  }, {
+    hoverKey: EVENT_RASTER_HOVER_CHOICE_KEY,
+    hoverX: badgeX,
+    hoverY: y - 178,
+    hoverWidth: 112,
+    hoverHeight: 80,
+    downAlpha: 0.76
+  });
 }
 
 function renderEventStage(
