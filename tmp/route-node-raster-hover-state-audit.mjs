@@ -72,7 +72,46 @@ async function readSceneStats(page, sceneName, underlayKey, hoverKey) {
   }, { sceneName, underlayKey, hoverKey });
 }
 
-await mkdir("tmp/ui-quality", { recursive: true });
+async function seedWorldMapStage2(page) {
+  const seeded = await page.evaluate(() => {
+    const game = window.__paperGame;
+    const scene = game?.scene?.getScenes?.(true)?.find((candidate) => candidate.scene?.key === "WorldMapScene")
+      ?? game?.scene?.getScene?.("WorldMapScene");
+    const context = scene?.registry?.get?.("bootContext");
+    const stages = context?.dataBundle?.stages ?? [];
+    if (!context?.save?.currentRun || stages.length < 2) {
+      return { ok: false, reason: "missing world-map context" };
+    }
+
+    const completedStageId = stages[0].id;
+    const currentStageId = stages[1].id;
+    context.save.profile.completedStages = [completedStageId];
+    context.save.profile.unlockedStages = [completedStageId, currentStageId];
+    context.save.currentRun = {
+      ...context.save.currentRun,
+      stageId: currentStageId,
+      completedStages: [completedStageId],
+      log: [...new Set([...(context.save.currentRun.log ?? []), "audit:worldmap_node_hover_stage2"])]
+    };
+    context.run.stageId = currentStageId;
+    context.run.completedStages = [completedStageId];
+    scene.scene.start("WorldMapScene", context);
+    return { ok: true, completedStageId, currentStageId };
+  });
+  if (!seeded.ok) {
+    throw new Error(`world-map hover seed failed: ${JSON.stringify(seeded)}`);
+  }
+
+  await page.waitForFunction((currentStageId) => {
+    const game = window.__paperGame;
+    const scene = game?.scene?.getScenes?.(true)?.find((candidate) => candidate.scene?.key === "WorldMapScene")
+      ?? game?.scene?.getScene?.("WorldMapScene");
+    const context = scene?.registry?.get?.("bootContext");
+    return context?.run?.stageId === currentStageId;
+  }, seeded.currentStageId, { timeout: 10000 });
+}
+
+await mkdir("tmp/ui-quality/worldmap", { recursive: true });
 
 const { chromium } = loadPlaywright();
 const executableCandidates = [
@@ -86,16 +125,21 @@ const cases = [
     label: "world-map-stage-node",
     sceneName: "WorldMapScene",
     underlayKey: "world_map_raster_underlay_concept",
-    pathname: "/?debug=1&entry=world_map&resetSave=1",
+    pathname: "/?data=release&entry=world_map&resetSave=1",
+    setup: "stage2-progress",
+    hoverKey: "ui_current_stage_halo_concept",
+    minVisibleHoverImages: 2,
     hoverX: 586,
     hoverY: 760,
-    screenshot: "tmp/ui-quality/world-map-raster-route-node-hover-state-v1-1920.png"
+    screenshot: "tmp/ui-quality/worldmap/worldmap-node-halo-hover-state-v1-1920.png"
   },
   {
     label: "dungeon-confirm",
     sceneName: "DungeonScene",
     underlayKey: "dungeon_raster_underlay_concept",
     pathname: "/?debug=1&entry=dungeon&resetSave=1",
+    hoverKey: "ui_hover_route_node_concept",
+    minVisibleHoverImages: 1,
     hoverX: 1010,
     hoverY: 582,
     screenshot: "tmp/ui-quality/dungeon-raster-route-node-hover-state-v1-1920.png"
@@ -131,6 +175,9 @@ try {
       const overlay = document.getElementById("debug-overlay");
       if (overlay) overlay.style.display = "none";
     });
+    if (testCase.setup === "stage2-progress") {
+      await seedWorldMapStage2(page);
+    }
 
     const canvas = page.locator("canvas");
     const box = await canvas.boundingBox();
@@ -141,9 +188,9 @@ try {
     await page.mouse.move(box.x + (testCase.hoverX / 1920) * box.width, box.y + (testCase.hoverY / 1080) * box.height);
     await page.waitForTimeout(140);
     const after = await canvas.screenshot({ path: testCase.screenshot });
-    const stats = await readSceneStats(page, testCase.sceneName, testCase.underlayKey, "ui_hover_route_node_concept");
+    const stats = await readSceneStats(page, testCase.sceneName, testCase.underlayKey, testCase.hoverKey);
     const delta = countByteDelta(before, after);
-    if (!stats.hasUnderlay || stats.textCount !== 0 || stats.visibleRectsAboveUnderlay !== 0 || stats.visibleHoverImages < 1 || delta <= 200) {
+    if (!stats.hasUnderlay || stats.textCount !== 0 || stats.visibleRectsAboveUnderlay !== 0 || stats.visibleHoverImages < testCase.minVisibleHoverImages || delta <= 200) {
       throw new Error(JSON.stringify({ label: testCase.label, screenshot: testCase.screenshot, delta, ...stats }, null, 2));
     }
     results.push({ ...testCase, screenshot: path.resolve(testCase.screenshot), delta, ...stats });

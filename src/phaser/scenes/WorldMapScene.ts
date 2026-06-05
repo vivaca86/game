@@ -1,6 +1,7 @@
 import Phaser from "phaser";
 import type { BootContext } from "../../app/bootContext";
 import type { StageData } from "../../data/schema";
+import type { InputAction } from "../../input/actions";
 import { bindKeyboardActions } from "../../input/bindings";
 import { persistSave } from "../../save/saveCodec";
 import { selectWorldMapStage } from "../../simulation/systems/dungeon/dungeonSystem";
@@ -11,12 +12,15 @@ import { requireBootContext, storeBootContext } from "../bridge/sceneBridge";
 import { renderActionButton, renderPaperPanel, renderRasterHoverHitTarget, renderSceneShell, renderUiSlot, textStyle } from "../view/sceneShell";
 
 const WORLD_MAP_RASTER_UNDERLAY_KEY = "world_map_raster_underlay_concept";
-const WORLD_MAP_RASTER_HOVER_NODE_KEY = "ui_hover_route_node_concept";
+const WORLD_MAP_RASTER_HOVER_NODE_KEY = "ui_current_stage_halo_concept";
 const WORLD_MAP_RASTER_HOVER_PLAY_KEY = "ui_hover_world_map_play_button_concept";
 const WORLD_MAP_RASTER_DOWN_PLAY_KEY = "ui_down_world_map_play_button_concept";
 const WORLD_MAP_RASTER_CURRENT_MARKER_KEY = "ui_current_stage_marker_concept";
 const WORLD_MAP_RASTER_CURRENT_HALO_KEY = "ui_current_stage_halo_concept";
 const WORLD_MAP_RASTER_CURRENT_STATUS_KEY = "ui_current_stage_status_badge_concept";
+const WORLD_MAP_RASTER_COMPLETED_BADGE_KEY = "ui_completed_stage_badge_concept";
+const WORLD_MAP_RASTER_LOCKED_BADGE_KEY = "ui_locked_stage_badge_concept";
+const WORLD_MAP_RASTER_SEALED_BADGE_KEY = "ui_sealed_stage_badge_concept";
 const WORLD_MAP_RASTER_STAGE_NODES: Array<{ x: number; y: number; width: number; height: number }> = [
   { x: 586, y: 760, width: 150, height: 150 },
   { x: 808, y: 756, width: 150, height: 150 },
@@ -34,6 +38,20 @@ const WORLD_MAP_RASTER_STAGE_NODES: Array<{ x: number; y: number; width: number;
   { x: 1252, y: 166, width: 170, height: 170 },
   { x: 1378, y: 306, width: 170, height: 170 }
 ];
+const WORLD_MAP_RASTER_RED_LOCKS: Record<number, { x: number; y: number; size: number }> = {
+  9: { x: 646, y: 285, size: 70 },
+  10: { x: 787, y: 337, size: 70 },
+  11: { x: 941, y: 358, size: 70 },
+  12: { x: 1068, y: 343, size: 70 },
+  13: { x: 1208, y: 232, size: 76 },
+  14: { x: 1311, y: 378, size: 76 }
+};
+const WORLD_MAP_RASTER_COMPLETED_BADGES: Record<number, { dx: number; dy: number; size: number; alpha: number }> = {
+  5: { dx: -0.04, dy: 0.43, size: 52, alpha: 0.82 },
+  6: { dx: 0.2, dy: 0.38, size: 52, alpha: 0.82 },
+  7: { dx: 0.02, dy: 0.32, size: 44, alpha: 0.72 },
+  8: { dx: 0.04, dy: 0.36, size: 54, alpha: 0.82 }
+};
 
 interface StageMapRow {
   stage: StageData;
@@ -66,7 +84,7 @@ export class WorldMapScene extends Phaser.Scene {
       renderWorldMapTheater(this, context);
     }
 
-    bindKeyboardActions(this, (action) => handleSceneAction(this, context, action), context.save.settings);
+    bindKeyboardActions(this, (action) => handleWorldMapAction(this, context, action), context.save.settings);
     renderDebugOverlay(context, "WorldMapScene");
   }
 }
@@ -80,9 +98,95 @@ function renderWorldMapRasterStage(scene: Phaser.Scene, context: BootContext): v
     .setDisplaySize(1920, 1080)
     .setDepth(0);
 
+  renderWorldMapStageStateBadges(scene, context);
   renderWorldMapRasterHitTarget(scene, 1576, 970, 280, 144, 0xf5c26b, () => handleSceneAction(scene, context, "confirm"));
   renderWorldMapCurrentStageMarker(scene, context);
   renderWorldMapRasterStageNodes(scene, context);
+}
+
+function renderWorldMapStageStateBadges(scene: Phaser.Scene, context: BootContext): void {
+  const currentStageId = context.run.stageId;
+  const unlockedStageIds = new Set([...context.save.profile.unlockedStages, currentStageId]);
+  const completedStageIds = new Set(context.save.profile.completedStages);
+  const firstLockedIndex = context.dataBundle.stages.findIndex((stage) => !unlockedStageIds.has(stage.id));
+
+  context.dataBundle.stages.forEach((stage, index) => {
+    const node = WORLD_MAP_RASTER_STAGE_NODES[index];
+    if (!node || stage.id === currentStageId) return;
+
+    if (completedStageIds.has(stage.id) && scene.textures.exists(WORLD_MAP_RASTER_COMPLETED_BADGE_KEY)) {
+      const completed = worldMapCompletedBadgePlacement(node, index);
+      scene.add.image(completed.x, completed.y, WORLD_MAP_RASTER_COMPLETED_BADGE_KEY)
+        .setDisplaySize(completed.size, completed.size)
+        .setAlpha(completed.alpha)
+        .setDepth(6);
+      return;
+    }
+
+    if (!unlockedStageIds.has(stage.id) && shouldUseWorldMapRedLock(index) && scene.textures.exists(WORLD_MAP_RASTER_LOCKED_BADGE_KEY)) {
+      const nextLocked = index === firstLockedIndex;
+      const lock = worldMapLockedBadgePlacement(node, index);
+      const size = nextLocked ? Math.max(lock.size, 76) : lock.size;
+      scene.add.image(lock.x, lock.y, WORLD_MAP_RASTER_LOCKED_BADGE_KEY)
+        .setDisplaySize(size, size)
+        .setAlpha(nextLocked ? 0.92 : 0.84)
+        .setDepth(nextLocked ? 6 : 5);
+      return;
+    }
+
+    if (!unlockedStageIds.has(stage.id) && index === firstLockedIndex && scene.textures.exists(WORLD_MAP_RASTER_SEALED_BADGE_KEY)) {
+      scene.add.image(node.x + node.width * 0.01, node.y + node.height * 0.39, WORLD_MAP_RASTER_SEALED_BADGE_KEY)
+        .setDisplaySize(60, 60)
+        .setAlpha(0.82)
+        .setDepth(6);
+    }
+  });
+}
+
+function worldMapCompletedBadgePlacement(
+  node: { x: number; y: number; width: number; height: number },
+  stageIndex: number
+): { x: number; y: number; size: number; alpha: number } {
+  if (stageIndex <= 2) {
+    return {
+      x: node.x + node.width * 0.03,
+      y: node.y + node.height * 0.32,
+      size: 78,
+      alpha: 0.96
+    };
+  }
+
+  const placed = WORLD_MAP_RASTER_COMPLETED_BADGES[stageIndex];
+  if (placed) {
+    return {
+      x: node.x + node.width * placed.dx,
+      y: node.y + node.height * placed.dy,
+      size: placed.size,
+      alpha: placed.alpha
+    };
+  }
+
+  return {
+    x: node.x + node.width * 0.02,
+    y: node.y + node.height * 0.31,
+    size: stageIndex >= 9 ? 64 : 60,
+    alpha: 0.88
+  };
+}
+
+function shouldUseWorldMapRedLock(stageIndex: number): boolean {
+  return stageIndex >= 9;
+}
+
+function worldMapLockedBadgePlacement(
+  node: { x: number; y: number; width: number; height: number },
+  stageIndex: number
+): { x: number; y: number; size: number } {
+  const sourceAligned = WORLD_MAP_RASTER_RED_LOCKS[stageIndex];
+  if (sourceAligned) return sourceAligned;
+  if (stageIndex >= 13) return { x: node.x - node.width * 0.34, y: node.y + node.height * 0.36, size: 76 };
+  if (stageIndex >= 11) return { x: node.x - node.width * 0.12, y: node.y + node.height * 0.36, size: 70 };
+  return { x: node.x - node.width * 0.06, y: node.y + node.height * 0.36, size: 70 };
 }
 
 function renderWorldMapCurrentStageMarker(scene: Phaser.Scene, context: BootContext): void {
@@ -141,11 +245,21 @@ function renderWorldMapRasterNodeHitTarget(
 ): void {
   renderRasterHoverHitTarget(scene, x, y, width, height, onClick, {
     hoverKey: WORLD_MAP_RASTER_HOVER_NODE_KEY,
-    hoverX: x + 72,
-    hoverY: y - 62,
-    hoverWidth: 88,
-    hoverHeight: 88,
-    downAlpha: 0.76
+    downKey: WORLD_MAP_RASTER_HOVER_NODE_KEY,
+    hoverX: x + 2,
+    hoverY: y + 4,
+    downX: x + 2,
+    downY: y + 4,
+    hoverWidth: width * 2.14,
+    hoverHeight: height * 2.28,
+    downWidth: width * 1.92,
+    downHeight: height * 2.04,
+    hoverAlpha: 0.9,
+    downAlpha: 0.98,
+    hoverDepth: 5.75,
+    downDepth: 5.75,
+    hoverBlendMode: Phaser.BlendModes.ADD,
+    downBlendMode: Phaser.BlendModes.ADD
   });
 }
 
@@ -172,6 +286,56 @@ function renderWorldMapRasterHitTarget(
     hoverAlpha: 0.96,
     downAlpha: 0.94
   });
+}
+
+function handleWorldMapAction(scene: Phaser.Scene, context: BootContext, action: InputAction): void {
+  const nextStageId = hasWorldMapRasterUnderlay(scene)
+    ? resolveKeyboardStageSelection(context, action)
+    : undefined;
+  if (nextStageId) {
+    selectStageAndRestart(scene, context, nextStageId);
+    return;
+  }
+
+  handleSceneAction(scene, context, action);
+}
+
+function resolveKeyboardStageSelection(context: BootContext, action: InputAction): string | undefined {
+  if (action !== "move_left" && action !== "move_right" && action !== "move_up" && action !== "move_down") {
+    return undefined;
+  }
+
+  const currentIndex = context.dataBundle.stages.findIndex((stage) => stage.id === context.run.stageId);
+  const currentNode = WORLD_MAP_RASTER_STAGE_NODES[currentIndex];
+  if (!currentNode) return undefined;
+
+  const unlockedStageIds = new Set([...context.save.profile.unlockedStages, context.run.stageId]);
+  const direction = keyboardStageDirection(action);
+  const candidates = context.dataBundle.stages
+    .map((stage, index) => ({ stage, index, node: WORLD_MAP_RASTER_STAGE_NODES[index] }))
+    .filter(({ stage, index, node }) => index !== currentIndex && node && unlockedStageIds.has(stage.id))
+    .map(({ stage, node }) => {
+      const dx = node.x - currentNode.x;
+      const dy = node.y - currentNode.y;
+      const primary = dx * direction.x + dy * direction.y;
+      const cross = Math.abs(dx * direction.y - dy * direction.x);
+      return {
+        stageId: stage.id,
+        primary,
+        score: primary + cross * 0.72
+      };
+    })
+    .filter((candidate) => candidate.primary > 8)
+    .sort((left, right) => left.score - right.score);
+
+  return candidates[0]?.stageId;
+}
+
+function keyboardStageDirection(action: Extract<InputAction, "move_left" | "move_right" | "move_up" | "move_down">): { x: number; y: number } {
+  if (action === "move_left") return { x: -1, y: 0 };
+  if (action === "move_right") return { x: 1, y: 0 };
+  if (action === "move_up") return { x: 0, y: -1 };
+  return { x: 0, y: 1 };
 }
 
 function renderWorldMapTheater(scene: Phaser.Scene, context: BootContext): void {

@@ -574,7 +574,7 @@ async function checkUiSkinStates() {
       { x: 1360, y: 640, label: "settings-space-confirm" },
       { x: 1626, y: 696, label: "settings-reset-defaults" },
       { x: 1626, y: 520, label: "settings-reset-save" },
-      { x: 1570, y: 890, label: "settings-return-town" }
+      { x: 1688, y: 958, label: "settings-return-town" }
     ];
     for (const target of settingsHoverTargets) {
       await assertHoverUsesRasterImageOnly(

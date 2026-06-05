@@ -37,21 +37,22 @@ async function startServer() {
 
 const defaultDownKey = "ui_down_pressed_stamp_concept";
 const targets = [
-  { sceneName: "TownScene", underlay: "town_raster_underlay_concept", pathname: "/?debug=1&entry=town&resetSave=1", downX: 1010, downY: 642 },
+  { sceneName: "TownScene", underlay: "town_raster_underlay_concept", pathname: "/?debug=1&entry=town&resetSave=1", downX: 1010, downY: 642, downKey: "ui_hover_action_seal_concept" },
   { sceneName: "WorldMapScene", underlay: "world_map_raster_underlay_concept", pathname: "/?debug=1&entry=world_map&resetSave=1", downX: 1576, downY: 970, downKey: "ui_down_world_map_play_button_concept" },
-  { sceneName: "DungeonScene", underlay: "dungeon_raster_underlay_concept", pathname: "/?debug=1&entry=dungeon&resetSave=1", downX: 1010, downY: 582 },
-  { sceneName: "CombatScene", underlay: "combat_raster_underlay_concept", pathname: "/?debug=1&entry=combat&resetSave=1", downX: 540, downY: 836 },
-  { sceneName: "RewardScene", underlay: "reward_raster_underlay_concept", pathname: "/?debug=1&entry=reward&resetSave=1", downX: 630, downY: 618 },
-  { sceneName: "EventScene", underlay: "event_raster_underlay_concept", pathname: "/?debug=1&entry=event&resetSave=1", downX: 618, downY: 722 },
-  { sceneName: "RuneBenchScene", underlay: "rune_bench_raster_underlay_concept", pathname: "/?debug=1&entry=rune_bench&resetSave=1&grantRune=rune_paper_spark", downX: 1010, downY: 742 },
-  { sceneName: "BossScene", underlay: "boss_raster_underlay_concept", pathname: "/?debug=1&entry=boss&resetSave=1", downX: 1718, downY: 930 },
-  { sceneName: "ResultScene", underlay: "result_raster_underlay_concept", pathname: "/?debug=1&entry=result&resetSave=1", downX: 1010, downY: 742 },
+  { sceneName: "DungeonScene", underlay: "dungeon_raster_underlay_concept", pathname: "/?debug=1&entry=dungeon&resetSave=1", downX: 1010, downY: 582, downKey: "ui_hover_route_node_concept" },
+  { sceneName: "CombatScene", underlay: "combat_raster_underlay_concept", pathname: "/?debug=1&entry=combat&resetSave=1", downX: 540, downY: 836, downKey: "ui_hover_gold_seal_concept" },
+  { sceneName: "RewardScene", underlay: "reward_raster_underlay_concept", pathname: "/?debug=1&entry=reward&resetSave=1", downX: 630, downY: 618, downKey: "ui_hover_choice_badge_concept" },
+  { sceneName: "EventScene", underlay: "event_raster_underlay_concept", pathname: "/?debug=1&entry=event&resetSave=1", downX: 618, downY: 722, downKey: "ui_hover_choice_badge_concept" },
+  { sceneName: "RuneBenchScene", underlay: "rune_bench_raster_underlay_concept", pathname: "/?debug=1&entry=rune_bench&resetSave=1&grantRune=rune_paper_spark", downX: 1010, downY: 742, downKey: "ui_hover_action_seal_concept" },
+  { sceneName: "BossScene", underlay: "boss_raster_underlay_concept", pathname: "/?debug=1&entry=boss&resetSave=1", downX: 1718, downY: 930, downKey: "ui_hover_boss_skull_stamp_concept" },
+  { sceneName: "ResultScene", underlay: "result_raster_underlay_concept", pathname: "/?debug=1&entry=result&resetSave=1", downX: 1010, downY: 742, downKey: "ui_hover_action_seal_concept" },
   {
     sceneName: "SettingsScene",
     underlay: "settings_raster_underlay_concept",
     pathname: "/?debug=1&entry=town&resetSave=1",
     downX: 840,
     downY: 282,
+    downKey: "ui_hover_action_seal_concept",
     setup: async (page) => {
       const canvas = page.locator("canvas");
       const box = await canvas.boundingBox();

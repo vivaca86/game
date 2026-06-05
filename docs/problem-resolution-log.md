@@ -1031,3 +1031,115 @@
 - Impact: The runtime current stage could still look like a completed stage in screenshot comparison, even though the actual `context.run.stageId` was `stage_lantern_foyer`.
 - Resolution: Added `ui_current_stage_status_badge_concept`, cropped from the original WorldMap concept's gold current-status diamond/check area. `WorldMapScene` renders it on the lower area of the current node, and the dedicated audit now verifies `visibleCurrentStatusImages=1` and `statusAtCurrentStage=true`.
 - Prevention: Stateful concept-underlay screens need a full state-read stack or recomposed variants. For WorldMap, the minimum current-node stack is now top marker plus halo plus lower status badge; a single marker is not enough when baked completed/current geometry remains.
+
+### Problem: WorldMap completed and locked states were not runtime-driven
+
+- Cause: The raster WorldMap had runtime current-state art, but completed and locked reads still came mostly from the static concept underlay. Completed nodes did not receive a runtime completed badge, and locked nodes did not have a verified runtime lock overlay tied to `profile.unlockedStages`/`profile.completedStages`.
+- Impact: The map could still look polished while communicating stale progress. A saved run with different stage progress could disagree with the baked concept art, especially after the underlay was neutralized for current-state work.
+- Resolution: Added `ui_completed_stage_badge_concept` and `ui_locked_stage_badge_concept`, both extracted from `assets/concepts/ui/world_map_ui_concept_v001.png`, registered them in the slice manifests and release shared UI raster bundle, and copied them through `tools/generate-dev-runtime-assets.mjs`. `WorldMapScene` now renders completed badges for completed non-current stages and locked badges for locked stages, while current stages keep precedence. The dedicated WorldMap audit now seeds `stage_sunny_gate` as completed and `stage_lavender_hall` as current, then verifies `visibleCompletedBadges=1`, `visibleLockedBadges=13`, and no completed/locked badge on the current stage.
+- Prevention: Future WorldMap state work should test at least one mixed progress save, not just the default first-stage state. Static concept underlays need runtime-state audits for every state family they visually imply.
+
+### Problem: WorldMap first locked-state overlay overused red lock badges
+
+- Cause: The first completed/locked runtime pass treated every locked stage as a red-lock stage. That made stages 3-9 read like red stickers even though the original WorldMap concept reserves red lock badges for the later upper chapter nodes and uses subtler gray sealed states through the lower/mid path.
+- Impact: The implementation was more state-complete but less faithful to the concept art. It repeated the risk of optimizing for an audit count instead of the user's visual target.
+- Resolution: Added `ui_sealed_stage_badge_concept`, extracted from the original concept's gray sealed diamond, and changed `WorldMapScene` so locked stages before the upper chapter row use gray seal badges while later chapter nodes use red lock badges. The dedicated WorldMap audit now verifies `visibleLockedBadges=6` and `visibleSealedBadges=7` separately for the seeded release state.
+- Prevention: State audits should encode the concept's visual taxonomy, not just the data taxonomy. `locked` can map to different visual families depending on stage position and concept language.
+
+### Problem: WorldMap lower node bodies still baked completed/current color into the runtime underlay
+
+- Cause: Earlier neutralization focused on completed check marks, the stage-4 diamond, and lock badges. The node bodies for stages 1-3 still retained strong teal completed-state color, and the stage-4 plate still retained current-state blue/cyan color.
+- Impact: Even with runtime completed/current/locked/sealed badges, the underlying node bodies could still imply the old static concept progress state. This made the map more polished than truthful and weakened the user's requested concept-quality alignment.
+- Resolution: Extended the `world_map_neutral_underlay` extraction pass with body-color regions for the lower stage-1/2/3 nodes and the stage-4 current plate. The pass reduces state-color dominance while preserving the node numbers and metal frame language. The dedicated WorldMap audit now samples `node1body`, `node2body`, `node3body`, and `stage4body` in addition to the older check/diamond/lock samples.
+- Prevention: Stateful raster underlays need both symbol-level and body-level samples. Verifying only badges/check marks is not enough when the node plate itself carries state color.
+
+### Problem: WorldMap stage-4 route still had a cyan dotted progress remnant
+
+- Cause: Earlier route neutralization covered the lower 1-4 path and the stage-4 node plate, but a vertical dotted cyan segment around source coordinate `940,503` remained. This segment came from the original concept's bright current-route path.
+- Impact: In a runtime state where stage 2 is current and stage 3 is locked/sealed, the leftover cyan dots still visually pointed back to the old baked stage-4 progress state.
+- Resolution: Added a narrow route segment mask to the `world_map_neutral_underlay` extraction. It removes cyan dominance from the dotted path while preserving the gray route body. The dedicated audit now samples `stage4routeDots`, which reports neutral warm values instead of cyan dominance.
+- Prevention: Route-line state checks need their own samples. Node/body checks can pass while route geometry still communicates stale progress.
+
+### Problem: WorldMap stage-5 still read like an unlocked blue node in the progressed state
+
+- Cause: The earlier neutralized-underlay pass stopped before the stage-5 node and the 4-to-5 route. In a progressed save with stages 1-3 completed and stage 4 current, stage 5 should read as sealed, but the static concept underlay still carried a strong blue node body and route tint.
+- Impact: The new completed/current/sealed overlays could pass object-count audits while the screenshot still implied stale progress beyond the real current stage.
+- Resolution: Extended the `world_map_neutral_underlay` extraction to include the stage-5 node body and the 4-to-5 route segment. The dedicated audit now samples `stage5body` and `stage5route` in addition to the earlier stage-4 route sample.
+- Prevention: WorldMap state audits should include at least one progressed save beyond the first unlock. `tmp/ui-worldmap-action-hit-target-audit.mjs` now captures `tmp/ui-quality/worldmap/worldmap-progress-current-stage4-v1-1920.png` and verifies stages 1-3 completed, `stage_peach_canal` current, five gray seals, six red locks, and no completed/locked/sealed badge on the current node.
+
+### Problem: WorldMap upper red-lock badges were visibly lower than the source concept
+
+- Cause: The first red-lock placement used a generic node-relative formula. That formula worked acceptably for the large right-side boss nodes, but it placed stages 10 and 11 noticeably below the source concept's red lock centers.
+- Impact: The red-lock overlay was technically runtime-driven, but the upper chapter row looked like pasted stickers rather than part of the illustrated node assemblies. This was a concept-quality mismatch, not a data-state bug.
+- Resolution: Added source-aligned red-lock placements for stages 10-15 in `WorldMapScene`, using the original concept's lock centers scaled to the 1920x1080 runtime canvas. The dedicated audit now verifies red-lock position, display size, and alpha rather than only the badge count.
+- Prevention: Concept-derived overlays should keep source-aligned anchors when the concept provides a clear state-art location. Generic node-relative formulas are only a fallback.
+
+### Problem: WorldMap late-progress completed badges were too large on mid-route nodes
+
+- Cause: The completed badge used one size and one lower-node anchor for every stage. That matched the original stage-1/2/3 completed checks, but in a late save it made stages 4-8 look noisy and route-covering.
+- Impact: A late progression map could pass count/position audits while still feeling visually heavy and less like the source concept. The runtime state was true, but the overlay density was not yet tuned to the node family.
+- Resolution: Split completed-badge placement by stage family. Stages 1-3 keep the larger original-style check, while later completed nodes use a smaller, slightly quieter check. The late-state audit now captures `tmp/ui-quality/worldmap/worldmap-progress-current-stage9-v1-1920.png` and verifies completed-badge position, size, and alpha.
+- Prevention: WorldMap audits should include late progression states, not only early progression. State overlay size should be checked as well as object count.
+
+### Problem: WorldMap lower/mid gray-seal overlays were too dense after the red-lock split
+
+- Cause: After red locks were reserved for stages 10-15, every locked lower/mid stage still received a small gray seal overlay. That made stages 3-9 or 5-9 read like a row of audit markers, even though the concept already communicates inactive lower/mid nodes through gray node bodies.
+- Impact: The map state was technically correct but visually noisier than the source concept. This risked replacing the old red-sticker problem with a subtler gray-sticker problem.
+- Resolution: `WorldMapScene` now renders the gray seal overlay only on the next lower/mid locked node. Later lower/mid locked nodes rely on the neutralized gray node art instead of additional seal markers. The dedicated audit now expects one sealed badge in the early and stage-4-progress cases and zero sealed badges in the late stage-9 current case, and it verifies the one seal's size and alpha.
+- Prevention: State audits must not only count all possible data-state markers. For concept-matched UI, they should encode visual hierarchy: next blocked stage gets explicit emphasis, non-next blocked stages can be quieter if the underlay already carries the inactive material language.
+
+### Problem: WorldMap stage-node hover looked like a detached UI token
+
+- Cause: WorldMap stage-node hover reused the shared component-sheet route token and positioned it at `x + 72, y - 62`. In screenshot review it appeared as a separate gold ring/teal token near the node rather than as the illustrated map node responding. The `ui_current_stage_halo_concept` asset also still contained the top diamond marker and lower route-dot fragments, so reusing it directly would have carried stale state pieces into hover.
+- Impact: The screen could pass raster/no-vector checks while still failing the user's concept-art standard because hover feedback felt pasted on. It also blurred the distinction between current, selected, and hover state.
+- Resolution: The `current_halo` extraction now masks out the top marker and lower route-dot fragments, leaving only the cyan concept glow arcs. `renderRasterHoverHitTarget` gained optional hover/down blend modes, and `WorldMapScene` now uses the cleaned `ui_current_stage_halo_concept` with additive blending for stage-node hover/down. Dungeon keeps the shared `ui_hover_route_node_concept`.
+- Prevention: Hover-state audits must include screenshot review and semantic fit checks, not just "a bitmap became visible." `tmp/route-node-raster-hover-state-audit.mjs` now seeds WorldMap to a stage-2 progress state and hovers completed stage 1, so node hover is verified independently from the current-stage marker.
+
+### Problem: WorldMap raster mode had no keyboard stage-selection path
+
+- Cause: `ArrowUp/Down/Left/Right` were already defined input actions, but `WorldMapScene` routed every action through the generic scene action handler. The generic handler ignores movement actions, so keyboard users could confirm the current stage but could not select another unlocked map node.
+- Impact: The visual UI had click hit targets and first-pass raster hover, but selected/focus/keyboard state remained unfinished. This contradicted the documented UI quality goal and left keyboard interaction behind pointer interaction.
+- Resolution: `WorldMapScene` now handles directional actions in raster mode before falling back to the generic handler. The resolver uses the concept node coordinates to pick the nearest unlocked stage in the pressed direction, then calls the existing `selectWorldMapStage`/save persistence path so the runtime current marker, halo, and status badge move to the selected node. `tmp/ui-worldmap-action-hit-target-audit.mjs` now verifies `ArrowLeft` from stage 2 selects stage 1 and captures `worldmap-keyboard-stage-select-v1-1920.png`.
+- Prevention: Keyboard/focus work should reuse existing gameplay selection paths and concept-derived state art rather than inventing a separate procedural focus ring. Audits should prove both the state transition and the raster-only visual result.
+
+### Problem: Keyboard-selected WorldMap states exposed remaining lower baked completed-check silhouettes
+
+- Cause: The neutralized underlay had reduced the green/cyan state color, but the lower check-badge shapes for stages 1-3 still remained visible enough to read as completed in some selected states.
+- Impact: After keyboard selection moved current focus back to stage 1, stage 2 could still look partly completed from the baked underlay even though the runtime completed data did not mark it completed.
+- Resolution: `tools/extract-ui-state-assets.mjs` now applies an additional neutral patch over the lower 1-3 baked check areas so runtime completed/current badges carry more of the state read. The latest WorldMap audit samples those old check areas as `node1check=[97,85,69]`, `node2check=[95,84,69]`, and `node3check=[99,87,71]`, with no green/cyan completed-state dominance.
+- Prevention: Pixel dominance samples are not enough when the silhouette itself remains readable. Future WorldMap recomposition should include shape-level screenshot review for non-current/non-completed lower nodes.
+
+### Problem: Late WorldMap completed badges looked like route-floating markers on mid nodes
+
+- Cause: After reducing late completed-badge size, stages 6-8 still used one generic node-relative placement. In the late-progress screenshot, stage 6 and 7 badges sat closer to the route than to the illustrated node bases, and stage 8 is effectively a weak route checkpoint rather than a fully visible numbered concept node.
+- Impact: The audit count was correct, but the visual read still felt pasted on in the mid-route area. This repeated the same failure mode where a runtime state marker is technically present but not integrated into the concept illustration.
+- Resolution: `WorldMapScene` now uses mid-route completed-badge placement overrides. Stage 6 and 7 badges are moved closer to their node-base material, and stage 8 uses a smaller, quieter completed marker. The dedicated WorldMap audit verifies the new positions/sizes/alpha, and the late-progress crop shows less route-floating weight.
+- Prevention: Late progression needs screenshot review in addition to count checks. When the concept does not expose a full numbered node, the runtime marker should be quieter or the node should be properly recomposed later rather than using the same badge treatment everywhere.
+
+### Problem: Reward/Event choice pressed state used a generic stamp instead of the choice badge language
+
+- Cause: Reward and Event raster choices used `ui_hover_choice_badge_concept` for hover, but their down state fell back to the shared `ui_down_pressed_stamp_concept`. That meant one control changed visual language between hover and press.
+- Impact: In the pressed screenshot, the selection looked like a separate brown stamp pasted over the card instead of the card header badge responding. This was technically raster, but weaker than the concept-matched state-art standard.
+- Resolution: Reward and Event choice hit targets now set `downKey` to `ui_hover_choice_badge_concept` and use a slightly larger pressed size on the same badge axis. The down audit now expects the choice-badge key for those two screens, and hover audit still verifies the existing choice-badge hover path.
+- Prevention: Control families should share state language across hover/down/disabled when a control-specific concept asset exists. The shared pressed stamp should remain a fallback, not the default for controls with a better local state asset.
+
+### Problem: Remaining audited raster pressed states still used the shared fallback stamp
+
+- Cause: Town, Dungeon, Combat, RuneBench, Boss, Result, and Settings already had concept-derived hover bitmap families, but several pressed/down states still inherited `ui_down_pressed_stamp_concept` from the shared raster hit-target helper.
+- Impact: The pressed screenshots could pass the raster/no-vector audit while still looking like a generic stamp had been placed over unrelated controls. This was especially visible on combat, boss, route, and utility controls where the hover language already had a better local visual family.
+- Resolution: The audited pressed/down targets now set explicit `downKey` values from their existing concept bitmap families. Combat uses `ui_hover_gold_seal_concept`, Boss uses `ui_hover_boss_skull_stamp_concept`, Dungeon uses `ui_hover_route_node_concept`, and Town/RuneBench/Result/Settings use `ui_hover_action_seal_concept`. The 10-screen down audit now expects those keys and still verifies exactly one visible down image, no text, and no visible rectangles above each concept underlay.
+- Prevention: Shared `ui_down_pressed_stamp_concept` should be treated as fallback state art only. When a screen/control family already has a concept-derived hover asset, down state should either reuse that local family intentionally or get a more specific concept-derived pressed asset after screenshot review.
+
+### Problem: Settings return-to-town feedback was anchored above the visible concept button
+
+- Cause: Settings raster mode used the old `1570,890` return hit target. That coordinate overlapped the lower-right area, but the visible concept control is the red check button lower and farther right.
+- Impact: The Settings per-control pressed audit passed object-level checks, but screenshot review showed the action-seal feedback floating on the dark area above the button. This repeated the core risk: technically raster state art can still fail if it is not anchored to the visible concept control.
+- Resolution: The return-to-town hit target moved to the visible bottom-right red check button, with a return-specific action-seal anchor. The Settings hover coverage audit, new Settings pressed coverage audit, and broad 10-screen down audit were updated and rerun.
+- Prevention: Dense concept screens need per-control screenshot review, not only representative checks. Any control whose feedback is tied to a large button, side panel, or tab should have its own tested coordinate instead of inheriting the generic placement formula.
+
+### Problem: Settings return button still used shared action-seal feedback after re-anchoring
+
+- Cause: The previous fix put the feedback on the correct button, but it still used the shared `ui_hover_action_seal_concept` family. That was better than a floating stamp, yet still weaker than the WorldMap play button standard where the concept button itself responds.
+- Impact: Settings could pass per-control hover/pressed audits while still looking less integrated than the concept art because the bottom-right red check button had an unrelated stamp on top rather than a button-specific state.
+- Resolution: Added `ui_hover_settings_return_button_concept` and `ui_down_settings_return_button_concept`, extracted from the Settings concept underlay. The first crop used runtime coordinates against the smaller source image and captured the wrong dark area; screenshot/source inspection caught it before in-game use. A corrected source-space crop and check-center alignment now make the button itself brighten/darken for hover/down.
+- Prevention: Button-specific assets must be checked at three levels: source crop, in-scene hover screenshot, and in-scene down screenshot. Runtime coordinates must be converted to the source image's native resolution before extracting from concept underlays.

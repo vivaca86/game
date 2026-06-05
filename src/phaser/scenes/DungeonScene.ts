@@ -69,11 +69,16 @@ function renderDungeonRasterHitTarget(
   const hoverSize = Math.min(132, Math.max(96, Math.min(width, height) * 1.12));
   renderRasterHoverHitTarget(scene, x, y, width, height, onClick, {
     hoverKey: DUNGEON_RASTER_HOVER_NODE_KEY,
+    downKey: DUNGEON_RASTER_HOVER_NODE_KEY,
     hoverX: x,
     hoverY: y,
     hoverWidth: hoverSize,
     hoverHeight: hoverSize,
-    downAlpha: 0.76
+    downX: x,
+    downY: y,
+    downWidth: hoverSize * 1.1,
+    downHeight: hoverSize * 1.1,
+    downAlpha: 0.82
   });
 }
 

@@ -68,10 +68,15 @@ function renderTownRasterHitTarget(
   const hoverSize = Math.min(104, Math.max(76, Math.min(width, height) * 1.08));
   renderRasterHoverHitTarget(scene, x, y, width, height, onClick, {
     hoverKey: TOWN_RASTER_HOVER_ACTION_KEY,
+    downKey: TOWN_RASTER_HOVER_ACTION_KEY,
     hoverX: x + width * 0.42,
     hoverY: y - height * 0.28,
     hoverWidth: hoverSize,
     hoverHeight: hoverSize,
+    downX: x + width * 0.42,
+    downY: y - height * 0.28,
+    downWidth: hoverSize * 1.12,
+    downHeight: hoverSize * 1.12,
     downAlpha: 0.76
   });
 }

@@ -98,6 +98,42 @@ const targets = [
     stateVariant: "buttonDown"
   },
   {
+    key: "ui_hover_settings_return_button_concept",
+    kind: "button_state",
+    source: path.join(rootDir, "assets", "source", "ui", "settings_raster_underlay_concept_v001.png"),
+    output: path.join(rootDir, "assets", "source", "ui", "ui_hover_settings_return_button_concept_v001.png"),
+    crop: { x: 1340, y: 775, w: 260, h: 140 },
+    nativeSize: { w: 330, h: 170 },
+    maskPolygon: [
+      { x: 18, y: 42 },
+      { x: 72, y: 16 },
+      { x: 300, y: 16 },
+      { x: 324, y: 50 },
+      { x: 308, y: 148 },
+      { x: 46, y: 160 },
+      { x: 8, y: 122 }
+    ],
+    stateVariant: "buttonHover"
+  },
+  {
+    key: "ui_down_settings_return_button_concept",
+    kind: "button_state",
+    source: path.join(rootDir, "assets", "source", "ui", "settings_raster_underlay_concept_v001.png"),
+    output: path.join(rootDir, "assets", "source", "ui", "ui_down_settings_return_button_concept_v001.png"),
+    crop: { x: 1340, y: 775, w: 260, h: 140 },
+    nativeSize: { w: 330, h: 170 },
+    maskPolygon: [
+      { x: 18, y: 42 },
+      { x: 72, y: 16 },
+      { x: 300, y: 16 },
+      { x: 324, y: 50 },
+      { x: 308, y: 148 },
+      { x: 46, y: 160 },
+      { x: 8, y: 122 }
+    ],
+    stateVariant: "buttonDown"
+  },
+  {
     key: "ui_current_stage_marker_concept",
     kind: "current_marker",
     source: path.join(rootDir, "assets", "concepts", "ui", "world_map_ui_concept_v001.png"),
@@ -120,6 +156,33 @@ const targets = [
     output: path.join(rootDir, "assets", "source", "ui", "ui_current_stage_status_badge_concept_v001.png"),
     crop: { x: 1034, y: 600, w: 82, h: 82 },
     nativeSize: { w: 96, h: 96 }
+  },
+  {
+    key: "ui_completed_stage_badge_concept",
+    kind: "world_map_stage_badge",
+    source: path.join(rootDir, "assets", "concepts", "ui", "world_map_ui_concept_v001.png"),
+    output: path.join(rootDir, "assets", "source", "ui", "ui_completed_stage_badge_concept_v001.png"),
+    crop: { x: 486, y: 680, w: 55, h: 58 },
+    nativeSize: { w: 96, h: 96 },
+    stateVariant: "completed"
+  },
+  {
+    key: "ui_locked_stage_badge_concept",
+    kind: "world_map_stage_badge",
+    source: path.join(rootDir, "assets", "concepts", "ui", "world_map_ui_concept_v001.png"),
+    output: path.join(rootDir, "assets", "source", "ui", "ui_locked_stage_badge_concept_v001.png"),
+    crop: { x: 793, y: 292, w: 52, h: 53 },
+    nativeSize: { w: 96, h: 96 },
+    stateVariant: "locked"
+  },
+  {
+    key: "ui_sealed_stage_badge_concept",
+    kind: "world_map_stage_badge",
+    source: path.join(rootDir, "assets", "concepts", "ui", "world_map_ui_concept_v001.png"),
+    output: path.join(rootDir, "assets", "source", "ui", "ui_sealed_stage_badge_concept_v001.png"),
+    crop: { x: 1142, y: 530, w: 36, h: 44 },
+    nativeSize: { w: 96, h: 96 },
+    stateVariant: "sealed"
   },
   {
     key: "effect_paper_slash_concept",
@@ -254,24 +317,41 @@ try {
         const imageData = ctx.getImageData(0, 0, nativeSize.w, nativeSize.h);
         const data = imageData.data;
         const regions = [
+          { x: 510, y: 662, rx: 58, ry: 76, strength: 0.88, mode: "cyan" },
+          { x: 704, y: 658, rx: 58, ry: 76, strength: 0.88, mode: "cyan" },
+          { x: 872, y: 648, rx: 58, ry: 76, strength: 0.88, mode: "cyan" },
+          { x: 873, y: 631, rx: 44, ry: 40, strength: 1.12, mode: "teal" },
+          { x: 1018, y: 604, rx: 66, ry: 88, strength: 0.92, mode: "cyan" },
           { x: 510, y: 704, rx: 76, ry: 54, strength: 1.08, mode: "green" },
           { x: 704, y: 700, rx: 76, ry: 54, strength: 1.08, mode: "green" },
           { x: 872, y: 690, rx: 76, ry: 54, strength: 1.08, mode: "green" },
           { x: 1018, y: 615, rx: 166, ry: 178, strength: 1.08, mode: "cyan" },
           { x: 1022, y: 512, rx: 96, ry: 112, strength: 1.12, mode: "cyan" },
-          { x: 1160, y: 502, rx: 82, ry: 90, strength: 0.78, mode: "cyan" }
+          { x: 1160, y: 502, rx: 82, ry: 90, strength: 0.78, mode: "cyan" },
+          { x: 1328, y: 574, rx: 66, ry: 82, strength: 0.96, mode: "cyan" },
+          { x: 1328, y: 542, rx: 48, ry: 46, strength: 0.88, mode: "teal" },
+          { x: 563, y: 248, rx: 52, ry: 52, strength: 0.94, mode: "red" },
+          { x: 686, y: 294, rx: 52, ry: 52, strength: 0.94, mode: "red" },
+          { x: 819, y: 312, rx: 52, ry: 52, strength: 0.98, mode: "red" },
+          { x: 930, y: 299, rx: 52, ry: 52, strength: 0.94, mode: "red" },
+          { x: 1052, y: 202, rx: 54, ry: 54, strength: 0.94, mode: "red" },
+          { x: 1142, y: 329, rx: 58, ry: 58, strength: 1, mode: "red" }
         ];
         const segments = [
           { x1: 510, y1: 676, x2: 704, y2: 676, r: 42, strength: 1.05 },
           { x1: 704, y1: 676, x2: 872, y2: 662, r: 42, strength: 1.05 },
           { x1: 872, y1: 662, x2: 1018, y2: 615, r: 48, strength: 1.08 },
-          { x1: 1018, y1: 588, x2: 1160, y2: 502, r: 42, strength: 0.94 }
+          { x1: 940, y1: 474, x2: 942, y2: 538, r: 34, strength: 1.16 },
+          { x1: 1018, y1: 588, x2: 1160, y2: 502, r: 42, strength: 0.94 },
+          { x1: 1160, y1: 502, x2: 1328, y2: 574, r: 38, strength: 0.86 }
         ];
 
-        for (let y = 420; y < 780; y += 1) {
-          for (let x = 420; x < 1250; x += 1) {
+        for (let y = 150; y < 780; y += 1) {
+          for (let x = 420; x < 1415; x += 1) {
             let greenMask = 0;
             let cyanMask = 0;
+            let redMask = 0;
+            let tealMask = 0;
 
             for (const region of regions) {
               const dx = (x - region.x) / region.rx;
@@ -281,8 +361,12 @@ try {
               const mask = (1 - distance) * region.strength;
               if (region.mode === "green") {
                 greenMask = Math.max(greenMask, mask);
-              } else {
+              } else if (region.mode === "cyan") {
                 cyanMask = Math.max(cyanMask, mask);
+              } else if (region.mode === "teal") {
+                tealMask = Math.max(tealMask, mask);
+              } else {
+                redMask = Math.max(redMask, mask);
               }
             }
 
@@ -293,7 +377,7 @@ try {
               }
             }
 
-            if (greenMask <= 0 && cyanMask <= 0) continue;
+            if (greenMask <= 0 && cyanMask <= 0 && redMask <= 0 && tealMask <= 0) continue;
 
             const offset = (y * nativeSize.w + x) * 4;
             const r = data[offset];
@@ -305,8 +389,10 @@ try {
             const luminance = r * 0.299 + g * 0.587 + b * 0.114;
             const cyan = smoothstep(20, 112, ((g + b) / 2) - r * 0.56 + saturation * 0.22);
             const green = smoothstep(12, 92, g - Math.max(r, b) * 0.7 + saturation * 0.22);
-            const state = Math.max(cyan * cyanMask, green * greenMask);
-            const glowState = Math.max(cyanMask, greenMask) * smoothstep(96, 188, luminance) * smoothstep(8, 70, saturation);
+            const red = smoothstep(26, 118, r - Math.max(g, b) * 0.92 + saturation * 0.18);
+            const darkTeal = smoothstep(14, 88, ((g + b) / 2) - r * 0.8 + saturation * 0.16) * (1 - smoothstep(118, 188, luminance));
+            const state = Math.max(cyan * cyanMask, green * greenMask, red * redMask, darkTeal * tealMask);
+            const glowState = Math.max(cyanMask, greenMask, redMask * 0.74, tealMask * 0.54) * smoothstep(96, 188, luminance) * smoothstep(8, 70, saturation);
             const amount = Math.min(1, Math.max(state * 1.72, glowState * 0.58));
             if (amount <= 0.035) continue;
 
@@ -334,17 +420,26 @@ try {
           { x: 872, y: 690, rx: 58, ry: 42, strength: 0.74 },
           { x: 1022, y: 512, rx: 62, ry: 78, strength: 0.82 },
           { x: 1018, y: 615, rx: 122, ry: 140, strength: 0.58 },
-          { x: 1018, y: 684, rx: 96, ry: 70, strength: 0.5 }
+          { x: 1018, y: 684, rx: 96, ry: 70, strength: 0.5 },
+          { x: 1328, y: 574, rx: 58, ry: 68, strength: 0.56 },
+          { x: 563, y: 248, rx: 36, ry: 40, strength: 0.68 },
+          { x: 686, y: 294, rx: 36, ry: 40, strength: 0.68 },
+          { x: 819, y: 312, rx: 36, ry: 40, strength: 0.72 },
+          { x: 930, y: 299, rx: 36, ry: 40, strength: 0.68 },
+          { x: 1052, y: 202, rx: 38, ry: 42, strength: 0.68 },
+          { x: 1142, y: 329, rx: 40, ry: 44, strength: 0.72 }
         ];
         const scrubSegments = [
           { x1: 510, y1: 676, x2: 704, y2: 676, r: 32, strength: 0.44 },
           { x1: 704, y1: 676, x2: 872, y2: 662, r: 32, strength: 0.44 },
           { x1: 872, y1: 662, x2: 1018, y2: 615, r: 38, strength: 0.5 },
-          { x1: 1018, y1: 588, x2: 1160, y2: 502, r: 32, strength: 0.42 }
+          { x1: 940, y1: 474, x2: 942, y2: 538, r: 24, strength: 0.52 },
+          { x1: 1018, y1: 588, x2: 1160, y2: 502, r: 32, strength: 0.42 },
+          { x1: 1160, y1: 502, x2: 1328, y2: 574, r: 28, strength: 0.38 }
         ];
 
-        for (let y = 450; y < 760; y += 1) {
-          for (let x = 450; x < 1210; x += 1) {
+        for (let y = 160; y < 760; y += 1) {
+          for (let x = 450; x < 1405; x += 1) {
             let scrubMask = 0;
 
             for (const region of scrubRegions) {
@@ -386,11 +481,17 @@ try {
           { x: 510, y: 704, rx: 58, ry: 44, strength: 1.22 },
           { x: 704, y: 700, rx: 58, ry: 44, strength: 1.22 },
           { x: 872, y: 690, rx: 58, ry: 44, strength: 1.22 },
-          { x: 1022, y: 512, rx: 56, ry: 70, strength: 0.86 }
+          { x: 1022, y: 512, rx: 56, ry: 70, strength: 0.86 },
+          { x: 563, y: 248, rx: 30, ry: 34, strength: 1.02 },
+          { x: 686, y: 294, rx: 30, ry: 34, strength: 1.02 },
+          { x: 819, y: 312, rx: 30, ry: 34, strength: 1.08 },
+          { x: 930, y: 299, rx: 30, ry: 34, strength: 1.02 },
+          { x: 1052, y: 202, rx: 32, ry: 36, strength: 1.02 },
+          { x: 1142, y: 329, rx: 34, ry: 38, strength: 1.08 }
         ];
 
-        for (let y = 470; y < 735; y += 1) {
-          for (let x = 470; x < 1080; x += 1) {
+        for (let y = 170; y < 735; y += 1) {
+          for (let x = 470; x < 1200; x += 1) {
             let coverMask = 0;
             for (const region of coverRegions) {
               const dx = (x - region.x) / region.rx;
@@ -416,6 +517,40 @@ try {
           }
         }
 
+        const checkPatchRegions = [
+          { x: 510, y: 704, rx: 42, ry: 32, strength: 1.12, target: [96, 84, 68] },
+          { x: 704, y: 700, rx: 42, ry: 32, strength: 1.12, target: [94, 83, 68] },
+          { x: 872, y: 690, rx: 42, ry: 32, strength: 1.12, target: [98, 86, 70] }
+        ];
+
+        for (let y = 662; y < 724; y += 1) {
+          for (let x = 468; x < 914; x += 1) {
+            let patch;
+            let patchMask = 0;
+            for (const region of checkPatchRegions) {
+              const dx = (x - region.x) / region.rx;
+              const dy = (y - region.y) / region.ry;
+              const distance = Math.sqrt(dx * dx + dy * dy);
+              if (distance >= 1) continue;
+              const mask = (1 - smoothstep(0, 1, distance)) * region.strength;
+              if (mask > patchMask) {
+                patchMask = mask;
+                patch = region;
+              }
+            }
+            if (!patch || patchMask <= 0.025) continue;
+
+            const offset = (y * nativeSize.w + x) * 4;
+            const r = data[offset];
+            const g = data[offset + 1];
+            const b = data[offset + 2];
+            const amount = Math.min(0.94, patchMask * 1.18);
+            data[offset] = Math.round(r * (1 - amount) + patch.target[0] * amount);
+            data[offset + 1] = Math.round(g * (1 - amount) + patch.target[1] * amount);
+            data[offset + 2] = Math.round(b * (1 - amount) + patch.target[2] * amount);
+          }
+        }
+
         ctx.putImageData(imageData, 0, 0);
         return canvas.toDataURL("image/png");
 
@@ -434,6 +569,97 @@ try {
       }, {
         base64: sourceBuffer.toString("base64"),
         nativeSize: target.nativeSize
+      })
+      : target.kind === "world_map_stage_badge"
+      ? await page.evaluate(async ({ base64, crop, nativeSize, stateVariant }) => {
+        const image = await new Promise((resolve, reject) => {
+          const img = new Image();
+          img.onload = () => resolve(img);
+          img.onerror = () => reject(new Error("source concept image failed to load"));
+          img.src = `data:image/png;base64,${base64}`;
+        });
+
+        const canvas = document.createElement("canvas");
+        canvas.width = nativeSize.w;
+        canvas.height = nativeSize.h;
+        const ctx = canvas.getContext("2d", { willReadFrequently: true });
+        if (!ctx) throw new Error("2d canvas context unavailable");
+
+        ctx.drawImage(image, crop.x, crop.y, crop.w, crop.h, 0, 0, nativeSize.w, nativeSize.h);
+        const imageData = ctx.getImageData(0, 0, nativeSize.w, nativeSize.h);
+        const data = imageData.data;
+        const centerX = nativeSize.w * 0.5;
+        const centerY = stateVariant === "sealed" ? nativeSize.h * 0.46 : stateVariant === "locked" ? nativeSize.h * 0.48 : nativeSize.h * 0.5;
+        const radiusX = nativeSize.w * (stateVariant === "locked" ? 0.43 : stateVariant === "sealed" ? 0.35 : 0.42);
+        const radiusY = nativeSize.h * (stateVariant === "locked" ? 0.42 : stateVariant === "sealed" ? 0.38 : 0.43);
+
+        for (let y = 0; y < nativeSize.h; y += 1) {
+          for (let x = 0; x < nativeSize.w; x += 1) {
+            const offset = (y * nativeSize.w + x) * 4;
+            const r = data[offset];
+            const g = data[offset + 1];
+            const b = data[offset + 2];
+            const max = Math.max(r, g, b);
+            const min = Math.min(r, g, b);
+            const saturation = max - min;
+            const luminance = r * 0.299 + g * 0.587 + b * 0.114;
+            const dx = (x - centerX) / radiusX;
+            const dy = (y - centerY) / radiusY;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            const radial = distance <= 0.72 ? 1 : Math.max(0, 1 - (distance - 0.72) / 0.18);
+            const sealedShape = stateVariant === "sealed"
+              ? Math.max(0, 1 - Math.max(0, Math.abs(x - centerX) / (nativeSize.w * 0.34) + Math.abs(y - centerY) / (nativeSize.h * 0.42) - 0.82) / 0.18)
+              : 1;
+            const gold = smoothstep(44, 146, r + g * 0.72 - b * 1.48 + saturation * 0.18);
+            const green = smoothstep(16, 104, g - Math.max(r, b) * 0.72 + saturation * 0.18);
+            const red = smoothstep(28, 120, r - Math.max(g, b) * 0.92 + saturation * 0.18);
+            const silver = smoothstep(22, 118, luminance - Math.abs(r - g) * 0.36 - Math.abs(g - b) * 0.36);
+            const coolEdge = smoothstep(8, 84, b - r * 0.72 + saturation * 0.12);
+            const darkInk = (1 - smoothstep(42, 132, luminance)) * smoothstep(12, 92, saturation);
+            const parchment = r > 132 && g > 106 && b > 78 && saturation < 78;
+
+            let keep = 0;
+            if (stateVariant === "locked") {
+              keep = Math.max(red, gold * 0.54, darkInk * 0.68) * radial;
+              if (parchment && red < 0.24 && gold < 0.34 && darkInk < 0.36) keep = 0;
+              data[offset] = Math.min(255, Math.round(r * 1.06 + red * 20 + gold * 6));
+              data[offset + 1] = Math.min(255, Math.round(g * 0.98 + gold * 9));
+              data[offset + 2] = Math.max(0, Math.round(b * 0.94));
+            } else if (stateVariant === "sealed") {
+              const innerInk = distance < 0.72 ? darkInk * (1 - smoothstep(28, 96, luminance)) * 0.36 : 0;
+              keep = Math.max(silver, coolEdge * 0.72, innerInk) * radial * sealedShape;
+              if (parchment && silver < 0.52 && coolEdge < 0.42) keep = 0;
+              data[offset] = Math.min(255, Math.round(r * 1.02 + silver * 9));
+              data[offset + 1] = Math.min(255, Math.round(g * 1.03 + silver * 9));
+              data[offset + 2] = Math.min(255, Math.round(b * 1.08 + silver * 12 + coolEdge * 6));
+            } else {
+              keep = Math.max(green, gold * 0.86) * radial;
+              if (parchment && green < 0.22 && gold < 0.32) keep = 0;
+              data[offset] = Math.min(255, Math.round(r * 1.04 + gold * 10));
+              data[offset + 1] = Math.min(255, Math.round(g * 1.07 + green * 18 + gold * 5));
+              data[offset + 2] = Math.max(0, Math.round(b * 0.94));
+            }
+
+            if (keep <= 0.08) {
+              data[offset + 3] = 0;
+              continue;
+            }
+            data[offset + 3] = Math.round(Math.min(242, 238 * keep * (0.58 + radial * 0.5)));
+          }
+        }
+
+        ctx.putImageData(imageData, 0, 0);
+        return canvas.toDataURL("image/png");
+
+        function smoothstep(edge0, edge1, value) {
+          const t = Math.max(0, Math.min(1, (value - edge0) / Math.max(1, edge1 - edge0)));
+          return t * t * (3 - 2 * t);
+        }
+      }, {
+        base64: sourceBuffer.toString("base64"),
+        crop: target.crop,
+        nativeSize: target.nativeSize,
+        stateVariant: target.stateVariant
       })
       : target.kind === "effect_sheet"
       ? await page.evaluate(async ({ base64, crop, nativeSize, frameSize, effectKind, drawScale, baseAngle, angleRange }) => {
@@ -651,9 +877,15 @@ try {
               1.1,
               Math.hypot((x - centerX) / (nativeSize.w * 0.22), (y - (centerY + nativeSize.h * 0.03)) / (nativeSize.h * 0.22))
             );
+            const markerCutout = smoothstep(
+              0.84,
+              1.08,
+              Math.hypot((x - centerX) / (nativeSize.w * 0.16), (y - nativeSize.h * 0.16) / (nativeSize.h * 0.13))
+            );
+            const routeCutout = x < nativeSize.w * 0.34 && y > nativeSize.h * 0.43 ? 0 : 1;
             const cyan = smoothstep(38, 136, Math.min(g, b) - r * 0.74 + saturation * 0.08);
             const whiteHot = smoothstep(196, 248, luminance) * cyan;
-            const keep = Math.max(cyan, whiteHot * 0.18) * smoothstep(0, 0.22, radial) * centerCutout;
+            const keep = Math.max(cyan, whiteHot * 0.18) * smoothstep(0, 0.22, radial) * centerCutout * markerCutout * routeCutout;
             if (keep <= 0.07) {
               data[offset + 3] = 0;
               continue;
@@ -787,7 +1019,7 @@ try {
         nativeSize: target.nativeSize
       })
       : target.kind === "button_state"
-        ? await page.evaluate(async ({ base64, crop, nativeSize, stateVariant }) => {
+        ? await page.evaluate(async ({ base64, crop, nativeSize, stateVariant, maskPolygon }) => {
         const image = await new Promise((resolve, reject) => {
           const img = new Image();
           img.onload = () => resolve(img);
@@ -805,7 +1037,7 @@ try {
 
         const imageData = ctx.getImageData(0, 0, nativeSize.w, nativeSize.h);
         const data = imageData.data;
-        const polygon = [
+        const polygon = maskPolygon ?? [
           { x: 8, y: 42 },
           { x: 38, y: 14 },
           { x: 245, y: 14 },
@@ -883,7 +1115,8 @@ try {
         base64: sourceBuffer.toString("base64"),
         crop: target.crop,
         nativeSize: target.nativeSize,
-        stateVariant: target.stateVariant
+        stateVariant: target.stateVariant,
+        maskPolygon: target.maskPolygon
       })
       : await page.evaluate(async ({ base64, crop, nativeSize, clearRects, stateVariant }) => {
       const image = await new Promise((resolve, reject) => {

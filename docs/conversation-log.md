@@ -1608,3 +1608,135 @@ Codex scoped the end-of-day task as a WIP GitHub checkpoint on the current `main
 Before committing, Codex checked the local branch, remote, current HEAD, dirty files, and remote `main`. Local `main` was at `b772203db8922df41feb1e02e16b553491cdf334`, and `git ls-remote origin refs/heads/main` returned the same hash, so there was no remote divergence before the WIP checkpoint. The GitHub CLI `gh` was not installed in this environment, so Codex did not use a PR workflow. The user's request was to save the current work to GitHub, so the intended path is a direct WIP commit and push to `main`.
 
 Codex added a detailed continuation handoff at `docs/ui-concept-raster-handoff-2026-06-05.md`, then linked it from `docs/handoff.md` and `docs/current-issues-and-plan.md`. The handoff records the active goal, the approximate 58% status estimate, screen-by-screen work completed, key files, verification commands, WorldMap's current state, remaining gaps, and the exact next-session startup path. The handoff explicitly says the UI is not complete, WorldMap is not fully recomposed, and final user acceptance/95% similarity/release readiness have not been reached.
+
+### Codex
+
+Codex resumed the active UI work after the user asked to continue `/gaol` UI work. The scoped continuation was the next WorldMap state gap: completed and locked state art was still not runtime-driven, even though current-stage marker/halo/status art already existed. Codex kept the work in concept-derived raster assets rather than Phaser vector/procedural overlays.
+
+Codex added `ui_completed_stage_badge_concept` and `ui_locked_stage_badge_concept`, extracted from `assets/concepts/ui/world_map_ui_concept_v001.png`. The new PNGs were registered in `src/data/assetManifest.slice.v1.json`, `docs/asset-manifest.slice.v1.json`, copied through `tools/generate-dev-runtime-assets.mjs`, and included in `src/data/releaseCatalogAdapter.ts` so release data mode can preload them.
+
+`WorldMapScene` now renders completed badges for completed non-current stages and locked badges for locked stages using `context.save.profile.completedStages`, `context.save.profile.unlockedStages`, and `context.run.stageId`. Current stage art has priority, so the current node does not also show completed/locked badges. The WorldMap underlay extraction also now mutes sampled old baked red lock centers in addition to the earlier completed/current samples.
+
+The dedicated WorldMap audit now creates a non-debug release save with `stage_sunny_gate` completed and `stage_lavender_hall` current. After screenshot review showed the first pass overused red locks, Codex added `ui_sealed_stage_badge_concept` from the original concept's gray sealed diamond and changed the visual taxonomy: lower/mid locked nodes use gray seal art, while later upper chapter nodes use red lock art. The audit now verifies `visibleCompletedBadges=1`, `expectedCompletedBadges=1`, `visibleLockedBadges=6`, `expectedLockedBadges=6`, `visibleSealedBadges=7`, `expectedSealedBadges=7`, `currentHasNoCompletedBadge=true`, and `currentHasNoLockedBadge=true`. The refreshed visual evidence is `tmp/ui-quality/worldmap/worldmap-state-overlays-v1-1920.png` and `tmp/ui-quality/worldmap/worldmap-play-button-action-hover-v1-1920.png`.
+
+Verification passed with `node tools/extract-ui-state-assets.mjs`, `npm.cmd run assets:generate:dev`, `npm.cmd run check`, and `node tmp/ui-worldmap-action-hit-target-audit.mjs`. `npm.cmd run check` still emits the existing Vite large chunk warning. `node tmp/run-phaser-smoke-with-vite.mjs` did not complete within 420000 ms or 900000 ms during this continuation, so this checkpoint must not claim broad Phaser smoke passed.
+
+This is a first-pass WorldMap completed/locked/sealed overlay checkpoint only. It improves runtime state truth and better matches the concept's red-lock-versus-gray-seal rhythm, but it is not final WorldMap recomposition, not selected/focus/mobile/accessibility completion, not user acceptance, and not a 95-point completion claim.
+
+Codex then continued the same WorldMap state-truth pass by addressing the next visible mismatch in the latest screenshot: lower node bodies still baked old progress colors into the runtime underlay. Stages 1-3 retained teal completed-style bodies, and stage 4 retained blue current-style plate color, which conflicted with the seeded runtime state where stage 1 is completed, stage 2 is current, and stage 3 is locked/sealed.
+
+Codex extended the `world_map_neutral_underlay` extraction in `tools/extract-ui-state-assets.mjs` with body-color neutralization regions for nodes 1-4. The intent was not to repaint the map or invent a new node style, but to mute baked state color while preserving the original concept's numbers, metal frames, paper texture, and terrain composition. The dedicated WorldMap audit now samples `node1body`, `node2body`, `node3body`, and `stage4body`; the latest run kept all sampled body pixels under the same state-dominance thresholds. Verification passed with `node tools/extract-ui-state-assets.mjs`, `npm.cmd run assets:generate:dev`, `node tmp/ui-worldmap-action-hit-target-audit.mjs`, and `npm.cmd run check`.
+
+This is still not final WorldMap state recomposition. Route-line state geometry, later node bodies, selected/focus/mobile/accessibility states, and user acceptance remain open.
+
+Codex continued the WorldMap route-state cleanup by finding the remaining cyan cluster in the current runtime underlay rather than guessing from the screenshot. A threshold scan of `assets/source/ui/world_map_raster_underlay_concept_v001.png` found the main leftover cyan cluster at source coordinate `940,503`; crop review confirmed it was the bright dotted current-route path near the old stage-4 route. Codex added a narrow route segment mask to `tools/extract-ui-state-assets.mjs`, regenerated the underlay/runtime assets, and verified that the crop now keeps the gray route body while removing cyan glow.
+
+The dedicated WorldMap audit now samples `stage4routeDots`, and the latest run reported it as neutral warm color with `cyanDominance=-30.5`. Verification passed with `node tools/extract-ui-state-assets.mjs`, `npm.cmd run assets:generate:dev`, `node tmp/ui-worldmap-action-hit-target-audit.mjs`, and `npm.cmd run check`. This still does not complete WorldMap recomposition; it only removes another stale route-state cue.
+
+Codex then reviewed the progressed-save screenshot where stages 1-3 are completed and `stage_peach_canal` is current. The screenshot showed that stage 5 still retained too much blue body/route color from the original concept underlay, so it could read as unlocked even though it should be sealed in that state.
+
+Codex extended `tools/extract-ui-state-assets.mjs` again to neutralize the stage-5 node body and the 4-to-5 route segment without replacing the concept map with vector art. `tmp/ui-worldmap-action-hit-target-audit.mjs` now samples `stage5body` and `stage5route`, and it also runs a second release-save state audit with `stage_sunny_gate`, `stage_lavender_hall`, and `stage_mint_garden` completed and `stage_peach_canal` current. The audit captures `tmp/ui-quality/worldmap/worldmap-progress-current-stage4-v1-1920.png` and verifies `visibleCompletedBadges=3`, `visibleSealedBadges=5`, `visibleLockedBadges=6`, runtime current marker/halo/status at the current node, and no completed/locked/sealed badge on the current node.
+
+Verification passed with `node tools/extract-ui-state-assets.mjs`, `npm.cmd run assets:generate:dev`, `node tmp/ui-worldmap-action-hit-target-audit.mjs`, `npm.cmd run check`, and `git diff --check`. `npm.cmd run check` still reports the existing Vite large chunk warning. This remains progress only: WorldMap still needs selected/focus/accessibility/mobile review, later state variants, and user acceptance before any completion claim.
+
+Codex continued the same WorldMap state pass after the user told it to keep improving the UI quality without making arbitrary visual changes. The scoped target was not a new art direction; it was to compare the current WorldMap state screenshots against the original `assets/concepts/ui/world_map_ui_concept_v001.png` and refine the next visible mismatch while staying in concept-derived raster assets.
+
+Screenshot review showed that the upper red-lock overlays for stages 10 and 11 were visibly lower than the source concept. Codex changed `WorldMapScene` so red locks for stages 10-15 use source-aligned runtime centers, and made the non-next red locks more legible instead of faint sticker-like overlays. The dedicated WorldMap audit now verifies red-lock position, display size, and alpha through `lockedStyleAtExpectedNodes=true`.
+
+The added late-state screenshot also exposed that completed badges on stages 4-8 were too large for mid-route nodes. Codex split completed-badge placement by stage family: stages 1-3 keep the larger original-style completed check, while later completed nodes use a smaller, quieter check. The audit now verifies completed-badge position, display size, and alpha through `completedStyleAtExpectedNodes=true`.
+
+`tmp/ui-worldmap-action-hit-target-audit.mjs` now captures a third release-save state at `tmp/ui-quality/worldmap/worldmap-progress-current-stage9-v1-1920.png`: stages 1-8 completed, `stage_moon_attic` current, and stage 10 as the first red-locked node. The audit passed for the early state, stage-4-progress state, and late-lock state. Screenshot review confirmed the upper red locks sit closer to the source concept and the mid-route completed badges are less heavy.
+
+Verification passed with `node tmp/ui-worldmap-action-hit-target-audit.mjs`, `npm.cmd run check`, and `git diff --check`. `npm.cmd run check` still reports the existing Vite large chunk warning. This is still not final WorldMap recomposition or UI completion; gray-seal density, selected/focus/accessibility/mobile review, later node variants, and user acceptance remain open.
+
+Codex continued the WorldMap state pass by reviewing the gray-seal density against the refreshed early and stage-4-progress screenshots. The screen looked more orderly after red-lock placement and completed-badge size fixes, but the lower/mid locked path still showed too many small gray seal overlays. Those markers were technically state-correct, but they read more like audit markers than concept-integrated node material because the neutralized underlay already carries gray inactive node bodies.
+
+Codex changed `WorldMapScene` so `ui_sealed_stage_badge_concept` renders only on the next lower/mid locked node. Later lower/mid locked nodes now rely on the gray node art in the underlay instead of additional seal overlays. The one next-seal badge was made slightly clearer with a 60px display size and stronger alpha.
+
+`tmp/ui-worldmap-action-hit-target-audit.mjs` was updated to encode this visual hierarchy: the early `stage_lavender_hall` current state now expects `visibleSealedBadges=1`, the stage-4-progress state expects `visibleSealedBadges=1`, and the late stage-9 current state expects `visibleSealedBadges=0`. The audit also verifies `sealedStyleAtExpectedNodes=true`.
+
+Verification passed with `node tmp/ui-worldmap-action-hit-target-audit.mjs`, `npm.cmd run check`, and `git diff --check`. Screenshot review confirmed the early and stage-4-progress maps are less cluttered: the next blocked stage remains explicit, while non-next lower/mid locked nodes stay quiet through the gray concept node bodies. This is still not final WorldMap recomposition or UI completion; selected/focus/accessibility/mobile review, later node variants, and user acceptance remain open.
+
+### Codex
+
+Codex continued after the user challenged the idea that the work was already finished. The correction was explicit: the UI goal is still open, and this pass only targets the next WorldMap interaction-state mismatch.
+
+Screenshot review of `tmp/ui-quality/world-map-raster-route-node-hover-state-v1-1920.png` showed that WorldMap node hover still felt pasted on. The shared `ui_hover_route_node_concept` appeared as a detached gold/teal token near stage 1 instead of the map node itself responding. Codex changed WorldMap node hover/down to use the WorldMap current halo material instead, but first cleaned `ui_current_stage_halo_concept` so it no longer carried the top marker diamond or lower route-dot fragments from the source concept.
+
+`renderRasterHoverHitTarget` now supports optional hover/down blend modes. `WorldMapScene` uses the cleaned `ui_current_stage_halo_concept` with additive blending for stage-node hover/down, while Dungeon continues to use `ui_hover_route_node_concept`. `tmp/route-node-raster-hover-state-audit.mjs` now seeds a release WorldMap state with stage 1 completed and stage 2 current, then hovers completed stage 1 and captures `tmp/ui-quality/worldmap/worldmap-node-halo-hover-state-v1-1920.png`. The audit verifies `visibleHoverImages=2`, `textCount=0`, and `visibleRectsAboveUnderlay=0`.
+
+Verification passed with `node tools\extract-ui-state-assets.mjs`, `npm.cmd run assets:generate:dev`, `node tmp\route-node-raster-hover-state-audit.mjs`, `node tmp\ui-worldmap-action-hit-target-audit.mjs`, `npm.cmd run check`, and `git diff --check`. `npm.cmd run check` still reports only the existing Vite large chunk warning. This is not a completion claim: selected/focus/keyboard/mobile/accessibility review, later node variants, broad state coverage, and user acceptance remain unfinished.
+
+### Codex
+
+Codex continued the active UI work under the user's reminder not to make arbitrary visual changes. The next target came from the existing handoff and rubric rather than a new interpretation: WorldMap pointer hover had a cleaner first pass, but selected/focus/keyboard state was still documented as unfinished.
+
+Code inspection confirmed the gap. `src/input/bindings.ts` already maps arrow keys to movement actions, but `WorldMapScene` sent those actions through the generic scene handler, which ignores movement. That meant `Enter/Space` could enter the selected stage, but keyboard users could not move selection between unlocked map nodes.
+
+Codex added a raster-WorldMap-only directional selection handler. It uses the existing concept stage-node coordinates to choose the nearest unlocked stage in the pressed direction, then calls the existing `selectWorldMapStage`/save persistence path. This keeps the behavior aligned with existing click stage selection and lets the runtime current marker, halo, and status badge show the selected node without drawing a procedural focus ring.
+
+`tmp/ui-worldmap-action-hit-target-audit.mjs` now includes a keyboard stage-select audit. It seeds release WorldMap with stage 1 completed and stage 2 current, presses `ArrowLeft`, verifies `currentStageId=stage_sunny_gate`, checks that marker/halo/status moved to the selected node, confirms `flow:stage_select:stage_sunny_gate` was logged, and captures `tmp/ui-quality/worldmap/worldmap-keyboard-stage-select-v1-1920.png`.
+
+Screenshot review of that state exposed a remaining underlay issue: the old lower completed-check silhouettes for stages 1-3 were muted in color but still partly readable. Codex added an extra neutral patch over those lower baked check areas in `tools/extract-ui-state-assets.mjs`, regenerated source/runtime assets, and reran the WorldMap audit. The silhouette is reduced but not a final recomposition; this remains a known follow-up.
+
+Verification passed with `node tools\extract-ui-state-assets.mjs`, `npm.cmd run assets:generate:dev`, `node tmp\ui-worldmap-action-hit-target-audit.mjs`, `node tmp\route-node-raster-hover-state-audit.mjs`, `npm.cmd run check`, and `git diff --check`. `npm.cmd run check` still reports the existing Vite large chunk warning. This is a first WorldMap keyboard-selection checkpoint only, not final selected/focus/keyboard coverage and not UI completion.
+
+### Codex
+
+Codex corrected the user's concern that the UI work had not suddenly finished. The active UI goal remains open; the current pass was only a continuation of WorldMap keyboard-selection and lower-node state-truth cleanup.
+
+After rerunning the dedicated WorldMap audit, the keyboard-selection path passed again: with `stage_sunny_gate` completed and `stage_lavender_hall` current, pressing `ArrowLeft` selected `stage_sunny_gate`, moved the current marker/halo/status stack to that node, avoided completed/locked/sealed badge overlap on the selected node, and captured `tmp/ui-quality/worldmap/worldmap-keyboard-stage-select-v1-1920.png`.
+
+The latest neutralized-underlay samples for the old lower 1-3 baked check areas are `node1check=[97,85,69]`, `node2check=[95,84,69]`, and `node3check=[99,87,71]`. Screenshot review shows the lower medallion silhouettes are reduced enough that stage 2 no longer reads as a green completed check in the keyboard-selected state, but this is still not full lower-node recomposition.
+
+Verification passed with `node tmp\ui-worldmap-action-hit-target-audit.mjs`, `node tmp\route-node-raster-hover-state-audit.mjs`, `npm.cmd run check`, and `git diff --check`. `npm.cmd run check` still reports only the existing Vite large JS chunk warning.
+
+### Codex
+
+Codex continued the same active UI goal and kept the scope on WorldMap state truth rather than inventing a new style. Screenshot review of `tmp/ui-quality/worldmap/worldmap-progress-current-stage9-v1-1920.png` showed that late completed badges for the mid-route area were technically verified but still looked too much like route-floating markers. The clearest issue was around stages 6-8: stages 6 and 7 needed to sit closer to their illustrated node bases, while stage 8 is only a weak route checkpoint in the concept art rather than a full visible numbered node.
+
+Codex added mid-route completed-badge placement overrides in `WorldMapScene`. Stages 6 and 7 now place the existing concept-derived completed badge closer to node-base material, and stage 8 uses a smaller, quieter completed marker instead of the same full treatment. No new vector/procedural art or new visual direction was introduced.
+
+`tmp/ui-worldmap-action-hit-target-audit.mjs` was updated so the late-progress audit verifies the new completed-badge positions, sizes, and alpha values. The refreshed evidence is `tmp/ui-quality/worldmap/worldmap-progress-current-stage9-v1-1920.png` plus the review crop `tmp/ui-quality/worldmap/crops/worldmap-late-mid-route-completed-crop-after-placement.png`.
+
+Verification passed with `node tmp\ui-worldmap-action-hit-target-audit.mjs`, `node tmp\route-node-raster-hover-state-audit.mjs`, `npm.cmd run check`, and `git diff --check`. `npm.cmd run check` still reports only the existing Vite large JS chunk warning. This is another WorldMap refinement checkpoint only; full later-node recomposition, dynamic route-state treatment, accessibility-safe labels/tooltips, mobile/responsive review, user acceptance, and final UI completion remain unfinished.
+
+### Codex
+
+Codex continued the active UI quality goal by checking the broader raster pressed/down evidence, not only WorldMap. The 10-screen down audit passed, but screenshot review of `tmp/ui-quality/down/reward-down-pressed-v1-1920.png` showed that Reward card choices still used the shared brown pressed stamp while their hover state used the more appropriate `ui_hover_choice_badge_concept` header badge.
+
+Codex made a narrow state-language fix for the existing Reward/Event choice family. `RewardScene` and `EventScene` now use `ui_hover_choice_badge_concept` for down state as well as hover state, with a slightly larger pressed display size on the same badge axis. This keeps the pressed feedback inside the card-choice visual language instead of adding a separate stamp over the card art.
+
+`tmp/ui-raster-down-audit.mjs` now expects `ui_hover_choice_badge_concept` as the down image for Reward and Event while retaining the shared pressed stamp for other audited screens. `tmp/choice-badge-raster-hover-state-audit.mjs` still verifies the hover path and click flow for Reward and Event.
+
+Verification passed with `node tmp\ui-raster-down-audit.mjs`, `node tmp\choice-badge-raster-hover-state-audit.mjs`, `npm.cmd run check`, and `git diff --check`. `npm.cmd run check` still reports only the existing Vite large JS chunk warning. This is not full pressed-state completion; the remaining screens still need screen-specific down-state review, and broader focus/keyboard, dynamic labels/tooltips, mobile/responsive review, user acceptance, and final UI completion remain unfinished.
+
+### Codex
+
+Codex continued after the user's "already done?" concern by explicitly treating the UI goal as still open. The next scope was the remaining audited pressed/down states: several screens already had concept-derived hover bitmap families, but their down state still fell back to the shared `ui_down_pressed_stamp_concept`.
+
+Codex updated the raster hit targets so the audited pressed state uses the same local concept family as hover where possible. Combat card/end-turn targets now use `ui_hover_gold_seal_concept` for down, Boss card/end-turn targets use `ui_hover_boss_skull_stamp_concept`, Dungeon uses `ui_hover_route_node_concept`, and Town/RuneBench/Result/Settings use `ui_hover_action_seal_concept`. Reward/Event and WorldMap keep their earlier choice-badge and play-button specific down art.
+
+`tmp/ui-raster-down-audit.mjs` now expects those control-family keys across the 10 audited raster screens. The refreshed screenshots are under `tmp/ui-quality/down/`, including `town-down-pressed-v1-1920.png`, `dungeon-down-pressed-v1-1920.png`, `combat-down-pressed-v1-1920.png`, `runebench-down-pressed-v1-1920.png`, `boss-down-pressed-v1-1920.png`, `result-down-pressed-v1-1920.png`, and `settings-down-pressed-v1-1920.png`.
+
+Verification passed with `node tmp\ui-raster-down-audit.mjs`, `node tmp\combat-raster-hover-state-audit.mjs`, `node tmp\boss-raster-hover-state-audit.mjs`, `npm.cmd run check`, and `git diff --check`. `npm.cmd run check` still reports only the existing Vite large JS chunk warning. This is broader pressed-state consistency, not final UI completion: Settings still needs full per-control pressed/focus review, Town/RuneBench/Result/Settings still share a broad action-seal family, and dynamic labels/tooltips, accessibility-safe text, mobile/responsive review, user acceptance, and final concept-match approval remain unfinished.
+
+### Codex
+
+Codex continued the UI quality pass without changing art direction. The next documented gap was Settings: hover coverage existed for all ten major raster controls, but pressed coverage had only been proven through the broader representative down audit.
+
+Codex added `tmp/settings-raster-pressed-coverage-audit.mjs`, mirroring the existing Settings hover coverage audit. It opens Settings from Town, hides the debug overlay, holds each of the ten Settings controls in pressed state, captures a 1920 screenshot, and verifies one visible `ui_hover_action_seal_concept` image, no Phaser text, and no visible rectangle overlays above the concept underlay.
+
+The first pressed screenshot review found a real coordinate problem: the `return-town` state feedback was anchored above the bottom-right red check button instead of on the button. Codex moved the Settings return hit target to the visible red check button and added a return-specific action-seal anchor. `tools/phaser-smoke-test.mjs`, `tmp/settings-raster-hover-coverage-audit.mjs`, and the new pressed audit now use the corrected `1744,956` return coordinate.
+
+Verification passed with `node tmp\settings-raster-pressed-coverage-audit.mjs`, `node tmp\settings-raster-hover-coverage-audit.mjs`, `node tmp\ui-raster-down-audit.mjs`, `npm.cmd run check`, and `git diff --check`. Screenshot evidence includes `tmp/ui-quality/settings-pressed-coverage/return-town-v1-1920.png`, where the feedback now sits on the red check button. This is still partial UI progress: Settings uses the broad action-seal family, and selected/focus, disabled, mobile/responsive, dynamic labels/tooltips, accessibility-safe text, user acceptance, and final concept-match approval remain unfinished.
+
+### Codex
+
+Codex continued the Settings quality pass by applying the same standard used for WorldMap's play button: when the concept shows a clear primary button, the button itself should provide hover/down state art instead of receiving a shared stamp. The target stayed narrow: only the Settings bottom-right return/check button, not a new art direction for the whole screen.
+
+Codex added `ui_hover_settings_return_button_concept` and `ui_down_settings_return_button_concept` to `tools/extract-ui-state-assets.mjs`, copied them through `tools/generate-dev-runtime-assets.mjs`, registered them in both manifests, and added them to release shared UI raster preloading. `SettingsScene` now uses those textures only for the return button; the other Settings controls keep the existing action-seal state art.
+
+During crop review, Codex caught and corrected two issues before finalizing the pass. The first crop used 1920x1080 runtime coordinates against the smaller `1677x938` source underlay, producing a dark background fragment instead of the button. After converting to source coordinates, a second screenshot review showed the button overlay's check mark did not align with the baked check. Codex measured the concept check center and shifted the overlay center to `1688,958` so the hover/down button art sits on the underlying concept button.
+
+Verification passed with `node tools\extract-ui-state-assets.mjs`, `npm.cmd run assets:generate:dev`, `node tmp\settings-raster-hover-coverage-audit.mjs`, `node tmp\settings-raster-pressed-coverage-audit.mjs`, `node tmp\ui-raster-down-audit.mjs`, `npm.cmd run check`, and `git diff --check`. `npm.cmd run check` reports the existing Vite large chunk warning only. Evidence screenshots are `tmp/ui-quality/settings-hover-coverage/return-town-v1-1920.png` and `tmp/ui-quality/settings-pressed-coverage/return-town-v1-1920.png`. This is still partial UI progress: the remaining Settings controls use the broad action-seal family, and focus/selected, disabled, mobile/responsive, dynamic labels/tooltips, accessibility-safe text, user acceptance, and final concept-match approval remain unfinished.

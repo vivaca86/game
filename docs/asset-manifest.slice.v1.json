@@ -366,6 +366,20 @@
       "styleKey": "premium_popup_book"
     },
     {
+      "key": "ui_hover_settings_return_button_concept",
+      "type": "image",
+      "path": "assets/runtime/ui/ui_hover_settings_return_button_concept_v001.png",
+      "nativeSize": { "w": 330, "h": 170 },
+      "styleKey": "premium_popup_book"
+    },
+    {
+      "key": "ui_down_settings_return_button_concept",
+      "type": "image",
+      "path": "assets/runtime/ui/ui_down_settings_return_button_concept_v001.png",
+      "nativeSize": { "w": 330, "h": 170 },
+      "styleKey": "premium_popup_book"
+    },
+    {
       "key": "ui_current_stage_marker_concept",
       "type": "image",
       "path": "assets/runtime/ui/ui_current_stage_marker_concept_v001.png",
@@ -383,6 +397,27 @@
       "key": "ui_current_stage_status_badge_concept",
       "type": "image",
       "path": "assets/runtime/ui/ui_current_stage_status_badge_concept_v001.png",
+      "nativeSize": { "w": 96, "h": 96 },
+      "styleKey": "premium_popup_book"
+    },
+    {
+      "key": "ui_completed_stage_badge_concept",
+      "type": "image",
+      "path": "assets/runtime/ui/ui_completed_stage_badge_concept_v001.png",
+      "nativeSize": { "w": 96, "h": 96 },
+      "styleKey": "premium_popup_book"
+    },
+    {
+      "key": "ui_locked_stage_badge_concept",
+      "type": "image",
+      "path": "assets/runtime/ui/ui_locked_stage_badge_concept_v001.png",
+      "nativeSize": { "w": 96, "h": 96 },
+      "styleKey": "premium_popup_book"
+    },
+    {
+      "key": "ui_sealed_stage_badge_concept",
+      "type": "image",
+      "path": "assets/runtime/ui/ui_sealed_stage_badge_concept_v001.png",
       "nativeSize": { "w": 96, "h": 96 },
       "styleKey": "premium_popup_book"
     },

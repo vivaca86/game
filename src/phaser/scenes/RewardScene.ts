@@ -83,11 +83,16 @@ function renderRewardRasterChoice(
   const action = REWARD_ACTIONS[index];
   renderRasterHoverHitTarget(scene, x, y + 20, 240, 486, () => handleSceneAction(scene, context, action), {
     hoverKey: REWARD_RASTER_HOVER_CHOICE_KEY,
+    downKey: REWARD_RASTER_HOVER_CHOICE_KEY,
     hoverX: x,
     hoverY: y - 268,
     hoverWidth: 112,
     hoverHeight: 80,
-    downAlpha: 0.76
+    downX: x,
+    downY: y - 268,
+    downWidth: 124,
+    downHeight: 88,
+    downAlpha: 0.94
   });
 }
 

@@ -10,6 +10,8 @@ import { renderActionButton, renderPaperPanel, renderRasterHoverHitTarget, rende
 type SettingsMutation = (settings: SettingsState) => void;
 const SETTINGS_RASTER_UNDERLAY_KEY = "settings_raster_underlay_concept";
 const SETTINGS_RASTER_HOVER_ACTION_KEY = "ui_hover_action_seal_concept";
+const SETTINGS_RASTER_HOVER_RETURN_KEY = "ui_hover_settings_return_button_concept";
+const SETTINGS_RASTER_DOWN_RETURN_KEY = "ui_down_settings_return_button_concept";
 
 export class SettingsScene extends Phaser.Scene {
   constructor() {
@@ -74,7 +76,16 @@ function renderSettingsRasterStage(scene: Phaser.Scene, context: BootContext): v
   }));
   renderSettingsRasterHitTarget(scene, 1626, 696, 300, 150, 0xf5c26b, () => resetSettings(scene, context));
   renderSettingsRasterHitTarget(scene, 1626, 520, 300, 150, 0xce5869, () => resetStoredSave(scene, context));
-  renderSettingsRasterHitTarget(scene, 1570, 890, 270, 135, 0x5eead4, () => scene.scene.start("TownScene", context));
+  renderSettingsRasterHitTarget(scene, 1688, 958, 330, 170, 0x5eead4, () => scene.scene.start("TownScene", context), {
+    hoverKey: SETTINGS_RASTER_HOVER_RETURN_KEY,
+    downKey: SETTINGS_RASTER_DOWN_RETURN_KEY,
+    stampX: 1688,
+    stampY: 958,
+    stampWidth: 330,
+    stampHeight: 170,
+    hoverAlpha: 0.96,
+    downAlpha: 0.94
+  });
 }
 
 function renderSettingsRasterHitTarget(
@@ -84,17 +95,36 @@ function renderSettingsRasterHitTarget(
   width: number,
   height: number,
   _accent: number,
-  onClick: () => void
+  onClick: () => void,
+  options: {
+    hoverKey?: string;
+    downKey?: string;
+    stampX?: number;
+    stampY?: number;
+    stampSize?: number;
+    stampWidth?: number;
+    stampHeight?: number;
+    hoverAlpha?: number;
+    downAlpha?: number;
+  } = {}
 ): void {
   const largeTarget = width >= 180 || height >= 80;
-  const hoverSize = largeTarget ? 94 : 68;
+  const hoverSize = options.stampSize ?? (largeTarget ? 94 : 68);
+  const stampX = options.stampX ?? (largeTarget ? x + width * 0.36 : x + width * 0.34);
+  const stampY = options.stampY ?? (largeTarget ? y - height * 0.22 : y - height * 0.18);
   renderRasterHoverHitTarget(scene, x, y, width, height, onClick, {
-    hoverKey: SETTINGS_RASTER_HOVER_ACTION_KEY,
-    hoverX: largeTarget ? x + width * 0.36 : x + width * 0.34,
-    hoverY: largeTarget ? y - height * 0.22 : y - height * 0.18,
-    hoverWidth: hoverSize,
-    hoverHeight: hoverSize,
-    downAlpha: 0.76
+    hoverKey: options.hoverKey ?? SETTINGS_RASTER_HOVER_ACTION_KEY,
+    downKey: options.downKey ?? SETTINGS_RASTER_HOVER_ACTION_KEY,
+    hoverX: stampX,
+    hoverY: stampY,
+    hoverWidth: options.stampWidth ?? hoverSize,
+    hoverHeight: options.stampHeight ?? hoverSize,
+    downX: stampX,
+    downY: stampY,
+    downWidth: options.stampWidth ?? hoverSize * 1.12,
+    downHeight: options.stampHeight ?? hoverSize * 1.12,
+    hoverAlpha: options.hoverAlpha,
+    downAlpha: options.downAlpha ?? 0.76
   });
 }
 

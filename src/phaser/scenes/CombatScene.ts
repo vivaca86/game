@@ -75,11 +75,16 @@ function renderCombatRasterEndTurnButton(scene: Phaser.Scene, context: BootConte
     depth: 22,
     hoverDepth: 24,
     hoverKey: COMBAT_RASTER_HOVER_SEAL_KEY,
+    downKey: COMBAT_RASTER_HOVER_SEAL_KEY,
     hoverX: x - 88,
     hoverY: y - 118,
     hoverWidth: 126,
     hoverHeight: 126,
-    downAlpha: 0.78
+    downX: x - 88,
+    downY: y - 118,
+    downWidth: 138,
+    downHeight: 138,
+    downAlpha: 0.94
   });
 }
 
@@ -252,11 +257,16 @@ export function renderCombatRasterCardHand(
     if (onCardClick) {
       renderRasterHoverHitTarget(scene, x, cardY, cardWidth, cardHeight, () => onCardClick(index), {
         hoverKey: COMBAT_RASTER_HOVER_SEAL_KEY,
+        downKey: COMBAT_RASTER_HOVER_SEAL_KEY,
         hoverX: x + 12,
         hoverY: cardY - 92,
         hoverWidth: 82,
         hoverHeight: 82,
-        downAlpha: 0.78
+        downX: x + 12,
+        downY: cardY - 92,
+        downWidth: 94,
+        downHeight: 94,
+        downAlpha: 0.94
       });
     }
   });

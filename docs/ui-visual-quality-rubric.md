@@ -2139,6 +2139,284 @@ This checkpoint adds a lower current-status badge to the runtime WorldMap curren
 
 This is progress toward the active concept-art quality goal, not completion. The current node now has runtime-driven marker, halo, and status badge, but the WorldMap is still not fully recomposed into dynamic completed/current/locked stage variants. Baked node/route geometry remains, keyboard focus state, dynamic labels, accessibility-safe tooltips, mobile/responsive review, and user acceptance remain unfinished.
 
+## WorldMap Completed/Locked Badge Checkpoint
+
+Date: 2026-06-05
+
+Evidence:
+
+- `assets/concepts/ui/world_map_ui_concept_v001.png`
+- `assets/source/ui/world_map_raster_underlay_concept_v001.png`
+- `assets/source/ui/ui_completed_stage_badge_concept_v001.png`
+- `assets/source/ui/ui_locked_stage_badge_concept_v001.png`
+- `assets/source/ui/ui_sealed_stage_badge_concept_v001.png`
+- `public/assets/runtime/ui/world_map_raster_underlay_concept_v001.png`
+- `public/assets/runtime/ui/ui_completed_stage_badge_concept_v001.png`
+- `public/assets/runtime/ui/ui_locked_stage_badge_concept_v001.png`
+- `public/assets/runtime/ui/ui_sealed_stage_badge_concept_v001.png`
+- `src/data/assetManifest.slice.v1.json`
+- `docs/asset-manifest.slice.v1.json`
+- `src/data/releaseCatalogAdapter.ts`
+- `src/phaser/scenes/WorldMapScene.ts`
+- `tools/extract-ui-state-assets.mjs`
+- `tools/generate-dev-runtime-assets.mjs`
+- `tmp/ui-worldmap-action-hit-target-audit.mjs`
+- `tmp/ui-quality/worldmap/worldmap-state-overlays-v1-1920.png`
+- `tmp/ui-quality/worldmap/worldmap-progress-current-stage4-v1-1920.png`
+- `tmp/ui-quality/worldmap/worldmap-progress-current-stage9-v1-1920.png`
+- `tmp/ui-quality/worldmap/worldmap-play-button-action-hover-v1-1920.png`
+- WorldMap state overlay audit: seeded release state with `stage_sunny_gate` completed and `stage_lavender_hall` current; verified `visibleCompletedBadges=1`, `expectedCompletedBadges=1`, `completedAtExpectedNodes=true`, `completedStyleAtExpectedNodes=true`, `visibleLockedBadges=6`, `expectedLockedBadges=6`, `lockedAtExpectedNodes=true`, `lockedStyleAtExpectedNodes=true`, `visibleSealedBadges=1`, `expectedSealedBadges=1`, `sealedAtExpectedNodes=true`, `sealedStyleAtExpectedNodes=true`, `currentHasNoCompletedBadge=true`, and `currentHasNoLockedBadge=true`
+- WorldMap progressed-state overlay audit: seeded release state with stages 1-3 completed and `stage_peach_canal` current; verified `visibleCompletedBadges=3`, `expectedCompletedBadges=3`, `completedStyleAtExpectedNodes=true`, `visibleLockedBadges=6`, `expectedLockedBadges=6`, `lockedStyleAtExpectedNodes=true`, `visibleSealedBadges=1`, `expectedSealedBadges=1`, `sealedStyleAtExpectedNodes=true`, current marker/halo/status at the current node, and no completed/locked/sealed badge on the current node
+- WorldMap late-lock overlay audit: seeded release state with stages 1-8 completed and `stage_moon_attic` current; verified `visibleCompletedBadges=8`, `completedStyleAtExpectedNodes=true`, `visibleLockedBadges=6`, `lockedStyleAtExpectedNodes=true`, `visibleSealedBadges=0`, `expectedSealedBadges=0`, current marker/halo/status at the current node, and no completed/locked/sealed badge on the current node
+- WorldMap neutralized-underlay audit: sampled old completed/current/locked baked-state pixels remained under state-dominance thresholds, including red lock samples for stages 10-15
+- WorldMap neutralized-underlay audit also samples lower node body colors: `node1body`, `node2body`, `node3body`, and `stage4body`
+- WorldMap neutralized-underlay audit samples `stage4routeDots`, `stage5body`, and `stage5route` for the remaining current-route and next-node remnants
+- `node tools/extract-ui-state-assets.mjs`
+- `npm.cmd run assets:generate:dev`
+- `npm.cmd run check`
+- `node tmp/ui-worldmap-action-hit-target-audit.mjs`
+- `git diff --check`
+
+Current status: `Needs user review`
+
+Completion level: `Partially complete`
+
+This checkpoint adds first-pass runtime completed, locked, and sealed badges to the raster WorldMap. The badges are concept-derived PNGs, not Phaser vector overlays, and `WorldMapScene` renders them from save/profile state. Current stage art has priority, so the current node does not also show completed or locked badges. The upper red locks now use source-aligned anchors for stages 10-15, later completed nodes use smaller badges than the lower 1-3 completed nodes to reduce late-route clutter, and gray seal overlays are reserved for the next lower/mid locked node rather than every lower/mid locked node.
+
+This is progress toward runtime state truth, not final WorldMap recomposition. The lower 1-5 baked node body colors and the main stage-4 plus 4-to-5 route remnants are now muted, but route geometry and later node variants are still baked into the underlay. Gray-seal density has a cleaner first-pass hierarchy now, but still needs later user review as part of full state recomposition. The broad Phaser smoke wrapper timed out in this continuation, so this checkpoint relies on `npm.cmd run check`, the dedicated WorldMap audit, `git diff --check`, and screenshot review rather than a fresh broad smoke pass.
+
+## WorldMap Node Hover Halo Cleanup Checkpoint
+
+Date: 2026-06-05
+
+Evidence:
+
+- `assets/concepts/ui/world_map_ui_concept_v001.png`
+- `assets/source/ui/ui_current_stage_halo_concept_v001.png`
+- `public/assets/runtime/ui/ui_current_stage_halo_concept_v001.png`
+- `assets/source/ui/ui_hover_route_node_concept_v001.png`
+- `src/phaser/view/sceneShell.ts`
+- `src/phaser/scenes/WorldMapScene.ts`
+- `tools/extract-ui-state-assets.mjs`
+- `tools/generate-dev-runtime-assets.mjs`
+- `tmp/route-node-raster-hover-state-audit.mjs`
+- `tmp/ui-worldmap-action-hit-target-audit.mjs`
+- `tmp/ui-quality/worldmap/worldmap-node-halo-hover-state-v1-1920.png`
+- `tmp/ui-quality/worldmap/worldmap-progress-current-stage4-v1-1920.png`
+- WorldMap route-node hover audit: seeded release state with `stage_sunny_gate` completed and `stage_lavender_hall` current; verified `hoverKey=ui_current_stage_halo_concept`, `visibleHoverImages=2`, `textCount=0`, and `visibleRectsAboveUnderlay=0`
+- Dungeon route-node hover audit still verifies `hoverKey=ui_hover_route_node_concept`, `visibleHoverImages=1`, `textCount=0`, and `visibleRectsAboveUnderlay=0`
+- WorldMap action/state audit still verifies old center coordinate `1010,512` does not advance, bottom-right play hover uses `ui_hover_world_map_play_button_concept`, current marker/halo/status are at the current node, completed/locked/sealed counts match the early/stage-4/late release states, and current nodes do not receive completed/locked/sealed badges
+- `node tools\extract-ui-state-assets.mjs`
+- `npm.cmd run assets:generate:dev`
+- `node tmp\route-node-raster-hover-state-audit.mjs`
+- `node tmp\ui-worldmap-action-hit-target-audit.mjs`
+- `npm.cmd run check`
+- `git diff --check`
+
+Current status: `Needs user review`
+
+Completion level: `Partially complete`
+
+This checkpoint removes the most obvious pasted-on WorldMap node hover issue. WorldMap node hover/down now uses a cleaned version of `ui_current_stage_halo_concept` with additive blending instead of the shared component-sheet route token. The cleaned halo extraction removes the top diamond marker and lower route-dot fragments so hover does not carry stale current-route state pieces.
+
+This is progress toward the active concept-art quality goal, not completion. Pointer hover is cleaner on WorldMap nodes, but keyboard focus, selected state, mobile/responsive review, dynamic labels/tooltips, full state recomposition, and user acceptance remain unfinished.
+
+## WorldMap Keyboard Selection Checkpoint
+
+Date: 2026-06-05
+
+Evidence:
+
+- `assets/concepts/ui/world_map_ui_concept_v001.png`
+- `assets/source/ui/world_map_raster_underlay_concept_v001.png`
+- `public/assets/runtime/ui/world_map_raster_underlay_concept_v001.png`
+- `src/input/bindings.ts`
+- `src/phaser/scenes/WorldMapScene.ts`
+- `tools/extract-ui-state-assets.mjs`
+- `tools/generate-dev-runtime-assets.mjs`
+- `tmp/ui-worldmap-action-hit-target-audit.mjs`
+- `tmp/route-node-raster-hover-state-audit.mjs`
+- `tmp/ui-quality/worldmap/worldmap-keyboard-stage-select-v1-1920.png`
+- WorldMap keyboard audit: seeded release state with `stage_sunny_gate` completed and `stage_lavender_hall` current; pressed `ArrowLeft`; verified `currentStageId=stage_sunny_gate`, `markerAtSelectedStage=true`, `haloAtSelectedStage=true`, `statusAtSelectedStage=true`, `selectedStageHasNoCompletedBadge=true`, `visibleRouteHoverImages=0`, `visibleTextCount=0`, `visibleRectsAboveUnderlay=0`, and `hasStageSelectLog=true`
+- WorldMap neutralized-underlay audit after the lower-check patch: `node1check=[97,85,69]`, `node2check=[95,84,69]`, and `node3check=[99,87,71]`, so the old lower completed-check areas no longer carry green/cyan completed-state dominance
+- WorldMap action/state audit still verifies early, stage-4-progress, and late-lock state overlays after the keyboard-selection change
+- WorldMap route-node hover audit still verifies cleaned halo hover on stage 1 and shared route-token hover on Dungeon
+- `node tools\extract-ui-state-assets.mjs`
+- `npm.cmd run assets:generate:dev`
+- `node tmp\ui-worldmap-action-hit-target-audit.mjs`
+- `node tmp\route-node-raster-hover-state-audit.mjs`
+- `npm.cmd run check`
+- `git diff --check`
+
+Current status: `Needs user review`
+
+Completion level: `Partially complete`
+
+This checkpoint gives raster WorldMap a first keyboard stage-selection path without drawing a procedural focus ring. Directional input picks the nearest unlocked node in the pressed direction using the concept node positions and reuses the existing runtime current marker, halo, and status badge to show the selected stage. The underlay extraction also adds a stronger neutral patch over the old lower 1-3 baked check areas so runtime badges carry more of the state meaning; latest screenshot review shows this is reduced, not fully recomposed.
+
+This is progress toward selected/focus/keyboard coverage, not completion. The lower-node baked silhouettes are reduced but not fully recomposed, focus behavior is not yet generalized across screens, and mobile/responsive review, dynamic labels/tooltips, and user acceptance remain unfinished.
+
+## WorldMap Late Completed Badge Placement Checkpoint
+
+Date: 2026-06-05
+
+Evidence:
+
+- `src/phaser/scenes/WorldMapScene.ts`
+- `tmp/ui-worldmap-action-hit-target-audit.mjs`
+- `tmp/ui-quality/worldmap/worldmap-progress-current-stage9-v1-1920.png`
+- `tmp/ui-quality/worldmap/crops/worldmap-late-mid-route-completed-crop-after-placement.png`
+- WorldMap late-lock overlay audit: seeded release state with stages 1-8 completed and `stage_moon_attic` current; verified `visibleCompletedBadges=8`, `expectedCompletedBadges=8`, `completedAtExpectedNodes=true`, `completedStyleAtExpectedNodes=true`, `visibleLockedBadges=6`, `lockedStyleAtExpectedNodes=true`, `visibleSealedBadges=0`, current marker/halo/status at the current node, and no completed/locked/sealed badge on the current node
+- WorldMap route-node hover audit still verifies cleaned halo hover on stage 1 and shared route-token hover on Dungeon
+- `node tmp\ui-worldmap-action-hit-target-audit.mjs`
+- `node tmp\route-node-raster-hover-state-audit.mjs`
+- `npm.cmd run check`
+- `git diff --check`
+
+Current status: `Needs user review`
+
+Completion level: `Partially complete`
+
+This checkpoint refines late-progress completed-badge placement without adding a new art direction. The same concept-derived completed badge is now placed by mid-route node family: stages 6 and 7 sit closer to their illustrated node-base material, while stage 8 is smaller and quieter because the concept map does not expose a full numbered node there.
+
+This is still not final WorldMap recomposition. The later route/node family needs proper concept-level variants or a clearer dynamic route-state treatment before final approval, and mobile/responsive review, accessibility-safe labels/tooltips, and user acceptance remain unfinished.
+
+## Reward/Event Choice Pressed Badge Checkpoint
+
+Date: 2026-06-05
+
+Evidence:
+
+- `src/phaser/scenes/RewardScene.ts`
+- `src/phaser/scenes/EventScene.ts`
+- `tmp/ui-raster-down-audit.mjs`
+- `tmp/choice-badge-raster-hover-state-audit.mjs`
+- `tmp/ui-quality/down/reward-down-pressed-v1-1920.png`
+- `tmp/ui-quality/down/event-down-pressed-v1-1920.png`
+- `tmp/ui-quality/reward-raster-choice-badge-hover-state-v1-1920.png`
+- `tmp/ui-quality/event-raster-choice-badge-hover-state-v1-1920.png`
+- 10-screen down audit: Town, WorldMap, Dungeon, Combat, Reward, Event, RuneBench, Boss, Result, and Settings each had `hasUnderlay=true`, `textCount=0`, `visibleRectsAboveUnderlay=0`, and `visibleDownImages=1`; Reward and Event now expect `ui_hover_choice_badge_concept` as their down image key
+- Choice-badge hover audit: Reward and Event still verify `visibleHoverImages=1`, no text, no visible rectangles, and the expected post-click phase
+- `node tmp\ui-raster-down-audit.mjs`
+- `node tmp\choice-badge-raster-hover-state-audit.mjs`
+- `npm.cmd run check`
+- `git diff --check`
+
+Current status: `Needs user review`
+
+Completion level: `Partially complete`
+
+This checkpoint removes the generic pressed stamp from Reward/Event raster choices. Hover and down now use the same concept-derived choice badge family, with down slightly larger and stronger on the same header-badge axis. This makes the interaction state read as the card choice responding instead of a separate stamp floating over the card.
+
+This is not final screen-specific pressed-state coverage. Town, Dungeon, Combat, RuneBench, Boss, Result, and Settings still need deeper per-control pressed art review, and broad keyboard/focus, dynamic labels/tooltips, mobile/responsive review, and user acceptance remain unfinished.
+
+## All Audited Raster Pressed-State Family Checkpoint
+
+Date: 2026-06-05
+
+Evidence:
+
+- `src/phaser/scenes/TownScene.ts`
+- `src/phaser/scenes/DungeonScene.ts`
+- `src/phaser/scenes/CombatScene.ts`
+- `src/phaser/scenes/RuneBenchScene.ts`
+- `src/phaser/scenes/BossScene.ts`
+- `src/phaser/scenes/ResultScene.ts`
+- `src/phaser/scenes/SettingsScene.ts`
+- `tmp/ui-raster-down-audit.mjs`
+- `tmp/ui-quality/down/town-down-pressed-v1-1920.png`
+- `tmp/ui-quality/down/dungeon-down-pressed-v1-1920.png`
+- `tmp/ui-quality/down/combat-down-pressed-v1-1920.png`
+- `tmp/ui-quality/down/runebench-down-pressed-v1-1920.png`
+- `tmp/ui-quality/down/boss-down-pressed-v1-1920.png`
+- `tmp/ui-quality/down/result-down-pressed-v1-1920.png`
+- `tmp/ui-quality/down/settings-down-pressed-v1-1920.png`
+- 10-screen down audit: Town, WorldMap, Dungeon, Combat, Reward, Event, RuneBench, Boss, Result, and Settings each had `hasUnderlay=true`, `textCount=0`, `visibleRectsAboveUnderlay=0`, and `visibleDownImages=1`; the audit now expects control-family down keys instead of the shared fallback for every audited target
+- Combat hover audit and Boss hover audit still passed after the pressed-state key changes
+- `node tmp\ui-raster-down-audit.mjs`
+- `node tmp\combat-raster-hover-state-audit.mjs`
+- `node tmp\boss-raster-hover-state-audit.mjs`
+- `npm.cmd run check`
+- `git diff --check`
+
+Current status: `Needs user review`
+
+Completion level: `Partially complete`
+
+This checkpoint removes the shared pressed-stamp fallback from all audited raster pressed/down targets. Combat now presses with the gold seal family, Boss presses with the boss skull stamp family, Dungeon presses with the route-node family, Reward/Event press with the choice-badge family, WorldMap still uses its button-specific play art, and Town/RuneBench/Result/Settings press with the action-seal family already used for their hover states.
+
+This is broader pressed-state consistency, not final state-art approval. Town/RuneBench/Result/Settings still share a generic action-seal family, Settings still needs full per-control pressed/focus review, and mobile/responsive, dynamic labels/tooltips, accessibility-safe text, and user acceptance remain unfinished.
+
+## Settings Pressed Coverage And Return Anchor Checkpoint
+
+Date: 2026-06-05
+
+Evidence:
+
+- `src/phaser/scenes/SettingsScene.ts`
+- `tools/phaser-smoke-test.mjs`
+- `tmp/settings-raster-hover-coverage-audit.mjs`
+- `tmp/settings-raster-pressed-coverage-audit.mjs`
+- `tmp/ui-quality/settings-pressed-coverage/volume-master-v1-1920.png`
+- `tmp/ui-quality/settings-pressed-coverage/display-mode-v1-1920.png`
+- `tmp/ui-quality/settings-pressed-coverage/reset-save-v1-1920.png`
+- `tmp/ui-quality/settings-pressed-coverage/return-town-v1-1920.png`
+- Settings pressed coverage audit: all ten major Settings raster controls had `hasUnderlay=true`, `textCount=0`, `visibleRectsAboveUnderlay=0`, `visibleDownImages=1`, and nontrivial screenshot deltas
+- Settings hover coverage audit: all ten major Settings raster controls still had `visibleHoverImages=1`, no text, and no visible rectangles above the underlay after the return-coordinate correction
+- 10-screen down audit still passed after the Settings return target moved
+- `node tmp\settings-raster-pressed-coverage-audit.mjs`
+- `node tmp\settings-raster-hover-coverage-audit.mjs`
+- `node tmp\ui-raster-down-audit.mjs`
+- `npm.cmd run check`
+- `git diff --check`
+
+Current status: `Needs user review`
+
+Completion level: `Partially complete`
+
+This checkpoint adds Settings per-control pressed-state evidence and fixes the clearest coordinate mismatch found during screenshot review. The return-to-town feedback now sits on the bottom-right red check button instead of floating above it, while the other nine Settings controls retain their existing action-seal placement.
+
+This is not final Settings interaction approval. Settings still uses the broad action-seal family rather than bespoke control-state art, and selected/focus, disabled, mobile/responsive, dynamic labels/tooltips, accessibility-safe text, and user acceptance remain unfinished.
+
+## Settings Return Button-Specific State Checkpoint
+
+Date: 2026-06-05
+
+Evidence:
+
+- `assets/source/ui/ui_hover_settings_return_button_concept_v001.png`
+- `assets/source/ui/ui_down_settings_return_button_concept_v001.png`
+- `public/assets/runtime/ui/ui_hover_settings_return_button_concept_v001.png`
+- `public/assets/runtime/ui/ui_down_settings_return_button_concept_v001.png`
+- `src/data/assetManifest.slice.v1.json`
+- `docs/asset-manifest.slice.v1.json`
+- `src/data/releaseCatalogAdapter.ts`
+- `src/phaser/scenes/SettingsScene.ts`
+- `tools/extract-ui-state-assets.mjs`
+- `tools/generate-dev-runtime-assets.mjs`
+- `tmp/settings-raster-hover-coverage-audit.mjs`
+- `tmp/settings-raster-pressed-coverage-audit.mjs`
+- `tmp/ui-quality/settings-hover-coverage/return-town-v1-1920.png`
+- `tmp/ui-quality/settings-pressed-coverage/return-town-v1-1920.png`
+- Settings hover coverage audit: return-to-town now expects `ui_hover_settings_return_button_concept`; all ten Settings controls still verify one visible hover image, no text, and no visible rectangles above the underlay
+- Settings pressed coverage audit: return-to-town now expects `ui_down_settings_return_button_concept`; all ten Settings controls still verify one visible down image, no text, and no visible rectangles above the underlay
+- 10-screen down audit still passed after the button-specific state change
+- `node tools\extract-ui-state-assets.mjs`
+- `npm.cmd run assets:generate:dev`
+- `node tmp\settings-raster-hover-coverage-audit.mjs`
+- `node tmp\settings-raster-pressed-coverage-audit.mjs`
+- `node tmp\ui-raster-down-audit.mjs`
+- `npm.cmd run check`
+- `git diff --check`
+
+Current status: `Needs user review`
+
+Completion level: `Partially complete`
+
+This checkpoint brings the Settings bottom-right return/check button closer to the WorldMap play-button standard: the visible concept button now supplies its own hover and down state art instead of receiving the shared action seal. The first extraction attempt caught the wrong crop, and screenshot review forced a source-coordinate correction plus overlay alignment before acceptance.
+
+This is still not final Settings approval. The other Settings controls still use the broad action-seal family, and selected/focus, disabled, mobile/responsive, dynamic labels/tooltips, accessibility-safe text, and user acceptance remain unfinished.
+
 ## Current Remaining Raster-Quality Scope
 
 Status: `Not complete`
@@ -2147,12 +2425,12 @@ The active goal still remains open. The immediate first-view raster concept-unde
 
 - Component-state art and broad card/relic/arcana art coverage remain candidate-level.
 - Combat, Boss, WorldMap, Dungeon, Reward, Event, Town, RuneBench, and Result now have first bitmap hover-state passes on representative controls; Settings has full current-control hover coverage for its ten major raster hit targets.
-- All ten primary raster concept screens now have a first shared bitmap pressed/down-state candidate on their audited hit targets, but final screen-specific pressed art is not approved.
-- Settings now has full current-control hover coverage for its ten major raster hit targets and participates in the shared down-state pass; its selected, disabled, keyboard focus, screen-specific down art, and dynamic readability states still need a full per-control pass.
+- All ten primary raster concept screens now have a bitmap pressed/down-state candidate on their audited hit targets, and those audited targets now use control-family concept bitmaps instead of the shared pressed-stamp fallback. This is still not final screen-specific pressed art across the full UI.
+- Settings now has full current-control hover coverage and pressed coverage for its ten major raster hit targets, and the return-to-town feedback is anchored to the visible bottom-right red check button with button-specific hover/down art. Its selected, disabled, keyboard focus, remaining bespoke screen-specific state art, and dynamic readability states still need a full per-control pass.
 - Event now has a first visible bitmap disabled-state candidate for the release unaffordable choice, verified with a 1920 debugless audit and smoke; disabled coverage is still not broad across every scene/control.
-- WorldMap no longer has the hidden center confirm target; primary action is now verified on the visible bottom-right play button, that button has first-pass hover/down art cropped from the original WorldMap concept, the current stage now has a runtime-driven marker plus concept-derived current halo plus lower current-status badge, and the runtime underlay now neutralizes the strongest baked 1-3 completed checks and stage-4 cyan state colors. This is still not full current/selected/completed/locked-state recomposition: baked route/node geometry remains, stage variants are not complete, and keyboard focus, dynamic labels, accessibility-safe tooltips, mobile/responsive review, and user acceptance remain unfinished.
+- WorldMap no longer has the hidden center confirm target; primary action is now verified on the visible bottom-right play button, that button has first-pass hover/down art cropped from the original WorldMap concept, the current stage now has a runtime-driven marker plus cleaned concept-derived current halo plus lower current-status badge, node hover uses the cleaned halo instead of a detached route token, arrow keys can select the nearest unlocked node by concept-map direction, and completed/locked/sealed stages now have first-pass runtime raster badges. The runtime underlay now neutralizes the strongest baked 1-3 completed checks, lower 1-5 node body colors, stage-4 cyan state colors, the main remaining stage-4 and 4-to-5 route remnants, and sampled old red lock centers. Red-lock placement is source-aligned for stages 10-15, late-route completed checks are smaller, stage 6/7 completed badges sit closer to their node bases, stage 8 is treated as a quieter route-point marker, and gray seals now emphasize only the next lower/mid locked node. This is still not full current/selected/completed/locked-state recomposition: baked route/node geometry remains, lower-node baked silhouettes are only reduced rather than fully recomposed, later stage variants are not complete, and broader keyboard focus, dynamic labels, accessibility-safe tooltips, mobile/responsive review, and user acceptance remain unfinished.
 - Combat and Boss now have concept-source-derived raster effect candidates on their raster paths. The Boss stage cue was corrected from a shield-like source to a component-sheet gold starburst source, but effect timing, target-specific placement across all effects, animation readability, and final Boss phase/effect communication are still not final.
 - The current textless raster-only checkpoints rely heavily on baked concept information and need safe dynamic-label/tooltips/accessibility passes before final UI approval.
-- Raster hover/down feedback is no longer universally invisible: all 10 primary raster concept screens have extracted bitmap hover-state candidates on representative controls and a shared pressed/down-state candidate on audited controls. Event also has a first disabled lock candidate. Final matching-quality selected, broad disabled, focus, screen-specific pressed, and screen-specific state coverage is still missing.
+- Raster hover/down feedback is no longer universally invisible: all 10 primary raster concept screens have extracted bitmap hover-state candidates on representative controls and a pressed/down-state candidate on audited controls. The audited pressed states now avoid the shared fallback stamp, and Event also has a first disabled lock candidate. Final matching-quality selected, broad disabled, focus, deeper per-control pressed, and screen-specific state coverage is still missing.
 - The full UI skin is not a 95-point completion candidate and has no user acceptance yet.
 - `npm.cmd run check` still reports the existing Vite large JS chunk warning, so performance remains tracked separately as `Needs verification`.

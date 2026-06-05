@@ -76,6 +76,8 @@ interface RasterHoverHitTargetOptions {
   depth?: number;
   hoverDepth?: number;
   downDepth?: number;
+  hoverBlendMode?: Phaser.BlendModes;
+  downBlendMode?: Phaser.BlendModes;
   useHandCursor?: boolean;
   hoverKey?: string;
   downKey?: string;
@@ -432,6 +434,9 @@ export function renderRasterHoverHitTarget(
       .setAlpha(options.idleAlpha ?? 0)
       .setDepth(options.hoverDepth ?? ((options.depth ?? 21) + 1))
     : undefined;
+  if (hoverImage && options.hoverBlendMode !== undefined) {
+    hoverImage.setBlendMode(options.hoverBlendMode);
+  }
   const downKey = options.downKey ?? UI_RASTER_DOWN_STAMP_KEY;
   const downImage = scene.textures.exists(downKey)
     ? scene.add.image(options.downX ?? options.hoverX ?? x, options.downY ?? options.hoverY ?? y, downKey)
@@ -439,6 +444,9 @@ export function renderRasterHoverHitTarget(
       .setAlpha(options.idleAlpha ?? 0)
       .setDepth(options.downDepth ?? options.hoverDepth ?? ((options.depth ?? 21) + 1))
     : undefined;
+  if (downImage && options.downBlendMode !== undefined) {
+    downImage.setBlendMode(options.downBlendMode);
+  }
   const hitTarget = scene.add.rectangle(x, y, width, height, 0xffffff, 0.001).setDepth(options.depth ?? 21);
   hitTarget.setInteractive({ useHandCursor: options.useHandCursor ?? true });
   const idleAlpha = options.idleAlpha ?? 0;

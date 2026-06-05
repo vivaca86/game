@@ -81,11 +81,16 @@ function renderBossRasterCardTargets(
     if (onCardClick) {
       renderRasterHoverHitTarget(scene, x, cardY, cardWidth, cardHeight, () => onCardClick(index), {
         hoverKey: BOSS_RASTER_HOVER_STAMP_KEY,
+        downKey: BOSS_RASTER_HOVER_STAMP_KEY,
         hoverX: x - 32,
         hoverY: cardY - 44,
         hoverWidth: 122,
         hoverHeight: 122,
-        downAlpha: 0.76
+        downX: x - 32,
+        downY: cardY - 44,
+        downWidth: 134,
+        downHeight: 134,
+        downAlpha: 0.92
       });
     }
   });
@@ -100,11 +105,16 @@ function renderBossRasterEndTurnTarget(scene: Phaser.Scene, context: BootContext
     depth: 22,
     hoverDepth: 24,
     hoverKey: BOSS_RASTER_HOVER_STAMP_KEY,
+    downKey: BOSS_RASTER_HOVER_STAMP_KEY,
     hoverX: x - 16,
     hoverY: y - 28,
     hoverWidth: 144,
     hoverHeight: 144,
-    downAlpha: 0.76
+    downX: x - 16,
+    downY: y - 28,
+    downWidth: 156,
+    downHeight: 156,
+    downAlpha: 0.92
   });
 }
 

@@ -19,7 +19,7 @@ function loadPlaywright() {
 }
 
 async function startServer() {
-  for (const port of [4201, 4202, 4203, 4204]) {
+  for (const port of [4205, 4206, 4207, 4208]) {
     try {
       const server = await createServer({
         root: process.cwd(),
@@ -44,8 +44,8 @@ function countByteDelta(left, right) {
   return delta;
 }
 
-async function readSceneStats(page, expectedHoverKey) {
-  return page.evaluate((hoverKey) => {
+async function readSceneStats(page, expectedDownKey) {
+  return page.evaluate((downKey) => {
     const sceneName = "SettingsScene";
     const underlayKey = "settings_raster_underlay_concept";
     const game = window.__paperGame;
@@ -69,13 +69,13 @@ async function readSceneStats(page, expectedHoverKey) {
       hasUnderlay: underlayIndex >= 0,
       textCount: visible.filter((child) => child?.type === "Text" && String(child.text ?? "").trim().length > 0).length,
       visibleRectsAboveUnderlay,
-      visibleHoverImages: visible.filter((child) => child?.type === "Image" && child.texture?.key === hoverKey && child.alpha > 0.05).length,
+      visibleDownImages: visible.filter((child) => child?.type === "Image" && child.texture?.key === downKey && child.alpha > 0.05).length,
       sceneKey: scene?.scene?.key
     };
-  }, expectedHoverKey);
+  }, expectedDownKey);
 }
 
-await mkdir("tmp/ui-quality/settings-hover-coverage", { recursive: true });
+await mkdir("tmp/ui-quality/settings-pressed-coverage", { recursive: true });
 
 const { chromium } = loadPlaywright();
 const executableCandidates = [
@@ -94,7 +94,7 @@ const targets = [
   { label: "space-confirm", x: 1360, y: 640 },
   { label: "reset-save", x: 1626, y: 520 },
   { label: "reset-defaults", x: 1626, y: 696 },
-  { label: "return-town", x: 1688, y: 958, hoverKey: "ui_hover_settings_return_button_concept" }
+  { label: "return-town", x: 1688, y: 958, downKey: "ui_down_settings_return_button_concept" }
 ];
 
 let browser;
@@ -137,12 +137,18 @@ try {
     await page.waitForTimeout(80);
     const before = await canvas.screenshot();
     await page.mouse.move(box.x + (target.x / 1920) * box.width, box.y + (target.y / 1080) * box.height);
+    await page.waitForTimeout(80);
+    await page.mouse.down();
     await page.waitForTimeout(140);
-    const screenshot = `tmp/ui-quality/settings-hover-coverage/${target.label}-v1-1920.png`;
+    const screenshot = `tmp/ui-quality/settings-pressed-coverage/${target.label}-v1-1920.png`;
     const after = await canvas.screenshot({ path: screenshot });
-    const stats = await readSceneStats(page, target.hoverKey ?? "ui_hover_action_seal_concept");
+    const stats = await readSceneStats(page, target.downKey ?? "ui_hover_action_seal_concept");
     const delta = countByteDelta(before, after);
-    if (!stats.hasUnderlay || stats.textCount !== 0 || stats.visibleRectsAboveUnderlay !== 0 || stats.visibleHoverImages !== 1 || delta <= 200) {
+    await page.mouse.move(box.x + 8, box.y + 8);
+    await page.waitForTimeout(80);
+    await page.mouse.up();
+
+    if (!stats.hasUnderlay || stats.textCount !== 0 || stats.visibleRectsAboveUnderlay !== 0 || stats.visibleDownImages !== 1 || delta <= 200) {
       throw new Error(JSON.stringify({ label: target.label, screenshot, delta, ...stats }, null, 2));
     }
     results.push({ ...target, screenshot: path.resolve(screenshot), delta, ...stats });
