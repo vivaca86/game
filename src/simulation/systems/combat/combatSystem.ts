@@ -138,6 +138,35 @@ export function playCardAtIndex(run: SliceRunState, bundle: GameDataBundle, inde
   }
 }
 
+export function getCombatCardCostAtIndex(
+  run: SliceRunState,
+  bundle: GameDataBundle,
+  index: number
+): number | undefined {
+  if (!run.combat || (run.phase !== "combat" && run.phase !== "boss")) return undefined;
+
+  const cardId = run.hand[index];
+  const card = cardId ? getCard(bundle, cardId) : undefined;
+  if (!card) return undefined;
+
+  const baseCost = getAttachedRuneModifiedCost(
+    run,
+    bundle,
+    card.id,
+    Math.max(0, card.cost - run.nextCardDiscount + run.nextCardCostPenalty)
+  );
+  return getPassiveAdjustedCardCost(run, bundle, card, baseCost).cost;
+}
+
+export function canPlayCardAtIndex(
+  run: SliceRunState,
+  bundle: GameDataBundle,
+  index: number
+): boolean {
+  const cost = getCombatCardCostAtIndex(run, bundle, index);
+  return cost !== undefined && run.player.energy >= cost;
+}
+
 export function endTurn(run: SliceRunState, bundle: GameDataBundle): void {
   if (!run.combat || (run.phase !== "combat" && run.phase !== "boss")) return;
   if (run.combat.defeated) return;

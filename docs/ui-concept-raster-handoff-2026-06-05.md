@@ -880,3 +880,52 @@ Remaining related work:
 
 - Settings still needs final selected/focus approval beyond this first evidence pass.
 - Broader UI focus/selected state review, broad disabled coverage, mobile/responsive review, dynamic labels/tooltips, accessibility-safe text, user acceptance, and final concept-match approval remain unfinished.
+
+## 2026-06-08 Continuation: Combat Boss Cost-Disabled Card Raster Feedback
+
+Status: `Partially complete`.
+
+This follow-up expands disabled-state coverage on Combat and Boss without adding new art direction. It reuses the existing `ui_disabled_lock_stamp_concept` bitmap already used by Event unaffordable choices.
+
+Added/changed:
+
+- `src/simulation/systems/combat/combatSystem.ts`
+- `src/phaser/scenes/CombatScene.ts`
+- `src/phaser/scenes/BossScene.ts`
+- `tmp/combat-boss-disabled-raster-state-audit.mjs`
+- `tmp/ui-quality/disabled/combat-disabled-card-v1-1920.png`
+- `tmp/ui-quality/disabled/boss-disabled-card-v1-1920.png`
+
+Behavior now verified by `tmp/combat-boss-disabled-raster-state-audit.mjs`:
+
+- Combat cost-disabled cards show `ui_disabled_lock_stamp_concept` at the card's local badge axis.
+- Boss cost-disabled cards show `ui_disabled_lock_stamp_concept` at the Boss card's local stamp axis.
+- Disabled cards do not show the local hover/down affordance.
+- Disabled card pointer click does not change phase, hand, energy, or log.
+- Disabled card `Digit1` keyboard action does not change phase, hand, energy, or log.
+- The checked states show no Phaser text and no visible rectangle overlays above the raster underlay.
+
+Verification run in this continuation:
+
+```powershell
+node tmp\combat-boss-disabled-raster-state-audit.mjs
+npx.cmd tsc --noEmit
+node tmp\combat-raster-hover-state-audit.mjs
+node tmp\boss-raster-hover-state-audit.mjs
+node tmp\combat-boss-keyboard-action-raster-state-audit.mjs
+node tmp\ui-disabled-raster-audit.mjs
+node tmp\ui-raster-hover-audit.mjs
+node tmp\ui-raster-down-audit.mjs
+npm.cmd run check
+git diff --check
+```
+
+Known verification note:
+
+- `npm.cmd run check` passed and still reports the existing large JS chunk warning.
+- Broad Phaser smoke was not rerun here and remains `Needs verification` from the previous `checkFullInputCoverage` timeout.
+
+Remaining related work:
+
+- This is not broad disabled-state completion. Event unaffordable choices and Combat/Boss cost-disabled cards now have first evidence, but disabled coverage across every scene/control remains open.
+- Final selected/focus language, WorldMap recomposition, dynamic labels/tooltips, accessibility-safe text, mobile/responsive review, user acceptance, and final concept-match approval remain unfinished.

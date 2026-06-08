@@ -2,12 +2,12 @@ import Phaser from "phaser";
 import type { BootContext } from "../../app/bootContext";
 import type { InputAction } from "../../input/actions";
 import { bindKeyboardActions } from "../../input/bindings";
-import { getActiveIntent, getCombatantData } from "../../simulation/systems/combat/combatSystem";
+import { canPlayCardAtIndex, getActiveIntent, getCombatantData } from "../../simulation/systems/combat/combatSystem";
 import { resolveCombatFeedbackEffectKey, resolveCombatFeedbackFrame } from "../../simulation/state/combatFeedback";
 import { renderDebugOverlay } from "../../ui/overlays/debugOverlay";
 import { handleSceneAction } from "../bridge/sceneActions";
 import { requireBootContext } from "../bridge/sceneBridge";
-import { renderActionButton, renderCardHand, renderPaperPanel, renderRasterHoverHitTarget, renderSceneShell, textStyle, triggerRasterHitTargetDown } from "../view/sceneShell";
+import { renderActionButton, renderCardHand, renderPaperPanel, renderRasterDisabledHitTarget, renderRasterHoverHitTarget, renderSceneShell, textStyle, triggerRasterHitTargetDown } from "../view/sceneShell";
 
 const COMBAT_RASTER_UNDERLAY_KEY = "combat_raster_underlay_concept";
 const COMBAT_RASTER_HOVER_SEAL_KEY = "ui_hover_gold_seal_concept";
@@ -33,11 +33,13 @@ export class CombatScene extends Phaser.Scene {
     const rasterUnderlay = hasCombatRasterUnderlay(this, false);
     renderCombatTheater(this, context, false);
     const rasterControls: CombatRasterControls | undefined = rasterUnderlay
-      ? { cardHitTargets: {} }
+      ? { cardHitTargets: {}, blockedCardActions: {} }
       : undefined;
     if (rasterControls) {
       renderCombatFeedbackEffect(this, context);
-      rasterControls.cardHitTargets = renderCombatRasterCardHand(this, context, (index) => handleSceneAction(this, context, `card_${index + 1}` as InputAction));
+      const cardTargets = renderCombatRasterCardHand(this, context, (index) => handleSceneAction(this, context, `card_${index + 1}` as InputAction));
+      rasterControls.cardHitTargets = cardTargets.hitTargets;
+      rasterControls.blockedCardActions = cardTargets.blockedActions;
     } else {
       renderCombatFeedbackEffect(this, context);
       renderCombatPanel(this, context, 0xfffbef, 0x8f5b42, "#1e2a3e", "#805845");
@@ -50,6 +52,9 @@ export class CombatScene extends Phaser.Scene {
       rasterControls.endTurnHitTarget = endTurnHitTarget;
     }
     bindKeyboardActions(this, (action) => {
+      if (isCombatRasterBlockedAction(rasterControls, action)) {
+        return;
+      }
       if (triggerRasterHitTargetDown(this, combatRasterKeyboardTarget(rasterControls, action), () => handleSceneAction(this, context, action))) {
         return;
       }
@@ -61,7 +66,13 @@ export class CombatScene extends Phaser.Scene {
 
 interface CombatRasterControls {
   cardHitTargets: Partial<Record<InputAction, Phaser.GameObjects.Rectangle>>;
+  blockedCardActions: Partial<Record<InputAction, boolean>>;
   endTurnHitTarget?: Phaser.GameObjects.Rectangle;
+}
+
+interface CombatRasterCardTargets {
+  hitTargets: Partial<Record<InputAction, Phaser.GameObjects.Rectangle>>;
+  blockedActions: Partial<Record<InputAction, boolean>>;
 }
 
 function combatRasterKeyboardTarget(
@@ -71,6 +82,13 @@ function combatRasterKeyboardTarget(
   if (!controls) return undefined;
   if (action === "end_turn") return controls.endTurnHitTarget;
   return controls.cardHitTargets[action];
+}
+
+function isCombatRasterBlockedAction(
+  controls: CombatRasterControls | undefined,
+  action: InputAction
+): boolean {
+  return Boolean(controls?.blockedCardActions[action]);
 }
 
 function renderCombatButtons(scene: Phaser.Scene, context: BootContext): Phaser.GameObjects.Rectangle | undefined {
@@ -264,7 +282,7 @@ export function renderCombatRasterCardHand(
   scene: Phaser.Scene,
   context: BootContext,
   onCardClick?: (index: number) => void
-): Partial<Record<InputAction, Phaser.GameObjects.Rectangle>> {
+): CombatRasterCardTargets {
   const hand = context.run.hand.length > 0
     ? context.run.hand
     : context.save.currentRun?.hand ?? context.dataBundle.cards.slice(0, 5).map((card) => card.id);
@@ -277,11 +295,27 @@ export function renderCombatRasterCardHand(
   const cardWidth = 210;
   const cardHeight = 324;
   const hitTargets: Partial<Record<InputAction, Phaser.GameObjects.Rectangle>> = {};
+  const blockedActions: Partial<Record<InputAction, boolean>> = {};
 
   cards.forEach((_card, index) => {
     const x = cardXs[index] ?? (540 + index * 220);
+    const action = `card_${index + 1}` as InputAction;
+    const playable = canPlayCardAtIndex(context.run, context.dataBundle, index);
+    if (!playable) {
+      blockedActions[action] = true;
+      renderRasterDisabledHitTarget(scene, x, cardY, cardWidth, cardHeight, {
+        depth: 22,
+        disabledDepth: 24,
+        disabledX: x + 12,
+        disabledY: cardY - 92,
+        disabledWidth: 88,
+        disabledHeight: 88,
+        disabledAlpha: 0.9
+      });
+      return;
+    }
+
     if (onCardClick) {
-      const action = `card_${index + 1}` as InputAction;
       hitTargets[action] = renderRasterHoverHitTarget(scene, x, cardY, cardWidth, cardHeight, () => onCardClick(index), {
         hoverKey: COMBAT_RASTER_HOVER_SEAL_KEY,
         downKey: COMBAT_RASTER_HOVER_SEAL_KEY,
@@ -297,7 +331,7 @@ export function renderCombatRasterCardHand(
       });
     }
   });
-  return hitTargets;
+  return { hitTargets, blockedActions };
 }
 
 function addRasterText(
