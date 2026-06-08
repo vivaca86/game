@@ -9,10 +9,11 @@ import { renderDebugOverlay } from "../../ui/overlays/debugOverlay";
 import { handleSceneAction } from "../bridge/sceneActions";
 import { requireBootContext } from "../bridge/sceneBridge";
 import { renderCombatFeedbackEffect, renderCombatPanel, renderCombatPlayerStandee, renderCombatTheater } from "./CombatScene";
-import { renderActionButton, renderCardHand, renderPaperPanel, renderRasterDisabledHitTarget, renderRasterHoverHitTarget, renderSceneShell, renderTransparentHitTarget, textStyle, triggerRasterHitTargetDown } from "../view/sceneShell";
+import { renderActionButton, renderCardHand, renderPaperPanel, renderRasterDisabledHitTarget, renderRasterHoverHitTarget, renderSceneShell, renderTransparentHitTarget, setRasterHitTargetHoverState, textStyle, triggerRasterHitTargetDown } from "../view/sceneShell";
 
 const BOSS_RASTER_UNDERLAY_KEY = "boss_raster_underlay_concept";
 const BOSS_RASTER_HOVER_STAMP_KEY = "ui_hover_boss_skull_stamp_concept";
+const BOSS_RASTER_FOCUS_ID_KEY = "bossRasterFocusId";
 
 export class BossScene extends Phaser.Scene {
   constructor() {
@@ -33,15 +34,22 @@ export class BossScene extends Phaser.Scene {
     });
 
     const rasterControls: BossRasterControls | undefined = hasBossRasterUnderlay(this)
-      ? { cardHitTargets: {}, blockedCardActions: {} }
+      ? { blockedCardActions: {}, controls: [] }
       : undefined;
     if (rasterControls) {
       renderBossRasterUnderlayOnly(this);
       renderCombatFeedbackEffect(this, context);
       const cardTargets = renderBossRasterCardTargets(this, context, (index) => handleSceneAction(this, context, `card_${index + 1}` as InputAction));
-      rasterControls.cardHitTargets = cardTargets.hitTargets;
       rasterControls.blockedCardActions = cardTargets.blockedActions;
-      rasterControls.endTurnHitTarget = renderBossRasterEndTurnTarget(this, context);
+      rasterControls.controls.push(...cardTargets.controls);
+      const endTurnHitTarget = renderBossRasterEndTurnTarget(this, context);
+      rasterControls.controls.push({
+        id: "end_turn",
+        x: 1750,
+        y: 960,
+        hitTarget: endTurnHitTarget,
+        activate: () => handleSceneAction(this, context, "end_turn")
+      });
     } else {
       renderCombatTheater(this, context, true);
       renderBossCommandBoard(this, context);
@@ -52,11 +60,11 @@ export class BossScene extends Phaser.Scene {
       renderBossEndTurnButton(this, context);
     }
 
+    const rasterKeyboardHandler = rasterControls
+      ? createBossRasterKeyboardHandler(this, rasterControls)
+      : undefined;
     bindKeyboardActions(this, (action) => {
-      if (isBossRasterBlockedAction(rasterControls, action)) {
-        return;
-      }
-      if (triggerRasterHitTargetDown(this, bossRasterKeyboardTarget(rasterControls, action), () => handleSceneAction(this, context, action))) {
+      if (rasterKeyboardHandler?.(action)) {
         return;
       }
       handleSceneAction(this, context, action);
@@ -66,23 +74,21 @@ export class BossScene extends Phaser.Scene {
 }
 
 interface BossRasterControls {
-  cardHitTargets: Partial<Record<InputAction, Phaser.GameObjects.Rectangle>>;
   blockedCardActions: Partial<Record<InputAction, boolean>>;
-  endTurnHitTarget?: Phaser.GameObjects.Rectangle;
+  controls: BossRasterControl[];
 }
 
 interface BossRasterCardTargets {
-  hitTargets: Partial<Record<InputAction, Phaser.GameObjects.Rectangle>>;
   blockedActions: Partial<Record<InputAction, boolean>>;
+  controls: BossRasterControl[];
 }
 
-function bossRasterKeyboardTarget(
-  controls: BossRasterControls | undefined,
-  action: InputAction
-): Phaser.GameObjects.Rectangle | undefined {
-  if (!controls) return undefined;
-  if (action === "end_turn") return controls.endTurnHitTarget;
-  return controls.cardHitTargets[action];
+interface BossRasterControl {
+  id: InputAction;
+  x: number;
+  y: number;
+  hitTarget: Phaser.GameObjects.Rectangle;
+  activate: () => void;
 }
 
 function isBossRasterBlockedAction(
@@ -90,6 +96,138 @@ function isBossRasterBlockedAction(
   action: InputAction
 ): boolean {
   return Boolean(controls?.blockedCardActions[action]);
+}
+
+function createBossRasterKeyboardHandler(
+  scene: Phaser.Scene,
+  rasterControls: BossRasterControls
+): (action: InputAction) => boolean {
+  const { controls } = rasterControls;
+  let focusedIndex = storedBossFocusIndex(scene, controls);
+
+  const setFocus = (nextIndex: number): void => {
+    if (!controls[nextIndex]) return;
+    if (focusedIndex >= 0 && focusedIndex !== nextIndex) {
+      setRasterHitTargetHoverState(controls[focusedIndex]?.hitTarget, false);
+    }
+    focusedIndex = nextIndex;
+    scene.registry.set(BOSS_RASTER_FOCUS_ID_KEY, controls[focusedIndex].id);
+    setRasterHitTargetHoverState(controls[focusedIndex].hitTarget, true);
+  };
+
+  const clearKeyboardFocus = (except?: BossRasterControl): void => {
+    if (focusedIndex < 0 || controls[focusedIndex] === except) return;
+    setRasterHitTargetHoverState(controls[focusedIndex].hitTarget, false);
+    focusedIndex = -1;
+    scene.registry.set(BOSS_RASTER_FOCUS_ID_KEY, undefined);
+  };
+
+  const activateControl = (control: BossRasterControl): void => {
+    scene.registry.set(BOSS_RASTER_FOCUS_ID_KEY, undefined);
+    focusedIndex = -1;
+    control.activate();
+  };
+
+  const triggerFocusedControl = (control: BossRasterControl): boolean => {
+    if (triggerRasterHitTargetDown(scene, control.hitTarget, () => activateControl(control))) {
+      return true;
+    }
+    activateControl(control);
+    return true;
+  };
+
+  controls.forEach((control) => {
+    control.hitTarget.on("pointerover", () => clearKeyboardFocus(control));
+    control.hitTarget.on("pointerout", () => {
+      if (focusedIndex >= 0 && controls[focusedIndex] === control) {
+        setRasterHitTargetHoverState(control.hitTarget, true);
+      }
+    });
+  });
+
+  if (focusedIndex >= 0) {
+    setRasterHitTargetHoverState(controls[focusedIndex].hitTarget, true);
+  }
+
+  return (action: InputAction): boolean => {
+    if (isBossRasterBlockedAction(rasterControls, action)) {
+      return true;
+    }
+    if (controls.length === 0) return false;
+
+    if (isBossMoveAction(action)) {
+      setFocus(resolveBossFocusIndex(controls, focusedIndex, action));
+      return true;
+    }
+
+    if (action === "confirm") {
+      if (focusedIndex < 0) {
+        setFocus(0);
+      }
+      const focusedControl = controls[focusedIndex];
+      if (!focusedControl) return true;
+      return triggerFocusedControl(focusedControl);
+    }
+
+    const directIndex = controls.findIndex((control) => control.id === action);
+    if (directIndex >= 0) {
+      setFocus(directIndex);
+      return triggerFocusedControl(controls[directIndex]);
+    }
+
+    return false;
+  };
+}
+
+function storedBossFocusIndex(scene: Phaser.Scene, controls: BossRasterControl[]): number {
+  const storedId = scene.registry.get(BOSS_RASTER_FOCUS_ID_KEY);
+  const storedIndex = controls.findIndex((control) => control.id === storedId);
+  return storedIndex >= 0 ? storedIndex : -1;
+}
+
+function isBossMoveAction(action: InputAction): action is "move_up" | "move_down" | "move_left" | "move_right" {
+  return action === "move_up" || action === "move_down" || action === "move_left" || action === "move_right";
+}
+
+function resolveBossFocusIndex(
+  controls: BossRasterControl[],
+  focusedIndex: number,
+  action: "move_up" | "move_down" | "move_left" | "move_right"
+): number {
+  if (focusedIndex < 0) return 0;
+  const current = controls[focusedIndex];
+  const candidates = controls
+    .map((control, index) => ({ control, index }))
+    .filter(({ index }) => index !== focusedIndex)
+    .filter(({ control }) => isBossFocusCandidate(current, control, action));
+  if (candidates.length === 0) return focusedIndex;
+
+  candidates.sort((left, right) => bossFocusScore(current, left.control, action) - bossFocusScore(current, right.control, action));
+  return candidates[0].index;
+}
+
+function isBossFocusCandidate(
+  current: BossRasterControl,
+  candidate: BossRasterControl,
+  action: "move_up" | "move_down" | "move_left" | "move_right"
+): boolean {
+  if (action === "move_up") return candidate.y < current.y - 8;
+  if (action === "move_down") return candidate.y > current.y + 8;
+  if (action === "move_left") return candidate.x < current.x - 8;
+  return candidate.x > current.x + 8;
+}
+
+function bossFocusScore(
+  current: BossRasterControl,
+  candidate: BossRasterControl,
+  action: "move_up" | "move_down" | "move_left" | "move_right"
+): number {
+  const dx = Math.abs(candidate.x - current.x);
+  const dy = Math.abs(candidate.y - current.y);
+  if (action === "move_up" || action === "move_down") {
+    return dy + dx * 0.82;
+  }
+  return dx + dy * 2.2;
 }
 
 function hasBossRasterUnderlay(scene: Phaser.Scene): boolean {
@@ -115,8 +253,8 @@ function renderBossRasterCardTargets(
   const cardY = 872;
   const cardWidth = 208;
   const cardHeight = 338;
-  const hitTargets: Partial<Record<InputAction, Phaser.GameObjects.Rectangle>> = {};
   const blockedActions: Partial<Record<InputAction, boolean>> = {};
+  const controls: BossRasterControl[] = [];
 
   cards.forEach((_card, index) => {
     const x = cardXs[index] ?? (540 + index * 220);
@@ -137,7 +275,7 @@ function renderBossRasterCardTargets(
     }
 
     if (onCardClick) {
-      hitTargets[action] = renderRasterHoverHitTarget(scene, x, cardY, cardWidth, cardHeight, () => onCardClick(index), {
+      const hitTarget = renderRasterHoverHitTarget(scene, x, cardY, cardWidth, cardHeight, () => onCardClick(index), {
         hoverKey: BOSS_RASTER_HOVER_STAMP_KEY,
         downKey: BOSS_RASTER_HOVER_STAMP_KEY,
         hoverX: x - 32,
@@ -150,9 +288,16 @@ function renderBossRasterCardTargets(
         downHeight: 134,
         downAlpha: 0.92
       });
+      controls.push({
+        id: action,
+        x,
+        y: cardY,
+        hitTarget,
+        activate: () => onCardClick(index)
+      });
     }
   });
-  return { hitTargets, blockedActions };
+  return { blockedActions, controls };
 }
 
 function renderBossRasterEndTurnTarget(scene: Phaser.Scene, context: BootContext): Phaser.GameObjects.Rectangle {

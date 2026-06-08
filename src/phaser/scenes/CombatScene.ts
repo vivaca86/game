@@ -7,10 +7,11 @@ import { resolveCombatFeedbackEffectKey, resolveCombatFeedbackFrame } from "../.
 import { renderDebugOverlay } from "../../ui/overlays/debugOverlay";
 import { handleSceneAction } from "../bridge/sceneActions";
 import { requireBootContext } from "../bridge/sceneBridge";
-import { renderActionButton, renderCardHand, renderPaperPanel, renderRasterDisabledHitTarget, renderRasterHoverHitTarget, renderSceneShell, textStyle, triggerRasterHitTargetDown } from "../view/sceneShell";
+import { renderActionButton, renderCardHand, renderPaperPanel, renderRasterDisabledHitTarget, renderRasterHoverHitTarget, renderSceneShell, setRasterHitTargetHoverState, textStyle, triggerRasterHitTargetDown } from "../view/sceneShell";
 
 const COMBAT_RASTER_UNDERLAY_KEY = "combat_raster_underlay_concept";
 const COMBAT_RASTER_HOVER_SEAL_KEY = "ui_hover_gold_seal_concept";
+const COMBAT_RASTER_FOCUS_ID_KEY = "combatRasterFocusId";
 
 export class CombatScene extends Phaser.Scene {
   constructor() {
@@ -33,13 +34,13 @@ export class CombatScene extends Phaser.Scene {
     const rasterUnderlay = hasCombatRasterUnderlay(this, false);
     renderCombatTheater(this, context, false);
     const rasterControls: CombatRasterControls | undefined = rasterUnderlay
-      ? { cardHitTargets: {}, blockedCardActions: {} }
+      ? { blockedCardActions: {}, controls: [] }
       : undefined;
     if (rasterControls) {
       renderCombatFeedbackEffect(this, context);
       const cardTargets = renderCombatRasterCardHand(this, context, (index) => handleSceneAction(this, context, `card_${index + 1}` as InputAction));
-      rasterControls.cardHitTargets = cardTargets.hitTargets;
       rasterControls.blockedCardActions = cardTargets.blockedActions;
+      rasterControls.controls.push(...cardTargets.controls);
     } else {
       renderCombatFeedbackEffect(this, context);
       renderCombatPanel(this, context, 0xfffbef, 0x8f5b42, "#1e2a3e", "#805845");
@@ -49,13 +50,21 @@ export class CombatScene extends Phaser.Scene {
     }
     const endTurnHitTarget = renderCombatButtons(this, context);
     if (rasterControls) {
-      rasterControls.endTurnHitTarget = endTurnHitTarget;
-    }
-    bindKeyboardActions(this, (action) => {
-      if (isCombatRasterBlockedAction(rasterControls, action)) {
-        return;
+      if (endTurnHitTarget) {
+        rasterControls.controls.push({
+          id: "end_turn",
+          x: 1660,
+          y: 910,
+          hitTarget: endTurnHitTarget,
+          activate: () => handleSceneAction(this, context, "end_turn")
+        });
       }
-      if (triggerRasterHitTargetDown(this, combatRasterKeyboardTarget(rasterControls, action), () => handleSceneAction(this, context, action))) {
+    }
+    const rasterKeyboardHandler = rasterControls
+      ? createCombatRasterKeyboardHandler(this, rasterControls)
+      : undefined;
+    bindKeyboardActions(this, (action) => {
+      if (rasterKeyboardHandler?.(action)) {
         return;
       }
       handleSceneAction(this, context, action);
@@ -65,23 +74,21 @@ export class CombatScene extends Phaser.Scene {
 }
 
 interface CombatRasterControls {
-  cardHitTargets: Partial<Record<InputAction, Phaser.GameObjects.Rectangle>>;
   blockedCardActions: Partial<Record<InputAction, boolean>>;
-  endTurnHitTarget?: Phaser.GameObjects.Rectangle;
+  controls: CombatRasterControl[];
 }
 
 interface CombatRasterCardTargets {
-  hitTargets: Partial<Record<InputAction, Phaser.GameObjects.Rectangle>>;
   blockedActions: Partial<Record<InputAction, boolean>>;
+  controls: CombatRasterControl[];
 }
 
-function combatRasterKeyboardTarget(
-  controls: CombatRasterControls | undefined,
-  action: InputAction
-): Phaser.GameObjects.Rectangle | undefined {
-  if (!controls) return undefined;
-  if (action === "end_turn") return controls.endTurnHitTarget;
-  return controls.cardHitTargets[action];
+interface CombatRasterControl {
+  id: InputAction;
+  x: number;
+  y: number;
+  hitTarget: Phaser.GameObjects.Rectangle;
+  activate: () => void;
 }
 
 function isCombatRasterBlockedAction(
@@ -89,6 +96,138 @@ function isCombatRasterBlockedAction(
   action: InputAction
 ): boolean {
   return Boolean(controls?.blockedCardActions[action]);
+}
+
+function createCombatRasterKeyboardHandler(
+  scene: Phaser.Scene,
+  rasterControls: CombatRasterControls
+): (action: InputAction) => boolean {
+  const { controls } = rasterControls;
+  let focusedIndex = storedCombatFocusIndex(scene, controls);
+
+  const setFocus = (nextIndex: number): void => {
+    if (!controls[nextIndex]) return;
+    if (focusedIndex >= 0 && focusedIndex !== nextIndex) {
+      setRasterHitTargetHoverState(controls[focusedIndex]?.hitTarget, false);
+    }
+    focusedIndex = nextIndex;
+    scene.registry.set(COMBAT_RASTER_FOCUS_ID_KEY, controls[focusedIndex].id);
+    setRasterHitTargetHoverState(controls[focusedIndex].hitTarget, true);
+  };
+
+  const clearKeyboardFocus = (except?: CombatRasterControl): void => {
+    if (focusedIndex < 0 || controls[focusedIndex] === except) return;
+    setRasterHitTargetHoverState(controls[focusedIndex].hitTarget, false);
+    focusedIndex = -1;
+    scene.registry.set(COMBAT_RASTER_FOCUS_ID_KEY, undefined);
+  };
+
+  const activateControl = (control: CombatRasterControl): void => {
+    scene.registry.set(COMBAT_RASTER_FOCUS_ID_KEY, undefined);
+    focusedIndex = -1;
+    control.activate();
+  };
+
+  const triggerFocusedControl = (control: CombatRasterControl): boolean => {
+    if (triggerRasterHitTargetDown(scene, control.hitTarget, () => activateControl(control))) {
+      return true;
+    }
+    activateControl(control);
+    return true;
+  };
+
+  controls.forEach((control) => {
+    control.hitTarget.on("pointerover", () => clearKeyboardFocus(control));
+    control.hitTarget.on("pointerout", () => {
+      if (focusedIndex >= 0 && controls[focusedIndex] === control) {
+        setRasterHitTargetHoverState(control.hitTarget, true);
+      }
+    });
+  });
+
+  if (focusedIndex >= 0) {
+    setRasterHitTargetHoverState(controls[focusedIndex].hitTarget, true);
+  }
+
+  return (action: InputAction): boolean => {
+    if (isCombatRasterBlockedAction(rasterControls, action)) {
+      return true;
+    }
+    if (controls.length === 0) return false;
+
+    if (isCombatMoveAction(action)) {
+      setFocus(resolveCombatFocusIndex(controls, focusedIndex, action));
+      return true;
+    }
+
+    if (action === "confirm") {
+      if (focusedIndex < 0) {
+        setFocus(0);
+      }
+      const focusedControl = controls[focusedIndex];
+      if (!focusedControl) return true;
+      return triggerFocusedControl(focusedControl);
+    }
+
+    const directIndex = controls.findIndex((control) => control.id === action);
+    if (directIndex >= 0) {
+      setFocus(directIndex);
+      return triggerFocusedControl(controls[directIndex]);
+    }
+
+    return false;
+  };
+}
+
+function storedCombatFocusIndex(scene: Phaser.Scene, controls: CombatRasterControl[]): number {
+  const storedId = scene.registry.get(COMBAT_RASTER_FOCUS_ID_KEY);
+  const storedIndex = controls.findIndex((control) => control.id === storedId);
+  return storedIndex >= 0 ? storedIndex : -1;
+}
+
+function isCombatMoveAction(action: InputAction): action is "move_up" | "move_down" | "move_left" | "move_right" {
+  return action === "move_up" || action === "move_down" || action === "move_left" || action === "move_right";
+}
+
+function resolveCombatFocusIndex(
+  controls: CombatRasterControl[],
+  focusedIndex: number,
+  action: "move_up" | "move_down" | "move_left" | "move_right"
+): number {
+  if (focusedIndex < 0) return 0;
+  const current = controls[focusedIndex];
+  const candidates = controls
+    .map((control, index) => ({ control, index }))
+    .filter(({ index }) => index !== focusedIndex)
+    .filter(({ control }) => isCombatFocusCandidate(current, control, action));
+  if (candidates.length === 0) return focusedIndex;
+
+  candidates.sort((left, right) => combatFocusScore(current, left.control, action) - combatFocusScore(current, right.control, action));
+  return candidates[0].index;
+}
+
+function isCombatFocusCandidate(
+  current: CombatRasterControl,
+  candidate: CombatRasterControl,
+  action: "move_up" | "move_down" | "move_left" | "move_right"
+): boolean {
+  if (action === "move_up") return candidate.y < current.y - 8;
+  if (action === "move_down") return candidate.y > current.y + 8;
+  if (action === "move_left") return candidate.x < current.x - 8;
+  return candidate.x > current.x + 8;
+}
+
+function combatFocusScore(
+  current: CombatRasterControl,
+  candidate: CombatRasterControl,
+  action: "move_up" | "move_down" | "move_left" | "move_right"
+): number {
+  const dx = Math.abs(candidate.x - current.x);
+  const dy = Math.abs(candidate.y - current.y);
+  if (action === "move_up" || action === "move_down") {
+    return dy + dx * 0.82;
+  }
+  return dx + dy * 2.2;
 }
 
 function renderCombatButtons(scene: Phaser.Scene, context: BootContext): Phaser.GameObjects.Rectangle | undefined {
@@ -294,8 +433,8 @@ export function renderCombatRasterCardHand(
   const cardY = 836;
   const cardWidth = 210;
   const cardHeight = 324;
-  const hitTargets: Partial<Record<InputAction, Phaser.GameObjects.Rectangle>> = {};
   const blockedActions: Partial<Record<InputAction, boolean>> = {};
+  const controls: CombatRasterControl[] = [];
 
   cards.forEach((_card, index) => {
     const x = cardXs[index] ?? (540 + index * 220);
@@ -316,7 +455,7 @@ export function renderCombatRasterCardHand(
     }
 
     if (onCardClick) {
-      hitTargets[action] = renderRasterHoverHitTarget(scene, x, cardY, cardWidth, cardHeight, () => onCardClick(index), {
+      const hitTarget = renderRasterHoverHitTarget(scene, x, cardY, cardWidth, cardHeight, () => onCardClick(index), {
         hoverKey: COMBAT_RASTER_HOVER_SEAL_KEY,
         downKey: COMBAT_RASTER_HOVER_SEAL_KEY,
         hoverX: x + 12,
@@ -329,9 +468,16 @@ export function renderCombatRasterCardHand(
         downHeight: 94,
         downAlpha: 0.94
       });
+      controls.push({
+        id: action,
+        x,
+        y: cardY,
+        hitTarget,
+        activate: () => onCardClick(index)
+      });
     }
   });
-  return { hitTargets, blockedActions };
+  return { blockedActions, controls };
 }
 
 function addRasterText(

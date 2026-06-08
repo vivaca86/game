@@ -2,7 +2,7 @@
 
 Status: Partially complete. Do not call this UI work complete.
 
-Current working estimate: about 63% of the active UI concept-quality goal.
+Current working estimate: about 74% of the active UI concept-quality goal.
 
 Active user goal:
 
@@ -29,10 +29,10 @@ The user objected strongly to vector/procedural-looking UI and asked why concept
 
 Approximate current state:
 
-- Overall active goal: about 60-65%, roughly 63%.
-- Static first-view concept matching: about 70-75%.
-- Interaction states: about 45-50%.
-- Dynamic state truth, especially WorldMap completed/current/locked variants: about 50-55%.
+- Overall active goal: about 73-75%, roughly 74%.
+- Static first-view concept matching: about 75-80%.
+- Interaction states: about 65-70%.
+- Dynamic state truth, especially WorldMap completed/current/locked variants: about 55-60%.
 - Final polish/user acceptance: still missing.
 
 This is not a formal metric and must not be used as a completion claim.
@@ -1095,3 +1095,60 @@ Results:
 Remaining related work:
 
 - This is not final selected/focus approval. Town/RuneBench/Result now have first utility keyboard-focus evidence, but Dungeon broader focus, Combat/Boss selected focus, WorldMap recomposition, broader disabled coverage, dynamic labels/tooltips, accessibility-safe text, mobile/responsive review, user acceptance, and final concept-match approval remain unfinished.
+
+## 2026-06-08 Continuation: Combat Boss Keyboard Focus Raster Feedback
+
+Status: `Partially complete`.
+
+This follow-up expands selected/focus coverage on Combat and Boss using only the existing local raster state art already used by pointer hover and direct keyboard down. It does not add a new focus ring, vector overlay, text label, tint, or alternate art direction.
+
+Added/changed:
+
+- `src/phaser/scenes/CombatScene.ts`
+- `src/phaser/scenes/BossScene.ts`
+- `tmp/combat-boss-keyboard-focus-raster-state-audit.mjs`
+- `tmp/ui-quality/combat-boss-keyboard-focus/combat-card-1-focus-v1-1920.png`
+- `tmp/ui-quality/combat-boss-keyboard-focus/combat-end-turn-focus-v1-1920.png`
+- `tmp/ui-quality/combat-boss-keyboard-focus/combat-end-turn-keyboard-activate-down-v1-1920.png`
+- `tmp/ui-quality/combat-boss-keyboard-focus/boss-card-1-focus-v1-1920.png`
+- `tmp/ui-quality/combat-boss-keyboard-focus/boss-end-turn-focus-v1-1920.png`
+- `tmp/ui-quality/combat-boss-keyboard-focus/boss-end-turn-keyboard-activate-down-v1-1920.png`
+
+Behavior now verified by `tmp/combat-boss-keyboard-focus-raster-state-audit.mjs`:
+
+- Combat arrow-key focus can reach the first playable card and the end-turn seal using `ui_hover_gold_seal_concept`.
+- Combat Enter on the focused end-turn target shows the same seal at pressed size and advances combat from turn 1 to turn 2.
+- Boss arrow-key focus can reach the first playable card and the end-turn stamp using `ui_hover_boss_skull_stamp_concept`.
+- Boss Enter on the focused end-turn target shows the same skull stamp at pressed size and advances boss combat from turn 1 to turn 2.
+- All checked states verify focus id, exact key, coordinate, size, no Phaser text, and no visible rectangle overlays above the raster underlay.
+
+Verification run in this continuation:
+
+```powershell
+node tmp\combat-boss-keyboard-focus-raster-state-audit.mjs
+node tmp\combat-boss-keyboard-action-raster-state-audit.mjs
+node tmp\combat-boss-disabled-raster-state-audit.mjs
+node tmp\ui-raster-hover-audit.mjs
+node tmp\ui-raster-down-audit.mjs
+npx.cmd tsc --noEmit
+npm.cmd run check
+$env:PHASER_SMOKE_PROGRESS='1'
+$env:PHASER_SMOKE_PROGRESS_FILE='tmp/phaser-smoke-progress-combat-boss-focus-rerun.log'
+node tmp\run-phaser-smoke-with-vite.mjs
+```
+
+Results:
+
+- Combat/Boss keyboard-focus audit passed.
+- Existing Combat/Boss keyboard-action and cost-disabled audits passed.
+- Existing 10-screen hover and 10-screen down audits passed.
+- Full broad Phaser smoke passed with `Phaser smoke OK`.
+- `npm.cmd run check` passed and still reports the existing large JS chunk warning.
+
+Known verification note:
+
+- One first full-smoke attempt hit the command timeout while `checkSaveReload` was running and did not leave final OK evidence. The same smoke command was rerun with a longer timeout and passed with `Phaser smoke OK`.
+
+Remaining related work:
+
+- This is not final selected/focus approval. Combat/Boss now have first directional keyboard-focus evidence, but Dungeon broader focus, WorldMap recomposition, broader disabled coverage, dynamic labels/tooltips, accessibility-safe text, mobile/responsive review, user acceptance, and final concept-match approval remain unfinished.
