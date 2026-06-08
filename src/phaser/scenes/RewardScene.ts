@@ -1,16 +1,18 @@
 import Phaser from "phaser";
 import type { BootContext } from "../../app/bootContext";
 import type { RewardEntry } from "../../data/schema";
+import type { InputAction } from "../../input/actions";
 import { bindKeyboardActions } from "../../input/bindings";
 import { findRewardEntryById, selectRewardEntries } from "../../simulation/state/runState";
 import { renderDebugOverlay } from "../../ui/overlays/debugOverlay";
 import { handleSceneAction } from "../bridge/sceneActions";
 import { requireBootContext } from "../bridge/sceneBridge";
-import { renderActionButton, renderPaperPanel, renderRasterHoverHitTarget, renderSceneShell, renderTooltip, renderTransparentHitTarget, renderUiSlot, textStyle, triggerRasterHitTargetDown } from "../view/sceneShell";
+import { renderActionButton, renderPaperPanel, renderRasterHoverHitTarget, renderSceneShell, renderTooltip, renderTransparentHitTarget, renderUiSlot, setRasterHitTargetHoverState, textStyle, triggerRasterHitTargetDown } from "../view/sceneShell";
 
 const REWARD_ACTIONS = ["card_1", "card_2", "card_3", "card_4", "card_5"] as const;
 const REWARD_RASTER_UNDERLAY_KEY = "reward_raster_underlay_concept";
 const REWARD_RASTER_HOVER_CHOICE_KEY = "ui_hover_choice_badge_concept";
+const REWARD_RASTER_FOCUS_INDEX_KEY = "rewardRasterFocusIndex";
 
 export class RewardScene extends Phaser.Scene {
   constructor() {
@@ -47,8 +49,11 @@ export class RewardScene extends Phaser.Scene {
       renderRewardStage(this, context, rewardPool?.displayNameKo ?? "보상 목록 없음", offers.slice(0, 4));
     }
 
+    const handleRasterKeyboardAction = rasterControls
+      ? createRewardRasterKeyboardHandler(this, context, rasterControls)
+      : undefined;
     bindKeyboardActions(this, (action) => {
-      if (action === "confirm" && triggerRasterHitTargetDown(this, rasterControls?.confirmHitTarget, () => handleSceneAction(this, context, action))) {
+      if (handleRasterKeyboardAction?.(action)) {
         return;
       }
       handleSceneAction(this, context, action);
@@ -58,7 +63,16 @@ export class RewardScene extends Phaser.Scene {
 }
 
 interface RewardRasterControls {
+  choices: RewardRasterChoiceControl[];
   confirmHitTarget?: Phaser.GameObjects.Rectangle;
+}
+
+interface RewardRasterChoiceControl {
+  index: number;
+  action: (typeof REWARD_ACTIONS)[number];
+  x: number;
+  y: number;
+  hitTarget: Phaser.GameObjects.Rectangle;
 }
 
 function hasRewardRasterUnderlay(scene: Phaser.Scene): boolean {
@@ -75,27 +89,32 @@ function renderRewardRasterStage(
     .setDepth(0);
 
   let confirmHitTarget: Phaser.GameObjects.Rectangle | undefined;
+  const choices: RewardRasterChoiceControl[] = [];
   const cardXs = [528, 795, 1062, 1329];
   offers.slice(0, 4).forEach((entry, index) => {
-    const hitTarget = renderRewardRasterChoice(scene, context, entry, index, cardXs[index] ?? (528 + index * 267), 610);
+    const action = REWARD_ACTIONS[index];
+    if (!action) return;
+    const x = cardXs[index] ?? (528 + index * 267);
+    const y = 610;
+    const hitTarget = renderRewardRasterChoice(scene, context, entry, action, x, y);
+    choices.push({ index, action, x, y, hitTarget });
     if (index === 0) {
       confirmHitTarget = hitTarget;
     }
   });
 
   renderRewardRasterConfirm(scene, context);
-  return { confirmHitTarget };
+  return { choices, confirmHitTarget };
 }
 
 function renderRewardRasterChoice(
   scene: Phaser.Scene,
   context: BootContext,
   entry: RewardEntry,
-  index: number,
+  action: RewardRasterChoiceControl["action"],
   x: number,
   y: number
 ): Phaser.GameObjects.Rectangle {
-  const action = REWARD_ACTIONS[index];
   return renderRasterHoverHitTarget(scene, x, y + 20, 240, 486, () => handleSceneAction(scene, context, action), {
     hoverKey: REWARD_RASTER_HOVER_CHOICE_KEY,
     downKey: REWARD_RASTER_HOVER_CHOICE_KEY,
@@ -109,6 +128,134 @@ function renderRewardRasterChoice(
     downHeight: 88,
     downAlpha: 0.94
   });
+}
+
+function createRewardRasterKeyboardHandler(
+  scene: Phaser.Scene,
+  context: BootContext,
+  rasterControls: RewardRasterControls
+): (action: InputAction) => boolean {
+  const { choices } = rasterControls;
+  let focusedIndex = storedRewardFocusIndex(scene, choices.length);
+
+  const setFocus = (nextIndex: number): void => {
+    if (!choices[nextIndex]) return;
+    if (focusedIndex >= 0 && focusedIndex !== nextIndex) {
+      setRasterHitTargetHoverState(choices[focusedIndex]?.hitTarget, false);
+    }
+    focusedIndex = nextIndex;
+    scene.registry.set(REWARD_RASTER_FOCUS_INDEX_KEY, focusedIndex);
+    setRasterHitTargetHoverState(choices[focusedIndex].hitTarget, true);
+  };
+
+  const clearKeyboardFocus = (except?: RewardRasterChoiceControl): void => {
+    if (focusedIndex < 0 || choices[focusedIndex] === except) return;
+    setRasterHitTargetHoverState(choices[focusedIndex].hitTarget, false);
+    focusedIndex = -1;
+    scene.registry.set(REWARD_RASTER_FOCUS_INDEX_KEY, undefined);
+  };
+
+  const activateControl = (control: RewardRasterChoiceControl): void => {
+    scene.registry.set(REWARD_RASTER_FOCUS_INDEX_KEY, undefined);
+    handleSceneAction(scene, context, control.action);
+  };
+
+  const triggerFocusedControl = (control: RewardRasterChoiceControl): boolean => {
+    if (triggerRasterHitTargetDown(scene, control.hitTarget, () => activateControl(control))) {
+      return true;
+    }
+    activateControl(control);
+    return true;
+  };
+
+  choices.forEach((control) => {
+    control.hitTarget.on("pointerover", () => clearKeyboardFocus(control));
+    control.hitTarget.on("pointerout", () => {
+      if (focusedIndex >= 0 && choices[focusedIndex] === control) {
+        setRasterHitTargetHoverState(control.hitTarget, true);
+      }
+    });
+  });
+
+  if (focusedIndex >= 0) {
+    setRasterHitTargetHoverState(choices[focusedIndex].hitTarget, true);
+  }
+
+  return (action: InputAction): boolean => {
+    if (choices.length === 0) return false;
+
+    if (isRewardMoveAction(action)) {
+      setFocus(resolveRewardFocusIndex(choices, focusedIndex, action));
+      return true;
+    }
+
+    if (action === "confirm") {
+      if (focusedIndex < 0) {
+        setFocus(0);
+      }
+      const focusedControl = choices[focusedIndex];
+      if (!focusedControl) return true;
+      return triggerFocusedControl(focusedControl);
+    }
+
+    const directIndex = choices.findIndex((control) => control.action === action);
+    if (directIndex >= 0) {
+      setFocus(directIndex);
+      return triggerFocusedControl(choices[directIndex]);
+    }
+
+    return false;
+  };
+}
+
+function storedRewardFocusIndex(scene: Phaser.Scene, choicesLength: number): number {
+  const storedIndex = Number(scene.registry.get(REWARD_RASTER_FOCUS_INDEX_KEY));
+  return Number.isInteger(storedIndex) && storedIndex >= 0 && storedIndex < choicesLength ? storedIndex : -1;
+}
+
+function isRewardMoveAction(action: InputAction): action is "move_up" | "move_down" | "move_left" | "move_right" {
+  return action === "move_up" || action === "move_down" || action === "move_left" || action === "move_right";
+}
+
+function resolveRewardFocusIndex(
+  choices: RewardRasterChoiceControl[],
+  focusedIndex: number,
+  action: "move_up" | "move_down" | "move_left" | "move_right"
+): number {
+  if (focusedIndex < 0) return 0;
+  const current = choices[focusedIndex];
+  const candidates = choices
+    .map((control, index) => ({ control, index }))
+    .filter(({ index }) => index !== focusedIndex)
+    .filter(({ control }) => isRewardFocusCandidate(current, control, action));
+  if (candidates.length === 0) return focusedIndex;
+
+  candidates.sort((left, right) => rewardFocusScore(current, left.control, action) - rewardFocusScore(current, right.control, action));
+  return candidates[0].index;
+}
+
+function isRewardFocusCandidate(
+  current: RewardRasterChoiceControl,
+  candidate: RewardRasterChoiceControl,
+  action: "move_up" | "move_down" | "move_left" | "move_right"
+): boolean {
+  if (action === "move_up") return candidate.y < current.y - 8;
+  if (action === "move_down") return candidate.y > current.y + 8;
+  if (action === "move_left") return candidate.x < current.x - 8;
+  return candidate.x > current.x + 8;
+}
+
+function rewardFocusScore(
+  current: RewardRasterChoiceControl,
+  candidate: RewardRasterChoiceControl,
+  action: "move_up" | "move_down" | "move_left" | "move_right"
+): number {
+  const dx = Math.abs(candidate.x - current.x);
+  const dy = Math.abs(candidate.y - current.y);
+  if (action === "move_up" || action === "move_down") {
+    return dy + dx * 0.82;
+  }
+  return dx + dy * 2.2;
 }
 
 function renderRewardRasterConfirm(scene: Phaser.Scene, context: BootContext): void {

@@ -1,16 +1,18 @@
 import Phaser from "phaser";
 import type { BootContext } from "../../app/bootContext";
 import type { EventChoice, EventData, RewardEntry } from "../../data/schema";
+import type { InputAction } from "../../input/actions";
 import { bindKeyboardActions } from "../../input/bindings";
 import { canPayEventChoice, getCurrentEvent } from "../../simulation/systems/events/eventSystem";
 import { renderDebugOverlay } from "../../ui/overlays/debugOverlay";
 import { handleSceneAction } from "../bridge/sceneActions";
 import { requireBootContext } from "../bridge/sceneBridge";
-import { renderActionButton, renderPaperPanel, renderRasterDisabledHitTarget, renderRasterHoverHitTarget, renderSceneShell, renderUiSlot, textStyle, triggerRasterHitTargetDown } from "../view/sceneShell";
+import { renderActionButton, renderPaperPanel, renderRasterDisabledHitTarget, renderRasterHoverHitTarget, renderSceneShell, renderUiSlot, setRasterHitTargetHoverState, textStyle, triggerRasterHitTargetDown } from "../view/sceneShell";
 
 const CHOICE_ACTIONS = ["card_1", "card_2", "card_3", "card_4", "card_5"] as const;
 const EVENT_RASTER_UNDERLAY_KEY = "event_raster_underlay_concept";
 const EVENT_RASTER_HOVER_CHOICE_KEY = "ui_hover_choice_badge_concept";
+const EVENT_RASTER_FOCUS_INDEX_KEY = "eventRasterFocusIndex";
 
 export class EventScene extends Phaser.Scene {
   constructor() {
@@ -43,8 +45,11 @@ export class EventScene extends Phaser.Scene {
       });
     }
 
+    const handleRasterKeyboardAction = rasterControls
+      ? createEventRasterKeyboardHandler(this, context, rasterControls)
+      : undefined;
     bindKeyboardActions(this, (action) => {
-      if (action === "confirm" && triggerRasterHitTargetDown(this, rasterControls?.confirmHitTarget, () => handleSceneAction(this, context, action))) {
+      if (handleRasterKeyboardAction?.(action)) {
         return;
       }
       handleSceneAction(this, context, action);
@@ -54,7 +59,16 @@ export class EventScene extends Phaser.Scene {
 }
 
 interface EventRasterControls {
+  choices: EventRasterChoiceControl[];
   confirmHitTarget?: Phaser.GameObjects.Rectangle;
+}
+
+interface EventRasterChoiceControl {
+  index: number;
+  action: (typeof CHOICE_ACTIONS)[number];
+  x: number;
+  y: number;
+  hitTarget: Phaser.GameObjects.Rectangle;
 }
 
 function hasEventRasterUnderlay(scene: Phaser.Scene): boolean {
@@ -71,24 +85,31 @@ function renderEventRasterStage(
     .setDepth(0);
 
   let confirmHitTarget: Phaser.GameObjects.Rectangle | undefined;
+  const choices: EventRasterChoiceControl[] = [];
   const cardXs = [530, 835, 1145, 1450];
   (event?.choices ?? []).slice(0, 4).forEach((choice, index) => {
-    const hitTarget = renderEventRasterChoice(scene, context, choice, index, cardXs[index] ?? (530 + index * 305), 770);
+    const action = CHOICE_ACTIONS[index];
+    if (!action) return;
+    const x = cardXs[index] ?? (530 + index * 305);
+    const y = 770;
+    const hitTarget = renderEventRasterChoice(scene, context, choice, action, x, y);
+    if (hitTarget) {
+      choices.push({ index, action, x, y, hitTarget });
+    }
     confirmHitTarget ??= hitTarget;
   });
-  return { confirmHitTarget };
+  return { choices, confirmHitTarget };
 }
 
 function renderEventRasterChoice(
   scene: Phaser.Scene,
   context: BootContext,
   choice: EventChoice,
-  index: number,
+  action: EventRasterChoiceControl["action"],
   x: number,
   y: number
 ): Phaser.GameObjects.Rectangle | undefined {
   const affordable = canPayEventChoice(context.run, choice);
-  const action = CHOICE_ACTIONS[index];
   const badgeX = x - 32;
 
   if (!affordable) {
@@ -117,6 +138,134 @@ function renderEventRasterChoice(
     downHeight: 88,
     downAlpha: 0.94
   });
+}
+
+function createEventRasterKeyboardHandler(
+  scene: Phaser.Scene,
+  context: BootContext,
+  rasterControls: EventRasterControls
+): (action: InputAction) => boolean {
+  const { choices } = rasterControls;
+  let focusedIndex = storedEventFocusIndex(scene, choices.length);
+
+  const setFocus = (nextIndex: number): void => {
+    if (!choices[nextIndex]) return;
+    if (focusedIndex >= 0 && focusedIndex !== nextIndex) {
+      setRasterHitTargetHoverState(choices[focusedIndex]?.hitTarget, false);
+    }
+    focusedIndex = nextIndex;
+    scene.registry.set(EVENT_RASTER_FOCUS_INDEX_KEY, focusedIndex);
+    setRasterHitTargetHoverState(choices[focusedIndex].hitTarget, true);
+  };
+
+  const clearKeyboardFocus = (except?: EventRasterChoiceControl): void => {
+    if (focusedIndex < 0 || choices[focusedIndex] === except) return;
+    setRasterHitTargetHoverState(choices[focusedIndex].hitTarget, false);
+    focusedIndex = -1;
+    scene.registry.set(EVENT_RASTER_FOCUS_INDEX_KEY, undefined);
+  };
+
+  const activateControl = (control: EventRasterChoiceControl): void => {
+    scene.registry.set(EVENT_RASTER_FOCUS_INDEX_KEY, undefined);
+    handleSceneAction(scene, context, control.action);
+  };
+
+  const triggerFocusedControl = (control: EventRasterChoiceControl): boolean => {
+    if (triggerRasterHitTargetDown(scene, control.hitTarget, () => activateControl(control))) {
+      return true;
+    }
+    activateControl(control);
+    return true;
+  };
+
+  choices.forEach((control) => {
+    control.hitTarget.on("pointerover", () => clearKeyboardFocus(control));
+    control.hitTarget.on("pointerout", () => {
+      if (focusedIndex >= 0 && choices[focusedIndex] === control) {
+        setRasterHitTargetHoverState(control.hitTarget, true);
+      }
+    });
+  });
+
+  if (focusedIndex >= 0) {
+    setRasterHitTargetHoverState(choices[focusedIndex].hitTarget, true);
+  }
+
+  return (action: InputAction): boolean => {
+    if (choices.length === 0) return false;
+
+    if (isEventMoveAction(action)) {
+      setFocus(resolveEventFocusIndex(choices, focusedIndex, action));
+      return true;
+    }
+
+    if (action === "confirm") {
+      if (focusedIndex < 0) {
+        setFocus(0);
+      }
+      const focusedControl = choices[focusedIndex];
+      if (!focusedControl) return true;
+      return triggerFocusedControl(focusedControl);
+    }
+
+    const directIndex = choices.findIndex((control) => control.action === action);
+    if (directIndex >= 0) {
+      setFocus(directIndex);
+      return triggerFocusedControl(choices[directIndex]);
+    }
+
+    return false;
+  };
+}
+
+function storedEventFocusIndex(scene: Phaser.Scene, choicesLength: number): number {
+  const storedIndex = Number(scene.registry.get(EVENT_RASTER_FOCUS_INDEX_KEY));
+  return Number.isInteger(storedIndex) && storedIndex >= 0 && storedIndex < choicesLength ? storedIndex : -1;
+}
+
+function isEventMoveAction(action: InputAction): action is "move_up" | "move_down" | "move_left" | "move_right" {
+  return action === "move_up" || action === "move_down" || action === "move_left" || action === "move_right";
+}
+
+function resolveEventFocusIndex(
+  choices: EventRasterChoiceControl[],
+  focusedIndex: number,
+  action: "move_up" | "move_down" | "move_left" | "move_right"
+): number {
+  if (focusedIndex < 0) return 0;
+  const current = choices[focusedIndex];
+  const candidates = choices
+    .map((control, index) => ({ control, index }))
+    .filter(({ index }) => index !== focusedIndex)
+    .filter(({ control }) => isEventFocusCandidate(current, control, action));
+  if (candidates.length === 0) return focusedIndex;
+
+  candidates.sort((left, right) => eventFocusScore(current, left.control, action) - eventFocusScore(current, right.control, action));
+  return candidates[0].index;
+}
+
+function isEventFocusCandidate(
+  current: EventRasterChoiceControl,
+  candidate: EventRasterChoiceControl,
+  action: "move_up" | "move_down" | "move_left" | "move_right"
+): boolean {
+  if (action === "move_up") return candidate.y < current.y - 8;
+  if (action === "move_down") return candidate.y > current.y + 8;
+  if (action === "move_left") return candidate.x < current.x - 8;
+  return candidate.x > current.x + 8;
+}
+
+function eventFocusScore(
+  current: EventRasterChoiceControl,
+  candidate: EventRasterChoiceControl,
+  action: "move_up" | "move_down" | "move_left" | "move_right"
+): number {
+  const dx = Math.abs(candidate.x - current.x);
+  const dy = Math.abs(candidate.y - current.y);
+  if (action === "move_up" || action === "move_down") {
+    return dy + dx * 0.82;
+  }
+  return dx + dy * 2.2;
 }
 
 function renderEventStage(

@@ -2862,6 +2862,38 @@ This checkpoint restores the broad browser smoke gate after the previous timeout
 
 This is not final UI approval. The full smoke passing proves the current browser flow and audited UI-state paths are not failing at this gate, but final selected/focus language, broader disabled coverage, WorldMap recomposition, mobile/responsive review, dynamic labels/tooltips, user acceptance, and final concept-match approval remain unfinished.
 
+## Reward Event Keyboard Focus Raster Feedback Checkpoint
+
+Date: 2026-06-08
+
+Evidence:
+
+- `src/phaser/scenes/RewardScene.ts`
+- `src/phaser/scenes/EventScene.ts`
+- `tmp/reward-event-keyboard-focus-raster-state-audit.mjs`
+- `tmp/ui-quality/keyboard-focus/reward-choice-2-focus-v1-1920.png`
+- `tmp/ui-quality/keyboard-focus/reward-choice-2-keyboard-activate-down-v1-1920.png`
+- `tmp/ui-quality/keyboard-focus/event-choice-2-focus-v1-1920.png`
+- `tmp/ui-quality/keyboard-focus/event-choice-2-keyboard-activate-down-v1-1920.png`
+- Reward/Event keyboard-focus audit verifies second-choice focus uses exactly one `ui_hover_choice_badge_concept` image at the expected second-card badge coordinate, no Phaser text, and no visible rectangle overlays above the raster underlay
+- Reward/Event keyboard-focus audit verifies Enter on that focus shows the same badge at pressed size and runs the focused second choice, not the first/default confirm target
+- `node tmp\reward-event-keyboard-focus-raster-state-audit.mjs`
+- `node tmp\keyboard-confirm-raster-state-audit.mjs`
+- `node tmp\choice-badge-raster-hover-state-audit.mjs`
+- `node tmp\ui-raster-down-audit.mjs`
+- `npx.cmd tsc --noEmit`
+- `npm.cmd run check`
+- `git diff --check`
+- Full `node tmp\run-phaser-smoke-with-vite.mjs` passed with `Phaser smoke OK`
+
+Current status: `Needs user review`
+
+Completion level: `Partially complete`
+
+This checkpoint extends focus/selected evidence on Reward and Event by reusing their existing concept badge bitmap family. It does not add a procedural focus ring, vector outline, text label, or alternate art direction.
+
+This is not final selected/focus approval. Reward/Event now have first directional keyboard choice-focus and focused activation evidence, but Dungeon/Town/RuneBench/Result broader focus, Combat/Boss selected focus, WorldMap recomposition, broad disabled coverage, mobile/responsive review, dynamic labels/tooltips, user acceptance, and final concept-match approval remain unfinished.
+
 ## Current Remaining Raster-Quality Scope
 
 Status: `Not complete`
@@ -2873,13 +2905,13 @@ The active goal still remains open. The immediate first-view raster concept-unde
 - All ten primary raster concept screens now have a bitmap pressed/down-state candidate on their audited hit targets, and those audited targets now use control-family concept bitmaps instead of the shared pressed-stamp fallback. This is still not final screen-specific pressed art across the full UI.
 - Settings now has full current-control hover coverage and pressed coverage for its ten major raster hit targets. Return-to-town, reset-save, reset-defaults, volume sliders, display-mode, large-text, reduced-motion, and space-confirm are anchored to their visible concept controls with button/panel/row-specific hover/down art. Its existing `Escape`/cancel return path now has first keyboard-cancel raster feedback evidence, and its ten audited controls now have first keyboard navigation/focus and Enter activation evidence using the same concept bitmap state art. Final selected, disabled, and dynamic readability states still need a full per-control pass.
 - Town, RuneBench, and Result audited representative utility controls now use screen-specific hover/down raster art instead of the shared action-seal family. Town's lower backpack/reset and gear/settings toolbar controls, RuneBench's lower confirm button, and Result's lower return button also have dedicated hover/down evidence. Town/RuneBench/Result keyboard confirm now has first raster down-state evidence. The ambiguous central Town legacy reset/settings coordinates keep click behavior without shared seal feedback. Town legacy UX decisions and selected/focus/disabled states still need deeper review.
-- Reward/Event choice cards and Dungeon confirm route node now have first keyboard-confirm raster feedback evidence using their existing local state families. Reward highlights the first reward card badge, Event highlights the first affordable choice badge, and Dungeon highlights the primary route-node confirm surface before the existing confirm flow advances. This is still not broad selected/focus coverage for those screens.
+- Reward/Event choice cards and Dungeon confirm route node now have first keyboard-confirm raster feedback evidence using their existing local state families. Reward highlights the first reward card badge, Event highlights the first affordable choice badge, and Dungeon highlights the primary route-node confirm surface before the existing confirm flow advances. Reward/Event now also have first directional choice-focus evidence: arrow keys can focus selectable card choices with the same concept badge family, and Enter activates the focused second choice in the audit. This is still not broad selected/focus coverage for all screens.
 - Combat/Boss now have first keyboard-action raster feedback evidence using their existing local state families. Combat highlights the audited card and end-turn controls with `ui_hover_gold_seal_concept`; Boss highlights the audited card and end-turn controls with `ui_hover_boss_skull_stamp_concept`. Combat/Boss cost-disabled cards now also show `ui_disabled_lock_stamp_concept` and block pointer/keyboard activation in the audited energy-0 state. This is still not broad selected/focus or disabled coverage for those screens.
 - Event now has a first visible bitmap disabled-state candidate for the release unaffordable choice, and Combat/Boss have first cost-disabled card candidates, verified with 1920 debugless audits; disabled coverage is still not broad across every scene/control.
 - WorldMap no longer has the hidden center confirm target; primary action is now verified on the visible bottom-right play button, that button has first-pass hover/down art cropped from the original WorldMap concept, the current stage now has a runtime-driven marker plus cleaned concept-derived current halo plus lower current-status badge, node hover uses the cleaned halo instead of a detached route token, arrow keys can select the nearest unlocked node by concept-map direction, and completed/locked/sealed stages now have first-pass runtime raster badges. The runtime underlay now neutralizes the strongest baked 1-3 completed checks, lower 1-5 node body colors, stage-4 cyan state colors, the main remaining stage-4 and 4-to-5 route remnants, and sampled old red lock centers. Red-lock placement is source-aligned for stages 10-15, late-route completed checks are smaller, stage 6/7 completed badges sit closer to their node bases, stage 8 is treated as a quieter route-point marker, and gray seals now emphasize only the next lower/mid locked node. This is still not full current/selected/completed/locked-state recomposition: baked route/node geometry remains, lower-node baked silhouettes are only reduced rather than fully recomposed, later stage variants are not complete, and broader keyboard focus, dynamic labels, accessibility-safe tooltips, mobile/responsive review, and user acceptance remain unfinished.
 - Combat and Boss now have concept-source-derived raster effect candidates on their raster paths. The Boss stage cue was corrected from a shield-like source to a component-sheet gold starburst source, but effect timing, target-specific placement across all effects, animation readability, and final Boss phase/effect communication are still not final.
 - The current textless raster-only checkpoints rely heavily on baked concept information and need safe dynamic-label/tooltips/accessibility passes before final UI approval.
-- Raster hover/down feedback is no longer universally invisible: all 10 primary raster concept screens have extracted bitmap hover-state candidates on representative controls and a pressed/down-state candidate on audited controls. The audited pressed states now avoid the shared fallback stamp, Event has a first disabled lock candidate, Combat/Boss have first cost-disabled card lock candidates, and Settings has first keyboard-cancel plus keyboard-focus feedback on its audited controls. Final matching-quality selected, broad disabled, focus, deeper per-control pressed, and screen-specific state coverage is still missing.
+- Raster hover/down feedback is no longer universally invisible: all 10 primary raster concept screens have extracted bitmap hover-state candidates on representative controls and a pressed/down-state candidate on audited controls. The audited pressed states now avoid the shared fallback stamp, Event has a first disabled lock candidate, Combat/Boss have first cost-disabled card lock candidates, Settings has first keyboard-cancel plus keyboard-focus feedback on its audited controls, and Reward/Event have first keyboard choice-focus evidence. Final matching-quality selected, broad disabled, focus, deeper per-control pressed, and screen-specific state coverage is still missing.
 - The full UI skin is not a 95-point completion candidate and has no user acceptance yet.
 - `npm.cmd run check` still reports the existing Vite large JS chunk warning, so performance remains tracked separately as `Needs verification`.
 - Broad Phaser smoke is passing for the latest 2026-06-08 checkpoint, but it remains a long-running regression gate rather than evidence of final UI approval.

@@ -976,3 +976,57 @@ Results:
 Remaining related work:
 
 - This is a restored verification gate, not final UI completion. Final selected/focus language, WorldMap recomposition, broader disabled coverage, dynamic labels/tooltips, accessibility-safe text, mobile/responsive review, user acceptance, and final concept-match approval remain unfinished.
+
+## 2026-06-08 Continuation: Reward Event Keyboard Focus Raster Feedback
+
+Status: `Partially complete`.
+
+This follow-up expands multi-choice selected/focus coverage on Reward and Event without adding a new focus style. It reuses the existing concept-derived `ui_hover_choice_badge_concept` badge that already belongs to Reward/Event choice-card hover/down states.
+
+Added/changed:
+
+- `src/phaser/scenes/RewardScene.ts`
+- `src/phaser/scenes/EventScene.ts`
+- `tmp/reward-event-keyboard-focus-raster-state-audit.mjs`
+- `tmp/ui-quality/keyboard-focus/reward-choice-2-focus-v1-1920.png`
+- `tmp/ui-quality/keyboard-focus/reward-choice-2-keyboard-activate-down-v1-1920.png`
+- `tmp/ui-quality/keyboard-focus/event-choice-2-focus-v1-1920.png`
+- `tmp/ui-quality/keyboard-focus/event-choice-2-keyboard-activate-down-v1-1920.png`
+
+Behavior now verified by `tmp/reward-event-keyboard-focus-raster-state-audit.mjs`:
+
+- Reward arrow-key focus can reach the second reward choice and shows exactly one `ui_hover_choice_badge_concept` image at the second card badge coordinate.
+- Reward Enter on that focus shows the same badge at pressed size and grants the second reward card `card_lamplight_mark`.
+- Release Event arrow-key focus can reach the second affordable `event_bubble_shop` choice and shows exactly one `ui_hover_choice_badge_concept` image at the second choice badge coordinate.
+- Event Enter on that focus shows the same badge at pressed size, records `event_bubble_shop_choice_2`, and advances to RuneBench.
+- Both checked states show no Phaser text and no visible rectangle overlays above the raster underlay.
+
+Verification run in this continuation:
+
+```powershell
+node tmp\reward-event-keyboard-focus-raster-state-audit.mjs
+node tmp\keyboard-confirm-raster-state-audit.mjs
+node tmp\choice-badge-raster-hover-state-audit.mjs
+node tmp\ui-raster-down-audit.mjs
+npx.cmd tsc --noEmit
+npm.cmd run check
+git diff --check
+$env:PHASER_SMOKE_PROGRESS='1'
+$env:PHASER_SMOKE_PROGRESS_FILE='tmp/phaser-smoke-progress-reward-event-focus.log'
+node tmp\run-phaser-smoke-with-vite.mjs
+```
+
+Results:
+
+- Reward/Event keyboard-focus audit passed.
+- Existing keyboard-confirm, choice hover, and raster down audits passed.
+- Full broad Phaser smoke passed with `Phaser smoke OK`.
+- `npm.cmd run check` passed and still reports the existing large JS chunk warning.
+
+Known verification note:
+
+- One parallel `keyboard-confirm` audit run failed to find Town's underlay during concurrent Vite/Playwright load; a single rerun passed.
+
+Remaining related work:
+
+- This is not final selected/focus approval. Reward/Event now have first directional choice-focus evidence, but Dungeon/Town/RuneBench/Result broader focus, Combat/Boss selected focus, WorldMap recomposition, broader disabled coverage, dynamic labels/tooltips, accessibility-safe text, mobile/responsive review, user acceptance, and final concept-match approval remain unfinished.
