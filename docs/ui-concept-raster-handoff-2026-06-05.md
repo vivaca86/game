@@ -539,3 +539,161 @@ Follow-up refinement in the same continuation:
 - Latest all-screen pressed-state pass: the audited pressed/down targets for Town, Dungeon, Combat, RuneBench, Boss, Result, and Settings now set explicit `downKey` values from their existing concept bitmap families instead of falling back to the shared `ui_down_pressed_stamp_concept`. Combat uses `ui_hover_gold_seal_concept`, Boss uses `ui_hover_boss_skull_stamp_concept`, Dungeon uses `ui_hover_route_node_concept`, and Town/RuneBench/Result/Settings use `ui_hover_action_seal_concept`. `node tmp\ui-raster-down-audit.mjs`, `node tmp\combat-raster-hover-state-audit.mjs`, `node tmp\boss-raster-hover-state-audit.mjs`, `npm.cmd run check`, and `git diff --check` passed. Evidence includes `tmp/ui-quality/down/town-down-pressed-v1-1920.png`, `tmp/ui-quality/down/dungeon-down-pressed-v1-1920.png`, `tmp/ui-quality/down/combat-down-pressed-v1-1920.png`, `tmp/ui-quality/down/runebench-down-pressed-v1-1920.png`, `tmp/ui-quality/down/boss-down-pressed-v1-1920.png`, `tmp/ui-quality/down/result-down-pressed-v1-1920.png`, and `tmp/ui-quality/down/settings-down-pressed-v1-1920.png`.
 - Latest Settings pressed-coverage pass: `tmp/settings-raster-pressed-coverage-audit.mjs` now verifies all ten major Settings raster controls in pressed state, parallel to the existing hover coverage audit. Screenshot review found `return-town` feedback anchored above the bottom-right red check button, so `SettingsScene` now places that hit target and its action-seal feedback on the visible check button instead. `node tmp\settings-raster-pressed-coverage-audit.mjs`, `node tmp\settings-raster-hover-coverage-audit.mjs`, `node tmp\ui-raster-down-audit.mjs`, `npm.cmd run check`, and `git diff --check` passed. Evidence includes `tmp/ui-quality/settings-pressed-coverage/return-town-v1-1920.png` and the refreshed hover/pressed coverage folders.
 - Latest Settings return button-specific state pass: `ui_hover_settings_return_button_concept` and `ui_down_settings_return_button_concept` are now extracted from `assets/source/ui/settings_raster_underlay_concept_v001.png`, registered in both manifests, copied to runtime assets, and preloaded for release data. `SettingsScene` uses those textures only for the bottom-right return/check button, replacing the shared action-seal feedback there. The crop was corrected after screenshot review caught a wrong source-coordinate crop and a later alignment pass matched the overlay check center to the concept check center. `node tools\extract-ui-state-assets.mjs`, `npm.cmd run assets:generate:dev`, `node tmp\settings-raster-hover-coverage-audit.mjs`, `node tmp\settings-raster-pressed-coverage-audit.mjs`, `node tmp\ui-raster-down-audit.mjs`, `npm.cmd run check`, and `git diff --check` passed. Evidence: `tmp/ui-quality/settings-hover-coverage/return-town-v1-1920.png`, `tmp/ui-quality/settings-pressed-coverage/return-town-v1-1920.png`, `assets/source/ui/ui_hover_settings_return_button_concept_v001.png`, and `assets/source/ui/ui_down_settings_return_button_concept_v001.png`.
+
+## 2026-06-08 Continuation: Town Lower Toolbar State Pass
+
+Status: `Partially complete`.
+
+This follow-up improves Town secondary utility state feedback without inventing new art from ambiguous areas of the concept.
+
+Added/changed:
+
+- `ui_hover_town_toolbar_reset_concept`
+- `ui_down_town_toolbar_reset_concept`
+- `ui_hover_town_toolbar_settings_concept`
+- `ui_down_town_toolbar_settings_concept`
+- `assets/source/ui/ui_hover_town_toolbar_reset_concept_v001.png`
+- `assets/source/ui/ui_down_town_toolbar_reset_concept_v001.png`
+- `assets/source/ui/ui_hover_town_toolbar_settings_concept_v001.png`
+- `assets/source/ui/ui_down_town_toolbar_settings_concept_v001.png`
+- `public/assets/runtime/ui/ui_hover_town_toolbar_reset_concept_v001.png`
+- `public/assets/runtime/ui/ui_down_town_toolbar_reset_concept_v001.png`
+- `public/assets/runtime/ui/ui_hover_town_toolbar_settings_concept_v001.png`
+- `public/assets/runtime/ui/ui_down_town_toolbar_settings_concept_v001.png`
+- `src/phaser/scenes/TownScene.ts`
+- `tools/extract-ui-state-assets.mjs`
+- `tools/generate-dev-runtime-assets.mjs`
+- `src/data/assetManifest.slice.v1.json`
+- `docs/asset-manifest.slice.v1.json`
+- `src/data/releaseCatalogAdapter.ts`
+- `tmp/town-raster-toolbar-state-audit.mjs`
+
+Behavior now verified by `tmp/town-raster-toolbar-state-audit.mjs`:
+
+- Lower backpack/reset hover shows exactly one `ui_hover_town_toolbar_reset_concept`.
+- Lower backpack/reset down shows exactly one `ui_down_town_toolbar_reset_concept`.
+- Lower gear/settings hover shows exactly one `ui_hover_town_toolbar_settings_concept`.
+- Lower gear/settings down shows exactly one `ui_down_town_toolbar_settings_concept`.
+- None of those states show the shared `ui_hover_action_seal_concept`.
+- The ambiguous central legacy reset/settings coordinates at `1010,724` and `1010,806` no longer show shared action-seal feedback.
+- Town remains textless/vectorless above the raster underlay in the checked states.
+
+Verification run in this continuation:
+
+```powershell
+node tools\extract-ui-state-assets.mjs
+npm.cmd run assets:generate:dev
+node tmp\town-raster-toolbar-state-audit.mjs
+node tmp\ui-raster-hover-audit.mjs
+node tmp\ui-raster-down-audit.mjs
+npm.cmd run check
+git diff --check
+```
+
+Screenshot evidence:
+
+- `tmp/ui-quality/town-toolbar/toolbar-reset-hover-v1-1920.png`
+- `tmp/ui-quality/town-toolbar/toolbar-reset-down-v1-1920.png`
+- `tmp/ui-quality/town-toolbar/toolbar-settings-hover-v1-1920.png`
+- `tmp/ui-quality/town-toolbar/toolbar-settings-down-v1-1920.png`
+
+Known verification note:
+
+- A first attempt to run `node tmp\ui-raster-hover-audit.mjs`, `node tmp\ui-raster-down-audit.mjs`, and `npm.cmd run check` in parallel timed out from local load. The leftover hover audit process was identified and stopped; the existing dev server and MCP node processes were left alone. Rerunning the audits/check individually passed.
+- Broad Phaser smoke was not rerun in this checkpoint. It remains `Needs verification` from the previous timeout in `checkFullInputCoverage`.
+
+Remaining related work:
+
+- RuneBench and Result secondary/legacy utility hit targets still need the same evidence-backed review.
+- Town central legacy reset/settings behavior still needs a UX/architecture decision because those coordinates do not map cleanly to one visible control.
+- Selected/focus, keyboard focus, broad disabled coverage, mobile/responsive review, dynamic labels/tooltips, accessibility-safe text, user acceptance, and final concept-match approval remain unfinished.
+
+## 2026-06-08 Continuation: RuneBench Result Lower Button Evidence
+
+Status: `Partially complete`.
+
+This follow-up verifies already wired RuneBench/Result lower visible button state art. It does not introduce a new art direction.
+
+Added/changed:
+
+- `tmp/runebench-result-lower-button-state-audit.mjs`
+- `tmp/ui-quality/lower-buttons/runebench-confirm-hover-v1-1920.png`
+- `tmp/ui-quality/lower-buttons/runebench-confirm-down-v1-1920.png`
+- `tmp/ui-quality/lower-buttons/result-return-hover-v1-1920.png`
+- `tmp/ui-quality/lower-buttons/result-return-down-v1-1920.png`
+- `tmp/ui-quality/lower-buttons/crops/runebench-confirm-hover-crop.png`
+- `tmp/ui-quality/lower-buttons/crops/runebench-confirm-down-crop.png`
+- `tmp/ui-quality/lower-buttons/crops/result-return-hover-crop.png`
+- `tmp/ui-quality/lower-buttons/crops/result-return-down-crop.png`
+
+Behavior now verified by `tmp/runebench-result-lower-button-state-audit.mjs`:
+
+- RuneBench lower confirm hover shows exactly one `ui_hover_runebench_confirm_button_concept`.
+- RuneBench lower confirm down shows exactly one `ui_down_runebench_confirm_button_concept`.
+- Result lower return hover shows exactly one `ui_hover_result_return_button_concept`.
+- Result lower return down shows exactly one `ui_down_result_return_button_concept`.
+- None of those states show the shared `ui_hover_action_seal_concept`.
+- Both scenes remain textless/vectorless above their raster underlays in the checked states.
+
+Verification run in this continuation:
+
+```powershell
+node tmp\runebench-result-lower-button-state-audit.mjs
+```
+
+Screenshot review:
+
+- RuneBench lower confirm is aligned to the visible green check button and uses the button surface for hover/down.
+- Result lower return is aligned to the wide bottom return panel and uses the panel surface for hover/down.
+- No coordinate correction was needed in `RuneBenchScene` or `ResultScene`.
+
+Remaining related work:
+
+- Broad Phaser smoke was not rerun here and remains `Needs verification` from the previous `checkFullInputCoverage` timeout.
+- Selected/focus, keyboard focus, broad disabled coverage, mobile/responsive review, dynamic labels/tooltips, accessibility-safe text, user acceptance, and final concept-match approval remain unfinished.
+
+## 2026-06-08 Continuation: Keyboard Confirm Raster Feedback
+
+Status: `Partially complete`.
+
+This follow-up adds first keyboard-confirm visual feedback for Town, RuneBench, and Result without adding a new procedural focus ring.
+
+Added/changed:
+
+- `src/phaser/view/sceneShell.ts`
+- `src/phaser/scenes/TownScene.ts`
+- `src/phaser/scenes/RuneBenchScene.ts`
+- `src/phaser/scenes/ResultScene.ts`
+- `tmp/keyboard-confirm-raster-state-audit.mjs`
+- `tmp/ui-quality/keyboard-confirm/town-keyboard-confirm-down-v1-1920.png`
+- `tmp/ui-quality/keyboard-confirm/runebench-keyboard-confirm-down-v1-1920.png`
+- `tmp/ui-quality/keyboard-confirm/result-keyboard-confirm-down-v1-1920.png`
+
+Behavior now verified by `tmp/keyboard-confirm-raster-state-audit.mjs`:
+
+- Town Enter/confirm briefly shows `ui_down_town_expedition_action_concept`, then advances to WorldMap.
+- RuneBench Enter/confirm briefly shows `ui_down_runebench_action_rail_concept`, then keeps the existing confirm flow.
+- Result Enter/confirm briefly shows `ui_down_result_action_card_concept`, then advances to Town.
+- The checked keyboard states show no Phaser text and no visible rectangle overlays above the raster underlay.
+
+Verification run in this continuation:
+
+```powershell
+node tmp\keyboard-confirm-raster-state-audit.mjs
+node tmp\town-raster-toolbar-state-audit.mjs
+node tmp\runebench-result-lower-button-state-audit.mjs
+node tmp\ui-raster-hover-audit.mjs
+node tmp\ui-raster-down-audit.mjs
+npm.cmd run check
+git diff --check
+```
+
+Known verification note:
+
+- `npm.cmd run check` passed. It still reports the existing large JS chunk warning, and this run also printed a Vite plugin timing advisory.
+- Broad Phaser smoke was not rerun here and remains `Needs verification` from the previous `checkFullInputCoverage` timeout.
+
+Remaining related work:
+
+- Reward/Event/Combat/Boss/Dungeon/Settings keyboard focus and selected/focus state art still need separate evidence.
+- Broad disabled coverage, mobile/responsive review, dynamic labels/tooltips, accessibility-safe text, user acceptance, and final concept-match approval remain unfinished.

@@ -6,7 +6,7 @@ import { getStage } from "../../simulation/state/runState";
 import { renderDebugOverlay } from "../../ui/overlays/debugOverlay";
 import { handleSceneAction } from "../bridge/sceneActions";
 import { requireBootContext } from "../bridge/sceneBridge";
-import { renderActionButton, renderPaperPanel, renderRasterHoverHitTarget, renderSceneShell, renderUiSlot, textStyle } from "../view/sceneShell";
+import { renderActionButton, renderPaperPanel, renderRasterHoverHitTarget, renderSceneShell, renderUiSlot, textStyle, triggerRasterHitTargetDown } from "../view/sceneShell";
 
 type ResultTone = "clear" | "defeat" | "return";
 const RESULT_RASTER_UNDERLAY_KEY = "result_raster_underlay_concept";
@@ -37,13 +37,19 @@ export class ResultScene extends Phaser.Scene {
       showRoute: false
     });
 
-    if (hasResultRasterUnderlay(this)) {
-      renderResultRasterStage(this, context);
-    } else {
+    const rasterControls = hasResultRasterUnderlay(this)
+      ? renderResultRasterStage(this, context)
+      : undefined;
+    if (!rasterControls) {
       renderResultTheater(this, context);
     }
 
-    bindKeyboardActions(this, (action) => handleSceneAction(this, context, action), context.save.settings);
+    bindKeyboardActions(this, (action) => {
+      if (action === "confirm" && triggerRasterHitTargetDown(this, rasterControls?.confirmHitTarget, () => handleSceneAction(this, context, action))) {
+        return;
+      }
+      handleSceneAction(this, context, action);
+    }, context.save.settings);
     renderDebugOverlay(context, "ResultScene");
   }
 }
@@ -52,12 +58,16 @@ function hasResultRasterUnderlay(scene: Phaser.Scene): boolean {
   return scene.textures.exists(RESULT_RASTER_UNDERLAY_KEY);
 }
 
-function renderResultRasterStage(scene: Phaser.Scene, context: BootContext): void {
+interface ResultRasterControls {
+  confirmHitTarget?: Phaser.GameObjects.Rectangle;
+}
+
+function renderResultRasterStage(scene: Phaser.Scene, context: BootContext): ResultRasterControls {
   scene.add.image(960, 540, RESULT_RASTER_UNDERLAY_KEY)
     .setDisplaySize(1920, 1080)
     .setDepth(0);
 
-  renderResultRasterHitTarget(scene, 1010, 742, 330, 66, 0xf5c26b, () => handleSceneAction(scene, context, "confirm"), {
+  const confirmHitTarget = renderResultRasterHitTarget(scene, 1010, 742, 330, 66, 0xf5c26b, () => handleSceneAction(scene, context, "confirm"), {
     hoverKey: RESULT_RASTER_ACTION_CARD_KEYS.hover,
     downKey: RESULT_RASTER_ACTION_CARD_KEYS.down,
     hoverX: 1170,
@@ -85,6 +95,8 @@ function renderResultRasterStage(scene: Phaser.Scene, context: BootContext): voi
     hoverAlpha: 0.96,
     downAlpha: 0.88
   });
+
+  return { confirmHitTarget };
 }
 
 function renderResultRasterHitTarget(
@@ -109,9 +121,9 @@ function renderResultRasterHitTarget(
     hoverAlpha?: number;
     downAlpha?: number;
   } = {}
-): void {
+): Phaser.GameObjects.Rectangle {
   const hoverSize = Math.min(108, Math.max(80, Math.min(width, height) * 1.12));
-  renderRasterHoverHitTarget(scene, x, y, width, height, onClick, {
+  return renderRasterHoverHitTarget(scene, x, y, width, height, onClick, {
     hoverKey: options.hoverKey ?? RESULT_RASTER_HOVER_ACTION_KEY,
     downKey: options.downKey ?? RESULT_RASTER_HOVER_ACTION_KEY,
     hoverX: options.hoverX ?? x + width * 0.38,

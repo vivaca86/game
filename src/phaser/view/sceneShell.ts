@@ -475,7 +475,31 @@ export function renderRasterHoverHitTarget(
     onClick();
   });
   hitTarget.on("pointerupoutside", showIdle);
+  hitTarget.setData("showRasterDown", showDown);
+  hitTarget.setData("showRasterIdle", showIdle);
   return hitTarget;
+}
+
+export function triggerRasterHitTargetDown(
+  scene: Phaser.Scene,
+  hitTarget: Phaser.GameObjects.Rectangle | undefined,
+  onComplete: () => void,
+  durationMs = 90
+): boolean {
+  const showDown = hitTarget?.getData("showRasterDown") as (() => void) | undefined;
+  const showIdle = hitTarget?.getData("showRasterIdle") as (() => void) | undefined;
+  if (!hitTarget || !showDown || hitTarget.getData("rasterActivationPending")) {
+    return false;
+  }
+
+  hitTarget.setData("rasterActivationPending", true);
+  showDown();
+  scene.time.delayedCall(durationMs, () => {
+    showIdle?.();
+    hitTarget.setData("rasterActivationPending", false);
+    onComplete();
+  });
+  return true;
 }
 
 export function renderPaperPanel(

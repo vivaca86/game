@@ -7,7 +7,7 @@ import { getAttachedRuneModifiedAmount, getAttachedRuneModifiedCost } from "../.
 import { renderDebugOverlay } from "../../ui/overlays/debugOverlay";
 import { handleSceneAction } from "../bridge/sceneActions";
 import { requireBootContext } from "../bridge/sceneBridge";
-import { renderActionButton, renderPaperPanel, renderRasterHoverHitTarget, renderSceneShell, renderUiSlot, textStyle } from "../view/sceneShell";
+import { renderActionButton, renderPaperPanel, renderRasterHoverHitTarget, renderSceneShell, renderUiSlot, textStyle, triggerRasterHitTargetDown } from "../view/sceneShell";
 
 const RUNE_BENCH_RASTER_UNDERLAY_KEY = "rune_bench_raster_underlay_concept";
 const RUNE_BENCH_RASTER_HOVER_ACTION_KEY = "ui_hover_action_seal_concept";
@@ -38,13 +38,19 @@ export class RuneBenchScene extends Phaser.Scene {
       showRoute: false
     });
 
-    if (hasRuneBenchRasterUnderlay(this)) {
-      renderRuneBenchRasterStage(this, context);
-    } else {
+    const rasterControls = hasRuneBenchRasterUnderlay(this)
+      ? renderRuneBenchRasterStage(this, context)
+      : undefined;
+    if (!rasterControls) {
       renderRuneBenchTheater(this, context);
     }
 
-    bindKeyboardActions(this, (action) => handleSceneAction(this, context, action), context.save.settings);
+    bindKeyboardActions(this, (action) => {
+      if (action === "confirm" && triggerRasterHitTargetDown(this, rasterControls?.confirmHitTarget, () => handleSceneAction(this, context, action))) {
+        return;
+      }
+      handleSceneAction(this, context, action);
+    }, context.save.settings);
     renderDebugOverlay(context, "RuneBenchScene");
   }
 }
@@ -53,12 +59,16 @@ function hasRuneBenchRasterUnderlay(scene: Phaser.Scene): boolean {
   return scene.textures.exists(RUNE_BENCH_RASTER_UNDERLAY_KEY);
 }
 
-function renderRuneBenchRasterStage(scene: Phaser.Scene, context: BootContext): void {
+interface RuneBenchRasterControls {
+  confirmHitTarget?: Phaser.GameObjects.Rectangle;
+}
+
+function renderRuneBenchRasterStage(scene: Phaser.Scene, context: BootContext): RuneBenchRasterControls {
   scene.add.image(960, 540, RUNE_BENCH_RASTER_UNDERLAY_KEY)
     .setDisplaySize(1920, 1080)
     .setDepth(0);
 
-  renderRuneBenchRasterHitTarget(scene, 1010, 742, 330, 66, 0xf5c26b, () => handleSceneAction(scene, context, "confirm"), {
+  const confirmHitTarget = renderRuneBenchRasterHitTarget(scene, 1010, 742, 330, 66, 0xf5c26b, () => handleSceneAction(scene, context, "confirm"), {
     hoverKey: RUNE_BENCH_RASTER_ACTION_RAIL_KEYS.hover,
     downKey: RUNE_BENCH_RASTER_ACTION_RAIL_KEYS.down,
     hoverX: 1062,
@@ -86,6 +96,8 @@ function renderRuneBenchRasterStage(scene: Phaser.Scene, context: BootContext): 
     hoverAlpha: 0.96,
     downAlpha: 0.88
   });
+
+  return { confirmHitTarget };
 }
 
 function renderRuneBenchRasterHitTarget(
@@ -110,9 +122,9 @@ function renderRuneBenchRasterHitTarget(
     hoverAlpha?: number;
     downAlpha?: number;
   } = {}
-): void {
+): Phaser.GameObjects.Rectangle {
   const hoverSize = Math.min(108, Math.max(80, Math.min(width, height) * 1.12));
-  renderRasterHoverHitTarget(scene, x, y, width, height, onClick, {
+  return renderRasterHoverHitTarget(scene, x, y, width, height, onClick, {
     hoverKey: options.hoverKey ?? RUNE_BENCH_RASTER_HOVER_ACTION_KEY,
     downKey: options.downKey ?? RUNE_BENCH_RASTER_HOVER_ACTION_KEY,
     hoverX: options.hoverX ?? x + width * 0.38,

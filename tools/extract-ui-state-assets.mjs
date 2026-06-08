@@ -378,6 +378,78 @@ const targets = [
     stateVariant: "buttonDown"
   },
   {
+    key: "ui_hover_town_toolbar_reset_concept",
+    kind: "button_state",
+    source: path.join(rootDir, "assets", "source", "ui", "town_raster_underlay_concept_v001.png"),
+    output: path.join(rootDir, "assets", "source", "ui", "ui_hover_town_toolbar_reset_concept_v001.png"),
+    crop: { x: 338, y: 785, w: 210, h: 130 },
+    nativeSize: { w: 230, h: 142 },
+    maskPolygon: [
+      { x: 12, y: 58 },
+      { x: 40, y: 36 },
+      { x: 188, y: 36 },
+      { x: 212, y: 58 },
+      { x: 204, y: 126 },
+      { x: 40, y: 134 },
+      { x: 12, y: 114 }
+    ],
+    stateVariant: "buttonHover"
+  },
+  {
+    key: "ui_down_town_toolbar_reset_concept",
+    kind: "button_state",
+    source: path.join(rootDir, "assets", "source", "ui", "town_raster_underlay_concept_v001.png"),
+    output: path.join(rootDir, "assets", "source", "ui", "ui_down_town_toolbar_reset_concept_v001.png"),
+    crop: { x: 338, y: 785, w: 210, h: 130 },
+    nativeSize: { w: 230, h: 142 },
+    maskPolygon: [
+      { x: 12, y: 58 },
+      { x: 40, y: 36 },
+      { x: 188, y: 36 },
+      { x: 212, y: 58 },
+      { x: 204, y: 126 },
+      { x: 40, y: 134 },
+      { x: 12, y: 114 }
+    ],
+    stateVariant: "buttonDown"
+  },
+  {
+    key: "ui_hover_town_toolbar_settings_concept",
+    kind: "button_state",
+    source: path.join(rootDir, "assets", "source", "ui", "town_raster_underlay_concept_v001.png"),
+    output: path.join(rootDir, "assets", "source", "ui", "ui_hover_town_toolbar_settings_concept_v001.png"),
+    crop: { x: 1080, y: 785, w: 175, h: 130 },
+    nativeSize: { w: 220, h: 164 },
+    maskPolygon: [
+      { x: 12, y: 62 },
+      { x: 40, y: 42 },
+      { x: 188, y: 42 },
+      { x: 206, y: 62 },
+      { x: 198, y: 144 },
+      { x: 36, y: 152 },
+      { x: 12, y: 126 }
+    ],
+    stateVariant: "buttonHover"
+  },
+  {
+    key: "ui_down_town_toolbar_settings_concept",
+    kind: "button_state",
+    source: path.join(rootDir, "assets", "source", "ui", "town_raster_underlay_concept_v001.png"),
+    output: path.join(rootDir, "assets", "source", "ui", "ui_down_town_toolbar_settings_concept_v001.png"),
+    crop: { x: 1080, y: 785, w: 175, h: 130 },
+    nativeSize: { w: 220, h: 164 },
+    maskPolygon: [
+      { x: 12, y: 62 },
+      { x: 40, y: 42 },
+      { x: 188, y: 42 },
+      { x: 206, y: 62 },
+      { x: 198, y: 144 },
+      { x: 36, y: 152 },
+      { x: 12, y: 126 }
+    ],
+    stateVariant: "buttonDown"
+  },
+  {
     key: "ui_hover_runebench_action_rail_concept",
     kind: "underlay_control_state",
     source: path.join(rootDir, "assets", "source", "ui", "rune_bench_raster_underlay_concept_v001.png"),

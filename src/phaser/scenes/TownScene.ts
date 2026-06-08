@@ -6,13 +6,21 @@ import { clearStoredSave } from "../../save/saveCodec";
 import { renderDebugOverlay } from "../../ui/overlays/debugOverlay";
 import { handleSceneAction } from "../bridge/sceneActions";
 import { requireBootContext } from "../bridge/sceneBridge";
-import { renderActionButton, renderPaperPanel, renderRasterHoverHitTarget, renderSceneShell, renderTooltip, renderUiSlot, textStyle } from "../view/sceneShell";
+import { renderActionButton, renderPaperPanel, renderRasterHoverHitTarget, renderSceneShell, renderTooltip, renderUiSlot, textStyle, triggerRasterHitTargetDown } from "../view/sceneShell";
 
 const TOWN_RASTER_UNDERLAY_KEY = "town_raster_underlay_concept";
 const TOWN_RASTER_HOVER_ACTION_KEY = "ui_hover_action_seal_concept";
 const TOWN_RASTER_EXPEDITION_ACTION_KEYS = {
   hover: "ui_hover_town_expedition_action_concept",
   down: "ui_down_town_expedition_action_concept"
+};
+const TOWN_RASTER_TOOLBAR_RESET_KEYS = {
+  hover: "ui_hover_town_toolbar_reset_concept",
+  down: "ui_down_town_toolbar_reset_concept"
+};
+const TOWN_RASTER_TOOLBAR_SETTINGS_KEYS = {
+  hover: "ui_hover_town_toolbar_settings_concept",
+  down: "ui_down_town_toolbar_settings_concept"
 };
 
 export class TownScene extends Phaser.Scene {
@@ -32,13 +40,19 @@ export class TownScene extends Phaser.Scene {
       showRoute: false
     });
 
-    if (hasTownRasterUnderlay(this)) {
-      renderTownRasterStage(this, context);
-    } else {
+    const rasterControls = hasTownRasterUnderlay(this)
+      ? renderTownRasterStage(this, context)
+      : undefined;
+    if (!rasterControls) {
       renderTownTheater(this, context);
     }
 
-    bindKeyboardActions(this, (action) => handleSceneAction(this, context, action), context.save.settings);
+    bindKeyboardActions(this, (action) => {
+      if (action === "confirm" && triggerRasterHitTargetDown(this, rasterControls?.confirmHitTarget, () => handleSceneAction(this, context, action))) {
+        return;
+      }
+      handleSceneAction(this, context, action);
+    }, context.save.settings);
     renderDebugOverlay(context, "TownScene");
   }
 }
@@ -47,12 +61,16 @@ function hasTownRasterUnderlay(scene: Phaser.Scene): boolean {
   return scene.textures.exists(TOWN_RASTER_UNDERLAY_KEY);
 }
 
-function renderTownRasterStage(scene: Phaser.Scene, context: BootContext): void {
+interface TownRasterControls {
+  confirmHitTarget?: Phaser.GameObjects.Rectangle;
+}
+
+function renderTownRasterStage(scene: Phaser.Scene, context: BootContext): TownRasterControls {
   scene.add.image(960, 540, TOWN_RASTER_UNDERLAY_KEY)
     .setDisplaySize(1920, 1080)
     .setDepth(0);
 
-  renderTownRasterHitTarget(scene, 1010, 642, 330, 66, 0xf5c26b, () => handleSceneAction(scene, context, "confirm"), {
+  const confirmHitTarget = renderTownRasterHitTarget(scene, 1010, 642, 330, 66, 0xf5c26b, () => handleSceneAction(scene, context, "confirm"), {
     hoverKey: TOWN_RASTER_EXPEDITION_ACTION_KEYS.hover,
     downKey: TOWN_RASTER_EXPEDITION_ACTION_KEYS.down,
     hoverX: 1048,
@@ -66,11 +84,45 @@ function renderTownRasterStage(scene: Phaser.Scene, context: BootContext): void 
     hoverAlpha: 0.96,
     downAlpha: 0.88
   });
-  renderTownRasterHitTarget(scene, 1010, 724, 330, 58, 0xce5869, () => resetStoredSave(scene, context));
-  renderTownRasterHitTarget(scene, 1010, 806, 330, 58, 0x6c8fd6, () => scene.scene.start("SettingsScene", context));
+  renderTownRasterHitTarget(scene, 1010, 724, 330, 58, 0xce5869, () => resetStoredSave(scene, context), {
+    hoverKey: "",
+    downKey: ""
+  });
+  renderTownRasterHitTarget(scene, 1010, 806, 330, 58, 0x6c8fd6, () => scene.scene.start("SettingsScene", context), {
+    hoverKey: "",
+    downKey: ""
+  });
 
-  renderTownRasterHitTarget(scene, 1208, 950, 120, 92, 0x6c8fd6, () => scene.scene.start("SettingsScene", context));
-  renderTownRasterHitTarget(scene, 514, 950, 130, 92, 0xce5869, () => resetStoredSave(scene, context));
+  renderTownRasterHitTarget(scene, 1340, 976, 140, 104, 0x6c8fd6, () => scene.scene.start("SettingsScene", context), {
+    hoverKey: TOWN_RASTER_TOOLBAR_SETTINGS_KEYS.hover,
+    downKey: TOWN_RASTER_TOOLBAR_SETTINGS_KEYS.down,
+    hoverX: 1340,
+    hoverY: 976,
+    hoverWidth: 220,
+    hoverHeight: 164,
+    downX: 1340,
+    downY: 976,
+    downWidth: 220,
+    downHeight: 164,
+    hoverAlpha: 0.96,
+    downAlpha: 0.86
+  });
+  renderTownRasterHitTarget(scene, 514, 976, 140, 104, 0xce5869, () => resetStoredSave(scene, context), {
+    hoverKey: TOWN_RASTER_TOOLBAR_RESET_KEYS.hover,
+    downKey: TOWN_RASTER_TOOLBAR_RESET_KEYS.down,
+    hoverX: 514,
+    hoverY: 976,
+    hoverWidth: 230,
+    hoverHeight: 142,
+    downX: 514,
+    downY: 976,
+    downWidth: 230,
+    downHeight: 142,
+    hoverAlpha: 0.96,
+    downAlpha: 0.86
+  });
+
+  return { confirmHitTarget };
 }
 
 function renderTownRasterHitTarget(
@@ -95,9 +147,9 @@ function renderTownRasterHitTarget(
     hoverAlpha?: number;
     downAlpha?: number;
   } = {}
-): void {
+): Phaser.GameObjects.Rectangle {
   const hoverSize = Math.min(104, Math.max(76, Math.min(width, height) * 1.08));
-  renderRasterHoverHitTarget(scene, x, y, width, height, onClick, {
+  return renderRasterHoverHitTarget(scene, x, y, width, height, onClick, {
     hoverKey: options.hoverKey ?? TOWN_RASTER_HOVER_ACTION_KEY,
     downKey: options.downKey ?? TOWN_RASTER_HOVER_ACTION_KEY,
     hoverX: options.hoverX ?? x + width * 0.42,

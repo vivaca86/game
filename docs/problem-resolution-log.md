@@ -1171,3 +1171,24 @@
 - Impact: Those screens could keep passing the broad raster audits while still showing a pasted-on generic seal instead of the visible concept control responding. This made the remaining utility surfaces look less integrated than the Settings pass.
 - Resolution: Added screen-underlay-derived hover/down pairs for the Town expedition arrow, RuneBench action rail, and Result action card. RuneBench's lower confirm button and Result's lower return button also received first-pass button-specific hover/down assets. `TownScene`, `RuneBenchScene`, and `ResultScene` now map the representative targets to those keys, `tools/phaser-smoke-test.mjs` expects the new keys, and `tmp/ui-raster-hover-audit.mjs` now verifies the expected hover key for every audited scene.
 - Prevention: Broad hover audits must verify exact texture keys, not only absence of vector/text overlays. Any representative control still using a shared state family should remain in the open scope until it has source crop, in-scene hover screenshot, and in-scene down screenshot evidence.
+
+### Problem: Town lower toolbar controls still used generic or mis-anchored state feedback
+
+- Cause: Town raster mode preserved legacy reset/settings coordinates for smoke-covered flows and added lower toolbar affordances, but the lower affordances still inherited the broad action-seal fallback. Crop review also showed the settings lower hit target sat near the scroll tile rather than the visible gear tile.
+- Impact: The Town screen could technically respond to input while still failing the concept-state standard: the visible toolbar controls did not brighten/darken as their own material, and central legacy hover feedback risked putting a shared seal over ambiguous town buildings/background material.
+- Resolution: Added `ui_hover_town_toolbar_reset_concept`, `ui_down_town_toolbar_reset_concept`, `ui_hover_town_toolbar_settings_concept`, and `ui_down_town_toolbar_settings_concept`, all cropped from `town_raster_underlay_concept_v001.png`. `TownScene` now anchors the lower reset/backpack target at `514,976` and the lower settings/gear target at `1340,976`. The central legacy reset/settings coordinates keep their click behavior but no longer show shared action-seal hover/down art.
+- Prevention: Do source-crop review before turning a hit target into state art. If a coordinate does not map to a clear visible control, preserve behavior separately and document the UX debt instead of inventing a state surface from background art.
+
+### Problem: RuneBench and Result lower button state art lacked dedicated evidence
+
+- Cause: RuneBench's lower confirm button and Result's lower return button had button-specific hover/down assets wired, but the broad 10-screen audits only checked the representative legacy/action coordinates. The lower visible buttons therefore had no dedicated screenshot/audit proof.
+- Impact: The UI could appear more complete than the evidence supported. A button-specific asset can still be misaligned, oversized, or masked poorly even if the representative scene audit passes.
+- Resolution: Added `tmp/runebench-result-lower-button-state-audit.mjs` to verify RuneBench lower confirm and Result lower return hover/down states directly. The audit checks exact texture keys, absence of the shared action seal, absence of Phaser text, and absence of visible rectangles above the raster underlay. Focused screenshot crops confirmed both buttons brighten/darken on their own concept button surfaces.
+- Prevention: Any first-pass secondary button state should receive its own hover/down screenshot evidence before it is treated as a covered utility target.
+
+### Problem: Keyboard confirm had no visible raster material feedback on utility screens
+
+- Cause: Town, RuneBench, and Result had pointer hover/down raster state art, but their keyboard `confirm` path used `bindKeyboardActions` to run the scene action immediately. That meant Enter/Space could advance the scene without ever showing the same material response.
+- Impact: Keyboard users had weaker feedback than pointer users, and the selected/focus scope could be overstated because the UI had state art but not keyboard-triggered state evidence.
+- Resolution: `renderRasterHoverHitTarget` now stores its existing down/idle callbacks on the hit target, and `triggerRasterHitTargetDown` can briefly show that down bitmap before completing the action. Town, RuneBench, and Result use this for keyboard confirm on their current primary raster confirm targets. `tmp/keyboard-confirm-raster-state-audit.mjs` verifies exact down keys, no text, no visible rectangles, and continued scene flow.
+- Prevention: Keyboard focus work should reuse existing concept-raster state art where possible and include a screenshot/audit that proves the keyboard path, not only pointer hover/down.

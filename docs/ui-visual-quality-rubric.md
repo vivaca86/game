@@ -2570,6 +2570,109 @@ This checkpoint removes the shared action-seal family from the audited Town, Run
 
 This is still not full utility-control approval. Secondary and legacy hit targets across Town/RuneBench/Result still need a deeper pass, selected/focus and disabled states remain incomplete, mobile/responsive review is not complete, broad Phaser smoke is still `Needs verification`, and there is no user acceptance or final concept-match approval.
 
+## Town Lower Toolbar State Checkpoint
+
+Date: 2026-06-08
+
+Evidence:
+
+- `assets/source/ui/ui_hover_town_toolbar_reset_concept_v001.png`
+- `assets/source/ui/ui_down_town_toolbar_reset_concept_v001.png`
+- `assets/source/ui/ui_hover_town_toolbar_settings_concept_v001.png`
+- `assets/source/ui/ui_down_town_toolbar_settings_concept_v001.png`
+- `public/assets/runtime/ui/ui_hover_town_toolbar_reset_concept_v001.png`
+- `public/assets/runtime/ui/ui_down_town_toolbar_reset_concept_v001.png`
+- `public/assets/runtime/ui/ui_hover_town_toolbar_settings_concept_v001.png`
+- `public/assets/runtime/ui/ui_down_town_toolbar_settings_concept_v001.png`
+- `src/phaser/scenes/TownScene.ts`
+- `tools/extract-ui-state-assets.mjs`
+- `tools/generate-dev-runtime-assets.mjs`
+- `tmp/town-raster-toolbar-state-audit.mjs`
+- `tmp/ui-quality/town-toolbar/toolbar-reset-hover-v1-1920.png`
+- `tmp/ui-quality/town-toolbar/toolbar-reset-down-v1-1920.png`
+- `tmp/ui-quality/town-toolbar/toolbar-settings-hover-v1-1920.png`
+- `tmp/ui-quality/town-toolbar/toolbar-settings-down-v1-1920.png`
+- Town toolbar audit verifies the lower reset/backpack and settings/gear controls show exactly one expected Town-specific hover/down image, no shared action-seal image, no Phaser text, and no visible rectangles above the raster underlay
+- Town toolbar audit also verifies the ambiguous central legacy reset/settings coordinates no longer show the shared action seal
+- `node tools\extract-ui-state-assets.mjs`
+- `npm.cmd run assets:generate:dev`
+- `node tmp\town-raster-toolbar-state-audit.mjs`
+- `node tmp\ui-raster-hover-audit.mjs`
+- `node tmp\ui-raster-down-audit.mjs`
+- `npm.cmd run check`
+- `git diff --check`
+
+Current status: `Needs user review`
+
+Completion level: `Partially complete`
+
+This checkpoint improves Town secondary utility feedback without inventing a new visual direction. The lower backpack/reset and gear/settings toolbar controls now brighten/darken as their own concept-underlay tiles. The settings toolbar hit target is re-anchored to the visible gear tile at `1340,976`, and the reset toolbar target is aligned to the visible backpack tile at `514,976`.
+
+The central legacy reset/settings hit targets at `1010,724` and `1010,806` still preserve behavior for existing flows, but they no longer show the shared action seal because crop review showed they sit over ambiguous town building/background material instead of one clear control. This remains a UX/architecture follow-up, not a final Town-control approval.
+
+## RuneBench Result Lower Button State Evidence Checkpoint
+
+Date: 2026-06-08
+
+Evidence:
+
+- `src/phaser/scenes/RuneBenchScene.ts`
+- `src/phaser/scenes/ResultScene.ts`
+- `assets/source/ui/ui_hover_runebench_confirm_button_concept_v001.png`
+- `assets/source/ui/ui_down_runebench_confirm_button_concept_v001.png`
+- `assets/source/ui/ui_hover_result_return_button_concept_v001.png`
+- `assets/source/ui/ui_down_result_return_button_concept_v001.png`
+- `tmp/runebench-result-lower-button-state-audit.mjs`
+- `tmp/ui-quality/lower-buttons/runebench-confirm-hover-v1-1920.png`
+- `tmp/ui-quality/lower-buttons/runebench-confirm-down-v1-1920.png`
+- `tmp/ui-quality/lower-buttons/result-return-hover-v1-1920.png`
+- `tmp/ui-quality/lower-buttons/result-return-down-v1-1920.png`
+- `tmp/ui-quality/lower-buttons/crops/runebench-confirm-hover-crop.png`
+- `tmp/ui-quality/lower-buttons/crops/runebench-confirm-down-crop.png`
+- `tmp/ui-quality/lower-buttons/crops/result-return-hover-crop.png`
+- `tmp/ui-quality/lower-buttons/crops/result-return-down-crop.png`
+- RuneBench/Result lower button audit verifies exactly one expected button-specific hover/down image, no shared action-seal image, no Phaser text, and no visible rectangles above each raster underlay
+- `node tmp\runebench-result-lower-button-state-audit.mjs`
+
+Current status: `Needs user review`
+
+Completion level: `Partially complete`
+
+This checkpoint does not add new art direction. It proves the already wired RuneBench lower confirm and Result lower return button-specific state art is aligned well enough to count as current evidence: RuneBench's green check tile brightens/darkens on its own surface, and Result's wide bottom return panel brightens/darkens as a full concept button.
+
+This is still not final utility-state approval. Remaining scope includes selected/focus, keyboard focus, broader disabled coverage, dynamic labels/tooltips, mobile/responsive review, broad Phaser smoke completion, user acceptance, and final concept-match approval.
+
+## Keyboard Confirm Raster Feedback Checkpoint
+
+Date: 2026-06-08
+
+Evidence:
+
+- `src/phaser/view/sceneShell.ts`
+- `src/phaser/scenes/TownScene.ts`
+- `src/phaser/scenes/RuneBenchScene.ts`
+- `src/phaser/scenes/ResultScene.ts`
+- `tmp/keyboard-confirm-raster-state-audit.mjs`
+- `tmp/ui-quality/keyboard-confirm/town-keyboard-confirm-down-v1-1920.png`
+- `tmp/ui-quality/keyboard-confirm/runebench-keyboard-confirm-down-v1-1920.png`
+- `tmp/ui-quality/keyboard-confirm/result-keyboard-confirm-down-v1-1920.png`
+- Keyboard confirm audit verifies exactly one expected concept-derived down image, no Phaser text, and no visible rectangles above the raster underlay for Town, RuneBench, and Result
+- `node tmp\keyboard-confirm-raster-state-audit.mjs`
+- `node tmp\town-raster-toolbar-state-audit.mjs`
+- `node tmp\runebench-result-lower-button-state-audit.mjs`
+- `node tmp\ui-raster-hover-audit.mjs`
+- `node tmp\ui-raster-down-audit.mjs`
+- `npm.cmd run check`
+- `git diff --check`
+
+Current status: `Needs user review`
+
+Completion level: `Partially complete`
+
+This checkpoint reuses existing concept-derived pressed art for keyboard confirm instead of adding a new procedural focus ring. Enter/confirm now briefly shows the primary raster down state before the existing action advances on Town, RuneBench, and Result. This makes keyboard activation feedback closer to pointer feedback for those utility screens.
+
+This is not broad keyboard focus completion. Reward/Event/Combat/Boss/Dungeon/Settings keyboard focus and selected/focus state art still need separate evidence, and broad disabled coverage, dynamic labels/tooltips, mobile/responsive review, broad Phaser smoke completion, user acceptance, and final concept-match approval remain unfinished.
+
 ## Current Remaining Raster-Quality Scope
 
 Status: `Not complete`
@@ -2580,7 +2683,7 @@ The active goal still remains open. The immediate first-view raster concept-unde
 - Combat, Boss, WorldMap, Dungeon, Reward, Event, Town, RuneBench, and Result now have first bitmap hover-state passes on representative controls; Settings has full current-control hover coverage for its ten major raster hit targets.
 - All ten primary raster concept screens now have a bitmap pressed/down-state candidate on their audited hit targets, and those audited targets now use control-family concept bitmaps instead of the shared pressed-stamp fallback. This is still not final screen-specific pressed art across the full UI.
 - Settings now has full current-control hover coverage and pressed coverage for its ten major raster hit targets. Return-to-town, reset-save, reset-defaults, volume sliders, display-mode, large-text, reduced-motion, and space-confirm are anchored to their visible concept controls with button/panel/row-specific hover/down art. Its selected, disabled, keyboard focus, and dynamic readability states still need a full per-control pass.
-- Town, RuneBench, and Result audited representative utility controls now use screen-specific hover/down raster art instead of the shared action-seal family. Their secondary/legacy utility hit targets and selected/focus/disabled states still need deeper review.
+- Town, RuneBench, and Result audited representative utility controls now use screen-specific hover/down raster art instead of the shared action-seal family. Town's lower backpack/reset and gear/settings toolbar controls, RuneBench's lower confirm button, and Result's lower return button also have dedicated hover/down evidence. Town/RuneBench/Result keyboard confirm now has first raster down-state evidence. The ambiguous central Town legacy reset/settings coordinates keep click behavior without shared seal feedback. Town legacy UX decisions and selected/focus/disabled states still need deeper review.
 - Event now has a first visible bitmap disabled-state candidate for the release unaffordable choice, verified with a 1920 debugless audit and smoke; disabled coverage is still not broad across every scene/control.
 - WorldMap no longer has the hidden center confirm target; primary action is now verified on the visible bottom-right play button, that button has first-pass hover/down art cropped from the original WorldMap concept, the current stage now has a runtime-driven marker plus cleaned concept-derived current halo plus lower current-status badge, node hover uses the cleaned halo instead of a detached route token, arrow keys can select the nearest unlocked node by concept-map direction, and completed/locked/sealed stages now have first-pass runtime raster badges. The runtime underlay now neutralizes the strongest baked 1-3 completed checks, lower 1-5 node body colors, stage-4 cyan state colors, the main remaining stage-4 and 4-to-5 route remnants, and sampled old red lock centers. Red-lock placement is source-aligned for stages 10-15, late-route completed checks are smaller, stage 6/7 completed badges sit closer to their node bases, stage 8 is treated as a quieter route-point marker, and gray seals now emphasize only the next lower/mid locked node. This is still not full current/selected/completed/locked-state recomposition: baked route/node geometry remains, lower-node baked silhouettes are only reduced rather than fully recomposed, later stage variants are not complete, and broader keyboard focus, dynamic labels, accessibility-safe tooltips, mobile/responsive review, and user acceptance remain unfinished.
 - Combat and Boss now have concept-source-derived raster effect candidates on their raster paths. The Boss stage cue was corrected from a shield-like source to a component-sheet gold starburst source, but effect timing, target-specific placement across all effects, animation readability, and final Boss phase/effect communication are still not final.

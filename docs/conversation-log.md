@@ -1774,3 +1774,37 @@ The asset pipeline, manifests, release preload allowlist, 10-screen hover audit,
 Verification passed with `node tools\extract-ui-state-assets.mjs`, `npm.cmd run assets:generate:dev`, `node tmp\ui-raster-hover-audit.mjs`, `node tmp\ui-raster-down-audit.mjs`, `npm.cmd run check`, and `git diff --check`. Screenshot review used `tmp/ui-quality/town-hover-no-vector-v1-1920.png`, `tmp/ui-quality/down/town-down-pressed-v1-1920.png`, `tmp/ui-quality/runebench-hover-no-vector-v1-1920.png`, `tmp/ui-quality/down/runebench-down-pressed-v1-1920.png`, `tmp/ui-quality/result-hover-no-vector-v1-1920.png`, and `tmp/ui-quality/down/result-down-pressed-v1-1920.png`.
 
 This is still partial UI progress. Secondary/legacy Town/RuneBench/Result hit targets, selected/focus states, broad disabled coverage, mobile/responsive review, dynamic labels/tooltips, accessibility-safe text, broad Phaser smoke completion, user acceptance, and final concept-match approval remain unfinished.
+
+### Codex
+
+Codex continued the active UI quality goal by narrowing the next Town pass to evidence-backed controls only. Source crop review showed the central legacy reset/settings coordinates at `1010,724` and `1010,806` cover town buildings and background material rather than a single clear control, while the lower toolbar backpack and gear tiles are visible button surfaces.
+
+Codex added Town lower-toolbar hover/down assets cropped from `town_raster_underlay_concept_v001.png`: `ui_hover_town_toolbar_reset_concept`, `ui_down_town_toolbar_reset_concept`, `ui_hover_town_toolbar_settings_concept`, and `ui_down_town_toolbar_settings_concept`. `TownScene` now maps the lower reset/backpack and settings/gear targets to those button-specific assets. The gear target was moved from the old `1208,950` scroll-adjacent coordinate to the visible gear tile center at `1340,976`; the backpack reset target was re-anchored at `514,976`.
+
+The same pass intentionally removed visual shared action-seal feedback from the central legacy reset/settings coordinates while preserving their click behavior for existing smoke-covered flows. This avoids inventing new art from ambiguous building/background crops and leaves the UX decision documented instead of hiding it behind a pasted-on generic seal.
+
+Codex added `tmp/town-raster-toolbar-state-audit.mjs`. It verifies the lower toolbar reset/settings hover/down states show exactly one expected Town-specific state image, no shared `ui_hover_action_seal_concept`, no Phaser text, and no visible rectangles above the underlay. It also verifies the two central legacy coordinates no longer leak the shared action seal.
+
+Verification passed with `node tools\extract-ui-state-assets.mjs`, `npm.cmd run assets:generate:dev`, `node tmp\town-raster-toolbar-state-audit.mjs`, `node tmp\ui-raster-hover-audit.mjs`, `node tmp\ui-raster-down-audit.mjs`, `npm.cmd run check`, and `git diff --check`. Screenshot review used `tmp/ui-quality/town-toolbar/toolbar-reset-hover-v1-1920.png`, `tmp/ui-quality/town-toolbar/toolbar-reset-down-v1-1920.png`, `tmp/ui-quality/town-toolbar/toolbar-settings-hover-v1-1920.png`, and `tmp/ui-quality/town-toolbar/toolbar-settings-down-v1-1920.png`. This is still partial UI progress: RuneBench/Result secondary targets, selected/focus states, broad disabled coverage, mobile/responsive review, dynamic labels/tooltips, broad Phaser smoke completion, user acceptance, and final concept-match approval remain unfinished.
+
+### Codex
+
+Codex continued the same evidence-backed utility-state pass by checking the RuneBench and Result lower visible buttons that already had first-pass button-specific state art wired. This was a verification/alignment pass, not a new art-direction pass.
+
+Codex added `tmp/runebench-result-lower-button-state-audit.mjs`. It opens `RuneBenchScene` and `ResultScene` in raster mode, hovers and presses the lower visible confirm/return buttons, captures screenshots, and verifies exactly one expected button-specific hover/down image, no shared `ui_hover_action_seal_concept`, no Phaser text, and no visible rectangle overlays above the concept underlay.
+
+Verification passed with `node tmp\runebench-result-lower-button-state-audit.mjs`. Screenshot review used the full captures and focused crops: `tmp/ui-quality/lower-buttons/runebench-confirm-hover-v1-1920.png`, `tmp/ui-quality/lower-buttons/runebench-confirm-down-v1-1920.png`, `tmp/ui-quality/lower-buttons/result-return-hover-v1-1920.png`, `tmp/ui-quality/lower-buttons/result-return-down-v1-1920.png`, plus `tmp/ui-quality/lower-buttons/crops/runebench-confirm-hover-crop.png`, `tmp/ui-quality/lower-buttons/crops/runebench-confirm-down-crop.png`, `tmp/ui-quality/lower-buttons/crops/result-return-hover-crop.png`, and `tmp/ui-quality/lower-buttons/crops/result-return-down-crop.png`.
+
+The visual review found no coordinate correction needed: RuneBench's lower green check button brightens/darkens on its own tile, and Result's bottom return panel brightens/darkens as a full concept button. This remains partial UI progress: selected/focus states, broad disabled coverage, mobile/responsive review, dynamic labels/tooltips, broad Phaser smoke completion, user acceptance, and final concept-match approval remain unfinished.
+
+### Codex
+
+Codex continued into the documented selected/focus gap without introducing a new focus-ring style. Code inspection showed raster scenes used `bindKeyboardActions` to run confirm immediately, so keyboard confirm had no visible material feedback even though pointer down state art existed.
+
+Codex added a small raster hit-target activation helper in `src/phaser/view/sceneShell.ts`. `renderRasterHoverHitTarget` now stores its existing `showDown`/`showIdle` callbacks on the hit target, and `triggerRasterHitTargetDown` can briefly show the same down bitmap before running the existing action. `TownScene`, `RuneBenchScene`, and `ResultScene` now use this only for keyboard `confirm` on their current primary raster confirm targets: Town expedition arrow, RuneBench action rail, and Result action card.
+
+Codex added `tmp/keyboard-confirm-raster-state-audit.mjs`. The audit presses Enter on Town, RuneBench, and Result, verifies one expected down-state image, no Phaser text, and no visible rectangle overlays above the raster underlay, then confirms the existing flow still advances. The audit pauses the Phaser scene clock only while capturing screenshots so Playwright does not miss the short down-state frame.
+
+Verification passed with `node tmp\keyboard-confirm-raster-state-audit.mjs`, `node tmp\town-raster-toolbar-state-audit.mjs`, `node tmp\runebench-result-lower-button-state-audit.mjs`, `node tmp\ui-raster-hover-audit.mjs`, `node tmp\ui-raster-down-audit.mjs`, `npm.cmd run check`, and `git diff --check`. Screenshot evidence includes `tmp/ui-quality/keyboard-confirm/town-keyboard-confirm-down-v1-1920.png`, `tmp/ui-quality/keyboard-confirm/runebench-keyboard-confirm-down-v1-1920.png`, and `tmp/ui-quality/keyboard-confirm/result-keyboard-confirm-down-v1-1920.png`.
+
+This is a first keyboard-confirm feedback checkpoint, not broad focus completion. WorldMap directional selection already has its own evidence, but Reward/Event/Combat/Boss/Dungeon/Settings keyboard focus/selected behavior, broad disabled coverage, mobile/responsive review, dynamic labels/tooltips, broad Phaser smoke completion, user acceptance, and final concept-match approval remain unfinished.
