@@ -11,6 +11,14 @@ import { renderActionButton, renderPaperPanel, renderRasterHoverHitTarget, rende
 
 const RUNE_BENCH_RASTER_UNDERLAY_KEY = "rune_bench_raster_underlay_concept";
 const RUNE_BENCH_RASTER_HOVER_ACTION_KEY = "ui_hover_action_seal_concept";
+const RUNE_BENCH_RASTER_ACTION_RAIL_KEYS = {
+  hover: "ui_hover_runebench_action_rail_concept",
+  down: "ui_down_runebench_action_rail_concept"
+};
+const RUNE_BENCH_RASTER_CONFIRM_BUTTON_KEYS = {
+  hover: "ui_hover_runebench_confirm_button_concept",
+  down: "ui_down_runebench_confirm_button_concept"
+};
 
 export class RuneBenchScene extends Phaser.Scene {
   constructor() {
@@ -50,8 +58,34 @@ function renderRuneBenchRasterStage(scene: Phaser.Scene, context: BootContext): 
     .setDisplaySize(1920, 1080)
     .setDepth(0);
 
-  renderRuneBenchRasterHitTarget(scene, 1010, 742, 330, 66, 0xf5c26b, () => handleSceneAction(scene, context, "confirm"));
-  renderRuneBenchRasterHitTarget(scene, 1660, 984, 250, 102, 0x5eead4, () => handleSceneAction(scene, context, "confirm"));
+  renderRuneBenchRasterHitTarget(scene, 1010, 742, 330, 66, 0xf5c26b, () => handleSceneAction(scene, context, "confirm"), {
+    hoverKey: RUNE_BENCH_RASTER_ACTION_RAIL_KEYS.hover,
+    downKey: RUNE_BENCH_RASTER_ACTION_RAIL_KEYS.down,
+    hoverX: 1062,
+    hoverY: 714,
+    hoverWidth: 540,
+    hoverHeight: 112,
+    downX: 1062,
+    downY: 714,
+    downWidth: 540,
+    downHeight: 112,
+    hoverAlpha: 0.92,
+    downAlpha: 0.84
+  });
+  renderRuneBenchRasterHitTarget(scene, 1660, 984, 250, 102, 0x5eead4, () => handleSceneAction(scene, context, "confirm"), {
+    hoverKey: RUNE_BENCH_RASTER_CONFIRM_BUTTON_KEYS.hover,
+    downKey: RUNE_BENCH_RASTER_CONFIRM_BUTTON_KEYS.down,
+    hoverX: 1644,
+    hoverY: 968,
+    hoverWidth: 330,
+    hoverHeight: 122,
+    downX: 1644,
+    downY: 968,
+    downWidth: 330,
+    downHeight: 122,
+    hoverAlpha: 0.96,
+    downAlpha: 0.88
+  });
 }
 
 function renderRuneBenchRasterHitTarget(
@@ -61,21 +95,36 @@ function renderRuneBenchRasterHitTarget(
   width: number,
   height: number,
   _accent: number,
-  onClick: () => void
+  onClick: () => void,
+  options: {
+    hoverKey?: string;
+    downKey?: string;
+    hoverX?: number;
+    hoverY?: number;
+    downX?: number;
+    downY?: number;
+    hoverWidth?: number;
+    hoverHeight?: number;
+    downWidth?: number;
+    downHeight?: number;
+    hoverAlpha?: number;
+    downAlpha?: number;
+  } = {}
 ): void {
   const hoverSize = Math.min(108, Math.max(80, Math.min(width, height) * 1.12));
   renderRasterHoverHitTarget(scene, x, y, width, height, onClick, {
-    hoverKey: RUNE_BENCH_RASTER_HOVER_ACTION_KEY,
-    downKey: RUNE_BENCH_RASTER_HOVER_ACTION_KEY,
-    hoverX: x + width * 0.38,
-    hoverY: y - height * 0.24,
-    hoverWidth: hoverSize,
-    hoverHeight: hoverSize,
-    downX: x + width * 0.38,
-    downY: y - height * 0.24,
-    downWidth: hoverSize * 1.12,
-    downHeight: hoverSize * 1.12,
-    downAlpha: 0.76
+    hoverKey: options.hoverKey ?? RUNE_BENCH_RASTER_HOVER_ACTION_KEY,
+    downKey: options.downKey ?? RUNE_BENCH_RASTER_HOVER_ACTION_KEY,
+    hoverX: options.hoverX ?? x + width * 0.38,
+    hoverY: options.hoverY ?? y - height * 0.24,
+    hoverWidth: options.hoverWidth ?? hoverSize,
+    hoverHeight: options.hoverHeight ?? hoverSize,
+    downX: options.downX ?? x + width * 0.38,
+    downY: options.downY ?? y - height * 0.24,
+    downWidth: options.downWidth ?? hoverSize * 1.12,
+    downHeight: options.downHeight ?? hoverSize * 1.12,
+    hoverAlpha: options.hoverAlpha,
+    downAlpha: options.downAlpha ?? 0.76
   });
 }
 

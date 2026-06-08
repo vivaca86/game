@@ -37,15 +37,15 @@ async function startServer() {
 
 const defaultDownKey = "ui_down_pressed_stamp_concept";
 const targets = [
-  { sceneName: "TownScene", underlay: "town_raster_underlay_concept", pathname: "/?debug=1&entry=town&resetSave=1", downX: 1010, downY: 642, downKey: "ui_hover_action_seal_concept" },
+  { sceneName: "TownScene", underlay: "town_raster_underlay_concept", pathname: "/?debug=1&entry=town&resetSave=1", downX: 1010, downY: 642, downKey: "ui_down_town_expedition_action_concept" },
   { sceneName: "WorldMapScene", underlay: "world_map_raster_underlay_concept", pathname: "/?debug=1&entry=world_map&resetSave=1", downX: 1576, downY: 970, downKey: "ui_down_world_map_play_button_concept" },
   { sceneName: "DungeonScene", underlay: "dungeon_raster_underlay_concept", pathname: "/?debug=1&entry=dungeon&resetSave=1", downX: 1010, downY: 582, downKey: "ui_hover_route_node_concept" },
   { sceneName: "CombatScene", underlay: "combat_raster_underlay_concept", pathname: "/?debug=1&entry=combat&resetSave=1", downX: 540, downY: 836, downKey: "ui_hover_gold_seal_concept" },
   { sceneName: "RewardScene", underlay: "reward_raster_underlay_concept", pathname: "/?debug=1&entry=reward&resetSave=1", downX: 630, downY: 618, downKey: "ui_hover_choice_badge_concept" },
   { sceneName: "EventScene", underlay: "event_raster_underlay_concept", pathname: "/?debug=1&entry=event&resetSave=1", downX: 618, downY: 722, downKey: "ui_hover_choice_badge_concept" },
-  { sceneName: "RuneBenchScene", underlay: "rune_bench_raster_underlay_concept", pathname: "/?debug=1&entry=rune_bench&resetSave=1&grantRune=rune_paper_spark", downX: 1010, downY: 742, downKey: "ui_hover_action_seal_concept" },
+  { sceneName: "RuneBenchScene", underlay: "rune_bench_raster_underlay_concept", pathname: "/?debug=1&entry=rune_bench&resetSave=1&grantRune=rune_paper_spark", downX: 1010, downY: 742, downKey: "ui_down_runebench_action_rail_concept" },
   { sceneName: "BossScene", underlay: "boss_raster_underlay_concept", pathname: "/?debug=1&entry=boss&resetSave=1", downX: 1718, downY: 930, downKey: "ui_hover_boss_skull_stamp_concept" },
-  { sceneName: "ResultScene", underlay: "result_raster_underlay_concept", pathname: "/?debug=1&entry=result&resetSave=1", downX: 1010, downY: 742, downKey: "ui_hover_action_seal_concept" },
+  { sceneName: "ResultScene", underlay: "result_raster_underlay_concept", pathname: "/?debug=1&entry=result&resetSave=1", downX: 1010, downY: 742, downKey: "ui_down_result_action_card_concept" },
   {
     sceneName: "SettingsScene",
     underlay: "settings_raster_underlay_concept",

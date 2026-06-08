@@ -10,6 +10,10 @@ import { renderActionButton, renderPaperPanel, renderRasterHoverHitTarget, rende
 
 const TOWN_RASTER_UNDERLAY_KEY = "town_raster_underlay_concept";
 const TOWN_RASTER_HOVER_ACTION_KEY = "ui_hover_action_seal_concept";
+const TOWN_RASTER_EXPEDITION_ACTION_KEYS = {
+  hover: "ui_hover_town_expedition_action_concept",
+  down: "ui_down_town_expedition_action_concept"
+};
 
 export class TownScene extends Phaser.Scene {
   constructor() {
@@ -48,7 +52,20 @@ function renderTownRasterStage(scene: Phaser.Scene, context: BootContext): void 
     .setDisplaySize(1920, 1080)
     .setDepth(0);
 
-  renderTownRasterHitTarget(scene, 1010, 642, 330, 66, 0xf5c26b, () => handleSceneAction(scene, context, "confirm"));
+  renderTownRasterHitTarget(scene, 1010, 642, 330, 66, 0xf5c26b, () => handleSceneAction(scene, context, "confirm"), {
+    hoverKey: TOWN_RASTER_EXPEDITION_ACTION_KEYS.hover,
+    downKey: TOWN_RASTER_EXPEDITION_ACTION_KEYS.down,
+    hoverX: 1048,
+    hoverY: 643,
+    hoverWidth: 160,
+    hoverHeight: 154,
+    downX: 1048,
+    downY: 643,
+    downWidth: 160,
+    downHeight: 154,
+    hoverAlpha: 0.96,
+    downAlpha: 0.88
+  });
   renderTownRasterHitTarget(scene, 1010, 724, 330, 58, 0xce5869, () => resetStoredSave(scene, context));
   renderTownRasterHitTarget(scene, 1010, 806, 330, 58, 0x6c8fd6, () => scene.scene.start("SettingsScene", context));
 
@@ -63,21 +80,36 @@ function renderTownRasterHitTarget(
   width: number,
   height: number,
   _accent: number,
-  onClick: () => void
+  onClick: () => void,
+  options: {
+    hoverKey?: string;
+    downKey?: string;
+    hoverX?: number;
+    hoverY?: number;
+    downX?: number;
+    downY?: number;
+    hoverWidth?: number;
+    hoverHeight?: number;
+    downWidth?: number;
+    downHeight?: number;
+    hoverAlpha?: number;
+    downAlpha?: number;
+  } = {}
 ): void {
   const hoverSize = Math.min(104, Math.max(76, Math.min(width, height) * 1.08));
   renderRasterHoverHitTarget(scene, x, y, width, height, onClick, {
-    hoverKey: TOWN_RASTER_HOVER_ACTION_KEY,
-    downKey: TOWN_RASTER_HOVER_ACTION_KEY,
-    hoverX: x + width * 0.42,
-    hoverY: y - height * 0.28,
-    hoverWidth: hoverSize,
-    hoverHeight: hoverSize,
-    downX: x + width * 0.42,
-    downY: y - height * 0.28,
-    downWidth: hoverSize * 1.12,
-    downHeight: hoverSize * 1.12,
-    downAlpha: 0.76
+    hoverKey: options.hoverKey ?? TOWN_RASTER_HOVER_ACTION_KEY,
+    downKey: options.downKey ?? TOWN_RASTER_HOVER_ACTION_KEY,
+    hoverX: options.hoverX ?? x + width * 0.42,
+    hoverY: options.hoverY ?? y - height * 0.28,
+    hoverWidth: options.hoverWidth ?? hoverSize,
+    hoverHeight: options.hoverHeight ?? hoverSize,
+    downX: options.downX ?? x + width * 0.42,
+    downY: options.downY ?? y - height * 0.28,
+    downWidth: options.downWidth ?? hoverSize * 1.12,
+    downHeight: options.downHeight ?? hoverSize * 1.12,
+    hoverAlpha: options.hoverAlpha,
+    downAlpha: options.downAlpha ?? 0.76
   });
 }
 

@@ -11,6 +11,14 @@ import { renderActionButton, renderPaperPanel, renderRasterHoverHitTarget, rende
 type ResultTone = "clear" | "defeat" | "return";
 const RESULT_RASTER_UNDERLAY_KEY = "result_raster_underlay_concept";
 const RESULT_RASTER_HOVER_ACTION_KEY = "ui_hover_action_seal_concept";
+const RESULT_RASTER_ACTION_CARD_KEYS = {
+  hover: "ui_hover_result_action_card_concept",
+  down: "ui_down_result_action_card_concept"
+};
+const RESULT_RASTER_RETURN_BUTTON_KEYS = {
+  hover: "ui_hover_result_return_button_concept",
+  down: "ui_down_result_return_button_concept"
+};
 
 export class ResultScene extends Phaser.Scene {
   constructor() {
@@ -49,8 +57,34 @@ function renderResultRasterStage(scene: Phaser.Scene, context: BootContext): voi
     .setDisplaySize(1920, 1080)
     .setDepth(0);
 
-  renderResultRasterHitTarget(scene, 1010, 742, 330, 66, 0xf5c26b, () => handleSceneAction(scene, context, "confirm"));
-  renderResultRasterHitTarget(scene, 960, 944, 440, 120, 0x5eead4, () => handleSceneAction(scene, context, "confirm"));
+  renderResultRasterHitTarget(scene, 1010, 742, 330, 66, 0xf5c26b, () => handleSceneAction(scene, context, "confirm"), {
+    hoverKey: RESULT_RASTER_ACTION_CARD_KEYS.hover,
+    downKey: RESULT_RASTER_ACTION_CARD_KEYS.down,
+    hoverX: 1170,
+    hoverY: 704,
+    hoverWidth: 300,
+    hoverHeight: 128,
+    downX: 1170,
+    downY: 704,
+    downWidth: 300,
+    downHeight: 128,
+    hoverAlpha: 0.94,
+    downAlpha: 0.84
+  });
+  renderResultRasterHitTarget(scene, 960, 944, 440, 120, 0x5eead4, () => handleSceneAction(scene, context, "confirm"), {
+    hoverKey: RESULT_RASTER_RETURN_BUTTON_KEYS.hover,
+    downKey: RESULT_RASTER_RETURN_BUTTON_KEYS.down,
+    hoverX: 960,
+    hoverY: 940,
+    hoverWidth: 440,
+    hoverHeight: 146,
+    downX: 960,
+    downY: 940,
+    downWidth: 440,
+    downHeight: 146,
+    hoverAlpha: 0.96,
+    downAlpha: 0.88
+  });
 }
 
 function renderResultRasterHitTarget(
@@ -60,21 +94,36 @@ function renderResultRasterHitTarget(
   width: number,
   height: number,
   _accent: number,
-  onClick: () => void
+  onClick: () => void,
+  options: {
+    hoverKey?: string;
+    downKey?: string;
+    hoverX?: number;
+    hoverY?: number;
+    downX?: number;
+    downY?: number;
+    hoverWidth?: number;
+    hoverHeight?: number;
+    downWidth?: number;
+    downHeight?: number;
+    hoverAlpha?: number;
+    downAlpha?: number;
+  } = {}
 ): void {
   const hoverSize = Math.min(108, Math.max(80, Math.min(width, height) * 1.12));
   renderRasterHoverHitTarget(scene, x, y, width, height, onClick, {
-    hoverKey: RESULT_RASTER_HOVER_ACTION_KEY,
-    downKey: RESULT_RASTER_HOVER_ACTION_KEY,
-    hoverX: x + width * 0.38,
-    hoverY: y - height * 0.24,
-    hoverWidth: hoverSize,
-    hoverHeight: hoverSize,
-    downX: x + width * 0.38,
-    downY: y - height * 0.24,
-    downWidth: hoverSize * 1.12,
-    downHeight: hoverSize * 1.12,
-    downAlpha: 0.76
+    hoverKey: options.hoverKey ?? RESULT_RASTER_HOVER_ACTION_KEY,
+    downKey: options.downKey ?? RESULT_RASTER_HOVER_ACTION_KEY,
+    hoverX: options.hoverX ?? x + width * 0.38,
+    hoverY: options.hoverY ?? y - height * 0.24,
+    hoverWidth: options.hoverWidth ?? hoverSize,
+    hoverHeight: options.hoverHeight ?? hoverSize,
+    downX: options.downX ?? x + width * 0.38,
+    downY: options.downY ?? y - height * 0.24,
+    downWidth: options.downWidth ?? hoverSize * 1.12,
+    downHeight: options.downHeight ?? hoverSize * 1.12,
+    hoverAlpha: options.hoverAlpha,
+    downAlpha: options.downAlpha ?? 0.76
   });
 }
 

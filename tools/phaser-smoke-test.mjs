@@ -421,7 +421,7 @@ async function checkReleaseCatalogMode() {
 
 async function checkClickableControls() {
   await withDebugPage("/?debug=1&entry=town&resetSave=1", "TownScene", async (page) => {
-    await assertHoverUsesRasterImageOnly(page, 1010, 642, "town-action-button", "ui_hover_action_seal_concept", "TownScene");
+    await assertHoverUsesRasterImageOnly(page, 1010, 642, "town-action-button", "ui_hover_town_expedition_action_concept", "TownScene", "ui_down_town_expedition_action_concept");
     await clickScenePoint(page, 1010, 642);
     await waitForDebugValue(page, "phase", "world_map");
 
@@ -459,7 +459,7 @@ async function checkFullInputCoverage() {
   });
 
   await withDebugPage("/?debug=1&entry=rune_bench&resetSave=1&grantRune=rune_paper_spark", "RuneBenchScene", async (page) => {
-    await assertHoverUsesRasterImageOnly(page, 1010, 742, "rune-bench-action", "ui_hover_action_seal_concept", "RuneBenchScene");
+    await assertHoverUsesRasterImageOnly(page, 1010, 742, "rune-bench-action", "ui_hover_runebench_action_rail_concept", "RuneBenchScene", "ui_down_runebench_action_rail_concept");
     await clickScenePoint(page, 1010, 742);
     await waitForDebugValue(page, "phase", "combat");
     await waitForDebugText(page, "equipped=card_sun_jab:rune_paper_spark");
@@ -472,7 +472,7 @@ async function checkFullInputCoverage() {
   });
 
   await withDebugPage("/?debug=1&entry=result&resetSave=1", "ResultScene", async (page) => {
-    await assertHoverUsesRasterImageOnly(page, 1010, 742, "result-confirm", "ui_hover_action_seal_concept", "ResultScene");
+    await assertHoverUsesRasterImageOnly(page, 1010, 742, "result-confirm", "ui_hover_result_action_card_concept", "ResultScene", "ui_down_result_action_card_concept");
     await clickScenePoint(page, 1010, 742);
     await waitForDebugValue(page, "phase", "town");
   });

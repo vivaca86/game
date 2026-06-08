@@ -36,21 +36,22 @@ async function startServer() {
 }
 
 const targets = [
-  { sceneName: "TownScene", underlay: "town_raster_underlay_concept", pathname: "/?debug=1&entry=town&resetSave=1", hoverX: 1010, hoverY: 642 },
-  { sceneName: "WorldMapScene", underlay: "world_map_raster_underlay_concept", pathname: "/?debug=1&entry=world_map&resetSave=1", hoverX: 1576, hoverY: 970 },
-  { sceneName: "DungeonScene", underlay: "dungeon_raster_underlay_concept", pathname: "/?debug=1&entry=dungeon&resetSave=1", hoverX: 1010, hoverY: 582 },
-  { sceneName: "CombatScene", underlay: "combat_raster_underlay_concept", pathname: "/?debug=1&entry=combat&resetSave=1", hoverX: 540, hoverY: 836 },
-  { sceneName: "RewardScene", underlay: "reward_raster_underlay_concept", pathname: "/?debug=1&entry=reward&resetSave=1", hoverX: 630, hoverY: 618 },
-  { sceneName: "EventScene", underlay: "event_raster_underlay_concept", pathname: "/?debug=1&entry=event&resetSave=1", hoverX: 618, hoverY: 722 },
-  { sceneName: "RuneBenchScene", underlay: "rune_bench_raster_underlay_concept", pathname: "/?debug=1&entry=rune_bench&resetSave=1&grantRune=rune_paper_spark", hoverX: 1010, hoverY: 742 },
-  { sceneName: "BossScene", underlay: "boss_raster_underlay_concept", pathname: "/?debug=1&entry=boss&resetSave=1", hoverX: 1718, hoverY: 930 },
-  { sceneName: "ResultScene", underlay: "result_raster_underlay_concept", pathname: "/?debug=1&entry=result&resetSave=1", hoverX: 1010, hoverY: 742 },
+  { sceneName: "TownScene", underlay: "town_raster_underlay_concept", pathname: "/?debug=1&entry=town&resetSave=1", hoverX: 1010, hoverY: 642, hoverKey: "ui_hover_town_expedition_action_concept" },
+  { sceneName: "WorldMapScene", underlay: "world_map_raster_underlay_concept", pathname: "/?debug=1&entry=world_map&resetSave=1", hoverX: 1576, hoverY: 970, hoverKey: "ui_hover_world_map_play_button_concept" },
+  { sceneName: "DungeonScene", underlay: "dungeon_raster_underlay_concept", pathname: "/?debug=1&entry=dungeon&resetSave=1", hoverX: 1010, hoverY: 582, hoverKey: "ui_hover_route_node_concept" },
+  { sceneName: "CombatScene", underlay: "combat_raster_underlay_concept", pathname: "/?debug=1&entry=combat&resetSave=1", hoverX: 540, hoverY: 836, hoverKey: "ui_hover_gold_seal_concept" },
+  { sceneName: "RewardScene", underlay: "reward_raster_underlay_concept", pathname: "/?debug=1&entry=reward&resetSave=1", hoverX: 630, hoverY: 618, hoverKey: "ui_hover_choice_badge_concept" },
+  { sceneName: "EventScene", underlay: "event_raster_underlay_concept", pathname: "/?debug=1&entry=event&resetSave=1", hoverX: 618, hoverY: 722, hoverKey: "ui_hover_choice_badge_concept" },
+  { sceneName: "RuneBenchScene", underlay: "rune_bench_raster_underlay_concept", pathname: "/?debug=1&entry=rune_bench&resetSave=1&grantRune=rune_paper_spark", hoverX: 1010, hoverY: 742, hoverKey: "ui_hover_runebench_action_rail_concept" },
+  { sceneName: "BossScene", underlay: "boss_raster_underlay_concept", pathname: "/?debug=1&entry=boss&resetSave=1", hoverX: 1718, hoverY: 930, hoverKey: "ui_hover_boss_skull_stamp_concept" },
+  { sceneName: "ResultScene", underlay: "result_raster_underlay_concept", pathname: "/?debug=1&entry=result&resetSave=1", hoverX: 1010, hoverY: 742, hoverKey: "ui_hover_result_action_card_concept" },
   {
     sceneName: "SettingsScene",
     underlay: "settings_raster_underlay_concept",
     pathname: "/?debug=1&entry=town&resetSave=1",
     hoverX: 840,
     hoverY: 282,
+    hoverKey: "ui_hover_settings_volume_master_concept",
     setup: async (page) => {
       const canvas = page.locator("canvas");
       const box = await canvas.boundingBox();
@@ -88,7 +89,7 @@ try {
   const page = await browser.newPage({ viewport: { width: 1920, height: 1080 }, deviceScaleFactor: 1 });
   const results = [];
 
-  for (const { sceneName, underlay, pathname, hoverX, hoverY, setup } of targets) {
+  for (const { sceneName, underlay, pathname, hoverX, hoverY, setup, hoverKey } of targets) {
     await page.goto(new URL(pathname, baseUrl).href, { waitUntil: "networkidle" });
     if (setup) await setup(page);
     await page.waitForFunction((expectedScene) => {
@@ -105,7 +106,7 @@ try {
     await page.waitForTimeout(120);
     const shot = `tmp/ui-quality/${sceneName.replace("Scene", "").toLowerCase()}-hover-no-vector-v1-1920.png`;
     await canvas.screenshot({ path: shot });
-    const stats = await page.evaluate(({ sceneName, underlay }) => {
+    const stats = await page.evaluate(({ sceneName, underlay, hoverKey }) => {
       const game = window.__paperGame;
       const scene = game?.scene?.getScenes?.(true)?.find((candidate) => candidate.scene?.key === sceneName)
         ?? game?.scene?.getScene?.(sceneName);
@@ -126,10 +127,15 @@ try {
         scene: sceneName,
         hasUnderlay: underlayIndex >= 0,
         textCount: visible.filter((child) => child?.type === "Text" && String(child.text ?? "").trim().length > 0).length,
-        visibleRectsAboveUnderlay: rectsAbove.length
+        visibleRectsAboveUnderlay: rectsAbove.length,
+        visibleHoverImages: visible.filter((child) => child?.type === "Image" && child.texture?.key === hoverKey && child.alpha > 0.05).length
       };
-    }, { sceneName, underlay });
+    }, { sceneName, underlay, hoverKey });
     results.push({ ...stats, screenshot: path.resolve(shot) });
+
+    if (!stats.hasUnderlay || stats.textCount !== 0 || stats.visibleRectsAboveUnderlay !== 0 || stats.visibleHoverImages !== 1) {
+      throw new Error(`${sceneName}: invalid hover-state audit ${JSON.stringify(stats)}`);
+    }
   }
 
   console.log(JSON.stringify({ baseUrl, results }, null, 2));

@@ -121,13 +121,14 @@ Completed progress in this checkpoint:
 - Settings now has a dedicated 10-control raster pressed audit, matching its existing hover coverage. Screenshot review found the return-to-town feedback floating above the bottom-right red check button, so that hit target was re-anchored to the visible concept button. A later pass replaced its shared action-seal feedback with button-specific hover/down art cropped from the Settings concept underlay.
 - Settings reset-save and reset-defaults now also have button-panel-specific hover/down art cropped from the Settings concept underlay. The reset-save skull card and reset-defaults gear card no longer use the shared action-seal family in the Settings per-control hover/pressed audits.
 - Settings volume sliders, display-mode selector, large-text toggle, reduced-motion toggle, and space-confirm toggle now also have row/control-specific hover/down art cropped from the Settings concept underlay. All ten audited Settings controls now use Settings-specific raster hover/down art instead of the shared action-seal family.
+- Town, RuneBench, and Result representative utility targets now have screen-specific hover/down art cropped from their own concept underlays instead of using the shared action-seal family. The 10-screen hover audit now verifies expected hover keys, and the down audit now expects `ui_down_town_expedition_action_concept`, `ui_down_runebench_action_rail_concept`, and `ui_down_result_action_card_concept`. RuneBench and Result also have first-pass state art wired for their visible lower confirm/return buttons.
 
 Next recommended work:
 
 1. Continue refining later completed-node variants and remaining baked route/node state against the concept; the mid-route completed badge placement is cleaner now but not final art approval.
 2. Continue neutralizing or replacing baked node/route geometry where it conflicts with runtime state, especially missing/weak later node variants, lower-node shape silhouettes, and any remaining route-line state marks.
 3. Refine selected/focus/keyboard state art without falling back to Phaser vector overlays. Pointer hover and directional keyboard selection have cleaner WorldMap first passes now, but this is not final keyboard/focus coverage across screens.
-4. Continue deeper pressed/down and focus review beyond the audited representative/current controls. Settings' ten audited controls now have screen-specific hover/down art, but Town/RuneBench/Result still share the action-seal family, and final selected/focus approval is still missing.
+4. Continue deeper pressed/down and focus review beyond the audited representative/current controls. Settings' ten audited controls and the Town/RuneBench/Result representative utility targets now have screen-specific hover/down art, but secondary/legacy hit targets, selected/focus state art, and final keyboard-focus approval are still missing.
 5. Add dynamic labels/tooltips/accessibility-safe text strategy outside the baked concept layer.
 6. Reinvestigate `node tmp/run-phaser-smoke-with-vite.mjs`, which timed out in the 2026-06-05 continuation despite dedicated WorldMap audit and `npm.cmd run check` passing.
 

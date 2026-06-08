@@ -148,6 +148,7 @@ Current state:
 - Settings has hover coverage for ten major controls.
 - All ten primary raster screens share first bitmap down-state candidate.
 - Settings return, reset-save, reset-defaults, volume sliders, display-mode selector, large-text toggle, reduced-motion toggle, and space-confirm toggle now have concept-underlay-derived control-specific hover and down art instead of the shared action-seal family.
+- Town expedition action, RuneBench action rail, and Result action card now also have concept-underlay-derived hover/down art instead of the shared action-seal family. RuneBench lower confirm and Result lower return buttons have first-pass button-specific hover/down art wired, but broader secondary/legacy target review remains unfinished.
 
 Key files:
 
@@ -181,10 +182,20 @@ Key files:
 - `assets/source/ui/ui_down_settings_reduced_motion_concept_v001.png`
 - `assets/source/ui/ui_hover_settings_space_confirm_concept_v001.png`
 - `assets/source/ui/ui_down_settings_space_confirm_concept_v001.png`
+- `assets/source/ui/ui_hover_town_expedition_action_concept_v001.png`
+- `assets/source/ui/ui_down_town_expedition_action_concept_v001.png`
+- `assets/source/ui/ui_hover_runebench_action_rail_concept_v001.png`
+- `assets/source/ui/ui_down_runebench_action_rail_concept_v001.png`
+- `assets/source/ui/ui_hover_runebench_confirm_button_concept_v001.png`
+- `assets/source/ui/ui_down_runebench_confirm_button_concept_v001.png`
+- `assets/source/ui/ui_hover_result_action_card_concept_v001.png`
+- `assets/source/ui/ui_down_result_action_card_concept_v001.png`
+- `assets/source/ui/ui_hover_result_return_button_concept_v001.png`
+- `assets/source/ui/ui_down_result_return_button_concept_v001.png`
 
 Still unfinished:
 
-- Per-control selected/focus/disabled states, plus remaining bespoke down states for Town/RuneBench/Result utility controls and unaudited controls outside the current Settings set.
+- Per-control selected/focus/disabled states, plus remaining bespoke state review for secondary/legacy Town/RuneBench/Result utility hit targets and unaudited controls outside the current Settings set.
 - Dynamic labels and tooltips that do not hurt the concept-art look.
 - User acceptance.
 
@@ -352,6 +363,19 @@ $env:PHASER_SMOKE_PROGRESS='1'; $env:PHASER_SMOKE_PROGRESS_FILE='tmp/phaser-smok
 ```
 
 It passed through `checkClickableControls` after the smoke helper's down-key default was updated to the current control-family bitmap standard, then timed out during `checkFullInputCoverage`. Treat broad Phaser smoke as `Needs verification`, not passed, for this continuation.
+
+The following passed after the Town/RuneBench/Result representative utility state pass:
+
+```powershell
+node tools\extract-ui-state-assets.mjs
+npm.cmd run assets:generate:dev
+node tmp\ui-raster-hover-audit.mjs
+node tmp\ui-raster-down-audit.mjs
+npm.cmd run check
+git diff --check
+```
+
+Screenshot review used `tmp/ui-quality/town-hover-no-vector-v1-1920.png`, `tmp/ui-quality/down/town-down-pressed-v1-1920.png`, `tmp/ui-quality/runebench-hover-no-vector-v1-1920.png`, `tmp/ui-quality/down/runebench-down-pressed-v1-1920.png`, `tmp/ui-quality/result-hover-no-vector-v1-1920.png`, and `tmp/ui-quality/down/result-down-pressed-v1-1920.png`. Broad Phaser smoke was not rerun for this pass; keep its status as `Needs verification` from the previous timeout until it completes.
 
 Known warning:
 

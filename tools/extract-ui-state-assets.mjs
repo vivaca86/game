@@ -340,6 +340,152 @@ const targets = [
     stateVariant: "controlDown"
   },
   {
+    key: "ui_hover_town_expedition_action_concept",
+    kind: "button_state",
+    source: path.join(rootDir, "assets", "source", "ui", "town_raster_underlay_concept_v001.png"),
+    output: path.join(rootDir, "assets", "source", "ui", "ui_hover_town_expedition_action_concept_v001.png"),
+    crop: { x: 850, y: 500, w: 125, h: 120 },
+    nativeSize: { w: 160, h: 154 },
+    maskPolygon: [
+      { x: 28, y: 34 },
+      { x: 54, y: 10 },
+      { x: 108, y: 10 },
+      { x: 134, y: 34 },
+      { x: 134, y: 86 },
+      { x: 106, y: 112 },
+      { x: 52, y: 112 },
+      { x: 24, y: 84 }
+    ],
+    stateVariant: "buttonHover"
+  },
+  {
+    key: "ui_down_town_expedition_action_concept",
+    kind: "button_state",
+    source: path.join(rootDir, "assets", "source", "ui", "town_raster_underlay_concept_v001.png"),
+    output: path.join(rootDir, "assets", "source", "ui", "ui_down_town_expedition_action_concept_v001.png"),
+    crop: { x: 850, y: 500, w: 125, h: 120 },
+    nativeSize: { w: 160, h: 154 },
+    maskPolygon: [
+      { x: 28, y: 34 },
+      { x: 54, y: 10 },
+      { x: 108, y: 10 },
+      { x: 134, y: 34 },
+      { x: 134, y: 86 },
+      { x: 106, y: 112 },
+      { x: 52, y: 112 },
+      { x: 24, y: 84 }
+    ],
+    stateVariant: "buttonDown"
+  },
+  {
+    key: "ui_hover_runebench_action_rail_concept",
+    kind: "underlay_control_state",
+    source: path.join(rootDir, "assets", "source", "ui", "rune_bench_raster_underlay_concept_v001.png"),
+    output: path.join(rootDir, "assets", "source", "ui", "ui_hover_runebench_action_rail_concept_v001.png"),
+    crop: { x: 690, y: 575, w: 470, h: 92 },
+    nativeSize: { w: 540, h: 112 },
+    stateVariant: "controlHover"
+  },
+  {
+    key: "ui_down_runebench_action_rail_concept",
+    kind: "underlay_control_state",
+    source: path.join(rootDir, "assets", "source", "ui", "rune_bench_raster_underlay_concept_v001.png"),
+    output: path.join(rootDir, "assets", "source", "ui", "ui_down_runebench_action_rail_concept_v001.png"),
+    crop: { x: 690, y: 575, w: 470, h: 92 },
+    nativeSize: { w: 540, h: 112 },
+    stateVariant: "controlDown"
+  },
+  {
+    key: "ui_hover_runebench_confirm_button_concept",
+    kind: "button_state",
+    source: path.join(rootDir, "assets", "source", "ui", "rune_bench_raster_underlay_concept_v001.png"),
+    output: path.join(rootDir, "assets", "source", "ui", "ui_hover_runebench_confirm_button_concept_v001.png"),
+    crop: { x: 1288, y: 790, w: 285, h: 105 },
+    nativeSize: { w: 330, h: 122 },
+    maskPolygon: [
+      { x: 4, y: 40 },
+      { x: 28, y: 18 },
+      { x: 292, y: 14 },
+      { x: 326, y: 36 },
+      { x: 318, y: 112 },
+      { x: 28, y: 118 },
+      { x: 4, y: 98 }
+    ],
+    stateVariant: "buttonHover"
+  },
+  {
+    key: "ui_down_runebench_confirm_button_concept",
+    kind: "button_state",
+    source: path.join(rootDir, "assets", "source", "ui", "rune_bench_raster_underlay_concept_v001.png"),
+    output: path.join(rootDir, "assets", "source", "ui", "ui_down_runebench_confirm_button_concept_v001.png"),
+    crop: { x: 1288, y: 790, w: 285, h: 105 },
+    nativeSize: { w: 330, h: 122 },
+    maskPolygon: [
+      { x: 4, y: 40 },
+      { x: 28, y: 18 },
+      { x: 292, y: 14 },
+      { x: 326, y: 36 },
+      { x: 318, y: 112 },
+      { x: 28, y: 118 },
+      { x: 4, y: 98 }
+    ],
+    stateVariant: "buttonDown"
+  },
+  {
+    key: "ui_hover_result_action_card_concept",
+    kind: "underlay_control_state",
+    source: path.join(rootDir, "assets", "source", "ui", "result_raster_underlay_concept_v001.png"),
+    output: path.join(rootDir, "assets", "source", "ui", "ui_hover_result_action_card_concept_v001.png"),
+    crop: { x: 910, y: 565, w: 220, h: 95 },
+    nativeSize: { w: 300, h: 128 },
+    stateVariant: "controlHover"
+  },
+  {
+    key: "ui_down_result_action_card_concept",
+    kind: "underlay_control_state",
+    source: path.join(rootDir, "assets", "source", "ui", "result_raster_underlay_concept_v001.png"),
+    output: path.join(rootDir, "assets", "source", "ui", "ui_down_result_action_card_concept_v001.png"),
+    crop: { x: 910, y: 565, w: 220, h: 95 },
+    nativeSize: { w: 300, h: 128 },
+    stateVariant: "controlDown"
+  },
+  {
+    key: "ui_hover_result_return_button_concept",
+    kind: "button_state",
+    source: path.join(rootDir, "assets", "source", "ui", "result_raster_underlay_concept_v001.png"),
+    output: path.join(rootDir, "assets", "source", "ui", "ui_hover_result_return_button_concept_v001.png"),
+    crop: { x: 662, y: 760, w: 350, h: 116 },
+    nativeSize: { w: 440, h: 146 },
+    maskPolygon: [
+      { x: 18, y: 34 },
+      { x: 48, y: 12 },
+      { x: 396, y: 12 },
+      { x: 430, y: 40 },
+      { x: 418, y: 132 },
+      { x: 38, y: 138 },
+      { x: 10, y: 108 }
+    ],
+    stateVariant: "buttonHover"
+  },
+  {
+    key: "ui_down_result_return_button_concept",
+    kind: "button_state",
+    source: path.join(rootDir, "assets", "source", "ui", "result_raster_underlay_concept_v001.png"),
+    output: path.join(rootDir, "assets", "source", "ui", "ui_down_result_return_button_concept_v001.png"),
+    crop: { x: 662, y: 760, w: 350, h: 116 },
+    nativeSize: { w: 440, h: 146 },
+    maskPolygon: [
+      { x: 18, y: 34 },
+      { x: 48, y: 12 },
+      { x: 396, y: 12 },
+      { x: 430, y: 40 },
+      { x: 418, y: 132 },
+      { x: 38, y: 138 },
+      { x: 10, y: 108 }
+    ],
+    stateVariant: "buttonDown"
+  },
+  {
     key: "ui_current_stage_marker_concept",
     kind: "current_marker",
     source: path.join(rootDir, "assets", "concepts", "ui", "world_map_ui_concept_v001.png"),
@@ -1224,7 +1370,7 @@ try {
         crop: target.crop,
         nativeSize: target.nativeSize
       })
-      : target.kind === "settings_control_state"
+      : target.kind === "settings_control_state" || target.kind === "underlay_control_state"
         ? await page.evaluate(async ({ base64, crop, nativeSize, stateVariant }) => {
         const image = await new Promise((resolve, reject) => {
           const img = new Image();
