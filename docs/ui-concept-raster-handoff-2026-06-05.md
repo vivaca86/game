@@ -1030,3 +1030,68 @@ Known verification note:
 Remaining related work:
 
 - This is not final selected/focus approval. Reward/Event now have first directional choice-focus evidence, but Dungeon/Town/RuneBench/Result broader focus, Combat/Boss selected focus, WorldMap recomposition, broader disabled coverage, dynamic labels/tooltips, accessibility-safe text, mobile/responsive review, user acceptance, and final concept-match approval remain unfinished.
+
+## 2026-06-08 Continuation: Utility Keyboard Focus Raster Feedback
+
+Status: `Partially complete`.
+
+This follow-up expands selected/focus coverage on Town, RuneBench, and Result using only existing screen-specific concept bitmap state art. It does not add a new focus ring, vector overlay, text label, tint, or generic stamp.
+
+Added/changed:
+
+- `src/phaser/scenes/TownScene.ts`
+- `src/phaser/scenes/RuneBenchScene.ts`
+- `src/phaser/scenes/ResultScene.ts`
+- `tmp/utility-keyboard-focus-raster-state-audit.mjs`
+- `tmp/ui-quality/utility-keyboard-focus/town-expedition-focus-v1-1920.png`
+- `tmp/ui-quality/utility-keyboard-focus/town-toolbar-settings-focus-v1-1920.png`
+- `tmp/ui-quality/utility-keyboard-focus/town-toolbar-reset-focus-v1-1920.png`
+- `tmp/ui-quality/utility-keyboard-focus/town-toolbar-settings-keyboard-activate-down-v1-1920.png`
+- `tmp/ui-quality/utility-keyboard-focus/runebench-action-rail-focus-v1-1920.png`
+- `tmp/ui-quality/utility-keyboard-focus/runebench-confirm-button-focus-v1-1920.png`
+- `tmp/ui-quality/utility-keyboard-focus/runebench-confirm-button-keyboard-activate-down-v1-1920.png`
+- `tmp/ui-quality/utility-keyboard-focus/result-action-card-focus-v1-1920.png`
+- `tmp/ui-quality/utility-keyboard-focus/result-return-button-focus-v1-1920.png`
+- `tmp/ui-quality/utility-keyboard-focus/result-return-button-keyboard-activate-down-v1-1920.png`
+
+Behavior now verified by `tmp/utility-keyboard-focus-raster-state-audit.mjs`:
+
+- Town arrow-key focus can reach expedition, lower settings/gear, and lower reset/backpack using each control's existing Town-specific hover bitmap.
+- Town focused activation on lower settings/gear shows `ui_down_town_toolbar_settings_concept` and opens Settings.
+- RuneBench arrow-key focus can reach the central action rail and lower confirm tile using existing RuneBench-specific hover bitmaps.
+- RuneBench focused activation on the lower confirm tile shows `ui_down_runebench_confirm_button_concept` and advances the run from RuneBench to Combat.
+- Result arrow-key focus can reach the central action card and lower return panel using existing Result-specific hover bitmaps.
+- Result focused activation on the lower return panel shows `ui_down_result_return_button_concept` and returns to Town.
+- All checked states verify focus id, exact key, coordinate, size, no Phaser text, and no visible rectangle overlays above the raster underlay.
+
+Important Town note:
+
+- The ambiguous central legacy reset/settings hit targets still preserve click behavior, but they remain excluded from keyboard focus because they do not map to one clear visible concept control.
+
+Verification run in this continuation:
+
+```powershell
+node tmp\utility-keyboard-focus-raster-state-audit.mjs
+node tmp\keyboard-confirm-raster-state-audit.mjs
+node tmp\town-raster-toolbar-state-audit.mjs
+node tmp\runebench-result-lower-button-state-audit.mjs
+node tmp\ui-raster-hover-audit.mjs
+node tmp\ui-raster-down-audit.mjs
+npx.cmd tsc --noEmit
+npm.cmd run check
+git diff --check
+$env:PHASER_SMOKE_PROGRESS='1'
+$env:PHASER_SMOKE_PROGRESS_FILE='tmp/phaser-smoke-progress-utility-focus.log'
+node tmp\run-phaser-smoke-with-vite.mjs
+```
+
+Results:
+
+- Utility keyboard-focus audit passed.
+- Existing keyboard-confirm, Town toolbar, RuneBench/Result lower button, 10-screen hover, and 10-screen down audits passed.
+- Full broad Phaser smoke passed with `Phaser smoke OK`.
+- `npm.cmd run check` passed and still reports the existing large JS chunk warning.
+
+Remaining related work:
+
+- This is not final selected/focus approval. Town/RuneBench/Result now have first utility keyboard-focus evidence, but Dungeon broader focus, Combat/Boss selected focus, WorldMap recomposition, broader disabled coverage, dynamic labels/tooltips, accessibility-safe text, mobile/responsive review, user acceptance, and final concept-match approval remain unfinished.

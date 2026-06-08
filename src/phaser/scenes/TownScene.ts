@@ -1,14 +1,16 @@
 import Phaser from "phaser";
 import type { BootContext } from "../../app/bootContext";
 import type { RoomType, StageData } from "../../data/schema";
+import type { InputAction } from "../../input/actions";
 import { bindKeyboardActions } from "../../input/bindings";
 import { clearStoredSave } from "../../save/saveCodec";
 import { renderDebugOverlay } from "../../ui/overlays/debugOverlay";
 import { handleSceneAction } from "../bridge/sceneActions";
 import { requireBootContext } from "../bridge/sceneBridge";
-import { renderActionButton, renderPaperPanel, renderRasterHoverHitTarget, renderSceneShell, renderTooltip, renderUiSlot, textStyle, triggerRasterHitTargetDown } from "../view/sceneShell";
+import { renderActionButton, renderPaperPanel, renderRasterHoverHitTarget, renderSceneShell, renderTooltip, renderUiSlot, setRasterHitTargetHoverState, textStyle, triggerRasterHitTargetDown } from "../view/sceneShell";
 
 const TOWN_RASTER_UNDERLAY_KEY = "town_raster_underlay_concept";
+const TOWN_RASTER_FOCUS_ID_KEY = "townRasterFocusId";
 const TOWN_RASTER_HOVER_ACTION_KEY = "ui_hover_action_seal_concept";
 const TOWN_RASTER_EXPEDITION_ACTION_KEYS = {
   hover: "ui_hover_town_expedition_action_concept",
@@ -22,6 +24,8 @@ const TOWN_RASTER_TOOLBAR_SETTINGS_KEYS = {
   hover: "ui_hover_town_toolbar_settings_concept",
   down: "ui_down_town_toolbar_settings_concept"
 };
+
+type TownRasterControlId = "expedition" | "toolbarSettings" | "toolbarReset";
 
 export class TownScene extends Phaser.Scene {
   constructor() {
@@ -47,8 +51,11 @@ export class TownScene extends Phaser.Scene {
       renderTownTheater(this, context);
     }
 
+    const handleRasterKeyboardAction = rasterControls
+      ? createTownRasterKeyboardHandler(this, rasterControls)
+      : undefined;
     bindKeyboardActions(this, (action) => {
-      if (action === "confirm" && triggerRasterHitTargetDown(this, rasterControls?.confirmHitTarget, () => handleSceneAction(this, context, action))) {
+      if (handleRasterKeyboardAction?.(action)) {
         return;
       }
       handleSceneAction(this, context, action);
@@ -62,7 +69,16 @@ function hasTownRasterUnderlay(scene: Phaser.Scene): boolean {
 }
 
 interface TownRasterControls {
+  controls: TownRasterControl[];
   confirmHitTarget?: Phaser.GameObjects.Rectangle;
+}
+
+interface TownRasterControl {
+  id: TownRasterControlId;
+  x: number;
+  y: number;
+  hitTarget: Phaser.GameObjects.Rectangle;
+  activate: () => void;
 }
 
 function renderTownRasterStage(scene: Phaser.Scene, context: BootContext): TownRasterControls {
@@ -70,7 +86,23 @@ function renderTownRasterStage(scene: Phaser.Scene, context: BootContext): TownR
     .setDisplaySize(1920, 1080)
     .setDepth(0);
 
-  const confirmHitTarget = renderTownRasterHitTarget(scene, 1010, 642, 330, 66, 0xf5c26b, () => handleSceneAction(scene, context, "confirm"), {
+  const controls: TownRasterControl[] = [];
+  const addControl = (
+    id: TownRasterControlId,
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    accent: number,
+    activate: () => void,
+    options?: Parameters<typeof renderTownRasterHitTarget>[7]
+  ): Phaser.GameObjects.Rectangle => {
+    const hitTarget = renderTownRasterHitTarget(scene, x, y, width, height, accent, activate, options);
+    controls.push({ id, x, y, hitTarget, activate });
+    return hitTarget;
+  };
+
+  const confirmHitTarget = addControl("expedition", 1010, 642, 330, 66, 0xf5c26b, () => handleSceneAction(scene, context, "confirm"), {
     hoverKey: TOWN_RASTER_EXPEDITION_ACTION_KEYS.hover,
     downKey: TOWN_RASTER_EXPEDITION_ACTION_KEYS.down,
     hoverX: 1048,
@@ -84,6 +116,7 @@ function renderTownRasterStage(scene: Phaser.Scene, context: BootContext): TownR
     hoverAlpha: 0.96,
     downAlpha: 0.88
   });
+  // These legacy coordinates preserve click behavior but do not map to a clear concept control.
   renderTownRasterHitTarget(scene, 1010, 724, 330, 58, 0xce5869, () => resetStoredSave(scene, context), {
     hoverKey: "",
     downKey: ""
@@ -93,7 +126,7 @@ function renderTownRasterStage(scene: Phaser.Scene, context: BootContext): TownR
     downKey: ""
   });
 
-  renderTownRasterHitTarget(scene, 1340, 976, 140, 104, 0x6c8fd6, () => scene.scene.start("SettingsScene", context), {
+  addControl("toolbarSettings", 1340, 976, 140, 104, 0x6c8fd6, () => scene.scene.start("SettingsScene", context), {
     hoverKey: TOWN_RASTER_TOOLBAR_SETTINGS_KEYS.hover,
     downKey: TOWN_RASTER_TOOLBAR_SETTINGS_KEYS.down,
     hoverX: 1340,
@@ -107,7 +140,7 @@ function renderTownRasterStage(scene: Phaser.Scene, context: BootContext): TownR
     hoverAlpha: 0.96,
     downAlpha: 0.86
   });
-  renderTownRasterHitTarget(scene, 514, 976, 140, 104, 0xce5869, () => resetStoredSave(scene, context), {
+  addControl("toolbarReset", 514, 976, 140, 104, 0xce5869, () => resetStoredSave(scene, context), {
     hoverKey: TOWN_RASTER_TOOLBAR_RESET_KEYS.hover,
     downKey: TOWN_RASTER_TOOLBAR_RESET_KEYS.down,
     hoverX: 514,
@@ -122,7 +155,7 @@ function renderTownRasterStage(scene: Phaser.Scene, context: BootContext): TownR
     downAlpha: 0.86
   });
 
-  return { confirmHitTarget };
+  return { controls, confirmHitTarget };
 }
 
 function renderTownRasterHitTarget(
@@ -163,6 +196,128 @@ function renderTownRasterHitTarget(
     hoverAlpha: options.hoverAlpha,
     downAlpha: options.downAlpha ?? 0.76
   });
+}
+
+function createTownRasterKeyboardHandler(
+  scene: Phaser.Scene,
+  rasterControls: TownRasterControls
+): (action: InputAction) => boolean {
+  const { controls } = rasterControls;
+  let focusedIndex = storedTownFocusIndex(scene, controls);
+
+  const setFocus = (nextIndex: number): void => {
+    if (!controls[nextIndex]) return;
+    if (focusedIndex >= 0 && focusedIndex !== nextIndex) {
+      setRasterHitTargetHoverState(controls[focusedIndex]?.hitTarget, false);
+    }
+    focusedIndex = nextIndex;
+    scene.registry.set(TOWN_RASTER_FOCUS_ID_KEY, controls[focusedIndex].id);
+    setRasterHitTargetHoverState(controls[focusedIndex].hitTarget, true);
+  };
+
+  const clearKeyboardFocus = (except?: TownRasterControl): void => {
+    if (focusedIndex < 0 || controls[focusedIndex] === except) return;
+    setRasterHitTargetHoverState(controls[focusedIndex].hitTarget, false);
+    focusedIndex = -1;
+    scene.registry.set(TOWN_RASTER_FOCUS_ID_KEY, undefined);
+  };
+
+  const activateControl = (control: TownRasterControl): void => {
+    scene.registry.set(TOWN_RASTER_FOCUS_ID_KEY, undefined);
+    control.activate();
+  };
+
+  const triggerFocusedControl = (control: TownRasterControl): boolean => {
+    if (triggerRasterHitTargetDown(scene, control.hitTarget, () => activateControl(control))) {
+      return true;
+    }
+    activateControl(control);
+    return true;
+  };
+
+  controls.forEach((control) => {
+    control.hitTarget.on("pointerover", () => clearKeyboardFocus(control));
+    control.hitTarget.on("pointerout", () => {
+      if (focusedIndex >= 0 && controls[focusedIndex] === control) {
+        setRasterHitTargetHoverState(control.hitTarget, true);
+      }
+    });
+  });
+
+  if (focusedIndex >= 0) {
+    setRasterHitTargetHoverState(controls[focusedIndex].hitTarget, true);
+  }
+
+  return (action: InputAction): boolean => {
+    if (controls.length === 0) return false;
+
+    if (isTownMoveAction(action)) {
+      setFocus(resolveTownFocusIndex(controls, focusedIndex, action));
+      return true;
+    }
+
+    if (action === "confirm") {
+      if (focusedIndex < 0) {
+        setFocus(0);
+      }
+      const focusedControl = controls[focusedIndex];
+      if (!focusedControl) return true;
+      return triggerFocusedControl(focusedControl);
+    }
+
+    return false;
+  };
+}
+
+function storedTownFocusIndex(scene: Phaser.Scene, controls: TownRasterControl[]): number {
+  const storedId = scene.registry.get(TOWN_RASTER_FOCUS_ID_KEY);
+  const storedIndex = controls.findIndex((control) => control.id === storedId);
+  return storedIndex >= 0 ? storedIndex : -1;
+}
+
+function isTownMoveAction(action: InputAction): action is "move_up" | "move_down" | "move_left" | "move_right" {
+  return action === "move_up" || action === "move_down" || action === "move_left" || action === "move_right";
+}
+
+function resolveTownFocusIndex(
+  controls: TownRasterControl[],
+  focusedIndex: number,
+  action: "move_up" | "move_down" | "move_left" | "move_right"
+): number {
+  if (focusedIndex < 0) return 0;
+  const current = controls[focusedIndex];
+  const candidates = controls
+    .map((control, index) => ({ control, index }))
+    .filter(({ index }) => index !== focusedIndex)
+    .filter(({ control }) => isTownFocusCandidate(current, control, action));
+  if (candidates.length === 0) return focusedIndex;
+
+  candidates.sort((left, right) => townFocusScore(current, left.control, action) - townFocusScore(current, right.control, action));
+  return candidates[0].index;
+}
+
+function isTownFocusCandidate(
+  current: TownRasterControl,
+  candidate: TownRasterControl,
+  action: "move_up" | "move_down" | "move_left" | "move_right"
+): boolean {
+  if (action === "move_up") return candidate.y < current.y - 8;
+  if (action === "move_down") return candidate.y > current.y + 8;
+  if (action === "move_left") return candidate.x < current.x - 8;
+  return candidate.x > current.x + 8;
+}
+
+function townFocusScore(
+  current: TownRasterControl,
+  candidate: TownRasterControl,
+  action: "move_up" | "move_down" | "move_left" | "move_right"
+): number {
+  const dx = Math.abs(candidate.x - current.x);
+  const dy = Math.abs(candidate.y - current.y);
+  if (action === "move_up" || action === "move_down") {
+    return dy + dx * 0.82;
+  }
+  return dx + dy * 2.2;
 }
 
 function renderTownTheater(scene: Phaser.Scene, context: BootContext): void {

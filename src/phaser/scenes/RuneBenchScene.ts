@@ -1,15 +1,17 @@
 import Phaser from "phaser";
 import type { BootContext } from "../../app/bootContext";
 import type { CardData, RuneData } from "../../data/schema";
+import type { InputAction } from "../../input/actions";
 import { bindKeyboardActions } from "../../input/bindings";
 import { getCurrentRoom, getEncounterPoolContentId, getStage } from "../../simulation/state/runState";
 import { getAttachedRuneModifiedAmount, getAttachedRuneModifiedCost } from "../../simulation/systems/runes/runeSystem";
 import { renderDebugOverlay } from "../../ui/overlays/debugOverlay";
 import { handleSceneAction } from "../bridge/sceneActions";
 import { requireBootContext } from "../bridge/sceneBridge";
-import { renderActionButton, renderPaperPanel, renderRasterHoverHitTarget, renderSceneShell, renderUiSlot, textStyle, triggerRasterHitTargetDown } from "../view/sceneShell";
+import { renderActionButton, renderPaperPanel, renderRasterHoverHitTarget, renderSceneShell, renderUiSlot, setRasterHitTargetHoverState, textStyle, triggerRasterHitTargetDown } from "../view/sceneShell";
 
 const RUNE_BENCH_RASTER_UNDERLAY_KEY = "rune_bench_raster_underlay_concept";
+const RUNE_BENCH_RASTER_FOCUS_ID_KEY = "runeBenchRasterFocusId";
 const RUNE_BENCH_RASTER_HOVER_ACTION_KEY = "ui_hover_action_seal_concept";
 const RUNE_BENCH_RASTER_ACTION_RAIL_KEYS = {
   hover: "ui_hover_runebench_action_rail_concept",
@@ -19,6 +21,8 @@ const RUNE_BENCH_RASTER_CONFIRM_BUTTON_KEYS = {
   hover: "ui_hover_runebench_confirm_button_concept",
   down: "ui_down_runebench_confirm_button_concept"
 };
+
+type RuneBenchRasterControlId = "actionRail" | "confirmButton";
 
 export class RuneBenchScene extends Phaser.Scene {
   constructor() {
@@ -45,8 +49,11 @@ export class RuneBenchScene extends Phaser.Scene {
       renderRuneBenchTheater(this, context);
     }
 
+    const handleRasterKeyboardAction = rasterControls
+      ? createRuneBenchRasterKeyboardHandler(this, rasterControls)
+      : undefined;
     bindKeyboardActions(this, (action) => {
-      if (action === "confirm" && triggerRasterHitTargetDown(this, rasterControls?.confirmHitTarget, () => handleSceneAction(this, context, action))) {
+      if (handleRasterKeyboardAction?.(action)) {
         return;
       }
       handleSceneAction(this, context, action);
@@ -60,7 +67,16 @@ function hasRuneBenchRasterUnderlay(scene: Phaser.Scene): boolean {
 }
 
 interface RuneBenchRasterControls {
+  controls: RuneBenchRasterControl[];
   confirmHitTarget?: Phaser.GameObjects.Rectangle;
+}
+
+interface RuneBenchRasterControl {
+  id: RuneBenchRasterControlId;
+  x: number;
+  y: number;
+  hitTarget: Phaser.GameObjects.Rectangle;
+  activate: () => void;
 }
 
 function renderRuneBenchRasterStage(scene: Phaser.Scene, context: BootContext): RuneBenchRasterControls {
@@ -68,7 +84,23 @@ function renderRuneBenchRasterStage(scene: Phaser.Scene, context: BootContext): 
     .setDisplaySize(1920, 1080)
     .setDepth(0);
 
-  const confirmHitTarget = renderRuneBenchRasterHitTarget(scene, 1010, 742, 330, 66, 0xf5c26b, () => handleSceneAction(scene, context, "confirm"), {
+  const controls: RuneBenchRasterControl[] = [];
+  const addControl = (
+    id: RuneBenchRasterControlId,
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    accent: number,
+    activate: () => void,
+    options?: Parameters<typeof renderRuneBenchRasterHitTarget>[7]
+  ): Phaser.GameObjects.Rectangle => {
+    const hitTarget = renderRuneBenchRasterHitTarget(scene, x, y, width, height, accent, activate, options);
+    controls.push({ id, x, y, hitTarget, activate });
+    return hitTarget;
+  };
+
+  const confirmHitTarget = addControl("actionRail", 1010, 742, 330, 66, 0xf5c26b, () => handleSceneAction(scene, context, "confirm"), {
     hoverKey: RUNE_BENCH_RASTER_ACTION_RAIL_KEYS.hover,
     downKey: RUNE_BENCH_RASTER_ACTION_RAIL_KEYS.down,
     hoverX: 1062,
@@ -82,7 +114,7 @@ function renderRuneBenchRasterStage(scene: Phaser.Scene, context: BootContext): 
     hoverAlpha: 0.92,
     downAlpha: 0.84
   });
-  renderRuneBenchRasterHitTarget(scene, 1660, 984, 250, 102, 0x5eead4, () => handleSceneAction(scene, context, "confirm"), {
+  addControl("confirmButton", 1660, 984, 250, 102, 0x5eead4, () => handleSceneAction(scene, context, "confirm"), {
     hoverKey: RUNE_BENCH_RASTER_CONFIRM_BUTTON_KEYS.hover,
     downKey: RUNE_BENCH_RASTER_CONFIRM_BUTTON_KEYS.down,
     hoverX: 1644,
@@ -97,7 +129,7 @@ function renderRuneBenchRasterStage(scene: Phaser.Scene, context: BootContext): 
     downAlpha: 0.88
   });
 
-  return { confirmHitTarget };
+  return { controls, confirmHitTarget };
 }
 
 function renderRuneBenchRasterHitTarget(
@@ -138,6 +170,128 @@ function renderRuneBenchRasterHitTarget(
     hoverAlpha: options.hoverAlpha,
     downAlpha: options.downAlpha ?? 0.76
   });
+}
+
+function createRuneBenchRasterKeyboardHandler(
+  scene: Phaser.Scene,
+  rasterControls: RuneBenchRasterControls
+): (action: InputAction) => boolean {
+  const { controls } = rasterControls;
+  let focusedIndex = storedRuneBenchFocusIndex(scene, controls);
+
+  const setFocus = (nextIndex: number): void => {
+    if (!controls[nextIndex]) return;
+    if (focusedIndex >= 0 && focusedIndex !== nextIndex) {
+      setRasterHitTargetHoverState(controls[focusedIndex]?.hitTarget, false);
+    }
+    focusedIndex = nextIndex;
+    scene.registry.set(RUNE_BENCH_RASTER_FOCUS_ID_KEY, controls[focusedIndex].id);
+    setRasterHitTargetHoverState(controls[focusedIndex].hitTarget, true);
+  };
+
+  const clearKeyboardFocus = (except?: RuneBenchRasterControl): void => {
+    if (focusedIndex < 0 || controls[focusedIndex] === except) return;
+    setRasterHitTargetHoverState(controls[focusedIndex].hitTarget, false);
+    focusedIndex = -1;
+    scene.registry.set(RUNE_BENCH_RASTER_FOCUS_ID_KEY, undefined);
+  };
+
+  const activateControl = (control: RuneBenchRasterControl): void => {
+    scene.registry.set(RUNE_BENCH_RASTER_FOCUS_ID_KEY, undefined);
+    control.activate();
+  };
+
+  const triggerFocusedControl = (control: RuneBenchRasterControl): boolean => {
+    if (triggerRasterHitTargetDown(scene, control.hitTarget, () => activateControl(control))) {
+      return true;
+    }
+    activateControl(control);
+    return true;
+  };
+
+  controls.forEach((control) => {
+    control.hitTarget.on("pointerover", () => clearKeyboardFocus(control));
+    control.hitTarget.on("pointerout", () => {
+      if (focusedIndex >= 0 && controls[focusedIndex] === control) {
+        setRasterHitTargetHoverState(control.hitTarget, true);
+      }
+    });
+  });
+
+  if (focusedIndex >= 0) {
+    setRasterHitTargetHoverState(controls[focusedIndex].hitTarget, true);
+  }
+
+  return (action: InputAction): boolean => {
+    if (controls.length === 0) return false;
+
+    if (isRuneBenchMoveAction(action)) {
+      setFocus(resolveRuneBenchFocusIndex(controls, focusedIndex, action));
+      return true;
+    }
+
+    if (action === "confirm") {
+      if (focusedIndex < 0) {
+        setFocus(0);
+      }
+      const focusedControl = controls[focusedIndex];
+      if (!focusedControl) return true;
+      return triggerFocusedControl(focusedControl);
+    }
+
+    return false;
+  };
+}
+
+function storedRuneBenchFocusIndex(scene: Phaser.Scene, controls: RuneBenchRasterControl[]): number {
+  const storedId = scene.registry.get(RUNE_BENCH_RASTER_FOCUS_ID_KEY);
+  const storedIndex = controls.findIndex((control) => control.id === storedId);
+  return storedIndex >= 0 ? storedIndex : -1;
+}
+
+function isRuneBenchMoveAction(action: InputAction): action is "move_up" | "move_down" | "move_left" | "move_right" {
+  return action === "move_up" || action === "move_down" || action === "move_left" || action === "move_right";
+}
+
+function resolveRuneBenchFocusIndex(
+  controls: RuneBenchRasterControl[],
+  focusedIndex: number,
+  action: "move_up" | "move_down" | "move_left" | "move_right"
+): number {
+  if (focusedIndex < 0) return 0;
+  const current = controls[focusedIndex];
+  const candidates = controls
+    .map((control, index) => ({ control, index }))
+    .filter(({ index }) => index !== focusedIndex)
+    .filter(({ control }) => isRuneBenchFocusCandidate(current, control, action));
+  if (candidates.length === 0) return focusedIndex;
+
+  candidates.sort((left, right) => runeBenchFocusScore(current, left.control, action) - runeBenchFocusScore(current, right.control, action));
+  return candidates[0].index;
+}
+
+function isRuneBenchFocusCandidate(
+  current: RuneBenchRasterControl,
+  candidate: RuneBenchRasterControl,
+  action: "move_up" | "move_down" | "move_left" | "move_right"
+): boolean {
+  if (action === "move_up") return candidate.y < current.y - 8;
+  if (action === "move_down") return candidate.y > current.y + 8;
+  if (action === "move_left") return candidate.x < current.x - 8;
+  return candidate.x > current.x + 8;
+}
+
+function runeBenchFocusScore(
+  current: RuneBenchRasterControl,
+  candidate: RuneBenchRasterControl,
+  action: "move_up" | "move_down" | "move_left" | "move_right"
+): number {
+  const dx = Math.abs(candidate.x - current.x);
+  const dy = Math.abs(candidate.y - current.y);
+  if (action === "move_up" || action === "move_down") {
+    return dy + dx * 0.82;
+  }
+  return dx + dy * 2.2;
 }
 
 interface RunePreviewStats {
