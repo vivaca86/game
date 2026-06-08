@@ -1,14 +1,28 @@
 import Phaser from "phaser";
 import type { BootContext } from "../../app/bootContext";
 import type { SettingsState } from "../../data/schema";
+import type { InputAction } from "../../input/actions";
 import { bindKeyboardActions } from "../../input/bindings";
 import { clearStoredSave, createDefaultSettings, persistSave } from "../../save/saveCodec";
 import { renderDebugOverlay } from "../../ui/overlays/debugOverlay";
 import { requireBootContext, storeBootContext } from "../bridge/sceneBridge";
-import { renderActionButton, renderPaperPanel, renderRasterHoverHitTarget, renderSceneShell, renderTooltip, renderUiSlot, textStyle, triggerRasterHitTargetDown } from "../view/sceneShell";
+import { renderActionButton, renderPaperPanel, renderRasterHoverHitTarget, renderSceneShell, renderTooltip, renderUiSlot, setRasterHitTargetHoverState, textStyle, triggerRasterHitTargetDown } from "../view/sceneShell";
 
 type SettingsMutation = (settings: SettingsState) => void;
+type SettingsRasterControlId =
+  | "volumeMaster"
+  | "volumeMusic"
+  | "volumeSfx"
+  | "displayMode"
+  | "largeText"
+  | "reducedMotion"
+  | "spaceConfirm"
+  | "resetSave"
+  | "resetDefaults"
+  | "returnTown";
+
 const SETTINGS_RASTER_UNDERLAY_KEY = "settings_raster_underlay_concept";
+const SETTINGS_RASTER_FOCUS_ID_KEY = "settingsRasterFocusId";
 const SETTINGS_RASTER_HOVER_ACTION_KEY = "ui_hover_action_seal_concept";
 const SETTINGS_RASTER_HOVER_RETURN_KEY = "ui_hover_settings_return_button_concept";
 const SETTINGS_RASTER_DOWN_RETURN_KEY = "ui_down_settings_return_button_concept";
@@ -49,11 +63,14 @@ export class SettingsScene extends Phaser.Scene {
     if (!rasterControls) {
       renderSettingsPanel(this, context);
     }
+    const handleRasterKeyboardAction = rasterControls
+      ? createSettingsRasterKeyboardHandler(this, rasterControls)
+      : undefined;
     bindKeyboardActions(this, (action) => {
+      if (handleRasterKeyboardAction?.(action)) {
+        return;
+      }
       if (action === "cancel") {
-        if (triggerRasterHitTargetDown(this, rasterControls?.returnHitTarget, () => this.scene.start("TownScene", context))) {
-          return;
-        }
         this.scene.start("TownScene", context);
       }
     }, context.save.settings);
@@ -62,7 +79,16 @@ export class SettingsScene extends Phaser.Scene {
 }
 
 interface SettingsRasterControls {
+  controls: SettingsRasterControl[];
   returnHitTarget?: Phaser.GameObjects.Rectangle;
+}
+
+interface SettingsRasterControl {
+  id: SettingsRasterControlId;
+  x: number;
+  y: number;
+  hitTarget: Phaser.GameObjects.Rectangle;
+  activate: () => void;
 }
 
 function hasSettingsRasterUnderlay(scene: Phaser.Scene): boolean {
@@ -74,28 +100,48 @@ function renderSettingsRasterStage(scene: Phaser.Scene, context: BootContext): S
     .setDisplaySize(1920, 1080)
     .setDepth(0);
 
-  renderSettingsRasterHitTarget(scene, 840, 282, 380, 58, 0xf5c26b, () => updateSettings(scene, context, (next) => {
+  const controls: SettingsRasterControl[] = [];
+  const addControl = (
+    id: SettingsRasterControlId,
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    accent: number,
+    onActivate: () => void,
+    options?: Parameters<typeof renderSettingsRasterHitTarget>[7]
+  ): Phaser.GameObjects.Rectangle => {
+    const activate = () => {
+      scene.registry.set(SETTINGS_RASTER_FOCUS_ID_KEY, id);
+      onActivate();
+    };
+    const hitTarget = renderSettingsRasterHitTarget(scene, x, y, width, height, accent, activate, options);
+    controls.push({ id, x, y, hitTarget, activate });
+    return hitTarget;
+  };
+
+  addControl("volumeMaster", 840, 282, 380, 58, 0xf5c26b, () => updateSettings(scene, context, (next) => {
     next.volumeMaster = stepVolume(next.volumeMaster, 0.1);
   }), settingsControlStateOptions(SETTINGS_RASTER_CONTROL_STATE_KEYS.volumeMaster, 716, 271, 540, 64));
-  renderSettingsRasterHitTarget(scene, 840, 372, 380, 58, 0xf5c26b, () => updateSettings(scene, context, (next) => {
+  addControl("volumeMusic", 840, 372, 380, 58, 0xf5c26b, () => updateSettings(scene, context, (next) => {
     next.volumeMusic = stepVolume(next.volumeMusic, 0.1);
   }), settingsControlStateOptions(SETTINGS_RASTER_CONTROL_STATE_KEYS.volumeMusic, 716, 363, 540, 64));
-  renderSettingsRasterHitTarget(scene, 840, 462, 380, 58, 0xf5c26b, () => updateSettings(scene, context, (next) => {
+  addControl("volumeSfx", 840, 462, 380, 58, 0xf5c26b, () => updateSettings(scene, context, (next) => {
     next.volumeSfx = stepVolume(next.volumeSfx, 0.1);
   }), settingsControlStateOptions(SETTINGS_RASTER_CONTROL_STATE_KEYS.volumeSfx, 716, 455, 540, 64));
-  renderSettingsRasterHitTarget(scene, 1360, 282, 340, 62, 0x5eead4, () => updateSettings(scene, context, (next) => {
+  addControl("displayMode", 1360, 282, 340, 62, 0x5eead4, () => updateSettings(scene, context, (next) => {
     next.displayMode = next.displayMode === "high_contrast" ? "standard" : "high_contrast";
   }), settingsControlStateOptions(SETTINGS_RASTER_CONTROL_STATE_KEYS.displayMode, 1311, 271, 492, 64));
-  renderSettingsRasterHitTarget(scene, 1360, 372, 300, 62, 0x5eead4, () => updateSettings(scene, context, (next) => {
+  addControl("largeText", 1360, 372, 300, 62, 0x5eead4, () => updateSettings(scene, context, (next) => {
     next.largeText = !next.largeText;
   }), settingsControlStateOptions(SETTINGS_RASTER_CONTROL_STATE_KEYS.largeText, 1311, 363, 492, 64));
-  renderSettingsRasterHitTarget(scene, 1360, 462, 300, 62, 0x5eead4, () => updateSettings(scene, context, (next) => {
+  addControl("reducedMotion", 1360, 462, 300, 62, 0x5eead4, () => updateSettings(scene, context, (next) => {
     next.reducedMotion = !next.reducedMotion;
   }), settingsControlStateOptions(SETTINGS_RASTER_CONTROL_STATE_KEYS.reducedMotion, 1311, 455, 492, 64));
-  renderSettingsRasterHitTarget(scene, 1360, 640, 320, 62, 0x5eead4, () => updateSettings(scene, context, (next) => {
+  addControl("spaceConfirm", 1360, 640, 320, 62, 0x5eead4, () => updateSettings(scene, context, (next) => {
     next.spaceConfirm = !next.spaceConfirm;
   }), settingsControlStateOptions(SETTINGS_RASTER_CONTROL_STATE_KEYS.spaceConfirm, 1311, 639, 492, 64));
-  renderSettingsRasterHitTarget(scene, 1626, 696, 300, 150, 0xf5c26b, () => resetSettings(scene, context), {
+  addControl("resetDefaults", 1626, 696, 300, 150, 0xf5c26b, () => resetSettings(scene, context), {
     hoverKey: SETTINGS_RASTER_HOVER_RESET_DEFAULTS_KEY,
     downKey: SETTINGS_RASTER_DOWN_RESET_DEFAULTS_KEY,
     stampX: 1626,
@@ -105,7 +151,10 @@ function renderSettingsRasterStage(scene: Phaser.Scene, context: BootContext): S
     hoverAlpha: 0.94,
     downAlpha: 0.92
   });
-  renderSettingsRasterHitTarget(scene, 1626, 520, 300, 150, 0xce5869, () => resetStoredSave(scene, context), {
+  addControl("resetSave", 1626, 520, 300, 150, 0xce5869, () => {
+    scene.registry.set(SETTINGS_RASTER_FOCUS_ID_KEY, undefined);
+    resetStoredSave(scene, context);
+  }, {
     hoverKey: SETTINGS_RASTER_HOVER_RESET_SAVE_KEY,
     downKey: SETTINGS_RASTER_DOWN_RESET_SAVE_KEY,
     stampX: 1626,
@@ -115,7 +164,10 @@ function renderSettingsRasterStage(scene: Phaser.Scene, context: BootContext): S
     hoverAlpha: 0.94,
     downAlpha: 0.92
   });
-  const returnHitTarget = renderSettingsRasterHitTarget(scene, 1688, 958, 330, 170, 0x5eead4, () => scene.scene.start("TownScene", context), {
+  const returnHitTarget = addControl("returnTown", 1688, 958, 330, 170, 0x5eead4, () => {
+    scene.registry.set(SETTINGS_RASTER_FOCUS_ID_KEY, undefined);
+    scene.scene.start("TownScene", context);
+  }, {
     hoverKey: SETTINGS_RASTER_HOVER_RETURN_KEY,
     downKey: SETTINGS_RASTER_DOWN_RETURN_KEY,
     stampX: 1688,
@@ -125,7 +177,124 @@ function renderSettingsRasterStage(scene: Phaser.Scene, context: BootContext): S
     hoverAlpha: 0.96,
     downAlpha: 0.94
   });
-  return { returnHitTarget };
+  return { controls, returnHitTarget };
+}
+
+function createSettingsRasterKeyboardHandler(
+  scene: Phaser.Scene,
+  rasterControls: SettingsRasterControls
+): (action: InputAction) => boolean {
+  const { controls } = rasterControls;
+  let focusedIndex = controls.findIndex((control) => control.id === scene.registry.get(SETTINGS_RASTER_FOCUS_ID_KEY));
+
+  const setFocus = (nextIndex: number): void => {
+    if (!controls[nextIndex]) return;
+    if (focusedIndex >= 0 && focusedIndex !== nextIndex) {
+      setRasterHitTargetHoverState(controls[focusedIndex]?.hitTarget, false);
+    }
+    focusedIndex = nextIndex;
+    scene.registry.set(SETTINGS_RASTER_FOCUS_ID_KEY, controls[focusedIndex].id);
+    setRasterHitTargetHoverState(controls[focusedIndex].hitTarget, true);
+  };
+
+  const clearKeyboardFocus = (except?: SettingsRasterControl): void => {
+    if (focusedIndex < 0 || controls[focusedIndex] === except) return;
+    setRasterHitTargetHoverState(controls[focusedIndex].hitTarget, false);
+    focusedIndex = -1;
+    scene.registry.set(SETTINGS_RASTER_FOCUS_ID_KEY, undefined);
+  };
+
+  controls.forEach((control) => {
+    control.hitTarget.on("pointerover", () => clearKeyboardFocus(control));
+    control.hitTarget.on("pointerout", () => {
+      if (focusedIndex >= 0 && controls[focusedIndex] === control) {
+        setRasterHitTargetHoverState(control.hitTarget, true);
+      }
+    });
+  });
+
+  if (focusedIndex >= 0) {
+    setRasterHitTargetHoverState(controls[focusedIndex].hitTarget, true);
+  }
+
+  return (action: InputAction): boolean => {
+    if (isSettingsMoveAction(action)) {
+      setFocus(resolveSettingsFocusIndex(controls, focusedIndex, action));
+      return true;
+    }
+
+    if (action === "confirm") {
+      if (focusedIndex < 0) {
+        setFocus(0);
+      }
+      const focusedControl = controls[focusedIndex];
+      if (!focusedControl) return true;
+      if (triggerRasterHitTargetDown(scene, focusedControl.hitTarget, focusedControl.activate)) {
+        return true;
+      }
+      focusedControl.activate();
+      return true;
+    }
+
+    if (action === "cancel") {
+      scene.registry.set(SETTINGS_RASTER_FOCUS_ID_KEY, undefined);
+      const returnControl = controls.find((control) => control.id === "returnTown");
+      const returnHitTarget = returnControl?.hitTarget ?? rasterControls.returnHitTarget;
+      const activateReturn = returnControl?.activate ?? (() => scene.scene.start("TownScene"));
+      if (triggerRasterHitTargetDown(scene, returnHitTarget, activateReturn)) {
+        return true;
+      }
+      activateReturn();
+      return true;
+    }
+
+    return false;
+  };
+}
+
+function isSettingsMoveAction(action: InputAction): action is "move_up" | "move_down" | "move_left" | "move_right" {
+  return action === "move_up" || action === "move_down" || action === "move_left" || action === "move_right";
+}
+
+function resolveSettingsFocusIndex(
+  controls: SettingsRasterControl[],
+  focusedIndex: number,
+  action: "move_up" | "move_down" | "move_left" | "move_right"
+): number {
+  if (focusedIndex < 0) return 0;
+  const current = controls[focusedIndex];
+  const candidates = controls
+    .map((control, index) => ({ control, index }))
+    .filter(({ index }) => index !== focusedIndex)
+    .filter(({ control }) => isSettingsFocusCandidate(current, control, action));
+  if (candidates.length === 0) return focusedIndex;
+
+  candidates.sort((left, right) => settingsFocusScore(current, left.control, action) - settingsFocusScore(current, right.control, action));
+  return candidates[0].index;
+}
+
+function isSettingsFocusCandidate(
+  current: SettingsRasterControl,
+  candidate: SettingsRasterControl,
+  action: "move_up" | "move_down" | "move_left" | "move_right"
+): boolean {
+  if (action === "move_up") return candidate.y < current.y - 8;
+  if (action === "move_down") return candidate.y > current.y + 8;
+  if (action === "move_left") return candidate.x < current.x - 8;
+  return candidate.x > current.x + 8;
+}
+
+function settingsFocusScore(
+  current: SettingsRasterControl,
+  candidate: SettingsRasterControl,
+  action: "move_up" | "move_down" | "move_left" | "move_right"
+): number {
+  const dx = Math.abs(candidate.x - current.x);
+  const dy = Math.abs(candidate.y - current.y);
+  if (action === "move_up" || action === "move_down") {
+    return dy + dx * 0.82;
+  }
+  return dx + dy * 2.2;
 }
 
 function settingsControlStateOptions(

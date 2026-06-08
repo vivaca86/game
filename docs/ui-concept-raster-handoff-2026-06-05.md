@@ -834,3 +834,49 @@ Remaining related work:
 
 - Settings still needs full keyboard navigation/focus and selected/focus state review beyond this first cancel feedback.
 - Broad disabled coverage, mobile/responsive review, dynamic labels/tooltips, accessibility-safe text, user acceptance, and final concept-match approval remain unfinished.
+
+## 2026-06-08 Continuation: Settings Keyboard Focus Raster Feedback
+
+Status: `Partially complete`.
+
+This follow-up gives Settings a first keyboard navigation/focus pass using only existing concept-derived hover/down art. It does not add a new focus ring, vector overlay, text label, or alternate art direction.
+
+Added/changed:
+
+- `src/phaser/view/sceneShell.ts`
+- `src/phaser/scenes/SettingsScene.ts`
+- `tmp/settings-keyboard-focus-raster-state-audit.mjs`
+- `tmp/ui-quality/settings-keyboard-focus/volume-master-focus-v1-1920.png`
+- `tmp/ui-quality/settings-keyboard-focus/display-mode-focus-v1-1920.png`
+- `tmp/ui-quality/settings-keyboard-focus/reset-save-focus-v1-1920.png`
+- `tmp/ui-quality/settings-keyboard-focus/return-town-focus-v1-1920.png`
+- `tmp/ui-quality/settings-keyboard-focus/volume-master-keyboard-activate-down-v1-1920.png`
+
+Behavior now verified by `tmp/settings-keyboard-focus-raster-state-audit.mjs`:
+
+- Arrow keys can focus all ten audited Settings controls.
+- Focus uses exactly one existing Settings-specific hover bitmap and no Phaser text or visible rectangle overlay.
+- Enter on volume-master briefly shows `ui_down_settings_volume_master_concept`, updates `volumeMaster` from `0.8` to `0.9`, restarts Settings through the existing update path, and restores focus to volume-master.
+
+Verification run in this continuation:
+
+```powershell
+node tmp\settings-keyboard-focus-raster-state-audit.mjs
+node tmp\settings-raster-hover-coverage-audit.mjs
+node tmp\settings-raster-pressed-coverage-audit.mjs
+node tmp\settings-keyboard-cancel-raster-state-audit.mjs
+node tmp\ui-raster-hover-audit.mjs
+node tmp\ui-raster-down-audit.mjs
+npm.cmd run check
+git diff --check
+```
+
+Known verification note:
+
+- `npm.cmd run check` passed and still reports the existing large JS chunk warning.
+- Broad Phaser smoke was not rerun here and remains `Needs verification` from the previous `checkFullInputCoverage` timeout.
+
+Remaining related work:
+
+- Settings still needs final selected/focus approval beyond this first evidence pass.
+- Broader UI focus/selected state review, broad disabled coverage, mobile/responsive review, dynamic labels/tooltips, accessibility-safe text, user acceptance, and final concept-match approval remain unfinished.

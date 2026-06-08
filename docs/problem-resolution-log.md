@@ -1213,3 +1213,10 @@
 - Impact: Keyboard users could leave Settings without seeing the same return-button material response that pointer users saw. This left Settings out of the first keyboard-material feedback pass.
 - Resolution: `SettingsScene` now keeps the return/check raster hit target and routes `Escape`/cancel through `triggerRasterHitTargetDown` before the unchanged Town transition. `tmp/settings-keyboard-cancel-raster-state-audit.mjs` verifies the `ui_down_settings_return_button_concept` frame, no Phaser text, no visible rectangle overlays, and the return to Town.
 - Prevention: When a scene has only cancel/back keyboard behavior, audit that behavior directly instead of adding a new confirm action. Keyboard feedback should reuse the visible concept control that already owns the pointer state art.
+
+### Problem: Settings controls had pointer state art but no keyboard focus path
+
+- Cause: Settings had ten concept-derived hover/down raster controls, but keyboard input only handled `Escape`/cancel. Directional actions and Enter did not move across or activate the visible Settings controls.
+- Impact: The Settings screen could pass pointer hover/pressed audits while remaining incomplete for keyboard focus. The UI had the right control-specific bitmap state art, but keyboard users could not see or use it.
+- Resolution: `SettingsScene` now tracks its ten raster controls, uses arrow-key movement to focus the nearest visible control, shows the existing control-specific hover bitmap as keyboard focus, and uses the existing down bitmap before running the focused control's existing action on Enter. `tmp/settings-keyboard-focus-raster-state-audit.mjs` verifies focus coverage, no text/vector leakage, Enter activation, persisted setting change, and focus restoration after scene restart.
+- Prevention: Dense settings/control screens should not count pointer hover/down coverage as keyboard focus coverage. Keyboard focus must have its own audit and should reuse the same concept-derived material state before any new focus language is considered.

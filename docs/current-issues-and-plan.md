@@ -127,12 +127,13 @@ Completed progress in this checkpoint:
 - Dungeon now also has first keyboard-confirm raster feedback evidence. Enter/confirm briefly shows the existing `ui_hover_route_node_concept` pressed state on the primary route-node confirm target before the existing dungeon confirm flow advances.
 - Combat and Boss now have first keyboard-action raster feedback evidence. `Digit1` and `KeyE` briefly show the existing local raster down state on the audited card and end-turn controls before the existing action runs.
 - Settings now has first keyboard-cancel raster feedback evidence for its existing return action. `Escape` briefly shows `ui_down_settings_return_button_concept` on the bottom-right return/check button before the unchanged Town transition runs. This does not add a Settings Enter/confirm behavior.
+- Settings now has first keyboard navigation/focus evidence across its ten audited controls. Arrow keys reuse the existing Settings-specific hover bitmaps as focus, and Enter reuses the existing down bitmap before running the focused control's existing action.
 
 Next recommended work:
 
 1. Continue refining later completed-node variants and remaining baked route/node state against the concept; the mid-route completed badge placement is cleaner now but not final art approval.
 2. Continue neutralizing or replacing baked node/route geometry where it conflicts with runtime state, especially missing/weak later node variants, lower-node shape silhouettes, and any remaining route-line state marks.
-3. Refine selected/focus/keyboard state art without falling back to Phaser vector overlays. WorldMap directional keyboard selection, Town/Reward/Event/Dungeon/RuneBench/Result keyboard-confirm feedback, Combat/Boss keyboard card/end-turn feedback, and Settings keyboard-cancel return feedback now have first evidence, but this is not final keyboard/focus coverage across screens.
+3. Refine selected/focus/keyboard state art without falling back to Phaser vector overlays. WorldMap directional keyboard selection, Town/Reward/Event/Dungeon/RuneBench/Result keyboard-confirm feedback, Combat/Boss keyboard card/end-turn feedback, and Settings keyboard-cancel plus keyboard-focus feedback now have first evidence, but this is not final keyboard/focus coverage across screens.
 4. Continue deeper pressed/down and focus review beyond the audited representative/current controls. Settings' ten audited controls, Town's lower toolbar controls, RuneBench lower confirm, Result lower return, and the Town/RuneBench/Result representative utility targets now have screen-specific hover/down evidence, but selected/focus state art, disabled-state breadth, remaining legacy UX decisions, and final keyboard-focus approval are still missing.
 5. Add dynamic labels/tooltips/accessibility-safe text strategy outside the baked concept layer.
 6. Reinvestigate `node tmp/run-phaser-smoke-with-vite.mjs`, which timed out in the 2026-06-05 continuation despite dedicated WorldMap audit and `npm.cmd run check` passing.
@@ -140,7 +141,7 @@ Next recommended work:
 Known unfinished scope:
 
 - Full WorldMap current/completed/locked recomposition beyond first-pass badges.
-- Selected/focus/keyboard state art beyond the first WorldMap directional-selection pass, Town/Reward/Event/Dungeon/RuneBench/Result keyboard-confirm feedback pass, Combat/Boss keyboard-action feedback pass, and Settings keyboard-cancel feedback pass.
+- Selected/focus/keyboard state art beyond the first WorldMap directional-selection pass, Town/Reward/Event/Dungeon/RuneBench/Result keyboard-confirm feedback pass, Combat/Boss keyboard-action feedback pass, and Settings keyboard-cancel/focus feedback pass.
 - Broad disabled-state coverage.
 - Screen-specific pressed/down art beyond the currently audited controls.
 - Dynamic readability and accessibility-safe text strategy.

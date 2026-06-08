@@ -475,9 +475,23 @@ export function renderRasterHoverHitTarget(
     onClick();
   });
   hitTarget.on("pointerupoutside", showIdle);
+  hitTarget.setData("showRasterHover", showHover);
   hitTarget.setData("showRasterDown", showDown);
   hitTarget.setData("showRasterIdle", showIdle);
   return hitTarget;
+}
+
+export function setRasterHitTargetHoverState(
+  hitTarget: Phaser.GameObjects.Rectangle | undefined,
+  hovered: boolean
+): boolean {
+  const showState = hitTarget?.getData(hovered ? "showRasterHover" : "showRasterIdle") as (() => void) | undefined;
+  if (!hitTarget || !showState || (hovered && hitTarget.getData("rasterActivationPending"))) {
+    return false;
+  }
+
+  showState();
+  return true;
 }
 
 export function triggerRasterHitTargetDown(
