@@ -43,7 +43,6 @@ const rasterOnlySceneUnderlays = {
   TownScene: "town_raster_underlay_concept",
   WorldMapScene: "world_map_raster_underlay_concept"
 };
-const rasterDownPressedImageKey = "ui_down_pressed_stamp_concept";
 const rasterDisabledImageKey = "ui_disabled_lock_stamp_concept";
 
 let browser;
@@ -565,16 +564,76 @@ async function checkUiSkinStates() {
     await assertSceneTextLayout(page, "SettingsScene");
     await waitForDebugValue(page, "uiSkin", "button+slot+tooltip");
     const settingsHoverTargets = [
-      { x: 840, y: 282, label: "settings-volume-master" },
-      { x: 840, y: 372, label: "settings-volume-music" },
-      { x: 840, y: 462, label: "settings-volume-sfx" },
-      { x: 1360, y: 282, label: "settings-display-mode" },
-      { x: 1360, y: 372, label: "settings-large-text" },
-      { x: 1360, y: 462, label: "settings-reduced-motion" },
-      { x: 1360, y: 640, label: "settings-space-confirm" },
-      { x: 1626, y: 696, label: "settings-reset-defaults" },
-      { x: 1626, y: 520, label: "settings-reset-save" },
-      { x: 1688, y: 958, label: "settings-return-town" }
+      {
+        x: 840,
+        y: 282,
+        label: "settings-volume-master",
+        hoverKey: "ui_hover_settings_volume_master_concept",
+        downKey: "ui_down_settings_volume_master_concept"
+      },
+      {
+        x: 840,
+        y: 372,
+        label: "settings-volume-music",
+        hoverKey: "ui_hover_settings_volume_music_concept",
+        downKey: "ui_down_settings_volume_music_concept"
+      },
+      {
+        x: 840,
+        y: 462,
+        label: "settings-volume-sfx",
+        hoverKey: "ui_hover_settings_volume_sfx_concept",
+        downKey: "ui_down_settings_volume_sfx_concept"
+      },
+      {
+        x: 1360,
+        y: 282,
+        label: "settings-display-mode",
+        hoverKey: "ui_hover_settings_display_mode_concept",
+        downKey: "ui_down_settings_display_mode_concept"
+      },
+      {
+        x: 1360,
+        y: 372,
+        label: "settings-large-text",
+        hoverKey: "ui_hover_settings_large_text_concept",
+        downKey: "ui_down_settings_large_text_concept"
+      },
+      {
+        x: 1360,
+        y: 462,
+        label: "settings-reduced-motion",
+        hoverKey: "ui_hover_settings_reduced_motion_concept",
+        downKey: "ui_down_settings_reduced_motion_concept"
+      },
+      {
+        x: 1360,
+        y: 640,
+        label: "settings-space-confirm",
+        hoverKey: "ui_hover_settings_space_confirm_concept",
+        downKey: "ui_down_settings_space_confirm_concept"
+      },
+      {
+        x: 1626,
+        y: 696,
+        label: "settings-reset-defaults",
+        hoverKey: "ui_hover_settings_reset_defaults_concept",
+        downKey: "ui_down_settings_reset_defaults_concept"
+      },
+      {
+        x: 1626,
+        y: 520,
+        label: "settings-reset-save",
+        hoverKey: "ui_hover_settings_reset_save_concept",
+        downKey: "ui_down_settings_reset_save_concept"
+      },
+      {
+        x: 1688,
+        y: 958,
+        label: "settings-return-town",
+        hoverKey: "ui_hover_settings_return_button_concept",
+        downKey: "ui_down_settings_return_button_concept"
+      }
     ];
     for (const target of settingsHoverTargets) {
       await assertHoverUsesRasterImageOnly(
@@ -582,8 +641,9 @@ async function checkUiSkinStates() {
         target.x,
         target.y,
         target.label,
-        "ui_hover_action_seal_concept",
-        "SettingsScene"
+        target.hoverKey ?? "ui_hover_action_seal_concept",
+        "SettingsScene",
+        target.downKey ?? target.hoverKey ?? "ui_hover_action_seal_concept"
       );
     }
     await captureUiSkinScreenshot(page, "settings-controls");
@@ -1388,7 +1448,7 @@ async function assertHoverKeepsCanvasStable(page, sceneX, sceneY, label) {
   }
 }
 
-async function assertHoverUsesRasterImageOnly(page, sceneX, sceneY, label, expectedImageKey, sceneName = "CombatScene", expectedDownImageKey = rasterDownPressedImageKey) {
+async function assertHoverUsesRasterImageOnly(page, sceneX, sceneY, label, expectedImageKey, sceneName = "CombatScene", expectedDownImageKey = expectedImageKey) {
   const canvas = page.locator("canvas");
   const canvasBox = await canvas.boundingBox();
   if (!canvasBox) {

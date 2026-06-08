@@ -1143,3 +1143,24 @@
 - Impact: Settings could pass per-control hover/pressed audits while still looking less integrated than the concept art because the bottom-right red check button had an unrelated stamp on top rather than a button-specific state.
 - Resolution: Added `ui_hover_settings_return_button_concept` and `ui_down_settings_return_button_concept`, extracted from the Settings concept underlay. The first crop used runtime coordinates against the smaller source image and captured the wrong dark area; screenshot/source inspection caught it before in-game use. A corrected source-space crop and check-center alignment now make the button itself brighten/darken for hover/down.
 - Prevention: Button-specific assets must be checked at three levels: source crop, in-scene hover screenshot, and in-scene down screenshot. Runtime coordinates must be converted to the source image's native resolution before extracting from concept underlays.
+
+### Problem: Settings reset panels still used the shared action-seal feedback
+
+- Cause: After the return/check button-specific pass, the two right-side Settings reset controls still used `ui_hover_action_seal_concept` for hover/down. The skull save-reset card and gear defaults-reset card were visually clear concept panels, so a shared seal remained a weaker, pasted-on response.
+- Impact: Settings per-control audits could pass while the reset controls still failed the stricter concept-state standard. The user-facing screen looked less integrated because the visible panel itself did not respond.
+- Resolution: Added `ui_hover_settings_reset_save_concept`, `ui_down_settings_reset_save_concept`, `ui_hover_settings_reset_defaults_concept`, and `ui_down_settings_reset_defaults_concept`, all extracted from `settings_raster_underlay_concept_v001.png`. `SettingsScene` now maps reset-save and reset-defaults to their own panel-specific hover/down art. Settings hover/pressed coverage audits now expect those keys, and the 10-screen down audit still passes.
+- Prevention: When a concept screen has a visible button or side-card control, prefer a source-cropped state for that control before using a shared action seal. Preview the source asset first, then inspect in-scene hover and down screenshots so background book/page material does not become the primary feedback shape.
+
+### Problem: Phaser smoke expected the obsolete shared pressed-stamp default
+
+- Cause: `tools/phaser-smoke-test.mjs` still defaulted down-state assertions to `ui_down_pressed_stamp_concept`, even though the documented raster pressed-state pass had moved audited controls to control-family bitmap keys.
+- Impact: The broad smoke failed at `town-action-button` even though the current down-state standard is now `ui_hover_action_seal_concept` for that control family. This made smoke disagree with the current UI rubric and dedicated down audit.
+- Resolution: Changed `assertHoverUsesRasterImageOnly` so omitted down-key expectations default to the expected hover key. WorldMap and Settings controls with bespoke down art still pass explicit down keys.
+- Prevention: Shared helper defaults must follow the current UI-state standard. If a state-art migration changes the visual family, update broad smoke helpers as well as dedicated audit scripts.
+
+### Problem: Settings sliders and toggles still used the shared action-seal feedback
+
+- Cause: The Settings return and reset panels had moved to concept-underlay-specific state art, but the three volume sliders, display-mode selector, large-text toggle, reduced-motion toggle, and space-confirm toggle still used the broad action-seal family.
+- Impact: The Settings screen could pass interaction audits while most of its main controls still responded with an unrelated pasted-on seal instead of the actual row/control brightening or darkening. This weakened concept-match quality on the screen with the most dense control surface.
+- Resolution: Added fourteen Settings row/control-specific assets: hover/down pairs for volume-master, volume-music, volume-sfx, display-mode, large-text, reduced-motion, and space-confirm. `SettingsScene` now maps those seven controls to their own hover/down art, and the Settings hover/pressed coverage audits expect the new keys. The 10-screen down audit and `npm.cmd run check` still pass.
+- Prevention: For dense concept-raster screens, finish the full audited control set before treating a shared state family as acceptable. Each control should have source preview, in-scene hover screenshot, and in-scene pressed screenshot evidence before the audit expectation is changed.

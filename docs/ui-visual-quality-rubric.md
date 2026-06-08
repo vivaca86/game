@@ -2417,6 +2417,106 @@ This checkpoint brings the Settings bottom-right return/check button closer to t
 
 This is still not final Settings approval. The other Settings controls still use the broad action-seal family, and selected/focus, disabled, mobile/responsive, dynamic labels/tooltips, accessibility-safe text, and user acceptance remain unfinished.
 
+## Settings Reset Panel-Specific State Checkpoint
+
+Date: 2026-06-08
+
+Evidence:
+
+- `assets/source/ui/ui_hover_settings_reset_save_concept_v001.png`
+- `assets/source/ui/ui_down_settings_reset_save_concept_v001.png`
+- `assets/source/ui/ui_hover_settings_reset_defaults_concept_v001.png`
+- `assets/source/ui/ui_down_settings_reset_defaults_concept_v001.png`
+- `public/assets/runtime/ui/ui_hover_settings_reset_save_concept_v001.png`
+- `public/assets/runtime/ui/ui_down_settings_reset_save_concept_v001.png`
+- `public/assets/runtime/ui/ui_hover_settings_reset_defaults_concept_v001.png`
+- `public/assets/runtime/ui/ui_down_settings_reset_defaults_concept_v001.png`
+- `src/data/assetManifest.slice.v1.json`
+- `docs/asset-manifest.slice.v1.json`
+- `src/data/releaseCatalogAdapter.ts`
+- `src/phaser/scenes/SettingsScene.ts`
+- `tools/extract-ui-state-assets.mjs`
+- `tools/generate-dev-runtime-assets.mjs`
+- `tools/phaser-smoke-test.mjs`
+- `tmp/settings-raster-hover-coverage-audit.mjs`
+- `tmp/settings-raster-pressed-coverage-audit.mjs`
+- `tmp/ui-quality/settings-hover-coverage/reset-save-v1-1920.png`
+- `tmp/ui-quality/settings-hover-coverage/reset-defaults-v1-1920.png`
+- `tmp/ui-quality/settings-pressed-coverage/reset-save-v1-1920.png`
+- `tmp/ui-quality/settings-pressed-coverage/reset-defaults-v1-1920.png`
+- Settings hover coverage audit: reset-save now expects `ui_hover_settings_reset_save_concept`; reset-defaults now expects `ui_hover_settings_reset_defaults_concept`; all ten Settings controls still verify one visible hover image, no text, and no visible rectangles above the underlay
+- Settings pressed coverage audit: reset-save now expects `ui_down_settings_reset_save_concept`; reset-defaults now expects `ui_down_settings_reset_defaults_concept`; all ten Settings controls still verify one visible down image, no text, and no visible rectangles above the underlay
+- 10-screen down audit still passed after the reset-panel-specific state change
+- `node tools\extract-ui-state-assets.mjs`
+- `npm.cmd run assets:generate:dev`
+- `node tmp\settings-raster-hover-coverage-audit.mjs`
+- `node tmp\settings-raster-pressed-coverage-audit.mjs`
+- `node tmp\ui-raster-down-audit.mjs`
+- `npm.cmd run check`
+
+Current status: `Needs user review`
+
+Completion level: `Partially complete`
+
+This checkpoint extends the Settings return-button standard to the right-side reset panels. The skull save-reset card and gear defaults-reset card now brighten/darken as their own concept-derived panels instead of receiving the shared action seal. The crop was matched back to the source underlay, then the mask was tightened after source preview so the left book/page material did not become the main feedback surface.
+
+Broad Phaser smoke remains `Needs verification` for this continuation. `tmp/run-phaser-smoke-with-vite.mjs` passed through `checkClickableControls` after `tools/phaser-smoke-test.mjs` was updated to expect control-family down keys by default, then timed out during `checkFullInputCoverage`.
+
+This is still not final Settings approval. At this checkpoint the sliders/toggles still used the broad action-seal family, and selected/focus, disabled, mobile/responsive, dynamic labels/tooltips, accessibility-safe text, and user acceptance remained unfinished.
+
+## Settings Row/Toggle-Specific State Checkpoint
+
+Date: 2026-06-08
+
+Evidence:
+
+- `assets/source/ui/ui_hover_settings_volume_master_concept_v001.png`
+- `assets/source/ui/ui_down_settings_volume_master_concept_v001.png`
+- `assets/source/ui/ui_hover_settings_volume_music_concept_v001.png`
+- `assets/source/ui/ui_down_settings_volume_music_concept_v001.png`
+- `assets/source/ui/ui_hover_settings_volume_sfx_concept_v001.png`
+- `assets/source/ui/ui_down_settings_volume_sfx_concept_v001.png`
+- `assets/source/ui/ui_hover_settings_display_mode_concept_v001.png`
+- `assets/source/ui/ui_down_settings_display_mode_concept_v001.png`
+- `assets/source/ui/ui_hover_settings_large_text_concept_v001.png`
+- `assets/source/ui/ui_down_settings_large_text_concept_v001.png`
+- `assets/source/ui/ui_hover_settings_reduced_motion_concept_v001.png`
+- `assets/source/ui/ui_down_settings_reduced_motion_concept_v001.png`
+- `assets/source/ui/ui_hover_settings_space_confirm_concept_v001.png`
+- `assets/source/ui/ui_down_settings_space_confirm_concept_v001.png`
+- `public/assets/runtime/ui/ui_hover_settings_volume_master_concept_v001.png`
+- `public/assets/runtime/ui/ui_down_settings_volume_master_concept_v001.png`
+- `public/assets/runtime/ui/ui_hover_settings_display_mode_concept_v001.png`
+- `public/assets/runtime/ui/ui_down_settings_space_confirm_concept_v001.png`
+- `src/phaser/scenes/SettingsScene.ts`
+- `tools/extract-ui-state-assets.mjs`
+- `tools/generate-dev-runtime-assets.mjs`
+- `tools/phaser-smoke-test.mjs`
+- `tmp/settings-raster-hover-coverage-audit.mjs`
+- `tmp/settings-raster-pressed-coverage-audit.mjs`
+- `tmp/ui-quality/settings-hover-coverage/volume-master-v1-1920.png`
+- `tmp/ui-quality/settings-pressed-coverage/volume-master-v1-1920.png`
+- `tmp/ui-quality/settings-hover-coverage/display-mode-v1-1920.png`
+- `tmp/ui-quality/settings-hover-coverage/space-confirm-v1-1920.png`
+- Settings hover coverage audit: all ten Settings controls now expect Settings-specific hover raster keys and still verify one visible hover image, no text, and no visible rectangles above the underlay
+- Settings pressed coverage audit: all ten Settings controls now expect Settings-specific down raster keys and still verify one visible down image, no text, and no visible rectangles above the underlay
+- 10-screen down audit still passed after the row/toggle-specific state change
+- `node tools\extract-ui-state-assets.mjs`
+- `npm.cmd run assets:generate:dev`
+- `node tmp\settings-raster-hover-coverage-audit.mjs`
+- `node tmp\settings-raster-pressed-coverage-audit.mjs`
+- `node tmp\ui-raster-down-audit.mjs`
+- `npm.cmd run check`
+- `git diff --check`
+
+Current status: `Needs user review`
+
+Completion level: `Partially complete`
+
+This checkpoint removes the remaining shared action-seal dependency from the ten audited Settings controls. The three volume sliders, display-mode selector, large-text toggle, reduced-motion toggle, and space-confirm toggle now brighten/darken as their own concept-underlay row/control art.
+
+This is still not final Settings approval. Selected/focus, disabled, keyboard focus, mobile/responsive, dynamic labels/tooltips, accessibility-safe text, user acceptance, and final concept-match approval remain unfinished.
+
 ## Current Remaining Raster-Quality Scope
 
 Status: `Not complete`
@@ -2426,7 +2526,7 @@ The active goal still remains open. The immediate first-view raster concept-unde
 - Component-state art and broad card/relic/arcana art coverage remain candidate-level.
 - Combat, Boss, WorldMap, Dungeon, Reward, Event, Town, RuneBench, and Result now have first bitmap hover-state passes on representative controls; Settings has full current-control hover coverage for its ten major raster hit targets.
 - All ten primary raster concept screens now have a bitmap pressed/down-state candidate on their audited hit targets, and those audited targets now use control-family concept bitmaps instead of the shared pressed-stamp fallback. This is still not final screen-specific pressed art across the full UI.
-- Settings now has full current-control hover coverage and pressed coverage for its ten major raster hit targets, and the return-to-town feedback is anchored to the visible bottom-right red check button with button-specific hover/down art. Its selected, disabled, keyboard focus, remaining bespoke screen-specific state art, and dynamic readability states still need a full per-control pass.
+- Settings now has full current-control hover coverage and pressed coverage for its ten major raster hit targets. Return-to-town, reset-save, reset-defaults, volume sliders, display-mode, large-text, reduced-motion, and space-confirm are anchored to their visible concept controls with button/panel/row-specific hover/down art. Its selected, disabled, keyboard focus, and dynamic readability states still need a full per-control pass.
 - Event now has a first visible bitmap disabled-state candidate for the release unaffordable choice, verified with a 1920 debugless audit and smoke; disabled coverage is still not broad across every scene/control.
 - WorldMap no longer has the hidden center confirm target; primary action is now verified on the visible bottom-right play button, that button has first-pass hover/down art cropped from the original WorldMap concept, the current stage now has a runtime-driven marker plus cleaned concept-derived current halo plus lower current-status badge, node hover uses the cleaned halo instead of a detached route token, arrow keys can select the nearest unlocked node by concept-map direction, and completed/locked/sealed stages now have first-pass runtime raster badges. The runtime underlay now neutralizes the strongest baked 1-3 completed checks, lower 1-5 node body colors, stage-4 cyan state colors, the main remaining stage-4 and 4-to-5 route remnants, and sampled old red lock centers. Red-lock placement is source-aligned for stages 10-15, late-route completed checks are smaller, stage 6/7 completed badges sit closer to their node bases, stage 8 is treated as a quieter route-point marker, and gray seals now emphasize only the next lower/mid locked node. This is still not full current/selected/completed/locked-state recomposition: baked route/node geometry remains, lower-node baked silhouettes are only reduced rather than fully recomposed, later stage variants are not complete, and broader keyboard focus, dynamic labels, accessibility-safe tooltips, mobile/responsive review, and user acceptance remain unfinished.
 - Combat and Boss now have concept-source-derived raster effect candidates on their raster paths. The Boss stage cue was corrected from a shield-like source to a component-sheet gold starburst source, but effect timing, target-specific placement across all effects, animation readability, and final Boss phase/effect communication are still not final.
@@ -2434,3 +2534,4 @@ The active goal still remains open. The immediate first-view raster concept-unde
 - Raster hover/down feedback is no longer universally invisible: all 10 primary raster concept screens have extracted bitmap hover-state candidates on representative controls and a pressed/down-state candidate on audited controls. The audited pressed states now avoid the shared fallback stamp, and Event also has a first disabled lock candidate. Final matching-quality selected, broad disabled, focus, deeper per-control pressed, and screen-specific state coverage is still missing.
 - The full UI skin is not a 95-point completion candidate and has no user acceptance yet.
 - `npm.cmd run check` still reports the existing Vite large JS chunk warning, so performance remains tracked separately as `Needs verification`.
+- Broad Phaser smoke is not passed for the 2026-06-08 continuation; the wrapper timed out during `checkFullInputCoverage`.

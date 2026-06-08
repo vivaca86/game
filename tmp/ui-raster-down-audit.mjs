@@ -52,7 +52,7 @@ const targets = [
     pathname: "/?debug=1&entry=town&resetSave=1",
     downX: 840,
     downY: 282,
-    downKey: "ui_hover_action_seal_concept",
+    downKey: "ui_down_settings_volume_master_concept",
     setup: async (page) => {
       const canvas = page.locator("canvas");
       const box = await canvas.boundingBox();

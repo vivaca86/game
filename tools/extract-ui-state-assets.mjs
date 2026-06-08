@@ -134,6 +134,212 @@ const targets = [
     stateVariant: "buttonDown"
   },
   {
+    key: "ui_hover_settings_reset_save_concept",
+    kind: "button_state",
+    source: path.join(rootDir, "assets", "source", "ui", "settings_raster_underlay_concept_v001.png"),
+    output: path.join(rootDir, "assets", "source", "ui", "ui_hover_settings_reset_save_concept_v001.png"),
+    crop: { x: 1278, y: 360, w: 290, h: 128 },
+    nativeSize: { w: 330, h: 150 },
+    maskPolygon: [
+      { x: 92, y: 24 },
+      { x: 106, y: 10 },
+      { x: 292, y: 8 },
+      { x: 318, y: 26 },
+      { x: 326, y: 72 },
+      { x: 314, y: 126 },
+      { x: 292, y: 144 },
+      { x: 100, y: 140 },
+      { x: 86, y: 112 }
+    ],
+    stateVariant: "buttonHover"
+  },
+  {
+    key: "ui_down_settings_reset_save_concept",
+    kind: "button_state",
+    source: path.join(rootDir, "assets", "source", "ui", "settings_raster_underlay_concept_v001.png"),
+    output: path.join(rootDir, "assets", "source", "ui", "ui_down_settings_reset_save_concept_v001.png"),
+    crop: { x: 1278, y: 360, w: 290, h: 128 },
+    nativeSize: { w: 330, h: 150 },
+    maskPolygon: [
+      { x: 92, y: 24 },
+      { x: 106, y: 10 },
+      { x: 292, y: 8 },
+      { x: 318, y: 26 },
+      { x: 326, y: 72 },
+      { x: 314, y: 126 },
+      { x: 292, y: 144 },
+      { x: 100, y: 140 },
+      { x: 86, y: 112 }
+    ],
+    stateVariant: "buttonDown"
+  },
+  {
+    key: "ui_hover_settings_reset_defaults_concept",
+    kind: "button_state",
+    source: path.join(rootDir, "assets", "source", "ui", "settings_raster_underlay_concept_v001.png"),
+    output: path.join(rootDir, "assets", "source", "ui", "ui_hover_settings_reset_defaults_concept_v001.png"),
+    crop: { x: 1278, y: 532, w: 290, h: 128 },
+    nativeSize: { w: 330, h: 150 },
+    maskPolygon: [
+      { x: 92, y: 24 },
+      { x: 106, y: 10 },
+      { x: 292, y: 8 },
+      { x: 318, y: 26 },
+      { x: 326, y: 72 },
+      { x: 314, y: 126 },
+      { x: 292, y: 144 },
+      { x: 100, y: 140 },
+      { x: 86, y: 112 }
+    ],
+    stateVariant: "buttonHover"
+  },
+  {
+    key: "ui_down_settings_reset_defaults_concept",
+    kind: "button_state",
+    source: path.join(rootDir, "assets", "source", "ui", "settings_raster_underlay_concept_v001.png"),
+    output: path.join(rootDir, "assets", "source", "ui", "ui_down_settings_reset_defaults_concept_v001.png"),
+    crop: { x: 1278, y: 532, w: 290, h: 128 },
+    nativeSize: { w: 330, h: 150 },
+    maskPolygon: [
+      { x: 92, y: 24 },
+      { x: 106, y: 10 },
+      { x: 292, y: 8 },
+      { x: 318, y: 26 },
+      { x: 326, y: 72 },
+      { x: 314, y: 126 },
+      { x: 292, y: 144 },
+      { x: 100, y: 140 },
+      { x: 86, y: 112 }
+    ],
+    stateVariant: "buttonDown"
+  },
+  {
+    key: "ui_hover_settings_volume_master_concept",
+    kind: "settings_control_state",
+    source: path.join(rootDir, "assets", "source", "ui", "settings_raster_underlay_concept_v001.png"),
+    output: path.join(rootDir, "assets", "source", "ui", "ui_hover_settings_volume_master_concept_v001.png"),
+    crop: { x: 390, y: 208, w: 470, h: 54 },
+    nativeSize: { w: 540, h: 64 },
+    stateVariant: "controlHover"
+  },
+  {
+    key: "ui_down_settings_volume_master_concept",
+    kind: "settings_control_state",
+    source: path.join(rootDir, "assets", "source", "ui", "settings_raster_underlay_concept_v001.png"),
+    output: path.join(rootDir, "assets", "source", "ui", "ui_down_settings_volume_master_concept_v001.png"),
+    crop: { x: 390, y: 208, w: 470, h: 54 },
+    nativeSize: { w: 540, h: 64 },
+    stateVariant: "controlDown"
+  },
+  {
+    key: "ui_hover_settings_volume_music_concept",
+    kind: "settings_control_state",
+    source: path.join(rootDir, "assets", "source", "ui", "settings_raster_underlay_concept_v001.png"),
+    output: path.join(rootDir, "assets", "source", "ui", "ui_hover_settings_volume_music_concept_v001.png"),
+    crop: { x: 390, y: 288, w: 470, h: 54 },
+    nativeSize: { w: 540, h: 64 },
+    stateVariant: "controlHover"
+  },
+  {
+    key: "ui_down_settings_volume_music_concept",
+    kind: "settings_control_state",
+    source: path.join(rootDir, "assets", "source", "ui", "settings_raster_underlay_concept_v001.png"),
+    output: path.join(rootDir, "assets", "source", "ui", "ui_down_settings_volume_music_concept_v001.png"),
+    crop: { x: 390, y: 288, w: 470, h: 54 },
+    nativeSize: { w: 540, h: 64 },
+    stateVariant: "controlDown"
+  },
+  {
+    key: "ui_hover_settings_volume_sfx_concept",
+    kind: "settings_control_state",
+    source: path.join(rootDir, "assets", "source", "ui", "settings_raster_underlay_concept_v001.png"),
+    output: path.join(rootDir, "assets", "source", "ui", "ui_hover_settings_volume_sfx_concept_v001.png"),
+    crop: { x: 390, y: 368, w: 470, h: 54 },
+    nativeSize: { w: 540, h: 64 },
+    stateVariant: "controlHover"
+  },
+  {
+    key: "ui_down_settings_volume_sfx_concept",
+    kind: "settings_control_state",
+    source: path.join(rootDir, "assets", "source", "ui", "settings_raster_underlay_concept_v001.png"),
+    output: path.join(rootDir, "assets", "source", "ui", "ui_down_settings_volume_sfx_concept_v001.png"),
+    crop: { x: 390, y: 368, w: 470, h: 54 },
+    nativeSize: { w: 540, h: 64 },
+    stateVariant: "controlDown"
+  },
+  {
+    key: "ui_hover_settings_display_mode_concept",
+    kind: "settings_control_state",
+    source: path.join(rootDir, "assets", "source", "ui", "settings_raster_underlay_concept_v001.png"),
+    output: path.join(rootDir, "assets", "source", "ui", "ui_hover_settings_display_mode_concept_v001.png"),
+    crop: { x: 930, y: 208, w: 430, h: 54 },
+    nativeSize: { w: 492, h: 64 },
+    stateVariant: "controlHover"
+  },
+  {
+    key: "ui_down_settings_display_mode_concept",
+    kind: "settings_control_state",
+    source: path.join(rootDir, "assets", "source", "ui", "settings_raster_underlay_concept_v001.png"),
+    output: path.join(rootDir, "assets", "source", "ui", "ui_down_settings_display_mode_concept_v001.png"),
+    crop: { x: 930, y: 208, w: 430, h: 54 },
+    nativeSize: { w: 492, h: 64 },
+    stateVariant: "controlDown"
+  },
+  {
+    key: "ui_hover_settings_large_text_concept",
+    kind: "settings_control_state",
+    source: path.join(rootDir, "assets", "source", "ui", "settings_raster_underlay_concept_v001.png"),
+    output: path.join(rootDir, "assets", "source", "ui", "ui_hover_settings_large_text_concept_v001.png"),
+    crop: { x: 930, y: 288, w: 430, h: 54 },
+    nativeSize: { w: 492, h: 64 },
+    stateVariant: "controlHover"
+  },
+  {
+    key: "ui_down_settings_large_text_concept",
+    kind: "settings_control_state",
+    source: path.join(rootDir, "assets", "source", "ui", "settings_raster_underlay_concept_v001.png"),
+    output: path.join(rootDir, "assets", "source", "ui", "ui_down_settings_large_text_concept_v001.png"),
+    crop: { x: 930, y: 288, w: 430, h: 54 },
+    nativeSize: { w: 492, h: 64 },
+    stateVariant: "controlDown"
+  },
+  {
+    key: "ui_hover_settings_reduced_motion_concept",
+    kind: "settings_control_state",
+    source: path.join(rootDir, "assets", "source", "ui", "settings_raster_underlay_concept_v001.png"),
+    output: path.join(rootDir, "assets", "source", "ui", "ui_hover_settings_reduced_motion_concept_v001.png"),
+    crop: { x: 930, y: 368, w: 430, h: 54 },
+    nativeSize: { w: 492, h: 64 },
+    stateVariant: "controlHover"
+  },
+  {
+    key: "ui_down_settings_reduced_motion_concept",
+    kind: "settings_control_state",
+    source: path.join(rootDir, "assets", "source", "ui", "settings_raster_underlay_concept_v001.png"),
+    output: path.join(rootDir, "assets", "source", "ui", "ui_down_settings_reduced_motion_concept_v001.png"),
+    crop: { x: 930, y: 368, w: 430, h: 54 },
+    nativeSize: { w: 492, h: 64 },
+    stateVariant: "controlDown"
+  },
+  {
+    key: "ui_hover_settings_space_confirm_concept",
+    kind: "settings_control_state",
+    source: path.join(rootDir, "assets", "source", "ui", "settings_raster_underlay_concept_v001.png"),
+    output: path.join(rootDir, "assets", "source", "ui", "ui_hover_settings_space_confirm_concept_v001.png"),
+    crop: { x: 930, y: 528, w: 430, h: 54 },
+    nativeSize: { w: 492, h: 64 },
+    stateVariant: "controlHover"
+  },
+  {
+    key: "ui_down_settings_space_confirm_concept",
+    kind: "settings_control_state",
+    source: path.join(rootDir, "assets", "source", "ui", "settings_raster_underlay_concept_v001.png"),
+    output: path.join(rootDir, "assets", "source", "ui", "ui_down_settings_space_confirm_concept_v001.png"),
+    crop: { x: 930, y: 528, w: 430, h: 54 },
+    nativeSize: { w: 492, h: 64 },
+    stateVariant: "controlDown"
+  },
+  {
     key: "ui_current_stage_marker_concept",
     kind: "current_marker",
     source: path.join(rootDir, "assets", "concepts", "ui", "world_map_ui_concept_v001.png"),
@@ -1017,6 +1223,91 @@ try {
         base64: sourceBuffer.toString("base64"),
         crop: target.crop,
         nativeSize: target.nativeSize
+      })
+      : target.kind === "settings_control_state"
+        ? await page.evaluate(async ({ base64, crop, nativeSize, stateVariant }) => {
+        const image = await new Promise((resolve, reject) => {
+          const img = new Image();
+          img.onload = () => resolve(img);
+          img.onerror = () => reject(new Error("source concept image failed to load"));
+          img.src = `data:image/png;base64,${base64}`;
+        });
+
+        const canvas = document.createElement("canvas");
+        canvas.width = nativeSize.w;
+        canvas.height = nativeSize.h;
+        const ctx = canvas.getContext("2d", { willReadFrequently: true });
+        if (!ctx) throw new Error("2d canvas context unavailable");
+
+        ctx.drawImage(image, crop.x, crop.y, crop.w, crop.h, 0, 0, nativeSize.w, nativeSize.h);
+
+        const imageData = ctx.getImageData(0, 0, nativeSize.w, nativeSize.h);
+        const data = imageData.data;
+        for (let y = 0; y < nativeSize.h; y += 1) {
+          for (let x = 0; x < nativeSize.w; x += 1) {
+            const offset = (y * nativeSize.w + x) * 4;
+            const edge = softRectMask(x, y, nativeSize.w, nativeSize.h);
+            if (edge <= 0) {
+              data[offset + 3] = 0;
+              continue;
+            }
+
+            const r = data[offset];
+            const g = data[offset + 1];
+            const b = data[offset + 2];
+            const max = Math.max(r, g, b);
+            const min = Math.min(r, g, b);
+            const saturation = max - min;
+            const luminance = r * 0.299 + g * 0.587 + b * 0.114;
+            const parchment = r > 138 && g > 112 && b > 82 && saturation < 74;
+            const darkInk = (1 - smoothstep(72, 160, luminance)) * 0.95;
+            const saturatedMaterial = smoothstep(18, 92, saturation) * 0.82;
+            const tealMaterial = smoothstep(18, 96, g + b * 0.7 - r * 1.12 - 42) * 0.9;
+            const warmMetal = smoothstep(22, 112, r + g * 0.72 - b * 1.38 - 92) * 0.72;
+            const fineLine = (1 - smoothstep(108, 184, luminance)) * smoothstep(10, 58, saturation + Math.abs(r - g) * 0.34);
+            let keep = Math.max(darkInk, saturatedMaterial, tealMaterial, warmMetal, fineLine * 0.82);
+            if (parchment && keep < 0.46) keep = 0;
+            if (keep <= 0.06) {
+              data[offset + 3] = 0;
+              continue;
+            }
+
+            const materialAlpha = Math.min(1, keep * 1.15) * edge;
+            if (stateVariant === "controlDown") {
+              const shade = 0.52 + Math.min(1, keep) * 0.16;
+              data[offset] = Math.max(0, Math.round(r * shade));
+              data[offset + 1] = Math.max(0, Math.round(g * (shade * 0.88)));
+              data[offset + 2] = Math.max(0, Math.round(b * (shade * 0.82)));
+              data[offset + 3] = Math.round(226 * materialAlpha);
+            } else {
+              data[offset] = Math.min(255, Math.round(r * 1.08 + luminance * 0.07 + warmMetal * 18));
+              data[offset + 1] = Math.min(255, Math.round(g * 1.07 + luminance * 0.05 + tealMaterial * 16 + warmMetal * 10));
+              data[offset + 2] = Math.min(255, Math.round(b * 1.02 + tealMaterial * 12));
+              data[offset + 3] = Math.round(236 * materialAlpha);
+            }
+          }
+        }
+
+        ctx.putImageData(imageData, 0, 0);
+        return canvas.toDataURL("image/png");
+
+        function smoothstep(edge0, edge1, value) {
+          const t = Math.max(0, Math.min(1, (value - edge0) / Math.max(1, edge1 - edge0)));
+          return t * t * (3 - 2 * t);
+        }
+
+        function softRectMask(x, y, width, height) {
+          const inset = 2;
+          const feather = 8;
+          const dx = Math.min(x - inset, width - inset - x);
+          const dy = Math.min(y - inset, height - inset - y);
+          return Math.max(0, Math.min(1, Math.min(dx, dy) / feather));
+        }
+      }, {
+        base64: sourceBuffer.toString("base64"),
+        crop: target.crop,
+        nativeSize: target.nativeSize,
+        stateVariant: target.stateVariant
       })
       : target.kind === "button_state"
         ? await page.evaluate(async ({ base64, crop, nativeSize, stateVariant, maskPolygon }) => {

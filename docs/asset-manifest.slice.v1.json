@@ -380,6 +380,132 @@
       "styleKey": "premium_popup_book"
     },
     {
+      "key": "ui_hover_settings_reset_save_concept",
+      "type": "image",
+      "path": "assets/runtime/ui/ui_hover_settings_reset_save_concept_v001.png",
+      "nativeSize": { "w": 330, "h": 150 },
+      "styleKey": "premium_popup_book"
+    },
+    {
+      "key": "ui_down_settings_reset_save_concept",
+      "type": "image",
+      "path": "assets/runtime/ui/ui_down_settings_reset_save_concept_v001.png",
+      "nativeSize": { "w": 330, "h": 150 },
+      "styleKey": "premium_popup_book"
+    },
+    {
+      "key": "ui_hover_settings_reset_defaults_concept",
+      "type": "image",
+      "path": "assets/runtime/ui/ui_hover_settings_reset_defaults_concept_v001.png",
+      "nativeSize": { "w": 330, "h": 150 },
+      "styleKey": "premium_popup_book"
+    },
+    {
+      "key": "ui_down_settings_reset_defaults_concept",
+      "type": "image",
+      "path": "assets/runtime/ui/ui_down_settings_reset_defaults_concept_v001.png",
+      "nativeSize": { "w": 330, "h": 150 },
+      "styleKey": "premium_popup_book"
+    },
+    {
+      "key": "ui_hover_settings_volume_master_concept",
+      "type": "image",
+      "path": "assets/runtime/ui/ui_hover_settings_volume_master_concept_v001.png",
+      "nativeSize": { "w": 540, "h": 64 },
+      "styleKey": "premium_popup_book"
+    },
+    {
+      "key": "ui_down_settings_volume_master_concept",
+      "type": "image",
+      "path": "assets/runtime/ui/ui_down_settings_volume_master_concept_v001.png",
+      "nativeSize": { "w": 540, "h": 64 },
+      "styleKey": "premium_popup_book"
+    },
+    {
+      "key": "ui_hover_settings_volume_music_concept",
+      "type": "image",
+      "path": "assets/runtime/ui/ui_hover_settings_volume_music_concept_v001.png",
+      "nativeSize": { "w": 540, "h": 64 },
+      "styleKey": "premium_popup_book"
+    },
+    {
+      "key": "ui_down_settings_volume_music_concept",
+      "type": "image",
+      "path": "assets/runtime/ui/ui_down_settings_volume_music_concept_v001.png",
+      "nativeSize": { "w": 540, "h": 64 },
+      "styleKey": "premium_popup_book"
+    },
+    {
+      "key": "ui_hover_settings_volume_sfx_concept",
+      "type": "image",
+      "path": "assets/runtime/ui/ui_hover_settings_volume_sfx_concept_v001.png",
+      "nativeSize": { "w": 540, "h": 64 },
+      "styleKey": "premium_popup_book"
+    },
+    {
+      "key": "ui_down_settings_volume_sfx_concept",
+      "type": "image",
+      "path": "assets/runtime/ui/ui_down_settings_volume_sfx_concept_v001.png",
+      "nativeSize": { "w": 540, "h": 64 },
+      "styleKey": "premium_popup_book"
+    },
+    {
+      "key": "ui_hover_settings_display_mode_concept",
+      "type": "image",
+      "path": "assets/runtime/ui/ui_hover_settings_display_mode_concept_v001.png",
+      "nativeSize": { "w": 492, "h": 64 },
+      "styleKey": "premium_popup_book"
+    },
+    {
+      "key": "ui_down_settings_display_mode_concept",
+      "type": "image",
+      "path": "assets/runtime/ui/ui_down_settings_display_mode_concept_v001.png",
+      "nativeSize": { "w": 492, "h": 64 },
+      "styleKey": "premium_popup_book"
+    },
+    {
+      "key": "ui_hover_settings_large_text_concept",
+      "type": "image",
+      "path": "assets/runtime/ui/ui_hover_settings_large_text_concept_v001.png",
+      "nativeSize": { "w": 492, "h": 64 },
+      "styleKey": "premium_popup_book"
+    },
+    {
+      "key": "ui_down_settings_large_text_concept",
+      "type": "image",
+      "path": "assets/runtime/ui/ui_down_settings_large_text_concept_v001.png",
+      "nativeSize": { "w": 492, "h": 64 },
+      "styleKey": "premium_popup_book"
+    },
+    {
+      "key": "ui_hover_settings_reduced_motion_concept",
+      "type": "image",
+      "path": "assets/runtime/ui/ui_hover_settings_reduced_motion_concept_v001.png",
+      "nativeSize": { "w": 492, "h": 64 },
+      "styleKey": "premium_popup_book"
+    },
+    {
+      "key": "ui_down_settings_reduced_motion_concept",
+      "type": "image",
+      "path": "assets/runtime/ui/ui_down_settings_reduced_motion_concept_v001.png",
+      "nativeSize": { "w": 492, "h": 64 },
+      "styleKey": "premium_popup_book"
+    },
+    {
+      "key": "ui_hover_settings_space_confirm_concept",
+      "type": "image",
+      "path": "assets/runtime/ui/ui_hover_settings_space_confirm_concept_v001.png",
+      "nativeSize": { "w": 492, "h": 64 },
+      "styleKey": "premium_popup_book"
+    },
+    {
+      "key": "ui_down_settings_space_confirm_concept",
+      "type": "image",
+      "path": "assets/runtime/ui/ui_down_settings_space_confirm_concept_v001.png",
+      "nativeSize": { "w": 492, "h": 64 },
+      "styleKey": "premium_popup_book"
+    },
+    {
       "key": "ui_current_stage_marker_concept",
       "type": "image",
       "path": "assets/runtime/ui/ui_current_stage_marker_concept_v001.png",

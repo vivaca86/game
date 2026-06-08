@@ -147,6 +147,7 @@ Current state:
 - Representative action/settings controls use concept-derived bitmap hover art.
 - Settings has hover coverage for ten major controls.
 - All ten primary raster screens share first bitmap down-state candidate.
+- Settings return, reset-save, reset-defaults, volume sliders, display-mode selector, large-text toggle, reduced-motion toggle, and space-confirm toggle now have concept-underlay-derived control-specific hover and down art instead of the shared action-seal family.
 
 Key files:
 
@@ -160,10 +161,30 @@ Key files:
 - `assets/source/ui/settings_raster_underlay_concept_v001.png`
 - `assets/source/ui/ui_hover_action_seal_concept_v001.png`
 - `assets/source/ui/ui_down_pressed_stamp_concept_v001.png`
+- `assets/source/ui/ui_hover_settings_return_button_concept_v001.png`
+- `assets/source/ui/ui_down_settings_return_button_concept_v001.png`
+- `assets/source/ui/ui_hover_settings_reset_save_concept_v001.png`
+- `assets/source/ui/ui_down_settings_reset_save_concept_v001.png`
+- `assets/source/ui/ui_hover_settings_reset_defaults_concept_v001.png`
+- `assets/source/ui/ui_down_settings_reset_defaults_concept_v001.png`
+- `assets/source/ui/ui_hover_settings_volume_master_concept_v001.png`
+- `assets/source/ui/ui_down_settings_volume_master_concept_v001.png`
+- `assets/source/ui/ui_hover_settings_volume_music_concept_v001.png`
+- `assets/source/ui/ui_down_settings_volume_music_concept_v001.png`
+- `assets/source/ui/ui_hover_settings_volume_sfx_concept_v001.png`
+- `assets/source/ui/ui_down_settings_volume_sfx_concept_v001.png`
+- `assets/source/ui/ui_hover_settings_display_mode_concept_v001.png`
+- `assets/source/ui/ui_down_settings_display_mode_concept_v001.png`
+- `assets/source/ui/ui_hover_settings_large_text_concept_v001.png`
+- `assets/source/ui/ui_down_settings_large_text_concept_v001.png`
+- `assets/source/ui/ui_hover_settings_reduced_motion_concept_v001.png`
+- `assets/source/ui/ui_down_settings_reduced_motion_concept_v001.png`
+- `assets/source/ui/ui_hover_settings_space_confirm_concept_v001.png`
+- `assets/source/ui/ui_down_settings_space_confirm_concept_v001.png`
 
 Still unfinished:
 
-- Per-control selected/focus/disabled/down states.
+- Per-control selected/focus/disabled states, plus remaining bespoke down states for Town/RuneBench/Result utility controls and unaudited controls outside the current Settings set.
 - Dynamic labels and tooltips that do not hurt the concept-art look.
 - User acceptance.
 
@@ -248,7 +269,7 @@ Recommended next WorldMap work:
 1. Refine later completed-node variants and remaining baked route/node geometry against the concept.
 2. Refine selected/focus/keyboard state art without reintroducing Phaser vector overlays. The first WorldMap arrow-key selection pass exists, but broader keyboard/focus coverage is still open.
 3. Add accessibility-safe dynamic labels/tooltips outside the baked concept layer.
-4. Reinvestigate the broad Phaser smoke timeout from this continuation.
+4. Reinvestigate the broad Phaser smoke timeout from the 2026-06-08 continuation: the wrapper passed through `checkClickableControls` after the hover/down key update, then timed out during `checkFullInputCoverage`.
 5. Capture 1920 screenshots and inspect visually before claiming improvement.
 
 ## Shared Raster Interaction System
@@ -313,6 +334,25 @@ node tmp/run-phaser-smoke-with-vite.mjs
 Phaser smoke OK
 ```
 
+The following passed after the 2026-06-08 Settings reset-panel and row/control-specific state pass:
+
+```powershell
+node tools\extract-ui-state-assets.mjs
+npm.cmd run assets:generate:dev
+node tmp\settings-raster-hover-coverage-audit.mjs
+node tmp\settings-raster-pressed-coverage-audit.mjs
+node tmp\ui-raster-down-audit.mjs
+npm.cmd run check
+```
+
+The following did not complete on 2026-06-08:
+
+```powershell
+$env:PHASER_SMOKE_PROGRESS='1'; $env:PHASER_SMOKE_PROGRESS_FILE='tmp/phaser-smoke-progress-current.log'; node tmp\run-phaser-smoke-with-vite.mjs
+```
+
+It passed through `checkClickableControls` after the smoke helper's down-key default was updated to the current control-family bitmap standard, then timed out during `checkFullInputCoverage`. Treat broad Phaser smoke as `Needs verification`, not passed, for this continuation.
+
 Known warning:
 
 - `npm.cmd run check` still emits the existing Vite large JS chunk warning.
@@ -335,6 +375,7 @@ Known useful scripts:
 - `tmp/raster-effect-concept-audit.mjs`
 - `tmp/ui-disabled-raster-audit.mjs`
 - `tmp/settings-raster-hover-coverage-audit.mjs`
+- `tmp/settings-raster-pressed-coverage-audit.mjs`
 - `tmp/run-phaser-smoke-with-vite.mjs`
 
 If they are absent in a fresh checkout because `tmp/` is gitignored, recreate or recover them from conversation logs before relying only on broad smoke.

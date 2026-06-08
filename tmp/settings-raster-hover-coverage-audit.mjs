@@ -85,15 +85,15 @@ const executableCandidates = [
 ];
 
 const targets = [
-  { label: "volume-master", x: 840, y: 282 },
-  { label: "volume-music", x: 840, y: 372 },
-  { label: "volume-sfx", x: 840, y: 462 },
-  { label: "display-mode", x: 1360, y: 282 },
-  { label: "large-text", x: 1360, y: 372 },
-  { label: "reduced-motion", x: 1360, y: 462 },
-  { label: "space-confirm", x: 1360, y: 640 },
-  { label: "reset-save", x: 1626, y: 520 },
-  { label: "reset-defaults", x: 1626, y: 696 },
+  { label: "volume-master", x: 840, y: 282, hoverKey: "ui_hover_settings_volume_master_concept" },
+  { label: "volume-music", x: 840, y: 372, hoverKey: "ui_hover_settings_volume_music_concept" },
+  { label: "volume-sfx", x: 840, y: 462, hoverKey: "ui_hover_settings_volume_sfx_concept" },
+  { label: "display-mode", x: 1360, y: 282, hoverKey: "ui_hover_settings_display_mode_concept" },
+  { label: "large-text", x: 1360, y: 372, hoverKey: "ui_hover_settings_large_text_concept" },
+  { label: "reduced-motion", x: 1360, y: 462, hoverKey: "ui_hover_settings_reduced_motion_concept" },
+  { label: "space-confirm", x: 1360, y: 640, hoverKey: "ui_hover_settings_space_confirm_concept" },
+  { label: "reset-save", x: 1626, y: 520, hoverKey: "ui_hover_settings_reset_save_concept" },
+  { label: "reset-defaults", x: 1626, y: 696, hoverKey: "ui_hover_settings_reset_defaults_concept" },
   { label: "return-town", x: 1688, y: 958, hoverKey: "ui_hover_settings_return_button_concept" }
 ];
 

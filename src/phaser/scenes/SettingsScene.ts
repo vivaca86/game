@@ -12,6 +12,19 @@ const SETTINGS_RASTER_UNDERLAY_KEY = "settings_raster_underlay_concept";
 const SETTINGS_RASTER_HOVER_ACTION_KEY = "ui_hover_action_seal_concept";
 const SETTINGS_RASTER_HOVER_RETURN_KEY = "ui_hover_settings_return_button_concept";
 const SETTINGS_RASTER_DOWN_RETURN_KEY = "ui_down_settings_return_button_concept";
+const SETTINGS_RASTER_HOVER_RESET_SAVE_KEY = "ui_hover_settings_reset_save_concept";
+const SETTINGS_RASTER_DOWN_RESET_SAVE_KEY = "ui_down_settings_reset_save_concept";
+const SETTINGS_RASTER_HOVER_RESET_DEFAULTS_KEY = "ui_hover_settings_reset_defaults_concept";
+const SETTINGS_RASTER_DOWN_RESET_DEFAULTS_KEY = "ui_down_settings_reset_defaults_concept";
+const SETTINGS_RASTER_CONTROL_STATE_KEYS = {
+  volumeMaster: { hover: "ui_hover_settings_volume_master_concept", down: "ui_down_settings_volume_master_concept" },
+  volumeMusic: { hover: "ui_hover_settings_volume_music_concept", down: "ui_down_settings_volume_music_concept" },
+  volumeSfx: { hover: "ui_hover_settings_volume_sfx_concept", down: "ui_down_settings_volume_sfx_concept" },
+  displayMode: { hover: "ui_hover_settings_display_mode_concept", down: "ui_down_settings_display_mode_concept" },
+  largeText: { hover: "ui_hover_settings_large_text_concept", down: "ui_down_settings_large_text_concept" },
+  reducedMotion: { hover: "ui_hover_settings_reduced_motion_concept", down: "ui_down_settings_reduced_motion_concept" },
+  spaceConfirm: { hover: "ui_hover_settings_space_confirm_concept", down: "ui_down_settings_space_confirm_concept" }
+} as const;
 
 export class SettingsScene extends Phaser.Scene {
   constructor() {
@@ -55,27 +68,45 @@ function renderSettingsRasterStage(scene: Phaser.Scene, context: BootContext): v
 
   renderSettingsRasterHitTarget(scene, 840, 282, 380, 58, 0xf5c26b, () => updateSettings(scene, context, (next) => {
     next.volumeMaster = stepVolume(next.volumeMaster, 0.1);
-  }));
+  }), settingsControlStateOptions(SETTINGS_RASTER_CONTROL_STATE_KEYS.volumeMaster, 716, 271, 540, 64));
   renderSettingsRasterHitTarget(scene, 840, 372, 380, 58, 0xf5c26b, () => updateSettings(scene, context, (next) => {
     next.volumeMusic = stepVolume(next.volumeMusic, 0.1);
-  }));
+  }), settingsControlStateOptions(SETTINGS_RASTER_CONTROL_STATE_KEYS.volumeMusic, 716, 363, 540, 64));
   renderSettingsRasterHitTarget(scene, 840, 462, 380, 58, 0xf5c26b, () => updateSettings(scene, context, (next) => {
     next.volumeSfx = stepVolume(next.volumeSfx, 0.1);
-  }));
+  }), settingsControlStateOptions(SETTINGS_RASTER_CONTROL_STATE_KEYS.volumeSfx, 716, 455, 540, 64));
   renderSettingsRasterHitTarget(scene, 1360, 282, 340, 62, 0x5eead4, () => updateSettings(scene, context, (next) => {
     next.displayMode = next.displayMode === "high_contrast" ? "standard" : "high_contrast";
-  }));
+  }), settingsControlStateOptions(SETTINGS_RASTER_CONTROL_STATE_KEYS.displayMode, 1311, 271, 492, 64));
   renderSettingsRasterHitTarget(scene, 1360, 372, 300, 62, 0x5eead4, () => updateSettings(scene, context, (next) => {
     next.largeText = !next.largeText;
-  }));
+  }), settingsControlStateOptions(SETTINGS_RASTER_CONTROL_STATE_KEYS.largeText, 1311, 363, 492, 64));
   renderSettingsRasterHitTarget(scene, 1360, 462, 300, 62, 0x5eead4, () => updateSettings(scene, context, (next) => {
     next.reducedMotion = !next.reducedMotion;
-  }));
+  }), settingsControlStateOptions(SETTINGS_RASTER_CONTROL_STATE_KEYS.reducedMotion, 1311, 455, 492, 64));
   renderSettingsRasterHitTarget(scene, 1360, 640, 320, 62, 0x5eead4, () => updateSettings(scene, context, (next) => {
     next.spaceConfirm = !next.spaceConfirm;
-  }));
-  renderSettingsRasterHitTarget(scene, 1626, 696, 300, 150, 0xf5c26b, () => resetSettings(scene, context));
-  renderSettingsRasterHitTarget(scene, 1626, 520, 300, 150, 0xce5869, () => resetStoredSave(scene, context));
+  }), settingsControlStateOptions(SETTINGS_RASTER_CONTROL_STATE_KEYS.spaceConfirm, 1311, 639, 492, 64));
+  renderSettingsRasterHitTarget(scene, 1626, 696, 300, 150, 0xf5c26b, () => resetSettings(scene, context), {
+    hoverKey: SETTINGS_RASTER_HOVER_RESET_DEFAULTS_KEY,
+    downKey: SETTINGS_RASTER_DOWN_RESET_DEFAULTS_KEY,
+    stampX: 1626,
+    stampY: 696,
+    stampWidth: 330,
+    stampHeight: 150,
+    hoverAlpha: 0.94,
+    downAlpha: 0.92
+  });
+  renderSettingsRasterHitTarget(scene, 1626, 520, 300, 150, 0xce5869, () => resetStoredSave(scene, context), {
+    hoverKey: SETTINGS_RASTER_HOVER_RESET_SAVE_KEY,
+    downKey: SETTINGS_RASTER_DOWN_RESET_SAVE_KEY,
+    stampX: 1626,
+    stampY: 520,
+    stampWidth: 330,
+    stampHeight: 150,
+    hoverAlpha: 0.94,
+    downAlpha: 0.92
+  });
   renderSettingsRasterHitTarget(scene, 1688, 958, 330, 170, 0x5eead4, () => scene.scene.start("TownScene", context), {
     hoverKey: SETTINGS_RASTER_HOVER_RETURN_KEY,
     downKey: SETTINGS_RASTER_DOWN_RETURN_KEY,
@@ -86,6 +117,34 @@ function renderSettingsRasterStage(scene: Phaser.Scene, context: BootContext): v
     hoverAlpha: 0.96,
     downAlpha: 0.94
   });
+}
+
+function settingsControlStateOptions(
+  keys: { hover: string; down: string },
+  stampX: number,
+  stampY: number,
+  stampWidth: number,
+  stampHeight: number
+): {
+  hoverKey: string;
+  downKey: string;
+  stampX: number;
+  stampY: number;
+  stampWidth: number;
+  stampHeight: number;
+  hoverAlpha: number;
+  downAlpha: number;
+} {
+  return {
+    hoverKey: keys.hover,
+    downKey: keys.down,
+    stampX,
+    stampY,
+    stampWidth,
+    stampHeight,
+    hoverAlpha: 0.96,
+    downAlpha: 0.92
+  };
 }
 
 function renderSettingsRasterHitTarget(
