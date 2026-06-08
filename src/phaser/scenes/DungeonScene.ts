@@ -1,16 +1,18 @@
 import Phaser from "phaser";
 import type { BootContext } from "../../app/bootContext";
 import type { RoomSlot, RoomType } from "../../data/schema";
+import type { InputAction } from "../../input/actions";
 import { bindKeyboardActions } from "../../input/bindings";
 import { getCurrentRoom, getEncounterPoolContentId, getStage } from "../../simulation/state/runState";
 import { getRevealedNextRoomType } from "../../simulation/systems/passives/passiveSystem";
 import { renderDebugOverlay } from "../../ui/overlays/debugOverlay";
 import { handleSceneAction } from "../bridge/sceneActions";
 import { requireBootContext } from "../bridge/sceneBridge";
-import { renderActionButton, renderPaperPanel, renderRasterHoverHitTarget, renderSceneShell, renderUiSlot, textStyle, triggerRasterHitTargetDown } from "../view/sceneShell";
+import { renderActionButton, renderPaperPanel, renderRasterHoverHitTarget, renderSceneShell, renderUiSlot, setRasterHitTargetHoverState, textStyle, triggerRasterHitTargetDown } from "../view/sceneShell";
 
 const DUNGEON_RASTER_UNDERLAY_KEY = "dungeon_raster_underlay_concept";
 const DUNGEON_RASTER_HOVER_NODE_KEY = "ui_hover_route_node_concept";
+const DUNGEON_RASTER_FOCUS_ID_KEY = "dungeonRasterFocusId";
 
 export class DungeonScene extends Phaser.Scene {
   constructor() {
@@ -37,8 +39,11 @@ export class DungeonScene extends Phaser.Scene {
       renderDungeonTheater(this, context, room);
     }
 
+    const rasterKeyboardHandler = rasterControls
+      ? createDungeonRasterKeyboardHandler(this, rasterControls)
+      : undefined;
     bindKeyboardActions(this, (action) => {
-      if (action === "confirm" && triggerRasterHitTargetDown(this, rasterControls?.confirmHitTarget, () => handleSceneAction(this, context, action))) {
+      if (rasterKeyboardHandler?.(action)) {
         return;
       }
       handleSceneAction(this, context, action);
@@ -48,7 +53,15 @@ export class DungeonScene extends Phaser.Scene {
 }
 
 interface DungeonRasterControls {
-  confirmHitTarget?: Phaser.GameObjects.Rectangle;
+  controls: DungeonRasterControl[];
+}
+
+interface DungeonRasterControl {
+  id: "room_node" | "bottom_confirm";
+  x: number;
+  y: number;
+  hitTarget: Phaser.GameObjects.Rectangle;
+  activate: () => void;
 }
 
 function hasDungeonRasterUnderlay(scene: Phaser.Scene): boolean {
@@ -63,9 +76,126 @@ function renderDungeonRasterStage(
     .setDisplaySize(1920, 1080)
     .setDepth(0);
 
-  const confirmHitTarget = renderDungeonRasterHitTarget(scene, 1010, 582, 330, 66, 0xf5c26b, () => handleSceneAction(scene, context, "confirm"));
-  renderDungeonRasterHitTarget(scene, 960, 962, 390, 106, 0xf5c26b, () => handleSceneAction(scene, context, "confirm"));
-  return { confirmHitTarget };
+  const roomNodeHitTarget = renderDungeonRasterHitTarget(scene, 1010, 582, 330, 66, 0xf5c26b, () => handleSceneAction(scene, context, "confirm"));
+  const bottomConfirmHitTarget = renderDungeonRasterHitTarget(scene, 960, 962, 390, 106, 0xf5c26b, () => handleSceneAction(scene, context, "confirm"));
+  return {
+    controls: [
+      {
+        id: "room_node",
+        x: 1010,
+        y: 582,
+        hitTarget: roomNodeHitTarget,
+        activate: () => handleSceneAction(scene, context, "confirm")
+      },
+      {
+        id: "bottom_confirm",
+        x: 960,
+        y: 962,
+        hitTarget: bottomConfirmHitTarget,
+        activate: () => handleSceneAction(scene, context, "confirm")
+      }
+    ]
+  };
+}
+
+function createDungeonRasterKeyboardHandler(
+  scene: Phaser.Scene,
+  rasterControls: DungeonRasterControls
+): (action: InputAction) => boolean {
+  const { controls } = rasterControls;
+  let focusedIndex = storedDungeonFocusIndex(scene, controls);
+
+  const setFocus = (nextIndex: number): void => {
+    if (!controls[nextIndex]) return;
+    if (focusedIndex >= 0 && focusedIndex !== nextIndex) {
+      setRasterHitTargetHoverState(controls[focusedIndex]?.hitTarget, false);
+    }
+    focusedIndex = nextIndex;
+    scene.registry.set(DUNGEON_RASTER_FOCUS_ID_KEY, controls[focusedIndex].id);
+    setRasterHitTargetHoverState(controls[focusedIndex].hitTarget, true);
+  };
+
+  const clearKeyboardFocus = (except?: DungeonRasterControl): void => {
+    if (focusedIndex < 0 || controls[focusedIndex] === except) return;
+    setRasterHitTargetHoverState(controls[focusedIndex].hitTarget, false);
+    focusedIndex = -1;
+    scene.registry.set(DUNGEON_RASTER_FOCUS_ID_KEY, undefined);
+  };
+
+  const activateControl = (control: DungeonRasterControl): void => {
+    scene.registry.set(DUNGEON_RASTER_FOCUS_ID_KEY, undefined);
+    focusedIndex = -1;
+    control.activate();
+  };
+
+  const triggerFocusedControl = (control: DungeonRasterControl): boolean => {
+    if (triggerRasterHitTargetDown(scene, control.hitTarget, () => activateControl(control))) {
+      return true;
+    }
+    activateControl(control);
+    return true;
+  };
+
+  controls.forEach((control) => {
+    control.hitTarget.on("pointerover", () => clearKeyboardFocus(control));
+    control.hitTarget.on("pointerout", () => {
+      if (focusedIndex >= 0 && controls[focusedIndex] === control) {
+        setRasterHitTargetHoverState(control.hitTarget, true);
+      }
+    });
+  });
+
+  if (focusedIndex >= 0) {
+    setRasterHitTargetHoverState(controls[focusedIndex].hitTarget, true);
+  }
+
+  return (action: InputAction): boolean => {
+    if (controls.length === 0) return false;
+
+    if (isDungeonMoveAction(action)) {
+      setFocus(resolveDungeonFocusIndex(controls, focusedIndex, action));
+      return true;
+    }
+
+    if (action === "confirm") {
+      if (focusedIndex < 0) {
+        setFocus(0);
+      }
+      const focusedControl = controls[focusedIndex];
+      if (!focusedControl) return true;
+      return triggerFocusedControl(focusedControl);
+    }
+
+    return false;
+  };
+}
+
+function storedDungeonFocusIndex(scene: Phaser.Scene, controls: DungeonRasterControl[]): number {
+  const storedId = scene.registry.get(DUNGEON_RASTER_FOCUS_ID_KEY);
+  const storedIndex = controls.findIndex((control) => control.id === storedId);
+  return storedIndex >= 0 ? storedIndex : -1;
+}
+
+function isDungeonMoveAction(action: InputAction): action is "move_up" | "move_down" | "move_left" | "move_right" {
+  return action === "move_up" || action === "move_down" || action === "move_left" || action === "move_right";
+}
+
+function resolveDungeonFocusIndex(
+  controls: DungeonRasterControl[],
+  focusedIndex: number,
+  action: "move_up" | "move_down" | "move_left" | "move_right"
+): number {
+  if (focusedIndex < 0) return 0;
+  if (action === "move_left" || action === "move_right") return focusedIndex;
+  const current = controls[focusedIndex];
+  const candidates = controls
+    .map((control, index) => ({ control, index }))
+    .filter(({ index }) => index !== focusedIndex)
+    .filter(({ control }) => action === "move_up" ? control.y < current.y - 8 : control.y > current.y + 8);
+  if (candidates.length === 0) return focusedIndex;
+
+  candidates.sort((left, right) => Math.abs(left.control.y - current.y) - Math.abs(right.control.y - current.y));
+  return candidates[0].index;
 }
 
 function renderDungeonRasterHitTarget(

@@ -2,7 +2,7 @@
 
 Status: Partially complete. Do not call this UI work complete.
 
-Current working estimate: about 74% of the active UI concept-quality goal.
+Current working estimate: about 75% of the active UI concept-quality goal.
 
 Active user goal:
 
@@ -29,7 +29,7 @@ The user objected strongly to vector/procedural-looking UI and asked why concept
 
 Approximate current state:
 
-- Overall active goal: about 73-75%, roughly 74%.
+- Overall active goal: about 74-76%, roughly 75%.
 - Static first-view concept matching: about 75-80%.
 - Interaction states: about 65-70%.
 - Dynamic state truth, especially WorldMap completed/current/locked variants: about 55-60%.
@@ -1152,3 +1152,50 @@ Known verification note:
 Remaining related work:
 
 - This is not final selected/focus approval. Combat/Boss now have first directional keyboard-focus evidence, but Dungeon broader focus, WorldMap recomposition, broader disabled coverage, dynamic labels/tooltips, accessibility-safe text, mobile/responsive review, user acceptance, and final concept-match approval remain unfinished.
+
+## 2026-06-08 End-of-Day: Dungeon Keyboard Focus Raster Feedback
+
+Status: `Partially complete`.
+
+This follow-up expands selected/focus coverage on Dungeon using only the existing route-node bitmap state art. It does not add a new focus ring, vector overlay, text label, tint, or alternate art direction.
+
+Added/changed:
+
+- `src/phaser/scenes/DungeonScene.ts`
+- `tmp/dungeon-keyboard-focus-raster-state-audit.mjs`
+- `tmp/ui-quality/dungeon-keyboard-focus/dungeon-room-node-focus-v1-1920.png`
+- `tmp/ui-quality/dungeon-keyboard-focus/dungeon-bottom-confirm-focus-v1-1920.png`
+- `tmp/ui-quality/dungeon-keyboard-focus/dungeon-bottom-confirm-keyboard-activate-down-v1-1920.png`
+
+Behavior now verified by `tmp/dungeon-keyboard-focus-raster-state-audit.mjs`:
+
+- Dungeon arrow-key focus can reach the central room node and the lower confirm panel using `ui_hover_route_node_concept`.
+- Dungeon Enter on the focused lower confirm target shows the same route-node bitmap at pressed size and enters the current room.
+- The focused activation audit verifies exact focus id, state key, coordinate, size, no Phaser text, no visible rectangle overlays, and transition from `dungeon` to `combat`.
+
+Verification run in this continuation:
+
+```powershell
+npx.cmd tsc --noEmit
+node tmp\keyboard-confirm-raster-state-audit.mjs
+node tmp\dungeon-keyboard-focus-raster-state-audit.mjs
+node tmp\route-node-raster-hover-state-audit.mjs
+node tmp\ui-raster-hover-audit.mjs
+node tmp\ui-raster-down-audit.mjs
+npm.cmd run check
+```
+
+Results:
+
+- Dungeon keyboard-focus audit passed.
+- Existing keyboard-confirm and route-node hover audits passed.
+- Existing 10-screen hover and 10-screen down audits passed after single reruns. One earlier parallel run hit Playwright/screenshot timing pressure, but the single reruns passed.
+- `npm.cmd run check` passed and still reports the existing large JS chunk warning.
+
+Known verification note:
+
+- A broad Phaser smoke rerun was started for this Dungeon focus change, but the user stopped the turn for end-of-day wrap-up. The progress log reached `checkUiSkinStates START` after `checkFullInputCoverage OK` and `checkSettingsSurface OK`, but it did not finish with `Phaser smoke OK`. Do not count that interrupted run as full broad-smoke evidence for this latest commit.
+
+Remaining related work:
+
+- This is not final selected/focus approval. Dungeon now has first directional focus evidence, but full broad-smoke rerun for this commit, WorldMap recomposition, broader disabled coverage, dynamic labels/tooltips, accessibility-safe text, mobile/responsive review, user acceptance, and final concept-match approval remain unfinished.
