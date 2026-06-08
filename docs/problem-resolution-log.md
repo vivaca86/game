@@ -1192,3 +1192,24 @@
 - Impact: Keyboard users had weaker feedback than pointer users, and the selected/focus scope could be overstated because the UI had state art but not keyboard-triggered state evidence.
 - Resolution: `renderRasterHoverHitTarget` now stores its existing down/idle callbacks on the hit target, and `triggerRasterHitTargetDown` can briefly show that down bitmap before completing the action. Town, RuneBench, and Result use this for keyboard confirm on their current primary raster confirm targets. `tmp/keyboard-confirm-raster-state-audit.mjs` verifies exact down keys, no text, no visible rectangles, and continued scene flow.
 - Prevention: Keyboard focus work should reuse existing concept-raster state art where possible and include a screenshot/audit that proves the keyboard path, not only pointer hover/down.
+
+### Problem: Reward/Event/Dungeon keyboard confirm skipped the local raster material response
+
+- Cause: Reward and Event choice cards had concept-derived pointer hover/down feedback, and Dungeon's confirm route node had concept-derived pointer hover/down feedback, but Enter/confirm still called the scene action directly. Those keyboard paths could therefore advance without showing the same local material state that pointer input showed.
+- Impact: The user-facing keyboard path looked less integrated than the pointer path, and the selected/focus scope still had missing evidence on three raster confirm screens even though their pointer state art was already aligned.
+- Resolution: `RewardScene` now exposes the first reward-card raster hit target for keyboard confirm, `EventScene` exposes the first affordable event-choice raster hit target, and `DungeonScene` exposes its primary raster confirm hit target. They use `triggerRasterHitTargetDown` to show the existing `ui_hover_choice_badge_concept` or `ui_hover_route_node_concept` pressed state before running the unchanged confirm behavior. `tmp/keyboard-confirm-raster-state-audit.mjs` now verifies Reward, Event, and Dungeon alongside Town, RuneBench, and Result.
+- Prevention: Any scene where `confirm` maps to a visible card, choice, route node, or button should route keyboard activation through that control's existing raster hit-target state before advancing. Reuse the local concept bitmap family first; do not add a generic focus ring or stamp unless no clear concept control exists.
+
+### Problem: Combat/Boss keyboard actions skipped card and end-turn material response
+
+- Cause: Combat and Boss raster card/end-turn controls already had pointer hover/down bitmap feedback, but `Digit1` and `KeyE` keyboard actions still called `handleSceneAction` directly. The action could happen without showing the same local control material response.
+- Impact: Keyboard play felt less grounded than pointer play on the two main combat screens, and existing hover/down screenshots could be mistaken for keyboard feedback evidence even though they only proved pointer paths.
+- Resolution: `CombatScene` and `BossScene` now keep references to their raster card and end-turn hit targets, then route keyboard card/end-turn actions through `triggerRasterHitTargetDown` before running the unchanged action. `tmp/combat-boss-keyboard-action-raster-state-audit.mjs` verifies `Digit1` and `KeyE` on both screens with exact local raster keys, no text, and no visible rectangle overlays.
+- Prevention: Keyboard audits for action-heavy scenes should cover the actual gameplay keys, not only Enter/Space confirm. Reuse each visible control's existing raster hit-target callbacks so pointer and keyboard state language stays matched.
+
+### Problem: Settings Escape/cancel skipped the return-button material response
+
+- Cause: Settings raster mode had button-specific hover/down art for the return/check button, but its only existing keyboard action, `Escape`/cancel, went straight to `TownScene`.
+- Impact: Keyboard users could leave Settings without seeing the same return-button material response that pointer users saw. This left Settings out of the first keyboard-material feedback pass.
+- Resolution: `SettingsScene` now keeps the return/check raster hit target and routes `Escape`/cancel through `triggerRasterHitTargetDown` before the unchanged Town transition. `tmp/settings-keyboard-cancel-raster-state-audit.mjs` verifies the `ui_down_settings_return_button_concept` frame, no Phaser text, no visible rectangle overlays, and the return to Town.
+- Prevention: When a scene has only cancel/back keyboard behavior, audit that behavior directly instead of adding a new confirm action. Keyboard feedback should reuse the visible concept control that already owns the pointer state art.

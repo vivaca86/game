@@ -6,7 +6,7 @@ import { canPayEventChoice, getCurrentEvent } from "../../simulation/systems/eve
 import { renderDebugOverlay } from "../../ui/overlays/debugOverlay";
 import { handleSceneAction } from "../bridge/sceneActions";
 import { requireBootContext } from "../bridge/sceneBridge";
-import { renderActionButton, renderPaperPanel, renderRasterDisabledHitTarget, renderRasterHoverHitTarget, renderSceneShell, renderUiSlot, textStyle } from "../view/sceneShell";
+import { renderActionButton, renderPaperPanel, renderRasterDisabledHitTarget, renderRasterHoverHitTarget, renderSceneShell, renderUiSlot, textStyle, triggerRasterHitTargetDown } from "../view/sceneShell";
 
 const CHOICE_ACTIONS = ["card_1", "card_2", "card_3", "card_4", "card_5"] as const;
 const EVENT_RASTER_UNDERLAY_KEY = "event_raster_underlay_concept";
@@ -30,9 +30,10 @@ export class EventScene extends Phaser.Scene {
       showRoute: false
     });
 
-    if (hasEventRasterUnderlay(this)) {
-      renderEventRasterStage(this, context, event);
-    } else {
+    const rasterControls = hasEventRasterUnderlay(this)
+      ? renderEventRasterStage(this, context, event)
+      : undefined;
+    if (!rasterControls) {
       renderEventStage(this, context, event);
       renderActionButton(this, 960, 1052, "Enter 첫 선택", () => handleSceneAction(this, context, "confirm"), {
         focus: true,
@@ -42,9 +43,18 @@ export class EventScene extends Phaser.Scene {
       });
     }
 
-    bindKeyboardActions(this, (action) => handleSceneAction(this, context, action), context.save.settings);
+    bindKeyboardActions(this, (action) => {
+      if (action === "confirm" && triggerRasterHitTargetDown(this, rasterControls?.confirmHitTarget, () => handleSceneAction(this, context, action))) {
+        return;
+      }
+      handleSceneAction(this, context, action);
+    }, context.save.settings);
     renderDebugOverlay(context, "EventScene");
   }
+}
+
+interface EventRasterControls {
+  confirmHitTarget?: Phaser.GameObjects.Rectangle;
 }
 
 function hasEventRasterUnderlay(scene: Phaser.Scene): boolean {
@@ -55,15 +65,18 @@ function renderEventRasterStage(
   scene: Phaser.Scene,
   context: BootContext,
   event: EventData | undefined
-): void {
+): EventRasterControls {
   scene.add.image(960, 540, EVENT_RASTER_UNDERLAY_KEY)
     .setDisplaySize(1920, 1080)
     .setDepth(0);
 
+  let confirmHitTarget: Phaser.GameObjects.Rectangle | undefined;
   const cardXs = [530, 835, 1145, 1450];
   (event?.choices ?? []).slice(0, 4).forEach((choice, index) => {
-    renderEventRasterChoice(scene, context, choice, index, cardXs[index] ?? (530 + index * 305), 770);
+    const hitTarget = renderEventRasterChoice(scene, context, choice, index, cardXs[index] ?? (530 + index * 305), 770);
+    confirmHitTarget ??= hitTarget;
   });
+  return { confirmHitTarget };
 }
 
 function renderEventRasterChoice(
@@ -73,7 +86,7 @@ function renderEventRasterChoice(
   index: number,
   x: number,
   y: number
-): void {
+): Phaser.GameObjects.Rectangle | undefined {
   const affordable = canPayEventChoice(context.run, choice);
   const action = CHOICE_ACTIONS[index];
   const badgeX = x - 32;
@@ -86,10 +99,10 @@ function renderEventRasterChoice(
       disabledHeight: 112,
       disabledAlpha: 0.92
     });
-    return;
+    return undefined;
   }
 
-  renderRasterHoverHitTarget(scene, x, y, 276, 430, () => {
+  return renderRasterHoverHitTarget(scene, x, y, 276, 430, () => {
     if (affordable && action) handleSceneAction(scene, context, action);
   }, {
     hoverKey: EVENT_RASTER_HOVER_CHOICE_KEY,

@@ -7,7 +7,7 @@ import { getRevealedNextRoomType } from "../../simulation/systems/passives/passi
 import { renderDebugOverlay } from "../../ui/overlays/debugOverlay";
 import { handleSceneAction } from "../bridge/sceneActions";
 import { requireBootContext } from "../bridge/sceneBridge";
-import { renderActionButton, renderPaperPanel, renderRasterHoverHitTarget, renderSceneShell, renderUiSlot, textStyle } from "../view/sceneShell";
+import { renderActionButton, renderPaperPanel, renderRasterHoverHitTarget, renderSceneShell, renderUiSlot, textStyle, triggerRasterHitTargetDown } from "../view/sceneShell";
 
 const DUNGEON_RASTER_UNDERLAY_KEY = "dungeon_raster_underlay_concept";
 const DUNGEON_RASTER_HOVER_NODE_KEY = "ui_hover_route_node_concept";
@@ -30,15 +30,25 @@ export class DungeonScene extends Phaser.Scene {
       showRoute: false
     });
 
-    if (hasDungeonRasterUnderlay(this)) {
-      renderDungeonRasterStage(this, context);
-    } else {
+    const rasterControls = hasDungeonRasterUnderlay(this)
+      ? renderDungeonRasterStage(this, context)
+      : undefined;
+    if (!rasterControls) {
       renderDungeonTheater(this, context, room);
     }
 
-    bindKeyboardActions(this, (action) => handleSceneAction(this, context, action), context.save.settings);
+    bindKeyboardActions(this, (action) => {
+      if (action === "confirm" && triggerRasterHitTargetDown(this, rasterControls?.confirmHitTarget, () => handleSceneAction(this, context, action))) {
+        return;
+      }
+      handleSceneAction(this, context, action);
+    }, context.save.settings);
     renderDebugOverlay(context, "DungeonScene");
   }
+}
+
+interface DungeonRasterControls {
+  confirmHitTarget?: Phaser.GameObjects.Rectangle;
 }
 
 function hasDungeonRasterUnderlay(scene: Phaser.Scene): boolean {
@@ -48,13 +58,14 @@ function hasDungeonRasterUnderlay(scene: Phaser.Scene): boolean {
 function renderDungeonRasterStage(
   scene: Phaser.Scene,
   context: BootContext
-): void {
+): DungeonRasterControls {
   scene.add.image(960, 540, DUNGEON_RASTER_UNDERLAY_KEY)
     .setDisplaySize(1920, 1080)
     .setDepth(0);
 
-  renderDungeonRasterHitTarget(scene, 1010, 582, 330, 66, 0xf5c26b, () => handleSceneAction(scene, context, "confirm"));
+  const confirmHitTarget = renderDungeonRasterHitTarget(scene, 1010, 582, 330, 66, 0xf5c26b, () => handleSceneAction(scene, context, "confirm"));
   renderDungeonRasterHitTarget(scene, 960, 962, 390, 106, 0xf5c26b, () => handleSceneAction(scene, context, "confirm"));
+  return { confirmHitTarget };
 }
 
 function renderDungeonRasterHitTarget(
@@ -65,9 +76,9 @@ function renderDungeonRasterHitTarget(
   height: number,
   _accent: number,
   onClick: () => void
-): void {
+): Phaser.GameObjects.Rectangle {
   const hoverSize = Math.min(132, Math.max(96, Math.min(width, height) * 1.12));
-  renderRasterHoverHitTarget(scene, x, y, width, height, onClick, {
+  return renderRasterHoverHitTarget(scene, x, y, width, height, onClick, {
     hoverKey: DUNGEON_RASTER_HOVER_NODE_KEY,
     downKey: DUNGEON_RASTER_HOVER_NODE_KEY,
     hoverX: x,

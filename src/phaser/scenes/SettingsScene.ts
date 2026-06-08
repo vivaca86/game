@@ -5,7 +5,7 @@ import { bindKeyboardActions } from "../../input/bindings";
 import { clearStoredSave, createDefaultSettings, persistSave } from "../../save/saveCodec";
 import { renderDebugOverlay } from "../../ui/overlays/debugOverlay";
 import { requireBootContext, storeBootContext } from "../bridge/sceneBridge";
-import { renderActionButton, renderPaperPanel, renderRasterHoverHitTarget, renderSceneShell, renderTooltip, renderUiSlot, textStyle } from "../view/sceneShell";
+import { renderActionButton, renderPaperPanel, renderRasterHoverHitTarget, renderSceneShell, renderTooltip, renderUiSlot, textStyle, triggerRasterHitTargetDown } from "../view/sceneShell";
 
 type SettingsMutation = (settings: SettingsState) => void;
 const SETTINGS_RASTER_UNDERLAY_KEY = "settings_raster_underlay_concept";
@@ -43,13 +43,17 @@ export class SettingsScene extends Phaser.Scene {
       showRoute: false
     });
 
-    if (hasSettingsRasterUnderlay(this)) {
-      renderSettingsRasterStage(this, context);
-    } else {
+    const rasterControls = hasSettingsRasterUnderlay(this)
+      ? renderSettingsRasterStage(this, context)
+      : undefined;
+    if (!rasterControls) {
       renderSettingsPanel(this, context);
     }
     bindKeyboardActions(this, (action) => {
       if (action === "cancel") {
+        if (triggerRasterHitTargetDown(this, rasterControls?.returnHitTarget, () => this.scene.start("TownScene", context))) {
+          return;
+        }
         this.scene.start("TownScene", context);
       }
     }, context.save.settings);
@@ -57,11 +61,15 @@ export class SettingsScene extends Phaser.Scene {
   }
 }
 
+interface SettingsRasterControls {
+  returnHitTarget?: Phaser.GameObjects.Rectangle;
+}
+
 function hasSettingsRasterUnderlay(scene: Phaser.Scene): boolean {
   return scene.textures.exists(SETTINGS_RASTER_UNDERLAY_KEY);
 }
 
-function renderSettingsRasterStage(scene: Phaser.Scene, context: BootContext): void {
+function renderSettingsRasterStage(scene: Phaser.Scene, context: BootContext): SettingsRasterControls {
   scene.add.image(960, 540, SETTINGS_RASTER_UNDERLAY_KEY)
     .setDisplaySize(1920, 1080)
     .setDepth(0);
@@ -107,7 +115,7 @@ function renderSettingsRasterStage(scene: Phaser.Scene, context: BootContext): v
     hoverAlpha: 0.94,
     downAlpha: 0.92
   });
-  renderSettingsRasterHitTarget(scene, 1688, 958, 330, 170, 0x5eead4, () => scene.scene.start("TownScene", context), {
+  const returnHitTarget = renderSettingsRasterHitTarget(scene, 1688, 958, 330, 170, 0x5eead4, () => scene.scene.start("TownScene", context), {
     hoverKey: SETTINGS_RASTER_HOVER_RETURN_KEY,
     downKey: SETTINGS_RASTER_DOWN_RETURN_KEY,
     stampX: 1688,
@@ -117,6 +125,7 @@ function renderSettingsRasterStage(scene: Phaser.Scene, context: BootContext): v
     hoverAlpha: 0.96,
     downAlpha: 0.94
   });
+  return { returnHitTarget };
 }
 
 function settingsControlStateOptions(
@@ -166,12 +175,12 @@ function renderSettingsRasterHitTarget(
     hoverAlpha?: number;
     downAlpha?: number;
   } = {}
-): void {
+): Phaser.GameObjects.Rectangle {
   const largeTarget = width >= 180 || height >= 80;
   const hoverSize = options.stampSize ?? (largeTarget ? 94 : 68);
   const stampX = options.stampX ?? (largeTarget ? x + width * 0.36 : x + width * 0.34);
   const stampY = options.stampY ?? (largeTarget ? y - height * 0.22 : y - height * 0.18);
-  renderRasterHoverHitTarget(scene, x, y, width, height, onClick, {
+  return renderRasterHoverHitTarget(scene, x, y, width, height, onClick, {
     hoverKey: options.hoverKey ?? SETTINGS_RASTER_HOVER_ACTION_KEY,
     downKey: options.downKey ?? SETTINGS_RASTER_HOVER_ACTION_KEY,
     hoverX: stampX,

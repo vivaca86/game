@@ -1,7 +1,6 @@
 import { mkdir } from "node:fs/promises";
 import { createRequire } from "node:module";
 import Module from "node:module";
-import path from "node:path";
 import { createServer } from "vite";
 
 const require = createRequire(import.meta.url);
@@ -12,50 +11,36 @@ Module._initPaths();
 
 const targets = [
   {
-    label: "town-keyboard-confirm",
-    sceneName: "TownScene",
-    underlayKey: "town_raster_underlay_concept",
-    pathname: "/?debug=1&entry=town&resetSave=1",
-    downKey: "ui_down_town_expedition_action_concept",
-    nextSceneName: "WorldMapScene"
+    label: "combat-keyboard-card",
+    sceneName: "CombatScene",
+    underlayKey: "combat_raster_underlay_concept",
+    pathname: "/?debug=1&entry=combat&resetSave=1",
+    key: "Digit1",
+    downKey: "ui_hover_gold_seal_concept"
   },
   {
-    label: "reward-keyboard-confirm",
-    sceneName: "RewardScene",
-    underlayKey: "reward_raster_underlay_concept",
-    pathname: "/?debug=1&entry=reward&resetSave=1",
-    downKey: "ui_hover_choice_badge_concept",
-    nextSceneName: "EventScene"
+    label: "combat-keyboard-end-turn",
+    sceneName: "CombatScene",
+    underlayKey: "combat_raster_underlay_concept",
+    pathname: "/?debug=1&entry=combat&resetSave=1",
+    key: "KeyE",
+    downKey: "ui_hover_gold_seal_concept"
   },
   {
-    label: "event-keyboard-confirm",
-    sceneName: "EventScene",
-    underlayKey: "event_raster_underlay_concept",
-    pathname: "/?debug=1&entry=event&resetSave=1",
-    downKey: "ui_hover_choice_badge_concept",
-    nextSceneName: "RuneBenchScene"
+    label: "boss-keyboard-card",
+    sceneName: "BossScene",
+    underlayKey: "boss_raster_underlay_concept",
+    pathname: "/?debug=1&entry=boss&resetSave=1",
+    key: "Digit1",
+    downKey: "ui_hover_boss_skull_stamp_concept"
   },
   {
-    label: "dungeon-keyboard-confirm",
-    sceneName: "DungeonScene",
-    underlayKey: "dungeon_raster_underlay_concept",
-    pathname: "/?debug=1&entry=dungeon&resetSave=1",
-    downKey: "ui_hover_route_node_concept"
-  },
-  {
-    label: "runebench-keyboard-confirm",
-    sceneName: "RuneBenchScene",
-    underlayKey: "rune_bench_raster_underlay_concept",
-    pathname: "/?debug=1&entry=rune_bench&resetSave=1&grantRune=rune_paper_spark",
-    downKey: "ui_down_runebench_action_rail_concept"
-  },
-  {
-    label: "result-keyboard-confirm",
-    sceneName: "ResultScene",
-    underlayKey: "result_raster_underlay_concept",
-    pathname: "/?debug=1&entry=result&resetSave=1",
-    downKey: "ui_down_result_action_card_concept",
-    nextSceneName: "TownScene"
+    label: "boss-keyboard-end-turn",
+    sceneName: "BossScene",
+    underlayKey: "boss_raster_underlay_concept",
+    pathname: "/?debug=1&entry=boss&resetSave=1",
+    key: "KeyE",
+    downKey: "ui_hover_boss_skull_stamp_concept"
   }
 ];
 
@@ -68,7 +53,7 @@ function loadPlaywright() {
 }
 
 async function startServer() {
-  for (const port of [4200, 4201, 4202, 4203]) {
+  for (const port of [4204, 4205, 4206, 4207]) {
     try {
       const server = await createServer({
         root: process.cwd(),
@@ -139,12 +124,12 @@ async function setScenePaused(page, sceneName, paused) {
 
 function assertState(label, stats) {
   if (!stats.hasUnderlay) throw new Error(`${label}: missing raster underlay`);
-  if (stats.visibleDownImages !== 1) throw new Error(`${label}: expected one visible keyboard down image, got ${stats.visibleDownImages}`);
+  if (stats.visibleDownImages !== 1) throw new Error(`${label}: expected one visible keyboard action down image, got ${stats.visibleDownImages}`);
   if (stats.textCount !== 0) throw new Error(`${label}: visible Phaser text leaked over raster underlay`);
   if (stats.visibleRectsAboveUnderlay !== 0) throw new Error(`${label}: visible rectangle overlay leaked`);
 }
 
-await mkdir("tmp/ui-quality/keyboard-confirm", { recursive: true });
+await mkdir("tmp/ui-quality/keyboard-actions", { recursive: true });
 
 const { chromium } = loadPlaywright();
 const executableCandidates = [
@@ -176,19 +161,16 @@ try {
 
   for (const target of targets) {
     await openTarget(page, baseUrl, target);
-    await page.keyboard.down("Enter");
+    await page.keyboard.down(target.key);
     await page.waitForTimeout(10);
     const stats = await captureStats(page, target);
     assertState(target.label, stats);
     await setScenePaused(page, target.sceneName, true);
-    await canvas.screenshot({ path: `tmp/ui-quality/keyboard-confirm/${target.label}-down-v1-1920.png` });
+    await canvas.screenshot({ path: `tmp/ui-quality/keyboard-actions/${target.label}-down-v1-1920.png` });
     await setScenePaused(page, target.sceneName, false);
-    await page.keyboard.up("Enter");
-    await page.waitForTimeout(180);
-    if (target.nextSceneName) {
-      await waitForScene(page, target.nextSceneName);
-    }
-    results.push({ label: target.label, ...stats });
+    await page.keyboard.up(target.key);
+    await page.waitForTimeout(220);
+    results.push({ label: target.label, key: target.key, ...stats });
   }
 
   console.log(JSON.stringify({ ok: true, results }, null, 2));

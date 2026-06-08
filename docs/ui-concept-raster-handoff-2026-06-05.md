@@ -697,3 +697,140 @@ Remaining related work:
 
 - Reward/Event/Combat/Boss/Dungeon/Settings keyboard focus and selected/focus state art still need separate evidence.
 - Broad disabled coverage, mobile/responsive review, dynamic labels/tooltips, accessibility-safe text, user acceptance, and final concept-match approval remain unfinished.
+
+## 2026-06-08 Continuation: Reward Event Dungeon Keyboard Confirm Raster Feedback
+
+Status: `Partially complete`.
+
+This follow-up extends first keyboard-confirm raster feedback to Reward, Event, and Dungeon using existing concept-derived state art. It does not add a new focus ring, vector overlay, text label, or alternate art direction.
+
+Added/changed:
+
+- `src/phaser/scenes/RewardScene.ts`
+- `src/phaser/scenes/EventScene.ts`
+- `src/phaser/scenes/DungeonScene.ts`
+- `tmp/keyboard-confirm-raster-state-audit.mjs`
+- `tmp/ui-quality/keyboard-confirm/reward-keyboard-confirm-down-v1-1920.png`
+- `tmp/ui-quality/keyboard-confirm/event-keyboard-confirm-down-v1-1920.png`
+- `tmp/ui-quality/keyboard-confirm/dungeon-keyboard-confirm-down-v1-1920.png`
+
+Behavior now verified by `tmp/keyboard-confirm-raster-state-audit.mjs`:
+
+- Reward Enter/confirm briefly shows `ui_hover_choice_badge_concept` on the first reward card badge, then advances through the existing reward confirm flow.
+- Event Enter/confirm briefly shows `ui_hover_choice_badge_concept` on the first affordable event choice badge, then advances through the existing event confirm flow.
+- Dungeon Enter/confirm briefly shows `ui_hover_route_node_concept` on the primary route-node confirm target, then advances through the existing dungeon confirm flow.
+- Town, Reward, Event, Dungeon, RuneBench, and Result checked keyboard states all show no Phaser text and no visible rectangle overlays above their raster underlays.
+
+Verification run in this continuation:
+
+```powershell
+node tmp\keyboard-confirm-raster-state-audit.mjs
+node tmp\choice-badge-raster-hover-state-audit.mjs
+node tmp\route-node-raster-hover-state-audit.mjs
+node tmp\ui-raster-hover-audit.mjs
+node tmp\ui-raster-down-audit.mjs
+npm.cmd run check
+git diff --check
+```
+
+Known verification note:
+
+- `npm.cmd run check` passed. It still reports the existing large JS chunk warning.
+- Broad Phaser smoke was not rerun here and remains `Needs verification` from the previous `checkFullInputCoverage` timeout.
+
+Remaining related work:
+
+- Combat/Boss/Settings keyboard focus and selected/focus state art still need separate evidence.
+- Reward/Event/Dungeon still need broader selected/focus state review beyond this first keyboard-confirm feedback.
+- Broad disabled coverage, mobile/responsive review, dynamic labels/tooltips, accessibility-safe text, user acceptance, and final concept-match approval remain unfinished.
+
+## 2026-06-08 Continuation: Combat Boss Keyboard Action Raster Feedback
+
+Status: `Partially complete`.
+
+This follow-up extends first keyboard raster feedback to the action-heavy combat screens. It reuses the same raster hit-target art already used by pointer input and does not add a new focus ring, vector overlay, text label, or alternate art direction.
+
+Added/changed:
+
+- `src/phaser/scenes/CombatScene.ts`
+- `src/phaser/scenes/BossScene.ts`
+- `tmp/combat-boss-keyboard-action-raster-state-audit.mjs`
+- `tmp/ui-quality/keyboard-actions/combat-keyboard-card-down-v1-1920.png`
+- `tmp/ui-quality/keyboard-actions/combat-keyboard-end-turn-down-v1-1920.png`
+- `tmp/ui-quality/keyboard-actions/boss-keyboard-card-down-v1-1920.png`
+- `tmp/ui-quality/keyboard-actions/boss-keyboard-end-turn-down-v1-1920.png`
+
+Behavior now verified by `tmp/combat-boss-keyboard-action-raster-state-audit.mjs`:
+
+- Combat `Digit1` briefly shows `ui_hover_gold_seal_concept` on the first card target, then runs the existing card action.
+- Combat `KeyE` briefly shows `ui_hover_gold_seal_concept` on the end-turn target, then runs the existing end-turn action.
+- Boss `Digit1` briefly shows `ui_hover_boss_skull_stamp_concept` on the first card target, then runs the existing card action.
+- Boss `KeyE` briefly shows `ui_hover_boss_skull_stamp_concept` on the end-turn target, then runs the existing end-turn action.
+- All checked keyboard-action states show no Phaser text and no visible rectangle overlays above their raster underlays.
+
+Verification run in this continuation:
+
+```powershell
+node tmp\combat-boss-keyboard-action-raster-state-audit.mjs
+node tmp\combat-raster-hover-state-audit.mjs
+node tmp\boss-raster-hover-state-audit.mjs
+node tmp\ui-raster-hover-audit.mjs
+node tmp\ui-raster-down-audit.mjs
+node tmp\keyboard-confirm-raster-state-audit.mjs
+npm.cmd run check
+git diff --check
+```
+
+Known verification note:
+
+- `npm.cmd run check` passed. It still reports the existing large JS chunk warning and printed a Vite plugin timing advisory.
+- Broad Phaser smoke was not rerun here and remains `Needs verification` from the previous `checkFullInputCoverage` timeout.
+
+Remaining related work:
+
+- Settings keyboard focus and selected/focus state art still need separate evidence.
+- Combat/Boss still need broader selected/focus state review beyond this first keyboard-action feedback.
+- Broad disabled coverage, mobile/responsive review, dynamic labels/tooltips, accessibility-safe text, user acceptance, and final concept-match approval remain unfinished.
+
+## 2026-06-08 Continuation: Settings Keyboard Cancel Raster Feedback
+
+Status: `Partially complete`.
+
+This follow-up finishes the safe part of the Settings keyboard pass before GitHub handoff. It does not add a new Settings confirm action; it only gives the existing `Escape`/cancel return path a visible raster material response.
+
+Added/changed:
+
+- `src/phaser/scenes/SettingsScene.ts`
+- `tmp/settings-keyboard-cancel-raster-state-audit.mjs`
+- `tmp/ui-quality/keyboard-actions/settings-keyboard-cancel-down-v1-1920.png`
+
+Behavior now verified by `tmp/settings-keyboard-cancel-raster-state-audit.mjs`:
+
+- Settings `Escape` briefly shows `ui_down_settings_return_button_concept` on the bottom-right return/check button, then returns to Town through the existing flow.
+- The checked keyboard-cancel state shows no Phaser text and no visible rectangle overlays above the raster underlay.
+- The audit verifies the scene returns to `TownScene` after the short down-state frame.
+
+Verification run in this continuation:
+
+```powershell
+node tmp\settings-keyboard-cancel-raster-state-audit.mjs
+node tmp\settings-raster-pressed-coverage-audit.mjs
+node tmp\settings-raster-hover-coverage-audit.mjs
+node tmp\ui-raster-hover-audit.mjs
+node tmp\ui-raster-down-audit.mjs
+node tmp\keyboard-confirm-raster-state-audit.mjs
+node tmp\combat-boss-keyboard-action-raster-state-audit.mjs
+npm.cmd run check
+git diff --check
+```
+
+Known verification note:
+
+- The first `node tmp\settings-raster-pressed-coverage-audit.mjs` run hit the 120s tool timeout. Rerunning with a longer limit passed.
+- `npm.cmd run check` passed and still reports the existing large JS chunk warning.
+- Broad Phaser smoke was not rerun here and remains `Needs verification` from the previous `checkFullInputCoverage` timeout.
+
+Remaining related work:
+
+- Settings still needs full keyboard navigation/focus and selected/focus state review beyond this first cancel feedback.
+- Broad disabled coverage, mobile/responsive review, dynamic labels/tooltips, accessibility-safe text, user acceptance, and final concept-match approval remain unfinished.

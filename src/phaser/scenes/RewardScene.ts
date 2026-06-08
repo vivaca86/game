@@ -6,7 +6,7 @@ import { findRewardEntryById, selectRewardEntries } from "../../simulation/state
 import { renderDebugOverlay } from "../../ui/overlays/debugOverlay";
 import { handleSceneAction } from "../bridge/sceneActions";
 import { requireBootContext } from "../bridge/sceneBridge";
-import { renderActionButton, renderPaperPanel, renderRasterHoverHitTarget, renderSceneShell, renderTooltip, renderTransparentHitTarget, renderUiSlot, textStyle } from "../view/sceneShell";
+import { renderActionButton, renderPaperPanel, renderRasterHoverHitTarget, renderSceneShell, renderTooltip, renderTransparentHitTarget, renderUiSlot, textStyle, triggerRasterHitTargetDown } from "../view/sceneShell";
 
 const REWARD_ACTIONS = ["card_1", "card_2", "card_3", "card_4", "card_5"] as const;
 const REWARD_RASTER_UNDERLAY_KEY = "reward_raster_underlay_concept";
@@ -40,15 +40,25 @@ export class RewardScene extends Phaser.Scene {
         Math.max(1, context.run.offeredRewards.length)
       );
 
-    if (hasRewardRasterUnderlay(this)) {
-      renderRewardRasterStage(this, context, offers.slice(0, 4));
-    } else {
+    const rasterControls = hasRewardRasterUnderlay(this)
+      ? renderRewardRasterStage(this, context, offers.slice(0, 4))
+      : undefined;
+    if (!rasterControls) {
       renderRewardStage(this, context, rewardPool?.displayNameKo ?? "보상 목록 없음", offers.slice(0, 4));
     }
 
-    bindKeyboardActions(this, (action) => handleSceneAction(this, context, action), context.save.settings);
+    bindKeyboardActions(this, (action) => {
+      if (action === "confirm" && triggerRasterHitTargetDown(this, rasterControls?.confirmHitTarget, () => handleSceneAction(this, context, action))) {
+        return;
+      }
+      handleSceneAction(this, context, action);
+    }, context.save.settings);
     renderDebugOverlay(context, "RewardScene");
   }
+}
+
+interface RewardRasterControls {
+  confirmHitTarget?: Phaser.GameObjects.Rectangle;
 }
 
 function hasRewardRasterUnderlay(scene: Phaser.Scene): boolean {
@@ -59,17 +69,22 @@ function renderRewardRasterStage(
   scene: Phaser.Scene,
   context: BootContext,
   offers: RewardEntry[]
-): void {
+): RewardRasterControls {
   scene.add.image(960, 540, REWARD_RASTER_UNDERLAY_KEY)
     .setDisplaySize(1920, 1080)
     .setDepth(0);
 
+  let confirmHitTarget: Phaser.GameObjects.Rectangle | undefined;
   const cardXs = [528, 795, 1062, 1329];
   offers.slice(0, 4).forEach((entry, index) => {
-    renderRewardRasterChoice(scene, context, entry, index, cardXs[index] ?? (528 + index * 267), 610);
+    const hitTarget = renderRewardRasterChoice(scene, context, entry, index, cardXs[index] ?? (528 + index * 267), 610);
+    if (index === 0) {
+      confirmHitTarget = hitTarget;
+    }
   });
 
   renderRewardRasterConfirm(scene, context);
+  return { confirmHitTarget };
 }
 
 function renderRewardRasterChoice(
@@ -79,9 +94,9 @@ function renderRewardRasterChoice(
   index: number,
   x: number,
   y: number
-): void {
+): Phaser.GameObjects.Rectangle {
   const action = REWARD_ACTIONS[index];
-  renderRasterHoverHitTarget(scene, x, y + 20, 240, 486, () => handleSceneAction(scene, context, action), {
+  return renderRasterHoverHitTarget(scene, x, y + 20, 240, 486, () => handleSceneAction(scene, context, action), {
     hoverKey: REWARD_RASTER_HOVER_CHOICE_KEY,
     downKey: REWARD_RASTER_HOVER_CHOICE_KEY,
     hoverX: x,

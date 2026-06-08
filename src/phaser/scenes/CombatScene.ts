@@ -7,7 +7,7 @@ import { resolveCombatFeedbackEffectKey, resolveCombatFeedbackFrame } from "../.
 import { renderDebugOverlay } from "../../ui/overlays/debugOverlay";
 import { handleSceneAction } from "../bridge/sceneActions";
 import { requireBootContext } from "../bridge/sceneBridge";
-import { renderActionButton, renderCardHand, renderPaperPanel, renderRasterHoverHitTarget, renderSceneShell, textStyle } from "../view/sceneShell";
+import { renderActionButton, renderCardHand, renderPaperPanel, renderRasterHoverHitTarget, renderSceneShell, textStyle, triggerRasterHitTargetDown } from "../view/sceneShell";
 
 const COMBAT_RASTER_UNDERLAY_KEY = "combat_raster_underlay_concept";
 const COMBAT_RASTER_HOVER_SEAL_KEY = "ui_hover_gold_seal_concept";
@@ -32,9 +32,12 @@ export class CombatScene extends Phaser.Scene {
 
     const rasterUnderlay = hasCombatRasterUnderlay(this, false);
     renderCombatTheater(this, context, false);
-    if (rasterUnderlay) {
+    const rasterControls: CombatRasterControls | undefined = rasterUnderlay
+      ? { cardHitTargets: {} }
+      : undefined;
+    if (rasterControls) {
       renderCombatFeedbackEffect(this, context);
-      renderCombatRasterCardHand(this, context, (index) => handleSceneAction(this, context, `card_${index + 1}` as InputAction));
+      rasterControls.cardHitTargets = renderCombatRasterCardHand(this, context, (index) => handleSceneAction(this, context, `card_${index + 1}` as InputAction));
     } else {
       renderCombatFeedbackEffect(this, context);
       renderCombatPanel(this, context, 0xfffbef, 0x8f5b42, "#1e2a3e", "#805845");
@@ -42,16 +45,37 @@ export class CombatScene extends Phaser.Scene {
       renderCombatEnemyStandee(this, context);
       renderCardHand(this, context, (index) => handleSceneAction(this, context, `card_${index + 1}` as InputAction));
     }
-    renderCombatButtons(this, context);
-    bindKeyboardActions(this, (action) => handleSceneAction(this, context, action), context.save.settings);
+    const endTurnHitTarget = renderCombatButtons(this, context);
+    if (rasterControls) {
+      rasterControls.endTurnHitTarget = endTurnHitTarget;
+    }
+    bindKeyboardActions(this, (action) => {
+      if (triggerRasterHitTargetDown(this, combatRasterKeyboardTarget(rasterControls, action), () => handleSceneAction(this, context, action))) {
+        return;
+      }
+      handleSceneAction(this, context, action);
+    }, context.save.settings);
     renderDebugOverlay(context, "CombatScene");
   }
 }
 
-function renderCombatButtons(scene: Phaser.Scene, context: BootContext): void {
+interface CombatRasterControls {
+  cardHitTargets: Partial<Record<InputAction, Phaser.GameObjects.Rectangle>>;
+  endTurnHitTarget?: Phaser.GameObjects.Rectangle;
+}
+
+function combatRasterKeyboardTarget(
+  controls: CombatRasterControls | undefined,
+  action: InputAction
+): Phaser.GameObjects.Rectangle | undefined {
+  if (!controls) return undefined;
+  if (action === "end_turn") return controls.endTurnHitTarget;
+  return controls.cardHitTargets[action];
+}
+
+function renderCombatButtons(scene: Phaser.Scene, context: BootContext): Phaser.GameObjects.Rectangle | undefined {
   if (hasCombatRasterUnderlay(scene, false)) {
-    renderCombatRasterEndTurnButton(scene, context);
-    return;
+    return renderCombatRasterEndTurnButton(scene, context);
   }
 
   renderActionButton(scene, 1630, 708, "턴 종료", () => handleSceneAction(scene, context, "end_turn"), {
@@ -60,18 +84,19 @@ function renderCombatButtons(scene: Phaser.Scene, context: BootContext): void {
     focus: true,
     fontSize: 22
   });
+  return undefined;
 }
 
 function hasCombatRasterUnderlay(scene: Phaser.Scene, boss: boolean): boolean {
   return !boss && scene.textures.exists(COMBAT_RASTER_UNDERLAY_KEY);
 }
 
-function renderCombatRasterEndTurnButton(scene: Phaser.Scene, context: BootContext): void {
+function renderCombatRasterEndTurnButton(scene: Phaser.Scene, context: BootContext): Phaser.GameObjects.Rectangle {
   const x = 1660;
   const y = 910;
   const width = 300;
   const height = 260;
-  renderRasterHoverHitTarget(scene, x, y, width, height, () => handleSceneAction(scene, context, "end_turn"), {
+  return renderRasterHoverHitTarget(scene, x, y, width, height, () => handleSceneAction(scene, context, "end_turn"), {
     depth: 22,
     hoverDepth: 24,
     hoverKey: COMBAT_RASTER_HOVER_SEAL_KEY,
@@ -239,7 +264,7 @@ export function renderCombatRasterCardHand(
   scene: Phaser.Scene,
   context: BootContext,
   onCardClick?: (index: number) => void
-): void {
+): Partial<Record<InputAction, Phaser.GameObjects.Rectangle>> {
   const hand = context.run.hand.length > 0
     ? context.run.hand
     : context.save.currentRun?.hand ?? context.dataBundle.cards.slice(0, 5).map((card) => card.id);
@@ -251,11 +276,13 @@ export function renderCombatRasterCardHand(
   const cardY = 836;
   const cardWidth = 210;
   const cardHeight = 324;
+  const hitTargets: Partial<Record<InputAction, Phaser.GameObjects.Rectangle>> = {};
 
   cards.forEach((_card, index) => {
     const x = cardXs[index] ?? (540 + index * 220);
     if (onCardClick) {
-      renderRasterHoverHitTarget(scene, x, cardY, cardWidth, cardHeight, () => onCardClick(index), {
+      const action = `card_${index + 1}` as InputAction;
+      hitTargets[action] = renderRasterHoverHitTarget(scene, x, cardY, cardWidth, cardHeight, () => onCardClick(index), {
         hoverKey: COMBAT_RASTER_HOVER_SEAL_KEY,
         downKey: COMBAT_RASTER_HOVER_SEAL_KEY,
         hoverX: x + 12,
@@ -270,6 +297,7 @@ export function renderCombatRasterCardHand(
       });
     }
   });
+  return hitTargets;
 }
 
 function addRasterText(

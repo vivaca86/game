@@ -9,7 +9,7 @@ import { renderDebugOverlay } from "../../ui/overlays/debugOverlay";
 import { handleSceneAction } from "../bridge/sceneActions";
 import { requireBootContext } from "../bridge/sceneBridge";
 import { renderCombatFeedbackEffect, renderCombatPanel, renderCombatPlayerStandee, renderCombatTheater } from "./CombatScene";
-import { renderActionButton, renderCardHand, renderPaperPanel, renderRasterHoverHitTarget, renderSceneShell, renderTransparentHitTarget, textStyle } from "../view/sceneShell";
+import { renderActionButton, renderCardHand, renderPaperPanel, renderRasterHoverHitTarget, renderSceneShell, renderTransparentHitTarget, textStyle, triggerRasterHitTargetDown } from "../view/sceneShell";
 
 const BOSS_RASTER_UNDERLAY_KEY = "boss_raster_underlay_concept";
 const BOSS_RASTER_HOVER_STAMP_KEY = "ui_hover_boss_skull_stamp_concept";
@@ -32,11 +32,14 @@ export class BossScene extends Phaser.Scene {
       onCardClick: (index) => handleSceneAction(this, context, `card_${index + 1}` as InputAction)
     });
 
-    if (hasBossRasterUnderlay(this)) {
+    const rasterControls: BossRasterControls | undefined = hasBossRasterUnderlay(this)
+      ? { cardHitTargets: {} }
+      : undefined;
+    if (rasterControls) {
       renderBossRasterUnderlayOnly(this);
       renderCombatFeedbackEffect(this, context);
-      renderBossRasterCardTargets(this, context, (index) => handleSceneAction(this, context, `card_${index + 1}` as InputAction));
-      renderBossRasterEndTurnTarget(this, context);
+      rasterControls.cardHitTargets = renderBossRasterCardTargets(this, context, (index) => handleSceneAction(this, context, `card_${index + 1}` as InputAction));
+      rasterControls.endTurnHitTarget = renderBossRasterEndTurnTarget(this, context);
     } else {
       renderCombatTheater(this, context, true);
       renderBossCommandBoard(this, context);
@@ -47,9 +50,28 @@ export class BossScene extends Phaser.Scene {
       renderBossEndTurnButton(this, context);
     }
 
-    bindKeyboardActions(this, (action) => handleSceneAction(this, context, action), context.save.settings);
+    bindKeyboardActions(this, (action) => {
+      if (triggerRasterHitTargetDown(this, bossRasterKeyboardTarget(rasterControls, action), () => handleSceneAction(this, context, action))) {
+        return;
+      }
+      handleSceneAction(this, context, action);
+    }, context.save.settings);
     renderDebugOverlay(context, "BossScene");
   }
+}
+
+interface BossRasterControls {
+  cardHitTargets: Partial<Record<InputAction, Phaser.GameObjects.Rectangle>>;
+  endTurnHitTarget?: Phaser.GameObjects.Rectangle;
+}
+
+function bossRasterKeyboardTarget(
+  controls: BossRasterControls | undefined,
+  action: InputAction
+): Phaser.GameObjects.Rectangle | undefined {
+  if (!controls) return undefined;
+  if (action === "end_turn") return controls.endTurnHitTarget;
+  return controls.cardHitTargets[action];
 }
 
 function hasBossRasterUnderlay(scene: Phaser.Scene): boolean {
@@ -66,7 +88,7 @@ function renderBossRasterCardTargets(
   scene: Phaser.Scene,
   context: BootContext,
   onCardClick?: (index: number) => void
-): void {
+): Partial<Record<InputAction, Phaser.GameObjects.Rectangle>> {
   const hand = context.run.hand.length > 0
     ? context.run.hand
     : context.save.currentRun?.hand ?? context.dataBundle.cards.slice(0, 5).map((card) => card.id);
@@ -75,11 +97,13 @@ function renderBossRasterCardTargets(
   const cardY = 872;
   const cardWidth = 208;
   const cardHeight = 338;
+  const hitTargets: Partial<Record<InputAction, Phaser.GameObjects.Rectangle>> = {};
 
   cards.forEach((_card, index) => {
     const x = cardXs[index] ?? (540 + index * 220);
     if (onCardClick) {
-      renderRasterHoverHitTarget(scene, x, cardY, cardWidth, cardHeight, () => onCardClick(index), {
+      const action = `card_${index + 1}` as InputAction;
+      hitTargets[action] = renderRasterHoverHitTarget(scene, x, cardY, cardWidth, cardHeight, () => onCardClick(index), {
         hoverKey: BOSS_RASTER_HOVER_STAMP_KEY,
         downKey: BOSS_RASTER_HOVER_STAMP_KEY,
         hoverX: x - 32,
@@ -94,14 +118,15 @@ function renderBossRasterCardTargets(
       });
     }
   });
+  return hitTargets;
 }
 
-function renderBossRasterEndTurnTarget(scene: Phaser.Scene, context: BootContext): void {
+function renderBossRasterEndTurnTarget(scene: Phaser.Scene, context: BootContext): Phaser.GameObjects.Rectangle {
   const x = 1750;
   const y = 960;
   const width = 292;
   const height = 220;
-  renderRasterHoverHitTarget(scene, x, y, width, height, () => handleSceneAction(scene, context, "end_turn"), {
+  return renderRasterHoverHitTarget(scene, x, y, width, height, () => handleSceneAction(scene, context, "end_turn"), {
     depth: 22,
     hoverDepth: 24,
     hoverKey: BOSS_RASTER_HOVER_STAMP_KEY,

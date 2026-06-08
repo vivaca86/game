@@ -1808,3 +1808,39 @@ Codex added `tmp/keyboard-confirm-raster-state-audit.mjs`. The audit presses Ent
 Verification passed with `node tmp\keyboard-confirm-raster-state-audit.mjs`, `node tmp\town-raster-toolbar-state-audit.mjs`, `node tmp\runebench-result-lower-button-state-audit.mjs`, `node tmp\ui-raster-hover-audit.mjs`, `node tmp\ui-raster-down-audit.mjs`, `npm.cmd run check`, and `git diff --check`. Screenshot evidence includes `tmp/ui-quality/keyboard-confirm/town-keyboard-confirm-down-v1-1920.png`, `tmp/ui-quality/keyboard-confirm/runebench-keyboard-confirm-down-v1-1920.png`, and `tmp/ui-quality/keyboard-confirm/result-keyboard-confirm-down-v1-1920.png`.
 
 This is a first keyboard-confirm feedback checkpoint, not broad focus completion. WorldMap directional selection already has its own evidence, but Reward/Event/Combat/Boss/Dungeon/Settings keyboard focus/selected behavior, broad disabled coverage, mobile/responsive review, dynamic labels/tooltips, broad Phaser smoke completion, user acceptance, and final concept-match approval remain unfinished.
+
+### Codex
+
+Codex continued the active UI quality goal by extending the same keyboard-confirm feedback standard to Reward, Event, and Dungeon without inventing a new focus-ring or state-art direction. Reward and Event already used the concept-derived `ui_hover_choice_badge_concept` family for pointer hover/down on selectable cards, and Dungeon already used `ui_hover_route_node_concept` for pointer hover/down on its confirm route node, so the keyboard path now reuses those exact raster hit-target down states.
+
+`RewardScene` now returns the first reward card raster hit target from its concept-underlay path and uses `triggerRasterHitTargetDown` before running the existing confirm action. `EventScene` now returns the first affordable event choice raster hit target, and `DungeonScene` now returns the primary raster confirm hit target. The existing click/number-key behavior remains on the card actions; this pass only gives Enter/confirm the same visible material response before the scene advances.
+
+`tmp/keyboard-confirm-raster-state-audit.mjs` now covers Town, Reward, Event, Dungeon, RuneBench, and Result. The new captures are `tmp/ui-quality/keyboard-confirm/reward-keyboard-confirm-down-v1-1920.png`, `tmp/ui-quality/keyboard-confirm/event-keyboard-confirm-down-v1-1920.png`, and `tmp/ui-quality/keyboard-confirm/dungeon-keyboard-confirm-down-v1-1920.png`. Visual review confirmed the first Reward card badge, first affordable Event choice badge, and Dungeon route-node confirm surface show the pressed state on their own concept material, with no Phaser text or vector rectangle overlay.
+
+Verification passed with `node tmp\keyboard-confirm-raster-state-audit.mjs`, `node tmp\choice-badge-raster-hover-state-audit.mjs`, `node tmp\route-node-raster-hover-state-audit.mjs`, `node tmp\ui-raster-hover-audit.mjs`, `node tmp\ui-raster-down-audit.mjs`, `npm.cmd run check`, and `git diff --check`. `npm.cmd run check` still reports the existing Vite large JS chunk warning only.
+
+This is still partial UI progress. Combat/Boss/Settings keyboard focus and selected/focus state art, broader disabled coverage, mobile/responsive review, dynamic labels/tooltips, broad Phaser smoke completion, user acceptance, and final concept-match approval remain unfinished.
+
+### Codex
+
+Codex continued the same keyboard-material feedback pass on Combat and Boss, where the relevant keyboard actions are not Enter confirm but `Digit1` for card use and `KeyE` for end turn. The pass reused the existing raster hit-target state art instead of adding any new overlay style: Combat uses `ui_hover_gold_seal_concept`, and Boss uses `ui_hover_boss_skull_stamp_concept`.
+
+`CombatScene` now keeps references to its raster card hit targets and raster end-turn target, and routes keyboard card/end-turn actions through `triggerRasterHitTargetDown` before running the unchanged scene action. `BossScene` does the same for its raster card targets and end-turn target. Pointer behavior is unchanged; the existing hit targets still own click handling and the keyboard path now borrows their down/idle callbacks.
+
+Codex added `tmp/combat-boss-keyboard-action-raster-state-audit.mjs`. It presses `Digit1` and `KeyE` on Combat and Boss, captures `tmp/ui-quality/keyboard-actions/combat-keyboard-card-down-v1-1920.png`, `tmp/ui-quality/keyboard-actions/combat-keyboard-end-turn-down-v1-1920.png`, `tmp/ui-quality/keyboard-actions/boss-keyboard-card-down-v1-1920.png`, and `tmp/ui-quality/keyboard-actions/boss-keyboard-end-turn-down-v1-1920.png`, and verifies exactly one expected local raster down image with no Phaser text or visible rectangle overlays above the underlay.
+
+Verification passed with `node tmp\combat-boss-keyboard-action-raster-state-audit.mjs`, `node tmp\combat-raster-hover-state-audit.mjs`, `node tmp\boss-raster-hover-state-audit.mjs`, `node tmp\ui-raster-hover-audit.mjs`, `node tmp\ui-raster-down-audit.mjs`, `node tmp\keyboard-confirm-raster-state-audit.mjs`, `npm.cmd run check`, and `git diff --check`. `npm.cmd run check` passed with the existing large JS chunk warning and a Vite plugin timing advisory.
+
+This is still partial UI progress. Combat/Boss now have first keyboard-action raster feedback evidence for the audited card and end-turn controls, but broader selected/focus state art, Settings keyboard focus, broad disabled coverage, mobile/responsive review, dynamic labels/tooltips, broad Phaser smoke completion, user acceptance, and final concept-match approval remain unfinished.
+
+### Codex
+
+Codex prepared the current checkpoint for GitHub handoff while keeping the active UI quality goal open. Before committing, Codex finished the half-applied Settings keyboard pass so the worktree would not be pushed in a broken intermediate state.
+
+Settings already had only one keyboard behavior: `Escape`/cancel returns to Town. Codex did not add a new `Enter`/confirm behavior. Instead, `SettingsScene` now reuses the existing return/check button raster hit target and `triggerRasterHitTargetDown` so pressing `Escape` briefly shows `ui_down_settings_return_button_concept` before the unchanged Town transition runs.
+
+Codex added `tmp/settings-keyboard-cancel-raster-state-audit.mjs`. It opens Settings from Town, presses `Escape`, captures `tmp/ui-quality/keyboard-actions/settings-keyboard-cancel-down-v1-1920.png`, verifies exactly one return-button down image, verifies no Phaser text or visible rectangle overlays above the raster underlay, then confirms the existing flow returns to Town.
+
+Verification passed with `node tmp\settings-keyboard-cancel-raster-state-audit.mjs`, `node tmp\settings-raster-pressed-coverage-audit.mjs`, `node tmp\settings-raster-hover-coverage-audit.mjs`, `node tmp\ui-raster-hover-audit.mjs`, `node tmp\ui-raster-down-audit.mjs`, `node tmp\keyboard-confirm-raster-state-audit.mjs`, `node tmp\combat-boss-keyboard-action-raster-state-audit.mjs`, `npm.cmd run check`, and `git diff --check`. The first Settings pressed coverage run hit the 120s tool timeout; rerunning with a longer limit passed. `npm.cmd run check` still reports the existing large JS chunk warning.
+
+This remains partial UI progress. Settings now has first keyboard-cancel raster feedback evidence for its existing return action, but full Settings keyboard navigation/focus, selected/focus state art, broad disabled coverage, mobile/responsive review, dynamic labels/tooltips, broad Phaser smoke completion, user acceptance, and final concept-match approval remain unfinished.

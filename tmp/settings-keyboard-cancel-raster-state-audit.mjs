@@ -10,54 +10,12 @@ const bundledPnpmModules = `${bundledNodeModules}/.pnpm/node_modules`;
 process.env.NODE_PATH = [process.env.NODE_PATH, bundledNodeModules, bundledPnpmModules].filter(Boolean).join(";");
 Module._initPaths();
 
-const targets = [
-  {
-    label: "town-keyboard-confirm",
-    sceneName: "TownScene",
-    underlayKey: "town_raster_underlay_concept",
-    pathname: "/?debug=1&entry=town&resetSave=1",
-    downKey: "ui_down_town_expedition_action_concept",
-    nextSceneName: "WorldMapScene"
-  },
-  {
-    label: "reward-keyboard-confirm",
-    sceneName: "RewardScene",
-    underlayKey: "reward_raster_underlay_concept",
-    pathname: "/?debug=1&entry=reward&resetSave=1",
-    downKey: "ui_hover_choice_badge_concept",
-    nextSceneName: "EventScene"
-  },
-  {
-    label: "event-keyboard-confirm",
-    sceneName: "EventScene",
-    underlayKey: "event_raster_underlay_concept",
-    pathname: "/?debug=1&entry=event&resetSave=1",
-    downKey: "ui_hover_choice_badge_concept",
-    nextSceneName: "RuneBenchScene"
-  },
-  {
-    label: "dungeon-keyboard-confirm",
-    sceneName: "DungeonScene",
-    underlayKey: "dungeon_raster_underlay_concept",
-    pathname: "/?debug=1&entry=dungeon&resetSave=1",
-    downKey: "ui_hover_route_node_concept"
-  },
-  {
-    label: "runebench-keyboard-confirm",
-    sceneName: "RuneBenchScene",
-    underlayKey: "rune_bench_raster_underlay_concept",
-    pathname: "/?debug=1&entry=rune_bench&resetSave=1&grantRune=rune_paper_spark",
-    downKey: "ui_down_runebench_action_rail_concept"
-  },
-  {
-    label: "result-keyboard-confirm",
-    sceneName: "ResultScene",
-    underlayKey: "result_raster_underlay_concept",
-    pathname: "/?debug=1&entry=result&resetSave=1",
-    downKey: "ui_down_result_action_card_concept",
-    nextSceneName: "TownScene"
-  }
-];
+const target = {
+  label: "settings-keyboard-cancel",
+  sceneName: "SettingsScene",
+  underlayKey: "settings_raster_underlay_concept",
+  downKey: "ui_down_settings_return_button_concept"
+};
 
 function loadPlaywright() {
   try {
@@ -68,7 +26,7 @@ function loadPlaywright() {
 }
 
 async function startServer() {
-  for (const port of [4200, 4201, 4202, 4203]) {
+  for (const port of [4208, 4209, 4210, 4211]) {
     try {
       const server = await createServer({
         root: process.cwd(),
@@ -84,15 +42,6 @@ async function startServer() {
   throw new Error("No free audit port found");
 }
 
-async function openTarget(page, baseUrl, target) {
-  await page.goto(new URL(target.pathname, baseUrl).href, { waitUntil: "networkidle" });
-  await waitForScene(page, target.sceneName);
-  await page.evaluate(() => {
-    const overlay = document.getElementById("debug-overlay");
-    if (overlay) overlay.style.display = "none";
-  });
-}
-
 async function waitForScene(page, sceneName) {
   await page.waitForFunction((expectedScene) => {
     const game = window.__paperGame;
@@ -100,7 +49,24 @@ async function waitForScene(page, sceneName) {
   }, sceneName, { timeout: 10000 });
 }
 
-async function captureStats(page, target) {
+async function openSettings(page, baseUrl) {
+  await page.goto(new URL("/?debug=1&entry=town&resetSave=1", baseUrl).href, { waitUntil: "networkidle" });
+  await waitForScene(page, "TownScene");
+  await page.waitForSelector("canvas", { timeout: 10000 });
+  const canvas = page.locator("canvas");
+  const box = await canvas.boundingBox();
+  if (!box) throw new Error("missing canvas");
+
+  await page.mouse.click(box.x + (1010 / 1920) * box.width, box.y + (806 / 1080) * box.height);
+  await waitForScene(page, target.sceneName);
+  await page.evaluate(() => {
+    const overlay = document.getElementById("debug-overlay");
+    if (overlay) overlay.style.display = "none";
+  });
+  return { canvas };
+}
+
+async function captureStats(page) {
   return page.evaluate(({ target }) => {
     const game = window.__paperGame;
     const scene = game?.scene?.getScenes?.(true)?.find((candidate) => candidate.scene?.key === target.sceneName)
@@ -139,12 +105,12 @@ async function setScenePaused(page, sceneName, paused) {
 
 function assertState(label, stats) {
   if (!stats.hasUnderlay) throw new Error(`${label}: missing raster underlay`);
-  if (stats.visibleDownImages !== 1) throw new Error(`${label}: expected one visible keyboard down image, got ${stats.visibleDownImages}`);
+  if (stats.visibleDownImages !== 1) throw new Error(`${label}: expected one visible keyboard cancel down image, got ${stats.visibleDownImages}`);
   if (stats.textCount !== 0) throw new Error(`${label}: visible Phaser text leaked over raster underlay`);
   if (stats.visibleRectsAboveUnderlay !== 0) throw new Error(`${label}: visible rectangle overlay leaked`);
 }
 
-await mkdir("tmp/ui-quality/keyboard-confirm", { recursive: true });
+await mkdir("tmp/ui-quality/keyboard-actions", { recursive: true });
 
 const { chromium } = loadPlaywright();
 const executableCandidates = [
@@ -171,27 +137,21 @@ try {
   if (!browser) throw launchError;
 
   const page = await browser.newPage({ viewport: { width: 1920, height: 1080 }, deviceScaleFactor: 1 });
-  const canvas = page.locator("canvas");
-  const results = [];
+  const { canvas } = await openSettings(page, baseUrl);
 
-  for (const target of targets) {
-    await openTarget(page, baseUrl, target);
-    await page.keyboard.down("Enter");
-    await page.waitForTimeout(10);
-    const stats = await captureStats(page, target);
-    assertState(target.label, stats);
-    await setScenePaused(page, target.sceneName, true);
-    await canvas.screenshot({ path: `tmp/ui-quality/keyboard-confirm/${target.label}-down-v1-1920.png` });
-    await setScenePaused(page, target.sceneName, false);
-    await page.keyboard.up("Enter");
-    await page.waitForTimeout(180);
-    if (target.nextSceneName) {
-      await waitForScene(page, target.nextSceneName);
-    }
-    results.push({ label: target.label, ...stats });
-  }
+  await page.keyboard.down("Escape");
+  await page.waitForTimeout(10);
+  const stats = await captureStats(page);
+  assertState(target.label, stats);
+  await setScenePaused(page, target.sceneName, true);
+  const screenshot = `tmp/ui-quality/keyboard-actions/${target.label}-down-v1-1920.png`;
+  await canvas.screenshot({ path: screenshot });
+  await setScenePaused(page, target.sceneName, false);
+  await page.keyboard.up("Escape");
+  await page.waitForTimeout(180);
+  await waitForScene(page, "TownScene");
 
-  console.log(JSON.stringify({ ok: true, results }, null, 2));
+  console.log(JSON.stringify({ ok: true, result: { label: target.label, key: "Escape", screenshot: path.resolve(screenshot), ...stats } }, null, 2));
 } finally {
   await browser?.close();
   await server?.close();
