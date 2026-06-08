@@ -129,6 +129,7 @@ Completed progress in this checkpoint:
 - Combat and Boss now have first cost-disabled card raster evidence. Cards whose effective combat cost is higher than current player energy show the existing `ui_disabled_lock_stamp_concept` bitmap instead of hover/down affordance, and the disabled pointer/keyboard paths do not advance or add blocked-card log churn.
 - Settings now has first keyboard-cancel raster feedback evidence for its existing return action. `Escape` briefly shows `ui_down_settings_return_button_concept` on the bottom-right return/check button before the unchanged Town transition runs. This does not add a Settings Enter/confirm behavior.
 - Settings now has first keyboard navigation/focus evidence across its ten audited controls. Arrow keys reuse the existing Settings-specific hover bitmaps as focus, and Enter reuses the existing down bitmap before running the focused control's existing action.
+- Broad Phaser smoke is passing again for this checkpoint. The smoke runner now has step filtering/progress timing, release passive subcase progress logs, longer keyboard settle timing for the delayed raster down feedback path, and state-waiting loops for repeated combat key actions. The full wrapper run ended with `Phaser smoke OK` after `checkBossResultFlow OK`.
 
 Next recommended work:
 
@@ -137,7 +138,7 @@ Next recommended work:
 3. Refine selected/focus/keyboard state art without falling back to Phaser vector overlays. WorldMap directional keyboard selection, Town/Reward/Event/Dungeon/RuneBench/Result keyboard-confirm feedback, Combat/Boss keyboard card/end-turn feedback, and Settings keyboard-cancel plus keyboard-focus feedback now have first evidence, but this is not final keyboard/focus coverage across screens.
 4. Continue deeper pressed/down, disabled, and focus review beyond the audited representative/current controls. Settings' ten audited controls, Town's lower toolbar controls, RuneBench lower confirm, Result lower return, the Town/RuneBench/Result representative utility targets, and Combat/Boss cost-disabled cards now have first evidence, but selected/focus state art, broader disabled-state breadth, remaining legacy UX decisions, and final keyboard-focus approval are still missing.
 5. Add dynamic labels/tooltips/accessibility-safe text strategy outside the baked concept layer.
-6. Reinvestigate `node tmp/run-phaser-smoke-with-vite.mjs`, which timed out in the 2026-06-05 continuation despite dedicated WorldMap audit and `npm.cmd run check` passing.
+6. Keep broad Phaser smoke as an ongoing regression gate. It is currently passing, but it is long-running and should be rerun after future keyboard/input/state changes.
 
 Known unfinished scope:
 
@@ -146,6 +147,6 @@ Known unfinished scope:
 - Broad disabled-state coverage beyond Event unaffordable choice and Combat/Boss cost-disabled cards.
 - Screen-specific pressed/down art beyond the currently audited controls.
 - Dynamic readability and accessibility-safe text strategy.
-- Broad Phaser smoke currently still needs follow-up: the Vite wrapper passed through `checkClickableControls` after the state-key update, then timed out during `checkFullInputCoverage` on 2026-06-08.
+- Broad Phaser smoke is currently passing for this checkpoint, but remains a long-running regression gate rather than evidence of final UI approval.
 - User acceptance.
 - Final 95% or release-ready UI.

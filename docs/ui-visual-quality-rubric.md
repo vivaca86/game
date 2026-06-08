@@ -2836,6 +2836,32 @@ This checkpoint expands disabled-state coverage using an existing concept-derive
 
 This is not broad disabled approval. Combat/Boss now have first cost-disabled card evidence, but disabled coverage across all scenes/controls, final selected/focus language, mobile/responsive review, dynamic labels/tooltips, user acceptance, and final concept-match approval remain unfinished.
 
+## Broad Phaser Smoke Gate Restored Checkpoint
+
+Date: 2026-06-08
+
+Evidence:
+
+- `tools/phaser-smoke-test.mjs`
+- Top-level smoke steps now log `START`, `OK <ms>`, and `FAIL <ms>`
+- `PHASER_SMOKE_ONLY` allows targeted reruns such as `checkReleasePassiveBatch`
+- Release passive subcases now log their active label before opening the page
+- Repeated combat-key passive cases now wait for real debug-state advancement instead of assuming a fixed key interval
+- Debug-value wait failures now include the current debug value, phase, hand, and log
+- Targeted passive batch passed with `Phaser smoke OK`
+- Full `node tmp\run-phaser-smoke-with-vite.mjs` passed with `Phaser smoke OK`
+- Full smoke evidence includes `checkFullInputCoverage OK`, `checkUiSkinStates OK`, `checkReleasePassiveBatch OK`, `checkCoreRunLoop OK`, `checkSceneFlowAndRuneEffect OK`, and `checkBossResultFlow OK`
+- `npm.cmd run check`
+- `git diff --check`
+
+Current status: `Passing regression gate`
+
+Completion level: `Verification restored`
+
+This checkpoint restores the broad browser smoke gate after the previous timeout. The root cause was not a new visual art pass; it was stale smoke timing and a fragile repeated-key passive test after keyboard raster down feedback intentionally delayed action execution. The smoke now waits for real state changes when validating repeated combat card plays.
+
+This is not final UI approval. The full smoke passing proves the current browser flow and audited UI-state paths are not failing at this gate, but final selected/focus language, broader disabled coverage, WorldMap recomposition, mobile/responsive review, dynamic labels/tooltips, user acceptance, and final concept-match approval remain unfinished.
+
 ## Current Remaining Raster-Quality Scope
 
 Status: `Not complete`
@@ -2856,4 +2882,4 @@ The active goal still remains open. The immediate first-view raster concept-unde
 - Raster hover/down feedback is no longer universally invisible: all 10 primary raster concept screens have extracted bitmap hover-state candidates on representative controls and a pressed/down-state candidate on audited controls. The audited pressed states now avoid the shared fallback stamp, Event has a first disabled lock candidate, Combat/Boss have first cost-disabled card lock candidates, and Settings has first keyboard-cancel plus keyboard-focus feedback on its audited controls. Final matching-quality selected, broad disabled, focus, deeper per-control pressed, and screen-specific state coverage is still missing.
 - The full UI skin is not a 95-point completion candidate and has no user acceptance yet.
 - `npm.cmd run check` still reports the existing Vite large JS chunk warning, so performance remains tracked separately as `Needs verification`.
-- Broad Phaser smoke is not passed for the 2026-06-08 continuation; the wrapper timed out during `checkFullInputCoverage`.
+- Broad Phaser smoke is passing for the latest 2026-06-08 checkpoint, but it remains a long-running regression gate rather than evidence of final UI approval.

@@ -31,6 +31,12 @@ const executableCandidates = [
 const productionSaveKey = "paper_theater_card_crawler_save_v1";
 const shouldLogSmokeProgress = process.env.PHASER_SMOKE_PROGRESS === "1";
 const smokeProgressFile = process.env.PHASER_SMOKE_PROGRESS_FILE;
+const smokeOnlySteps = new Set(
+  (process.env.PHASER_SMOKE_ONLY ?? "")
+    .split(",")
+    .map((step) => step.trim())
+    .filter(Boolean)
+);
 const rasterOnlySceneUnderlays = {
   BossScene: "boss_raster_underlay_concept",
   CombatScene: "combat_raster_underlay_concept",
@@ -127,8 +133,20 @@ try {
 }
 
 async function runSmokeStep(label, action) {
-  await logSmokeProgress(label);
-  await action();
+  if (smokeOnlySteps.size > 0 && !smokeOnlySteps.has(label)) {
+    await logSmokeProgress(`${label} SKIP`);
+    return;
+  }
+
+  const start = Date.now();
+  await logSmokeProgress(`${label} START`);
+  try {
+    await action();
+    await logSmokeProgress(`${label} OK ${Date.now() - start}ms`);
+  } catch (error) {
+    await logSmokeProgress(`${label} FAIL ${Date.now() - start}ms`);
+    throw error;
+  }
 }
 
 async function logSmokeProgress(label) {
@@ -934,7 +952,13 @@ async function checkReleaseEventBatch() {
 }
 
 async function checkReleasePassiveBatch() {
-  await withDebugPage(
+  const withPassivePage = async (label, pathname, sceneName, action) => {
+    await logSmokeProgress(`checkReleasePassiveBatch ${label}`);
+    await withDebugPage(pathname, sceneName, action);
+  };
+
+  await withPassivePage(
+    "start-relics",
     "/?debug=1&data=release&entry=combat&resetSave=1&grantRelic=relic_round_lantern&grantRelic=relic_cloud_socks",
     "CombatScene",
     async (page) => {
@@ -945,7 +969,8 @@ async function checkReleasePassiveBatch() {
     }
   );
 
-  await withDebugPage(
+  await withPassivePage(
+    "card-reward-options",
     "/?debug=1&data=release&entry=reward&resetSave=1&rewardPool=reward_pool_release_cards&grantRelic=relic_ribbon_box",
     "RewardScene",
     async (page) => {
@@ -958,7 +983,8 @@ async function checkReleasePassiveBatch() {
     }
   );
 
-  await withDebugPage(
+  await withPassivePage(
+    "event-gold-bonus",
     "/?debug=1&data=release&entry=event&resetSave=1&stage=stage_sunny_gate&grantRelic=relic_candy_pouch",
     "EventScene",
     async (page) => {
@@ -969,7 +995,8 @@ async function checkReleasePassiveBatch() {
     }
   );
 
-  await withDebugPage(
+  await withPassivePage(
+    "heal-after-combat",
     "/?debug=1&data=release&entry=combat&resetSave=1&playerHp=60&enemyHp=8&grantRelic=relic_mint_thermos",
     "CombatScene",
     async (page) => {
@@ -981,7 +1008,8 @@ async function checkReleasePassiveBatch() {
     }
   );
 
-  await withDebugPage(
+  await withPassivePage(
+    "zero-cost-gold",
     "/?debug=1&data=release&entry=combat&resetSave=1&grantArcana=arcana_star_bakery",
     "CombatScene",
     async (page) => {
@@ -991,7 +1019,8 @@ async function checkReleasePassiveBatch() {
     }
   );
 
-  await withDebugPage(
+  await withPassivePage(
+    "guard-random-damage",
     "/?debug=1&data=release&entry=combat&resetSave=1&grantArcana=arcana_cloud_parade",
     "CombatScene",
     async (page) => {
@@ -1002,7 +1031,8 @@ async function checkReleasePassiveBatch() {
     }
   );
 
-  await withDebugPage(
+  await withPassivePage(
+    "first-expensive-free",
     "/?debug=1&data=release&entry=combat&resetSave=1&grantRelic=relic_sun_cookie",
     "CombatScene",
     async (page) => {
@@ -1014,7 +1044,8 @@ async function checkReleasePassiveBatch() {
     }
   );
 
-  await withDebugPage(
+  await withPassivePage(
+    "retain-one-card",
     "/?debug=1&data=release&entry=combat&resetSave=1&grantRelic=relic_sleepy_pillow&handCard=card_sunbean_punch&handCard=card_morning_daybreak&handCard=card_cloud_cushion&handCard=card_mint_spark&handCard=card_morning_parcel&grantCard=card_sprout_guard&grantCard=card_morning_breakfast&grantCard=card_peach_softguard&grantCard=card_mint_leafjab",
     "CombatScene",
     async (page) => {
@@ -1028,7 +1059,8 @@ async function checkReleasePassiveBatch() {
     }
   );
 
-  await withDebugPage(
+  await withPassivePage(
+    "rune-reward-options",
     "/?debug=1&data=release&entry=reward&resetSave=1&rewardPool=reward_pool_release_runes&grantRelic=relic_bubble_lens",
     "RewardScene",
     async (page) => {
@@ -1040,7 +1072,8 @@ async function checkReleasePassiveBatch() {
     }
   );
 
-  await withDebugPage(
+  await withPassivePage(
+    "elite-card-supplement",
     "/?debug=1&data=release&entry=reward&resetSave=1&stage=stage_rainbow_keep&room=stage_rainbow_keep_room_2_elite&rewardPool=reward_pool_release_relics&grantRelic=relic_elite_sticker",
     "RewardScene",
     async (page) => {
@@ -1052,7 +1085,8 @@ async function checkReleasePassiveBatch() {
     }
   );
 
-  await withDebugPage(
+  await withPassivePage(
+    "stage-clear-reward-bonus",
     "/?debug=1&data=release&entry=reward&resetSave=1&rewardPool=reward_pool_release_stage_clear&grantRelic=relic_final_picnic",
     "RewardScene",
     async (page) => {
@@ -1064,7 +1098,8 @@ async function checkReleasePassiveBatch() {
     }
   );
 
-  await withDebugPage(
+  await withPassivePage(
+    "boss-victory-reward-bonus",
     "/?debug=1&data=release&entry=boss&resetSave=1&enemyHp=8&grantRelic=relic_final_picnic&handCard=card_sunbean_punch&handCard=card_sunbean_punch&handCard=card_sunbean_punch&handCard=card_cloud_cushion&handCard=card_mint_spark",
     "BossScene",
     async (page) => {
@@ -1080,7 +1115,8 @@ async function checkReleasePassiveBatch() {
     }
   );
 
-  await withDebugPage(
+  await withPassivePage(
+    "soft-compass",
     "/?debug=1&data=release&entry=dungeon&resetSave=1&stage=stage_rainbow_keep&grantRelic=relic_soft_compass",
     "DungeonScene",
     async (page) => {
@@ -1089,37 +1125,41 @@ async function checkReleasePassiveBatch() {
     }
   );
 
-  await withDebugPage(
-    "/?debug=1&data=release&entry=combat&resetSave=1&enemyHp=22&grantArcana=arcana_ribbon_firework&handCard=card_mint_spark&handCard=card_mint_spark&handCard=card_mint_spark&handCard=card_mint_spark&handCard=card_mint_spark",
+  await withPassivePage(
+    "ribbon-firework",
+    "/?debug=1&data=release&entry=combat&resetSave=1&enemyHp=22&grantArcana=arcana_ribbon_firework&handCard=card_morning_breakfast&handCard=card_morning_breakfast&handCard=card_morning_breakfast&handCard=card_morning_breakfast&handCard=card_morning_breakfast",
     "CombatScene",
     async (page) => {
       for (let index = 0; index < 5; index += 1) {
         await pressAndSettle(page, "Digit1");
+        await waitForDebugValue(page, "chain", String(index + 1));
       }
       await waitForDebugValue(page, "enemyHp", "12");
     }
   );
 
-  await withDebugPage(
+  await withPassivePage(
+    "mint-rest",
     "/?debug=1&data=release&entry=combat&resetSave=1&playerHp=60&grantArcana=arcana_mint_rest&handCard=card_cloud_cushion&handCard=card_cloud_cushion&handCard=card_cloud_cushion&handCard=card_mint_spark&handCard=card_morning_breakfast",
     "CombatScene",
     async (page) => {
-      await pressAndSettle(page, "Digit1");
-      await pressAndSettle(page, "Digit1");
-      await pressAndSettle(page, "Digit1");
-      await waitForDebugValue(page, "guardCardsPlayed", "3");
+      for (let index = 0; index < 3; index += 1) {
+        await pressAndSettle(page, "Digit1");
+        await waitForDebugValue(page, "guardCardsPlayed", String(index + 1));
+      }
       await waitForDebugValue(page, "playerHp", "63");
     }
   );
 
-  await withDebugPage(
+  await withPassivePage(
+    "prism-path",
     "/?debug=1&data=release&entry=combat&resetSave=1&grantArcana=arcana_prism_path&handCard=card_sunbean_punch&handCard=card_cloud_cushion&handCard=card_mint_spark&handCard=card_peach_softguard&handCard=card_morning_breakfast&grantCard=card_sprout_guard",
     "CombatScene",
     async (page) => {
-      await pressAndSettle(page, "Digit1");
-      await pressAndSettle(page, "Digit1");
-      await pressAndSettle(page, "Digit1");
-      await pressAndSettle(page, "Digit1");
+      for (let index = 0; index < 4; index += 1) {
+        await pressAndSettle(page, "Digit1");
+        await waitForDebugValue(page, "chain", String(index + 1));
+      }
       await waitForDebugValue(page, "colorsPlayed", "coral,sky,mint,peach");
       const state = await getDebugMap(page);
       const hand = (state.hand ?? "").split(",").filter(Boolean);
@@ -1129,18 +1169,21 @@ async function checkReleasePassiveBatch() {
     }
   );
 
-  await withDebugPage(
+  await withPassivePage(
+    "cloud-blanket",
     "/?debug=1&data=release&entry=combat&resetSave=1&grantArcana=arcana_cloud_blanket",
     "CombatScene",
     async (page) => {
       await pressAndSettle(page, "Digit3");
+      await waitForDebugValue(page, "chain", "1");
       await pressAndSettle(page, "KeyE");
       await waitForDebugValue(page, "turn", "2");
       await waitForDebugValue(page, "playerBlock", "2");
     }
   );
 
-  await withDebugPage(
+  await withPassivePage(
+    "sprout-song",
     "/?debug=1&data=release&entry=combat&resetSave=1&playerHp=40&grantArcana=arcana_sprout_song&handCard=card_morning_breakfast&handCard=card_sunbean_punch&handCard=card_cloud_cushion&handCard=card_mint_spark&handCard=card_morning_parcel",
     "CombatScene",
     async (page) => {
@@ -1347,7 +1390,7 @@ async function playUsefulCombatAction(page, state) {
 
 async function pressAndSettle(page, key) {
   await page.keyboard.press(key);
-  await page.waitForTimeout(80);
+  await page.waitForTimeout(140);
 }
 
 async function captureEffectScreenshot(page, label) {
@@ -1817,14 +1860,23 @@ async function waitForDebugScene(page, sceneName) {
 }
 
 async function waitForDebugValue(page, key, value) {
-  await page.waitForFunction(
-    ([expectedKey, expectedValue]) => {
-      const spans = Array.from(document.querySelectorAll("#debug-overlay span"));
-      return spans.some((span) => span.textContent === `${expectedKey}=${expectedValue}`);
-    },
-    [key, value],
-    { timeout: 10000 }
-  );
+  try {
+    await page.waitForFunction(
+      ([expectedKey, expectedValue]) => {
+        const spans = Array.from(document.querySelectorAll("#debug-overlay span"));
+        return spans.some((span) => span.textContent === `${expectedKey}=${expectedValue}`);
+      },
+      [key, value],
+      { timeout: 10000 }
+    );
+  } catch (error) {
+    const state = await getDebugMap(page).catch(() => ({}));
+    throw new Error(
+      `Expected debug ${key}=${value}; got ${key}=${state[key] ?? "missing"} `
+      + `phase=${state.phase ?? "missing"} hand=${state.hand ?? "missing"} log=${state.log ?? "missing"}`,
+      { cause: error }
+    );
+  }
 }
 
 async function waitForDebugText(page, text) {

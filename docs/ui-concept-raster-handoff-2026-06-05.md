@@ -280,7 +280,7 @@ Recommended next WorldMap work:
 1. Refine later completed-node variants and remaining baked route/node geometry against the concept.
 2. Refine selected/focus/keyboard state art without reintroducing Phaser vector overlays. The first WorldMap arrow-key selection pass exists, but broader keyboard/focus coverage is still open.
 3. Add accessibility-safe dynamic labels/tooltips outside the baked concept layer.
-4. Reinvestigate the broad Phaser smoke timeout from the 2026-06-08 continuation: the wrapper passed through `checkClickableControls` after the hover/down key update, then timed out during `checkFullInputCoverage`.
+4. Keep broad Phaser smoke as an ongoing regression gate. The earlier 2026-06-08 timeout has since been root-caused and the full wrapper now passes again.
 5. Capture 1920 screenshots and inspect visually before claiming improvement.
 
 ## Shared Raster Interaction System
@@ -362,7 +362,7 @@ The following did not complete on 2026-06-08:
 $env:PHASER_SMOKE_PROGRESS='1'; $env:PHASER_SMOKE_PROGRESS_FILE='tmp/phaser-smoke-progress-current.log'; node tmp\run-phaser-smoke-with-vite.mjs
 ```
 
-It passed through `checkClickableControls` after the smoke helper's down-key default was updated to the current control-family bitmap standard, then timed out during `checkFullInputCoverage`. Treat broad Phaser smoke as `Needs verification`, not passed, for this continuation.
+It passed through `checkClickableControls` after the smoke helper's down-key default was updated to the current control-family bitmap standard, then timed out during `checkFullInputCoverage`. A later follow-up restored the broad smoke gate; see the broad smoke section below for the passing run.
 
 The following passed after the Town/RuneBench/Result representative utility state pass:
 
@@ -649,7 +649,7 @@ Screenshot review:
 
 Remaining related work:
 
-- Broad Phaser smoke was not rerun here and remains `Needs verification` from the previous `checkFullInputCoverage` timeout.
+- Broad Phaser smoke has since been rerun in the follow-up checkpoint below and now passes.
 - Selected/focus, keyboard focus, broad disabled coverage, mobile/responsive review, dynamic labels/tooltips, accessibility-safe text, user acceptance, and final concept-match approval remain unfinished.
 
 ## 2026-06-08 Continuation: Keyboard Confirm Raster Feedback
@@ -929,3 +929,50 @@ Remaining related work:
 
 - This is not broad disabled-state completion. Event unaffordable choices and Combat/Boss cost-disabled cards now have first evidence, but disabled coverage across every scene/control remains open.
 - Final selected/focus language, WorldMap recomposition, dynamic labels/tooltips, accessibility-safe text, mobile/responsive review, user acceptance, and final concept-match approval remain unfinished.
+
+## 2026-06-08 Continuation: Broad Phaser Smoke Gate Restored
+
+Status: `Verification gate restored`.
+
+This follow-up did not add a new visual style. It restored the broad Phaser smoke gate that had been reported as timing out, so future UI-state work can be checked against the full browser flow again.
+
+Added/changed:
+
+- `tools/phaser-smoke-test.mjs`
+- `PHASER_SMOKE_ONLY` step filtering for targeted smoke reruns
+- `START`/`OK`/`FAIL` timing progress for each top-level smoke step
+- Release passive subcase progress labels
+- More robust repeated combat-key waits after the keyboard raster down feedback delay
+- More useful debug-value failure messages
+
+Root cause:
+
+- The previous broad smoke looked like a generic timeout because progress logging was too coarse.
+- The failing release passive cases pressed combat keys repeatedly with a fixed 80ms settle, but keyboard activation now intentionally shows a brief raster down state before running the action.
+- `ribbon-firework` also used five draw/discount cards, so repeated `Digit1` was a fragile way to prove five actual card plays.
+
+Verification run in this continuation:
+
+```powershell
+$env:PHASER_SMOKE_PROGRESS='1'
+$env:PHASER_SMOKE_PROGRESS_FILE='tmp/phaser-smoke-progress-current.log'
+$env:PHASER_SMOKE_ONLY='checkReleasePassiveBatch'
+node tmp\run-phaser-smoke-with-vite.mjs
+
+$env:PHASER_SMOKE_PROGRESS='1'
+$env:PHASER_SMOKE_PROGRESS_FILE='tmp/phaser-smoke-progress-full.log'
+node tmp\run-phaser-smoke-with-vite.mjs
+
+npm.cmd run check
+git diff --check
+```
+
+Results:
+
+- Targeted `checkReleasePassiveBatch` passed with `Phaser smoke OK`.
+- Full broad Phaser smoke passed with `Phaser smoke OK`, including `checkFullInputCoverage OK`, `checkUiSkinStates OK`, `checkReleasePassiveBatch OK`, `checkCoreRunLoop OK`, `checkSceneFlowAndRuneEffect OK`, and `checkBossResultFlow OK`.
+- `npm.cmd run check` passed and still reports the existing large JS chunk warning.
+
+Remaining related work:
+
+- This is a restored verification gate, not final UI completion. Final selected/focus language, WorldMap recomposition, broader disabled coverage, dynamic labels/tooltips, accessibility-safe text, mobile/responsive review, user acceptance, and final concept-match approval remain unfinished.
