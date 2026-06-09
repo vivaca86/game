@@ -92,6 +92,7 @@ The current active goal is to make the game UI match the concept art at similar 
 Detailed continuation handoff:
 
 - `docs/ui-concept-raster-handoff-2026-06-05.md`
+- `docs/other-pc-handoff-2026-06-09.md` for a short clone-and-continue checklist on a different PC.
 
 Current best estimate:
 
