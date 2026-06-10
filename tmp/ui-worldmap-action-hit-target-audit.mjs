@@ -134,6 +134,16 @@ try {
       && child.texture?.key === "ui_current_stage_marker_concept"
       && (child.alpha ?? 1) > 0.05
     ));
+    const bodyImages = visible.filter((child) => (
+      child?.type === "Image"
+      && child.texture?.key === "ui_current_stage_body_wash_concept"
+      && (child.alpha ?? 1) > 0.05
+    ));
+    const frameImages = visible.filter((child) => (
+      child?.type === "Image"
+      && child.texture?.key === "ui_current_stage_frame_concept"
+      && (child.alpha ?? 1) > 0.05
+    ));
     const haloImages = visible.filter((child) => (
       child?.type === "Image"
       && child.texture?.key === "ui_current_stage_halo_concept"
@@ -152,6 +162,20 @@ try {
       && expectedNode
       && Math.abs(haloImages[0].x - (expectedNode.x + 2)) <= 1
       && Math.abs(haloImages[0].y - (expectedNode.y + 4)) <= 1;
+    const bodyAtCurrentStage = bodyImages.length === 1
+      && expectedNode
+      && Math.abs(bodyImages[0].x - (expectedNode.x + expectedNode.width * 0.02)) <= 1
+      && Math.abs(bodyImages[0].y - (expectedNode.y + expectedNode.height * 0.04)) <= 1
+      && Math.abs(bodyImages[0].displayWidth - expectedNode.width * 1.12) <= 1
+      && Math.abs(bodyImages[0].displayHeight - expectedNode.height * 1.16) <= 1
+      && (bodyImages[0].alpha ?? 1) >= 0.64;
+    const frameAtCurrentStage = frameImages.length === 1
+      && expectedNode
+      && Math.abs(frameImages[0].x - (expectedNode.x + expectedNode.width * 0.02)) <= 1
+      && Math.abs(frameImages[0].y - (expectedNode.y + expectedNode.height * 0.01)) <= 1
+      && Math.abs(frameImages[0].displayWidth - expectedNode.width * 1.34) <= 1
+      && Math.abs(frameImages[0].displayHeight - expectedNode.height * 1.38) <= 1
+      && (frameImages[0].alpha ?? 1) >= 0.88;
     const statusAtCurrentStage = statusImages.length === 1
       && expectedNode
       && Math.abs(statusImages[0].x - (expectedNode.x + expectedNode.width * 0.1)) <= 1
@@ -170,7 +194,7 @@ try {
         return (child?.isFilled && fillAlpha > 0.02) || (child?.isStroked && strokeWidth > 0 && strokeAlpha > 0.02);
       }).length;
     return {
-      ok: underlayIndex >= 0 && visiblePlayImages === 1 && visibleRouteImages === 0 && markerAtCurrentStage && haloAtCurrentStage && statusAtCurrentStage && visibleTextCount === 0 && visibleRectsAboveUnderlay === 0,
+      ok: underlayIndex >= 0 && visiblePlayImages === 1 && visibleRouteImages === 0 && markerAtCurrentStage && haloAtCurrentStage && bodyAtCurrentStage && frameAtCurrentStage && statusAtCurrentStage && visibleTextCount === 0 && visibleRectsAboveUnderlay === 0,
       hasUnderlay: underlayIndex >= 0,
       visiblePlayImages,
       visibleRouteImages,
@@ -179,6 +203,10 @@ try {
       markerAtCurrentStage: Boolean(markerAtCurrentStage),
       visibleCurrentHaloImages: haloImages.length,
       haloAtCurrentStage: Boolean(haloAtCurrentStage),
+      visibleCurrentBodyImages: bodyImages.length,
+      bodyAtCurrentStage: Boolean(bodyAtCurrentStage),
+      visibleCurrentFrameImages: frameImages.length,
+      frameAtCurrentStage: Boolean(frameAtCurrentStage),
       visibleCurrentStatusImages: statusImages.length,
       statusAtCurrentStage: Boolean(statusAtCurrentStage),
       visibleTextCount,
@@ -213,9 +241,12 @@ try {
       { label: "node3plateUpper", x: 873, y: 631 },
       { label: "node3body", x: 872, y: 648 },
       { label: "stage4body", x: 1018, y: 604 },
+      { label: "stage4topMarkerScar", x: 1022, y: 512, maxCyanDominance: 18, maxRedDominance: 30 },
+      { label: "stage4statusScar", x: 1075, y: 641, maxCyanDominance: 18, maxRedDominance: 30 },
       { label: "stage4routeDots", x: 940, y: 503 },
-      { label: "stage5body", x: 1328, y: 574 },
-      { label: "stage5route", x: 1238, y: 536 },
+      { label: "stage5body", x: 1176, y: 540 },
+      { label: "stage5lowerSeal", x: 1180, y: 592 },
+      { label: "stage5route", x: 1114, y: 568 },
       { label: "stage10lock", x: 563, y: 248 },
       { label: "stage11lock", x: 686, y: 294 },
       { label: "stage12lock", x: 819, y: 312 },
@@ -236,7 +267,11 @@ try {
       };
     });
     return {
-      ok: samples.every((sample) => sample.greenDominance < 24 && sample.cyanDominance < 28 && sample.redDominance < 42),
+      ok: samples.every((sample) => (
+        sample.greenDominance < (sample.maxGreenDominance ?? 24)
+        && sample.cyanDominance < (sample.maxCyanDominance ?? 28)
+        && sample.redDominance < (sample.maxRedDominance ?? 42)
+      )),
       samples
     };
   });
@@ -384,9 +419,19 @@ async function runKeyboardStageSelectAudit(browser, baseUrl) {
       const currentIndex = stages.findIndex((stage) => stage.id === currentStageId);
       const currentNode = stageNodes[currentIndex];
       const markerImages = visible.filter((child) => child?.type === "Image" && child.texture?.key === "ui_current_stage_marker_concept" && (child.alpha ?? 1) > 0.05);
+      const bodyImages = visible.filter((child) => child?.type === "Image" && child.texture?.key === "ui_current_stage_body_wash_concept" && (child.alpha ?? 1) > 0.05);
+      const frameImages = visible.filter((child) => child?.type === "Image" && child.texture?.key === "ui_current_stage_frame_concept" && (child.alpha ?? 1) > 0.05);
       const haloImages = visible.filter((child) => child?.type === "Image" && child.texture?.key === "ui_current_stage_halo_concept" && (child.alpha ?? 1) > 0.05);
       const statusImages = visible.filter((child) => child?.type === "Image" && child.texture?.key === "ui_current_stage_status_badge_concept" && (child.alpha ?? 1) > 0.05);
       const completedImages = visible.filter((child) => child?.type === "Image" && child.texture?.key === "ui_completed_stage_badge_concept" && (child.alpha ?? 1) > 0.05);
+      const completedBodyImages = visible.filter((child) => child?.type === "Image" && child.texture?.key === "ui_completed_stage_body_wash_concept" && (child.alpha ?? 1) > 0.05);
+      const completedFrameImages = visible.filter((child) => child?.type === "Image" && child.texture?.key === "ui_completed_stage_frame_concept" && (child.alpha ?? 1) > 0.05);
+      const lockedBodyImages = visible.filter((child) => child?.type === "Image" && child.texture?.key === "ui_locked_stage_body_wash_concept" && (child.alpha ?? 1) > 0.05);
+      const sealedBodyImages = visible.filter((child) => child?.type === "Image" && child.texture?.key === "ui_sealed_stage_body_wash_concept" && (child.alpha ?? 1) > 0.05);
+      const sealedFrameImages = visible.filter((child) => child?.type === "Image" && child.texture?.key === "ui_sealed_stage_frame_concept" && (child.alpha ?? 1) > 0.05);
+      const dormantBodyImages = visible.filter((child) => child?.type === "Image" && child.texture?.key === "ui_dormant_stage_body_wash_concept" && (child.alpha ?? 1) > 0.05);
+      const dormantFrameImages = visible.filter((child) => child?.type === "Image" && child.texture?.key === "ui_dormant_stage_frame_concept" && (child.alpha ?? 1) > 0.05);
+      const routeBeadImages = visible.filter((child) => child?.type === "Image" && child.texture?.key === "ui_world_map_route_progress_bead_concept" && (child.alpha ?? 1) > 0.05);
       const routeHoverImages = visible.filter((child) => child?.type === "Image" && child.texture?.key === "ui_hover_route_node_concept" && (child.alpha ?? 1) > 0.05);
       const visibleTextCount = visible.filter((child) => child?.type === "Text" && String(child.text ?? "").trim().length > 0).length;
       const visibleRectsAboveUnderlay = visible
@@ -406,6 +451,20 @@ async function runKeyboardStageSelectAudit(browser, baseUrl) {
         && currentNode
         && Math.abs(haloImages[0].x - (currentNode.x + 2)) <= 1
         && Math.abs(haloImages[0].y - (currentNode.y + 4)) <= 1;
+      const bodyAtSelectedStage = bodyImages.length === 1
+        && currentNode
+        && Math.abs(bodyImages[0].x - (currentNode.x + currentNode.width * 0.02)) <= 1
+        && Math.abs(bodyImages[0].y - (currentNode.y + currentNode.height * 0.04)) <= 1
+        && Math.abs(bodyImages[0].displayWidth - currentNode.width * 1.12) <= 1
+        && Math.abs(bodyImages[0].displayHeight - currentNode.height * 1.16) <= 1
+        && (bodyImages[0].alpha ?? 1) >= 0.64;
+      const frameAtSelectedStage = frameImages.length === 1
+        && currentNode
+        && Math.abs(frameImages[0].x - (currentNode.x + currentNode.width * 0.02)) <= 1
+        && Math.abs(frameImages[0].y - (currentNode.y + currentNode.height * 0.01)) <= 1
+        && Math.abs(frameImages[0].displayWidth - currentNode.width * 1.34) <= 1
+        && Math.abs(frameImages[0].displayHeight - currentNode.height * 1.38) <= 1
+        && (frameImages[0].alpha ?? 1) >= 0.88;
       const statusAtSelectedStage = statusImages.length === 1
         && currentNode
         && Math.abs(statusImages[0].x - (currentNode.x + currentNode.width * 0.1)) <= 1
@@ -414,14 +473,52 @@ async function runKeyboardStageSelectAudit(browser, baseUrl) {
         Math.abs(image.x - currentNode.x) < currentNode.width * 0.6
         && Math.abs(image.y - currentNode.y) < currentNode.height * 0.6
       ));
+      const selectedStageHasNoCompletedBody = !currentNode || completedBodyImages.every((image) => !(
+        Math.abs(image.x - currentNode.x) < currentNode.width * 0.72
+        && Math.abs(image.y - currentNode.y) < currentNode.height * 0.72
+      ));
+      const selectedStageHasNoCompletedFrame = !currentNode || !completedFrameImages.some((image) => (
+        Math.abs(image.x - currentNode.x) < currentNode.width * 0.72
+        && Math.abs(image.y - currentNode.y) < currentNode.height * 0.72
+      ));
+      const selectedStageHasNoLockedBody = !currentNode || lockedBodyImages.every((image) => !(
+        Math.abs(image.x - currentNode.x) < currentNode.width * 0.72
+        && Math.abs(image.y - currentNode.y) < currentNode.height * 0.72
+      ));
+      const selectedStageHasNoSealedBody = !currentNode || sealedBodyImages.every((image) => !(
+        Math.abs(image.x - currentNode.x) < currentNode.width * 0.72
+        && Math.abs(image.y - currentNode.y) < currentNode.height * 0.72
+      ));
+      const selectedStageHasNoSealedFrame = !currentNode || sealedFrameImages.every((image) => !(
+        Math.abs(image.x - currentNode.x) < currentNode.width * 0.72
+        && Math.abs(image.y - currentNode.y) < currentNode.height * 0.72
+      ));
+      const selectedStageHasNoDormantBody = !currentNode || dormantBodyImages.every((image) => !(
+        Math.abs(image.x - currentNode.x) < currentNode.width * 0.72
+        && Math.abs(image.y - currentNode.y) < currentNode.height * 0.72
+      ));
+      const selectedStageHasNoDormantFrame = !currentNode || dormantFrameImages.every((image) => !(
+        Math.abs(image.x - currentNode.x) < currentNode.width * 0.72
+        && Math.abs(image.y - currentNode.y) < currentNode.height * 0.72
+      ));
       const log = context?.run?.log ?? [];
       return {
         ok: underlayIndex >= 0
           && currentStageId === expectedStageId
           && markerAtSelectedStage
           && haloAtSelectedStage
+          && bodyAtSelectedStage
+          && frameAtSelectedStage
           && statusAtSelectedStage
           && selectedStageHasNoCompletedBadge
+          && selectedStageHasNoCompletedBody
+          && selectedStageHasNoCompletedFrame
+          && selectedStageHasNoLockedBody
+          && selectedStageHasNoSealedBody
+          && selectedStageHasNoSealedFrame
+          && selectedStageHasNoDormantBody
+          && selectedStageHasNoDormantFrame
+          && routeBeadImages.length === 0
           && routeHoverImages.length === 0
           && visibleTextCount === 0
           && visibleRectsAboveUnderlay === 0
@@ -432,9 +529,21 @@ async function runKeyboardStageSelectAudit(browser, baseUrl) {
         markerAtSelectedStage: Boolean(markerAtSelectedStage),
         visibleCurrentHaloImages: haloImages.length,
         haloAtSelectedStage: Boolean(haloAtSelectedStage),
+        visibleCurrentBodyImages: bodyImages.length,
+        bodyAtSelectedStage: Boolean(bodyAtSelectedStage),
+        visibleCurrentFrameImages: frameImages.length,
+        frameAtSelectedStage: Boolean(frameAtSelectedStage),
         visibleCurrentStatusImages: statusImages.length,
         statusAtSelectedStage: Boolean(statusAtSelectedStage),
         selectedStageHasNoCompletedBadge,
+        selectedStageHasNoCompletedBody,
+        selectedStageHasNoCompletedFrame,
+        selectedStageHasNoLockedBody,
+        selectedStageHasNoSealedBody,
+        selectedStageHasNoSealedFrame,
+        selectedStageHasNoDormantBody,
+        selectedStageHasNoDormantFrame,
+        visibleRouteBeads: routeBeadImages.length,
         visibleRouteHoverImages: routeHoverImages.length,
         visibleTextCount,
         visibleRectsAboveUnderlay,
@@ -525,9 +634,29 @@ async function runStateOverlayAudit(browser, baseUrl, auditCase) {
         && child.texture?.key === "ui_completed_stage_badge_concept"
         && (child.alpha ?? 1) > 0.05
       ));
+      const completedBodyImages = visible.filter((child) => (
+        child?.type === "Image"
+        && child.texture?.key === "ui_completed_stage_body_wash_concept"
+        && (child.alpha ?? 1) > 0.05
+      ));
+      const completedFrameImages = visible.filter((child) => (
+        child?.type === "Image"
+        && child.texture?.key === "ui_completed_stage_frame_concept"
+        && (child.alpha ?? 1) > 0.05
+      ));
       const lockedImages = visible.filter((child) => (
         child?.type === "Image"
         && child.texture?.key === "ui_locked_stage_badge_concept"
+        && (child.alpha ?? 1) > 0.05
+      ));
+      const lockedBodyImages = visible.filter((child) => (
+        child?.type === "Image"
+        && child.texture?.key === "ui_locked_stage_body_wash_concept"
+        && (child.alpha ?? 1) > 0.05
+      ));
+      const lockedFrameImages = visible.filter((child) => (
+        child?.type === "Image"
+        && child.texture?.key === "ui_locked_stage_frame_concept"
         && (child.alpha ?? 1) > 0.05
       ));
       const sealedImages = visible.filter((child) => (
@@ -535,9 +664,44 @@ async function runStateOverlayAudit(browser, baseUrl, auditCase) {
         && child.texture?.key === "ui_sealed_stage_badge_concept"
         && (child.alpha ?? 1) > 0.05
       ));
+      const sealedBodyImages = visible.filter((child) => (
+        child?.type === "Image"
+        && child.texture?.key === "ui_sealed_stage_body_wash_concept"
+        && (child.alpha ?? 1) > 0.05
+      ));
+      const sealedFrameImages = visible.filter((child) => (
+        child?.type === "Image"
+        && child.texture?.key === "ui_sealed_stage_frame_concept"
+        && (child.alpha ?? 1) > 0.05
+      ));
+      const dormantBodyImages = visible.filter((child) => (
+        child?.type === "Image"
+        && child.texture?.key === "ui_dormant_stage_body_wash_concept"
+        && (child.alpha ?? 1) > 0.05
+      ));
+      const dormantFrameImages = visible.filter((child) => (
+        child?.type === "Image"
+        && child.texture?.key === "ui_dormant_stage_frame_concept"
+        && (child.alpha ?? 1) > 0.05
+      ));
+      const routeBeadImages = visible.filter((child) => (
+        child?.type === "Image"
+        && child.texture?.key === "ui_world_map_route_progress_bead_concept"
+        && (child.alpha ?? 1) > 0.05
+      ));
       const markerImages = visible.filter((child) => (
         child?.type === "Image"
         && child.texture?.key === "ui_current_stage_marker_concept"
+        && (child.alpha ?? 1) > 0.05
+      ));
+      const currentBodyImages = visible.filter((child) => (
+        child?.type === "Image"
+        && child.texture?.key === "ui_current_stage_body_wash_concept"
+        && (child.alpha ?? 1) > 0.05
+      ));
+      const frameImages = visible.filter((child) => (
+        child?.type === "Image"
+        && child.texture?.key === "ui_current_stage_frame_concept"
         && (child.alpha ?? 1) > 0.05
       ));
       const haloImages = visible.filter((child) => (
@@ -567,8 +731,42 @@ async function runStateOverlayAudit(browser, baseUrl, auditCase) {
       const expectedSealed = stages
         .map((stage, index) => ({ stage, node: stageNodes[index] }))
         .filter(({ stage, node }, index) => node && !unlockedStageIds.has(stage.id) && index < 9 && index === firstLockedIndex);
+      const expectedDormant = stages
+        .map((stage, index) => ({ stage, node: stageNodes[index], index }))
+        .filter(({ stage, node, index }) => node && !unlockedStageIds.has(stage.id) && index < 9 && index !== firstLockedIndex);
       const imageAt = (images, x, y) => images.find((image) => Math.abs(image.x - x) <= 1 && Math.abs(image.y - y) <= 1);
       const hasImageAt = (images, x, y) => Boolean(imageAt(images, x, y));
+      const routeBeadPlacements = (fromNode, toNode, finalLeg) => {
+        const dx = toNode.x - fromNode.x;
+        const dy = toNode.y - fromNode.y;
+        const length = Math.hypot(dx, dy);
+        if (length <= 1) return [];
+        const fromPad = Math.max(fromNode.width, fromNode.height) * 0.36;
+        const toPad = Math.max(toNode.width, toNode.height) * 0.36;
+        const usableLength = Math.max(0, length - fromPad - toPad);
+        if (usableLength < 24) return [];
+        const count = Math.max(1, Math.floor(usableLength / 46));
+        return Array.from({ length: count }, (_, beadIndex) => {
+          const progress = (fromPad + usableLength * ((beadIndex + 1) / (count + 1))) / length;
+          return {
+            x: fromNode.x + dx * progress,
+            y: fromNode.y + dy * progress,
+            size: finalLeg ? 44 : 38,
+            minAlpha: finalLeg ? 0.6 : 0.44
+          };
+        });
+      };
+      const expectedRouteBeads = [];
+      for (let routeIndex = 0; routeIndex < currentIndex; routeIndex += 1) {
+        const fromStage = stages[routeIndex];
+        const toStage = stages[routeIndex + 1];
+        const fromNode = stageNodes[routeIndex];
+        const toNode = stageNodes[routeIndex + 1];
+        if (!fromStage || !toStage || !fromNode || !toNode) continue;
+        if (!completedStageIds.has(fromStage.id)) continue;
+        if (toStage.id !== currentStageId && !completedStageIds.has(toStage.id)) continue;
+        expectedRouteBeads.push(...routeBeadPlacements(fromNode, toNode, routeIndex === currentIndex - 1));
+      }
       const lockedBadgePlacement = (node, stageIndex) => {
         const sourceAlignedLocks = {
           9: { x: 646, y: 285, size: 70 },
@@ -622,6 +820,87 @@ async function runStateOverlayAudit(browser, baseUrl, auditCase) {
           minAlpha: 0.86
         };
       };
+      const currentBodyPlacement = (node) => ({
+        x: node.x + node.width * 0.02,
+        y: node.y + node.height * 0.04,
+        width: node.width * 1.12,
+        height: node.height * 1.16,
+        minAlpha: 0.64
+      });
+      const completedBodyPlacement = (node, stageIndex) => ({
+        x: node.x + node.width * 0.02,
+        y: node.y + node.height * 0.04,
+        width: node.width * 1.12,
+        height: node.height * 1.18,
+        minAlpha: stageIndex <= 2 ? 0.6 : stageIndex <= 4 ? 0.52 : 0.44
+      });
+      const completedFramePlacement = (node, stageIndex) => ({
+        x: node.x + node.width * 0.02,
+        y: node.y + node.height * 0.02,
+        width: node.width * 1.3,
+        height: node.height * 1.36,
+        minAlpha: stageIndex <= 2 ? 0.7 : stageIndex <= 4 ? 0.64 : 0.56
+      });
+      const lockedFramePlacement = (node, stageIndex) => {
+        const nextLocked = stageIndex === firstLockedIndex;
+        const upperBossNode = stageIndex >= 13;
+        return {
+          x: node.x + node.width * (upperBossNode ? -0.02 : 0.01),
+          y: node.y + node.height * (upperBossNode ? 0.08 : 0.05),
+          width: node.width * (upperBossNode ? 1.24 : 1.28),
+          height: node.height * (upperBossNode ? 1.24 : 1.32),
+          minAlpha: nextLocked ? 0.72 : 0.56
+        };
+      };
+      const lockedBodyPlacement = (node, stageIndex) => {
+        const nextLocked = stageIndex === firstLockedIndex;
+        const upperBossNode = stageIndex >= 13;
+        return {
+          x: node.x + node.width * (upperBossNode ? -0.02 : 0.01),
+          y: node.y + node.height * (upperBossNode ? 0.09 : 0.06),
+          width: node.width * (upperBossNode ? 1.08 : 1.12),
+          height: node.height * (upperBossNode ? 1.1 : 1.18),
+          minAlpha: nextLocked ? 0.54 : 0.4
+        };
+      };
+      const sealedBodyPlacement = (node) => ({
+        x: node.x + node.width * 0.01,
+        y: node.y + node.height * 0.07,
+        width: node.width * 1.1,
+        height: node.height * 1.16,
+        minAlpha: 0.48
+      });
+      const sealedFramePlacement = (node) => ({
+        x: node.x + node.width * 0.01,
+        y: node.y + node.height * 0.05,
+        width: node.width * 1.24,
+        height: node.height * 1.3,
+        minAlpha: 0.56
+      });
+      const dormantBodyPlacement = (node, stageIndex) => {
+        const lowerNode = stageIndex <= 4;
+        return {
+          x: node.x + node.width * 0.01,
+          y: node.y + node.height * (lowerNode ? 0.06 : 0.07),
+          width: node.width * (lowerNode ? 1.12 : 1.08),
+          height: node.height * (lowerNode ? 1.18 : 1.14),
+          minAlpha: lowerNode ? 0.4 : 0.32
+        };
+      };
+      const dormantFramePlacement = (node, stageIndex) => {
+        const lowerNode = stageIndex <= 4;
+        return {
+          x: node.x + node.width * 0.01,
+          y: node.y + node.height * (lowerNode ? 0.04 : 0.05),
+          width: node.width * (lowerNode ? 1.26 : 1.2),
+          height: node.height * (lowerNode ? 1.32 : 1.26),
+          minAlpha: lowerNode ? 0.48 : 0.38
+        };
+      };
+      const sealedBadgePlacement = (node) => ({
+        x: node.x + node.width * 0.01,
+        y: node.y + node.height * 0.39
+      });
       const completedAtExpectedNodes = expectedCompleted.every(({ node }) => (
         hasImageAt(completedImages, completedBadgePlacement(node, stageNodes.indexOf(node)).x, completedBadgePlacement(node, stageNodes.indexOf(node)).y)
       ));
@@ -631,6 +910,52 @@ async function runStateOverlayAudit(browser, baseUrl, auditCase) {
         return image
           && Math.abs(image.displayWidth - placement.size) <= 1
           && Math.abs(image.displayHeight - placement.size) <= 1
+          && (image.alpha ?? 1) >= placement.minAlpha;
+      });
+      const completedBodiesAtExpectedNodes = expectedCompleted.every(({ node }) => (
+        hasImageAt(completedBodyImages, completedBodyPlacement(node, stageNodes.indexOf(node)).x, completedBodyPlacement(node, stageNodes.indexOf(node)).y)
+      ));
+      const completedBodyStyleAtExpectedNodes = expectedCompleted.every(({ node }) => {
+        const placement = completedBodyPlacement(node, stageNodes.indexOf(node));
+        const image = imageAt(completedBodyImages, placement.x, placement.y);
+        return image
+          && Math.abs(image.displayWidth - placement.width) <= 1
+          && Math.abs(image.displayHeight - placement.height) <= 1
+          && (image.alpha ?? 1) >= placement.minAlpha;
+      });
+      const completedFramesAtExpectedNodes = expectedCompleted.every(({ node }) => (
+        hasImageAt(completedFrameImages, completedFramePlacement(node, stageNodes.indexOf(node)).x, completedFramePlacement(node, stageNodes.indexOf(node)).y)
+      ));
+      const completedFrameStyleAtExpectedNodes = expectedCompleted.every(({ node }) => {
+        const placement = completedFramePlacement(node, stageNodes.indexOf(node));
+        const image = imageAt(completedFrameImages, placement.x, placement.y);
+        return image
+          && Math.abs(image.displayWidth - placement.width) <= 1
+          && Math.abs(image.displayHeight - placement.height) <= 1
+          && (image.alpha ?? 1) >= placement.minAlpha;
+      });
+      const lockedBodiesAtExpectedNodes = expectedLocked.every(({ node, stage }) => {
+        const placement = lockedBodyPlacement(node, stages.findIndex((candidate) => candidate.id === stage.id));
+        return hasImageAt(lockedBodyImages, placement.x, placement.y);
+      });
+      const lockedBodyStyleAtExpectedNodes = expectedLocked.every(({ node, stage }) => {
+        const placement = lockedBodyPlacement(node, stages.findIndex((candidate) => candidate.id === stage.id));
+        const image = imageAt(lockedBodyImages, placement.x, placement.y);
+        return image
+          && Math.abs(image.displayWidth - placement.width) <= 1
+          && Math.abs(image.displayHeight - placement.height) <= 1
+          && (image.alpha ?? 1) >= placement.minAlpha;
+      });
+      const lockedFramesAtExpectedNodes = expectedLocked.every(({ node, stage }) => {
+        const placement = lockedFramePlacement(node, stages.findIndex((candidate) => candidate.id === stage.id));
+        return hasImageAt(lockedFrameImages, placement.x, placement.y);
+      });
+      const lockedFrameStyleAtExpectedNodes = expectedLocked.every(({ node, stage }) => {
+        const placement = lockedFramePlacement(node, stages.findIndex((candidate) => candidate.id === stage.id));
+        const image = imageAt(lockedFrameImages, placement.x, placement.y);
+        return image
+          && Math.abs(image.displayWidth - placement.width) <= 1
+          && Math.abs(image.displayHeight - placement.height) <= 1
           && (image.alpha ?? 1) >= placement.minAlpha;
       });
       const lockedAtExpectedNodes = expectedLocked.every(({ node, stage }) => {
@@ -646,14 +971,68 @@ async function runStateOverlayAudit(browser, baseUrl, auditCase) {
           && (image.alpha ?? 1) >= placement.minAlpha;
       });
       const sealedAtExpectedNodes = expectedSealed.every(({ node }) => (
-        hasImageAt(sealedImages, node.x + node.width * 0.01, node.y + node.height * 0.39)
+        hasImageAt(sealedImages, sealedBadgePlacement(node).x, sealedBadgePlacement(node).y)
       ));
       const sealedStyleAtExpectedNodes = expectedSealed.every(({ node }) => {
-        const image = imageAt(sealedImages, node.x + node.width * 0.01, node.y + node.height * 0.39);
+        const image = imageAt(sealedImages, sealedBadgePlacement(node).x, sealedBadgePlacement(node).y);
         return image
           && Math.abs(image.displayWidth - 60) <= 1
           && Math.abs(image.displayHeight - 60) <= 1
           && (image.alpha ?? 1) >= 0.8;
+      });
+      const sealedBodiesAtExpectedNodes = expectedSealed.every(({ node }) => (
+        hasImageAt(sealedBodyImages, sealedBodyPlacement(node).x, sealedBodyPlacement(node).y)
+      ));
+      const sealedBodyStyleAtExpectedNodes = expectedSealed.every(({ node }) => {
+        const placement = sealedBodyPlacement(node);
+        const image = imageAt(sealedBodyImages, placement.x, placement.y);
+        return image
+          && Math.abs(image.displayWidth - placement.width) <= 1
+          && Math.abs(image.displayHeight - placement.height) <= 1
+          && (image.alpha ?? 1) >= placement.minAlpha;
+      });
+      const sealedFramesAtExpectedNodes = expectedSealed.every(({ node }) => (
+        hasImageAt(sealedFrameImages, sealedFramePlacement(node).x, sealedFramePlacement(node).y)
+      ));
+      const sealedFrameStyleAtExpectedNodes = expectedSealed.every(({ node }) => {
+        const placement = sealedFramePlacement(node);
+        const image = imageAt(sealedFrameImages, placement.x, placement.y);
+        return image
+          && Math.abs(image.displayWidth - placement.width) <= 1
+          && Math.abs(image.displayHeight - placement.height) <= 1
+          && (image.alpha ?? 1) >= placement.minAlpha;
+      });
+      const dormantBodiesAtExpectedNodes = expectedDormant.every(({ node, index }) => (
+        hasImageAt(dormantBodyImages, dormantBodyPlacement(node, index).x, dormantBodyPlacement(node, index).y)
+      ));
+      const dormantBodyStyleAtExpectedNodes = expectedDormant.every(({ node, index }) => {
+        const placement = dormantBodyPlacement(node, index);
+        const image = imageAt(dormantBodyImages, placement.x, placement.y);
+        return image
+          && Math.abs(image.displayWidth - placement.width) <= 1
+          && Math.abs(image.displayHeight - placement.height) <= 1
+          && (image.alpha ?? 1) >= placement.minAlpha;
+      });
+      const dormantFramesAtExpectedNodes = expectedDormant.every(({ node, index }) => (
+        hasImageAt(dormantFrameImages, dormantFramePlacement(node, index).x, dormantFramePlacement(node, index).y)
+      ));
+      const dormantFrameStyleAtExpectedNodes = expectedDormant.every(({ node, index }) => {
+        const placement = dormantFramePlacement(node, index);
+        const image = imageAt(dormantFrameImages, placement.x, placement.y);
+        return image
+          && Math.abs(image.displayWidth - placement.width) <= 1
+          && Math.abs(image.displayHeight - placement.height) <= 1
+          && (image.alpha ?? 1) >= placement.minAlpha;
+      });
+      const routeBeadsAtExpectedSegments = expectedRouteBeads.every((placement) => (
+        hasImageAt(routeBeadImages, placement.x, placement.y)
+      ));
+      const routeBeadStyleAtExpectedSegments = expectedRouteBeads.every((placement) => {
+        const image = imageAt(routeBeadImages, placement.x, placement.y);
+        return image
+          && Math.abs(image.displayWidth - placement.size) <= 1
+          && Math.abs(image.displayHeight - placement.size) <= 1
+          && (image.alpha ?? 1) >= placement.minAlpha;
       });
       const markerAtCurrentStage = markerImages.length === 1
         && expectedMarker
@@ -663,6 +1042,20 @@ async function runStateOverlayAudit(browser, baseUrl, auditCase) {
         && currentNode
         && Math.abs(haloImages[0].x - (currentNode.x + 2)) <= 1
         && Math.abs(haloImages[0].y - (currentNode.y + 4)) <= 1;
+      const bodyAtCurrentStage = currentBodyImages.length === 1
+        && currentNode
+        && Math.abs(currentBodyImages[0].x - currentBodyPlacement(currentNode).x) <= 1
+        && Math.abs(currentBodyImages[0].y - currentBodyPlacement(currentNode).y) <= 1
+        && Math.abs(currentBodyImages[0].displayWidth - currentBodyPlacement(currentNode).width) <= 1
+        && Math.abs(currentBodyImages[0].displayHeight - currentBodyPlacement(currentNode).height) <= 1
+        && (currentBodyImages[0].alpha ?? 1) >= currentBodyPlacement(currentNode).minAlpha;
+      const frameAtCurrentStage = frameImages.length === 1
+        && currentNode
+        && Math.abs(frameImages[0].x - (currentNode.x + currentNode.width * 0.02)) <= 1
+        && Math.abs(frameImages[0].y - (currentNode.y + currentNode.height * 0.01)) <= 1
+        && Math.abs(frameImages[0].displayWidth - currentNode.width * 1.34) <= 1
+        && Math.abs(frameImages[0].displayHeight - currentNode.height * 1.38) <= 1
+        && (frameImages[0].alpha ?? 1) >= 0.88;
       const statusAtCurrentStage = statusImages.length === 1
         && currentNode
         && Math.abs(statusImages[0].x - (currentNode.x + currentNode.width * 0.1)) <= 1
@@ -671,49 +1064,167 @@ async function runStateOverlayAudit(browser, baseUrl, auditCase) {
         Math.abs(image.x - currentNode.x) < currentNode.width * 0.6
         && Math.abs(image.y - currentNode.y) < currentNode.height * 0.6
       ));
+      const currentHasNoCompletedBody = !currentNode || completedBodyImages.every((image) => !(
+        Math.abs(image.x - currentNode.x) < currentNode.width * 0.72
+        && Math.abs(image.y - currentNode.y) < currentNode.height * 0.72
+      ));
+      const currentHasNoCompletedFrame = !currentNode || !completedFrameImages.some((image) => (
+        Math.abs(image.x - currentNode.x) < currentNode.width * 0.72
+        && Math.abs(image.y - currentNode.y) < currentNode.height * 0.72
+      ));
       const currentHasNoLockedBadge = !currentNode || [...lockedImages, ...sealedImages].every((image) => !(
         Math.abs(image.x - currentNode.x) < currentNode.width * 0.6
         && Math.abs(image.y - currentNode.y) < currentNode.height * 0.6
       ));
+      const currentHasNoLockedBody = !currentNode || lockedBodyImages.every((image) => !(
+        Math.abs(image.x - currentNode.x) < currentNode.width * 0.72
+        && Math.abs(image.y - currentNode.y) < currentNode.height * 0.72
+      ));
+      const currentHasNoLockedFrame = !currentNode || lockedFrameImages.every((image) => !(
+        Math.abs(image.x - currentNode.x) < currentNode.width * 0.72
+        && Math.abs(image.y - currentNode.y) < currentNode.height * 0.72
+      ));
+      const currentHasNoSealedBody = !currentNode || sealedBodyImages.every((image) => !(
+        Math.abs(image.x - currentNode.x) < currentNode.width * 0.72
+        && Math.abs(image.y - currentNode.y) < currentNode.height * 0.72
+      ));
+      const currentHasNoSealedFrame = !currentNode || sealedFrameImages.every((image) => !(
+        Math.abs(image.x - currentNode.x) < currentNode.width * 0.72
+        && Math.abs(image.y - currentNode.y) < currentNode.height * 0.72
+      ));
+      const currentHasNoDormantBody = !currentNode || dormantBodyImages.every((image) => !(
+        Math.abs(image.x - currentNode.x) < currentNode.width * 0.72
+        && Math.abs(image.y - currentNode.y) < currentNode.height * 0.72
+      ));
+      const currentHasNoDormantFrame = !currentNode || dormantFrameImages.every((image) => !(
+        Math.abs(image.x - currentNode.x) < currentNode.width * 0.72
+        && Math.abs(image.y - currentNode.y) < currentNode.height * 0.72
+      ));
 
       return {
         ok: completedImages.length === expectedCompleted.length
+          && routeBeadImages.length === expectedRouteBeads.length
+          && completedBodyImages.length === expectedCompleted.length
+          && completedFrameImages.length === expectedCompleted.length
+          && currentBodyImages.length === 1
+          && lockedBodyImages.length === expectedLocked.length
+          && lockedFrameImages.length === expectedLocked.length
           && lockedImages.length === expectedLocked.length
+          && sealedBodyImages.length === expectedSealed.length
+          && sealedFrameImages.length === expectedSealed.length
           && sealedImages.length === expectedSealed.length
+          && dormantBodyImages.length === expectedDormant.length
+          && dormantFrameImages.length === expectedDormant.length
           && completedAtExpectedNodes
           && completedStyleAtExpectedNodes
+          && completedBodiesAtExpectedNodes
+          && completedBodyStyleAtExpectedNodes
+          && completedFramesAtExpectedNodes
+          && completedFrameStyleAtExpectedNodes
+          && lockedBodiesAtExpectedNodes
+          && lockedBodyStyleAtExpectedNodes
+          && lockedFramesAtExpectedNodes
+          && lockedFrameStyleAtExpectedNodes
           && lockedAtExpectedNodes
           && lockedStyleAtExpectedNodes
+          && sealedBodiesAtExpectedNodes
+          && sealedBodyStyleAtExpectedNodes
+          && sealedFramesAtExpectedNodes
+          && sealedFrameStyleAtExpectedNodes
           && sealedAtExpectedNodes
           && sealedStyleAtExpectedNodes
+          && dormantBodiesAtExpectedNodes
+          && dormantBodyStyleAtExpectedNodes
+          && dormantFramesAtExpectedNodes
+          && dormantFrameStyleAtExpectedNodes
+          && routeBeadsAtExpectedSegments
+          && routeBeadStyleAtExpectedSegments
           && markerAtCurrentStage
           && haloAtCurrentStage
+          && bodyAtCurrentStage
+          && frameAtCurrentStage
           && statusAtCurrentStage
           && currentHasNoCompletedBadge
-          && currentHasNoLockedBadge,
+          && currentHasNoCompletedBody
+          && currentHasNoCompletedFrame
+          && currentHasNoLockedBadge
+          && currentHasNoLockedBody
+          && currentHasNoLockedFrame
+          && currentHasNoSealedBody
+          && currentHasNoSealedFrame
+          && currentHasNoDormantBody
+          && currentHasNoDormantFrame,
         currentStageId,
         completedStageIds: [...completedStageIds],
         unlockedStageIds: [...unlockedStageIds],
+        visibleRouteBeads: routeBeadImages.length,
+        expectedRouteBeads: expectedRouteBeads.length,
+        routeBeadsAtExpectedSegments,
+        routeBeadStyleAtExpectedSegments,
         visibleCompletedBadges: completedImages.length,
         expectedCompletedBadges: expectedCompleted.length,
         completedAtExpectedNodes,
         completedStyleAtExpectedNodes,
+        visibleCompletedBodies: completedBodyImages.length,
+        expectedCompletedBodies: expectedCompleted.length,
+        completedBodiesAtExpectedNodes,
+        completedBodyStyleAtExpectedNodes,
+        visibleCompletedFrames: completedFrameImages.length,
+        expectedCompletedFrames: expectedCompleted.length,
+        completedFramesAtExpectedNodes,
+        completedFrameStyleAtExpectedNodes,
+        visibleLockedBodies: lockedBodyImages.length,
+        expectedLockedBodies: expectedLocked.length,
+        lockedBodiesAtExpectedNodes,
+        lockedBodyStyleAtExpectedNodes,
+        visibleLockedFrames: lockedFrameImages.length,
+        expectedLockedFrames: expectedLocked.length,
+        lockedFramesAtExpectedNodes,
+        lockedFrameStyleAtExpectedNodes,
         visibleLockedBadges: lockedImages.length,
         expectedLockedBadges: expectedLocked.length,
         lockedAtExpectedNodes,
         lockedStyleAtExpectedNodes,
+        visibleSealedBodies: sealedBodyImages.length,
+        expectedSealedBodies: expectedSealed.length,
+        sealedBodiesAtExpectedNodes,
+        sealedBodyStyleAtExpectedNodes,
+        visibleSealedFrames: sealedFrameImages.length,
+        expectedSealedFrames: expectedSealed.length,
+        sealedFramesAtExpectedNodes,
+        sealedFrameStyleAtExpectedNodes,
         visibleSealedBadges: sealedImages.length,
         expectedSealedBadges: expectedSealed.length,
         sealedAtExpectedNodes,
         sealedStyleAtExpectedNodes,
+        visibleDormantBodies: dormantBodyImages.length,
+        expectedDormantBodies: expectedDormant.length,
+        dormantBodiesAtExpectedNodes,
+        dormantBodyStyleAtExpectedNodes,
+        visibleDormantFrames: dormantFrameImages.length,
+        expectedDormantFrames: expectedDormant.length,
+        dormantFramesAtExpectedNodes,
+        dormantFrameStyleAtExpectedNodes,
         visibleCurrentMarkerImages: markerImages.length,
         markerAtCurrentStage: Boolean(markerAtCurrentStage),
         visibleCurrentHaloImages: haloImages.length,
         haloAtCurrentStage: Boolean(haloAtCurrentStage),
+        visibleCurrentBodyImages: currentBodyImages.length,
+        bodyAtCurrentStage: Boolean(bodyAtCurrentStage),
+        visibleCurrentFrameImages: frameImages.length,
+        frameAtCurrentStage: Boolean(frameAtCurrentStage),
         visibleCurrentStatusImages: statusImages.length,
         statusAtCurrentStage: Boolean(statusAtCurrentStage),
         currentHasNoCompletedBadge,
-        currentHasNoLockedBadge
+        currentHasNoCompletedBody,
+        currentHasNoCompletedFrame,
+        currentHasNoLockedBadge,
+        currentHasNoLockedBody,
+        currentHasNoLockedFrame,
+        currentHasNoSealedBody,
+        currentHasNoSealedFrame,
+        currentHasNoDormantBody,
+        currentHasNoDormantFrame
       };
     });
     if (!stateAudit.ok) {

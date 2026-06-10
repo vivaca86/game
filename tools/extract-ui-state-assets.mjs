@@ -566,6 +566,99 @@ const targets = [
     nativeSize: { w: 96, h: 108 }
   },
   {
+    key: "ui_current_stage_frame_concept",
+    kind: "current_stage_frame",
+    source: path.join(rootDir, "assets", "concepts", "ui", "world_map_ui_concept_v001.png"),
+    output: path.join(rootDir, "assets", "source", "ui", "ui_current_stage_frame_concept_v001.png"),
+    crop: { x: 940, y: 532, w: 170, h: 176 },
+    nativeSize: { w: 210, h: 216 }
+  },
+  {
+    key: "ui_current_stage_body_wash_concept",
+    kind: "world_map_stage_body_wash",
+    source: path.join(rootDir, "assets", "concepts", "ui", "world_map_ui_concept_v001.png"),
+    output: path.join(rootDir, "assets", "source", "ui", "ui_current_stage_body_wash_concept_v001.png"),
+    crop: { x: 940, y: 532, w: 170, h: 176 },
+    nativeSize: { w: 210, h: 216 },
+    stateVariant: "current"
+  },
+  {
+    key: "ui_completed_stage_frame_concept",
+    kind: "completed_stage_frame",
+    source: path.join(rootDir, "assets", "concepts", "ui", "world_map_ui_concept_v001.png"),
+    output: path.join(rootDir, "assets", "source", "ui", "ui_completed_stage_frame_concept_v001.png"),
+    crop: { x: 622, y: 586, w: 170, h: 178 },
+    nativeSize: { w: 210, h: 220 }
+  },
+  {
+    key: "ui_completed_stage_body_wash_concept",
+    kind: "world_map_stage_body_wash",
+    source: path.join(rootDir, "assets", "concepts", "ui", "world_map_ui_concept_v001.png"),
+    output: path.join(rootDir, "assets", "source", "ui", "ui_completed_stage_body_wash_concept_v001.png"),
+    crop: { x: 622, y: 586, w: 170, h: 178 },
+    nativeSize: { w: 210, h: 220 },
+    stateVariant: "completed"
+  },
+  {
+    key: "ui_locked_stage_frame_concept",
+    kind: "locked_stage_frame",
+    source: path.join(rootDir, "assets", "concepts", "ui", "world_map_ui_concept_v001.png"),
+    output: path.join(rootDir, "assets", "source", "ui", "ui_locked_stage_frame_concept_v001.png"),
+    crop: { x: 708, y: 222, w: 170, h: 178 },
+    nativeSize: { w: 210, h: 220 }
+  },
+  {
+    key: "ui_locked_stage_body_wash_concept",
+    kind: "world_map_stage_body_wash",
+    source: path.join(rootDir, "assets", "concepts", "ui", "world_map_ui_concept_v001.png"),
+    output: path.join(rootDir, "assets", "source", "ui", "ui_locked_stage_body_wash_concept_v001.png"),
+    crop: { x: 708, y: 222, w: 170, h: 178 },
+    nativeSize: { w: 210, h: 220 },
+    stateVariant: "locked"
+  },
+  {
+    key: "ui_sealed_stage_frame_concept",
+    kind: "sealed_stage_frame",
+    source: path.join(rootDir, "assets", "concepts", "ui", "world_map_ui_concept_v001.png"),
+    output: path.join(rootDir, "assets", "source", "ui", "ui_sealed_stage_frame_concept_v001.png"),
+    crop: { x: 564, y: 356, w: 170, h: 178 },
+    nativeSize: { w: 210, h: 220 }
+  },
+  {
+    key: "ui_sealed_stage_body_wash_concept",
+    kind: "world_map_stage_body_wash",
+    source: path.join(rootDir, "assets", "concepts", "ui", "world_map_ui_concept_v001.png"),
+    output: path.join(rootDir, "assets", "source", "ui", "ui_sealed_stage_body_wash_concept_v001.png"),
+    crop: { x: 564, y: 356, w: 170, h: 178 },
+    nativeSize: { w: 210, h: 220 },
+    stateVariant: "sealed"
+  },
+  {
+    key: "ui_dormant_stage_frame_concept",
+    kind: "sealed_stage_frame",
+    source: path.join(rootDir, "assets", "concepts", "ui", "world_map_ui_concept_v001.png"),
+    output: path.join(rootDir, "assets", "source", "ui", "ui_dormant_stage_frame_concept_v001.png"),
+    crop: { x: 564, y: 356, w: 170, h: 178 },
+    nativeSize: { w: 210, h: 220 }
+  },
+  {
+    key: "ui_dormant_stage_body_wash_concept",
+    kind: "world_map_stage_body_wash",
+    source: path.join(rootDir, "assets", "concepts", "ui", "world_map_ui_concept_v001.png"),
+    output: path.join(rootDir, "assets", "source", "ui", "ui_dormant_stage_body_wash_concept_v001.png"),
+    crop: { x: 564, y: 356, w: 170, h: 178 },
+    nativeSize: { w: 210, h: 220 },
+    stateVariant: "dormant"
+  },
+  {
+    key: "ui_world_map_route_progress_bead_concept",
+    kind: "world_map_route_bead",
+    source: path.join(rootDir, "assets", "concepts", "ui", "world_map_ui_concept_v001.png"),
+    output: path.join(rootDir, "assets", "source", "ui", "ui_world_map_route_progress_bead_concept_v001.png"),
+    crop: { x: 1048, y: 548, w: 54, h: 74 },
+    nativeSize: { w: 80, h: 100 }
+  },
+  {
     key: "ui_current_stage_halo_concept",
     kind: "current_halo",
     source: path.join(rootDir, "assets", "concepts", "ui", "world_map_ui_concept_v001.png"),
@@ -752,8 +845,9 @@ try {
           { x: 1018, y: 615, rx: 166, ry: 178, strength: 1.08, mode: "cyan" },
           { x: 1022, y: 512, rx: 96, ry: 112, strength: 1.12, mode: "cyan" },
           { x: 1160, y: 502, rx: 82, ry: 90, strength: 0.78, mode: "cyan" },
-          { x: 1328, y: 574, rx: 66, ry: 82, strength: 0.96, mode: "cyan" },
-          { x: 1328, y: 542, rx: 48, ry: 46, strength: 0.88, mode: "teal" },
+          { x: 1176, y: 540, rx: 68, ry: 86, strength: 1.04, mode: "cyan" },
+          { x: 1176, y: 516, rx: 54, ry: 50, strength: 0.96, mode: "teal" },
+          { x: 1180, y: 592, rx: 44, ry: 42, strength: 0.92, mode: "cyan" },
           { x: 563, y: 248, rx: 52, ry: 52, strength: 0.94, mode: "red" },
           { x: 686, y: 294, rx: 52, ry: 52, strength: 0.94, mode: "red" },
           { x: 819, y: 312, rx: 52, ry: 52, strength: 0.98, mode: "red" },
@@ -766,7 +860,7 @@ try {
           { x1: 704, y1: 676, x2: 872, y2: 662, r: 42, strength: 1.05 },
           { x1: 872, y1: 662, x2: 1018, y2: 615, r: 48, strength: 1.08 },
           { x1: 940, y1: 474, x2: 942, y2: 538, r: 34, strength: 1.16 },
-          { x1: 1018, y1: 588, x2: 1160, y2: 502, r: 42, strength: 0.94 },
+          { x1: 1018, y1: 588, x2: 1174, y2: 558, r: 42, strength: 1.04 },
           { x1: 1160, y1: 502, x2: 1328, y2: 574, r: 38, strength: 0.86 }
         ];
 
@@ -845,7 +939,8 @@ try {
           { x: 1022, y: 512, rx: 62, ry: 78, strength: 0.82 },
           { x: 1018, y: 615, rx: 122, ry: 140, strength: 0.58 },
           { x: 1018, y: 684, rx: 96, ry: 70, strength: 0.5 },
-          { x: 1328, y: 574, rx: 58, ry: 68, strength: 0.56 },
+          { x: 1176, y: 540, rx: 58, ry: 72, strength: 0.62 },
+          { x: 1180, y: 592, rx: 36, ry: 36, strength: 0.56 },
           { x: 563, y: 248, rx: 36, ry: 40, strength: 0.68 },
           { x: 686, y: 294, rx: 36, ry: 40, strength: 0.68 },
           { x: 819, y: 312, rx: 36, ry: 40, strength: 0.72 },
@@ -858,7 +953,7 @@ try {
           { x1: 704, y1: 676, x2: 872, y2: 662, r: 32, strength: 0.44 },
           { x1: 872, y1: 662, x2: 1018, y2: 615, r: 38, strength: 0.5 },
           { x1: 940, y1: 474, x2: 942, y2: 538, r: 24, strength: 0.52 },
-          { x1: 1018, y1: 588, x2: 1160, y2: 502, r: 32, strength: 0.42 },
+          { x1: 1018, y1: 588, x2: 1174, y2: 558, r: 32, strength: 0.52 },
           { x1: 1160, y1: 502, x2: 1328, y2: 574, r: 28, strength: 0.38 }
         ];
 
@@ -906,6 +1001,8 @@ try {
           { x: 704, y: 700, rx: 58, ry: 44, strength: 1.22 },
           { x: 872, y: 690, rx: 58, ry: 44, strength: 1.22 },
           { x: 1022, y: 512, rx: 56, ry: 70, strength: 0.86 },
+          { x: 1176, y: 540, rx: 46, ry: 56, strength: 0.72 },
+          { x: 1180, y: 592, rx: 30, ry: 32, strength: 0.78 },
           { x: 563, y: 248, rx: 30, ry: 34, strength: 1.02 },
           { x: 686, y: 294, rx: 30, ry: 34, strength: 1.02 },
           { x: 819, y: 312, rx: 30, ry: 34, strength: 1.08 },
@@ -972,6 +1069,105 @@ try {
             data[offset] = Math.round(r * (1 - amount) + patch.target[0] * amount);
             data[offset + 1] = Math.round(g * (1 - amount) + patch.target[1] * amount);
             data[offset + 2] = Math.round(b * (1 - amount) + patch.target[2] * amount);
+          }
+        }
+
+        const stage5PatchRegions = [
+          { x: 1176, y: 540, rx: 42, ry: 48, strength: 0.82, target: [100, 93, 82] },
+          { x: 1180, y: 592, rx: 28, ry: 28, strength: 0.82, target: [112, 105, 94] }
+        ];
+        const stage5PatchSegments = [
+          { x1: 1018, y1: 588, x2: 1174, y2: 558, r: 24, strength: 0.74, target: [126, 116, 98] }
+        ];
+
+        for (let y = 500; y < 620; y += 1) {
+          for (let x = 990; x < 1218; x += 1) {
+            let targetColor;
+            let patchMask = 0;
+            for (const region of stage5PatchRegions) {
+              const dx = (x - region.x) / region.rx;
+              const dy = (y - region.y) / region.ry;
+              const distance = Math.sqrt(dx * dx + dy * dy);
+              if (distance >= 1) continue;
+              const mask = (1 - smoothstep(0, 1, distance)) * region.strength;
+              if (mask > patchMask) {
+                patchMask = mask;
+                targetColor = region.target;
+              }
+            }
+            for (const segment of stage5PatchSegments) {
+              const distance = distanceToSegment(x, y, segment.x1, segment.y1, segment.x2, segment.y2);
+              if (distance >= segment.r) continue;
+              const mask = smoothstep(segment.r, 0, distance) * segment.strength;
+              if (mask > patchMask) {
+                patchMask = mask;
+                targetColor = segment.target;
+              }
+            }
+            if (!targetColor || patchMask <= 0.025) continue;
+
+            const offset = (y * nativeSize.w + x) * 4;
+            const r = data[offset];
+            const g = data[offset + 1];
+            const b = data[offset + 2];
+            const amount = Math.min(0.9, patchMask * 1.06);
+            data[offset] = Math.round(r * (1 - amount) + targetColor[0] * amount);
+            data[offset + 1] = Math.round(g * (1 - amount) + targetColor[1] * amount);
+            data[offset + 2] = Math.round(b * (1 - amount) + targetColor[2] * amount);
+          }
+        }
+
+        const stage4ScarPatchRegions = [
+          { x: 1022, y: 512, rx: 46, ry: 58, strength: 0.98, target: [116, 108, 96] },
+          { x: 1075, y: 641, rx: 36, ry: 34, strength: 0.9, target: [118, 108, 86] },
+          { x: 1018, y: 604, rx: 92, ry: 110, strength: 0.38, target: [94, 88, 76], innerRx: 46, innerRy: 58 }
+        ];
+        const stage4ScarPatchSegments = [
+          { x1: 940, y1: 474, x2: 942, y2: 538, r: 22, strength: 0.82, target: [112, 104, 92] },
+          { x1: 1004, y1: 636, x2: 1082, y2: 660, r: 18, strength: 0.56, target: [108, 98, 82] }
+        ];
+
+        for (let y = 470; y < 690; y += 1) {
+          for (let x = 930; x < 1120; x += 1) {
+            let targetColor;
+            let patchMask = 0;
+            for (const region of stage4ScarPatchRegions) {
+              const dx = (x - region.x) / region.rx;
+              const dy = (y - region.y) / region.ry;
+              const distance = Math.sqrt(dx * dx + dy * dy);
+              if (distance >= 1) continue;
+              let mask = (1 - smoothstep(0, 1, distance)) * region.strength;
+              if (region.innerRx && region.innerRy) {
+                const innerDistance = Math.sqrt(
+                  ((x - region.x) / region.innerRx) ** 2
+                  + ((y - region.y) / region.innerRy) ** 2
+                );
+                mask *= smoothstep(0.64, 0.94, innerDistance);
+              }
+              if (mask > patchMask) {
+                patchMask = mask;
+                targetColor = region.target;
+              }
+            }
+            for (const segment of stage4ScarPatchSegments) {
+              const distance = distanceToSegment(x, y, segment.x1, segment.y1, segment.x2, segment.y2);
+              if (distance >= segment.r) continue;
+              const mask = smoothstep(segment.r, 0, distance) * segment.strength;
+              if (mask > patchMask) {
+                patchMask = mask;
+                targetColor = segment.target;
+              }
+            }
+            if (!targetColor || patchMask <= 0.025) continue;
+
+            const offset = (y * nativeSize.w + x) * 4;
+            const r = data[offset];
+            const g = data[offset + 1];
+            const b = data[offset + 2];
+            const amount = Math.min(0.88, patchMask * 1.04);
+            data[offset] = Math.round(r * (1 - amount) + targetColor[0] * amount);
+            data[offset + 1] = Math.round(g * (1 - amount) + targetColor[1] * amount);
+            data[offset + 2] = Math.round(b * (1 - amount) + targetColor[2] * amount);
           }
         }
 
@@ -1084,6 +1280,709 @@ try {
         crop: target.crop,
         nativeSize: target.nativeSize,
         stateVariant: target.stateVariant
+      })
+      : target.kind === "current_stage_frame"
+      ? await page.evaluate(async ({ base64, crop, nativeSize }) => {
+        const image = await new Promise((resolve, reject) => {
+          const img = new Image();
+          img.onload = () => resolve(img);
+          img.onerror = () => reject(new Error("source concept image failed to load"));
+          img.src = `data:image/png;base64,${base64}`;
+        });
+
+        const canvas = document.createElement("canvas");
+        canvas.width = nativeSize.w;
+        canvas.height = nativeSize.h;
+        const ctx = canvas.getContext("2d", { willReadFrequently: true });
+        if (!ctx) throw new Error("2d canvas context unavailable");
+
+        ctx.drawImage(image, crop.x, crop.y, crop.w, crop.h, 0, 0, nativeSize.w, nativeSize.h);
+        const imageData = ctx.getImageData(0, 0, nativeSize.w, nativeSize.h);
+        const data = imageData.data;
+        const centerX = nativeSize.w * 0.48;
+        const centerY = nativeSize.h * 0.49;
+        const statusX = nativeSize.w * 0.8;
+        const statusY = nativeSize.h * 0.62;
+
+        for (let y = 0; y < nativeSize.h; y += 1) {
+          for (let x = 0; x < nativeSize.w; x += 1) {
+            const offset = (y * nativeSize.w + x) * 4;
+            const r = data[offset];
+            const g = data[offset + 1];
+            const b = data[offset + 2];
+            const max = Math.max(r, g, b);
+            const min = Math.min(r, g, b);
+            const saturation = max - min;
+            const luminance = r * 0.299 + g * 0.587 + b * 0.114;
+            const dx = (x - centerX) / (nativeSize.w * 0.42);
+            const dy = (y - centerY) / (nativeSize.h * 0.45);
+            const shieldDistance = Math.sqrt(dx * dx + dy * dy);
+            const outerFalloff = 1 - smoothstep(0.94, 1.18, shieldDistance);
+            const centerCutout = smoothstep(
+              0.74,
+              0.98,
+              Math.hypot((x - centerX) / (nativeSize.w * 0.22), (y - centerY) / (nativeSize.h * 0.24))
+            );
+            const ring = smoothstep(0.34, 0.58, shieldDistance) * outerFalloff * centerCutout;
+            const statusCutout = smoothstep(
+              0.78,
+              1.04,
+              Math.hypot((x - statusX) / (nativeSize.w * 0.18), (y - statusY) / (nativeSize.h * 0.2))
+            );
+            const markerCutout = smoothstep(
+              0.82,
+              1.08,
+              Math.hypot((x - centerX) / (nativeSize.w * 0.17), (y - nativeSize.h * 0.08) / (nativeSize.h * 0.15))
+            );
+            const topRouteCutout = y < nativeSize.h * 0.31 && (x < nativeSize.w * 0.34 || x > nativeSize.w * 0.66) ? 0 : 1;
+            const lowerLeftRouteCutout = x < nativeSize.w * 0.31 && y > nativeSize.h * 0.58 ? 0 : 1;
+            const rightRouteCutout = x > nativeSize.w * 0.72 && y > nativeSize.h * 0.42 && y < nativeSize.h * 0.62 ? 0 : 1;
+            const routeCutout = topRouteCutout * lowerLeftRouteCutout * rightRouteCutout;
+            const cyan = smoothstep(34, 136, Math.min(g, b) - r * 0.72 + saturation * 0.08);
+            const blue = smoothstep(10, 86, b - r * 0.58 + (g - r) * 0.12 + saturation * 0.12)
+              * (1 - smoothstep(154, 230, luminance));
+            const gold = smoothstep(46, 148, r + g * 0.72 - b * 1.48 + saturation * 0.16);
+            const darkEdge = (1 - smoothstep(52, 138, luminance)) * smoothstep(18, 108, saturation);
+            const parchment = r > 128 && g > 102 && b > 74 && saturation < 82;
+
+            let keep = Math.max(cyan * 1.06, blue * 0.98, gold * 0.18) * ring * statusCutout * markerCutout * routeCutout;
+            if (parchment) keep = 0;
+
+            if (keep <= 0.08) {
+              data[offset + 3] = 0;
+              continue;
+            }
+
+            data[offset] = Math.min(255, Math.round(r * 0.98 + cyan * 4 + gold * 8));
+            data[offset + 1] = Math.min(255, Math.round(g * 1.02 + cyan * 12 + gold * 5));
+            data[offset + 2] = Math.min(255, Math.round(b * 1.06 + cyan * 18));
+            data[offset + 3] = Math.round(Math.min(232, 238 * keep * (0.58 + outerFalloff * 0.48)));
+          }
+        }
+
+        ctx.putImageData(imageData, 0, 0);
+        return canvas.toDataURL("image/png");
+
+        function smoothstep(edge0, edge1, value) {
+          const t = Math.max(0, Math.min(1, (value - edge0) / Math.max(1, edge1 - edge0)));
+          return t * t * (3 - 2 * t);
+        }
+      }, {
+        base64: sourceBuffer.toString("base64"),
+        crop: target.crop,
+        nativeSize: target.nativeSize
+      })
+      : target.kind === "completed_stage_frame"
+      ? await page.evaluate(async ({ base64, crop, nativeSize }) => {
+        const image = await new Promise((resolve, reject) => {
+          const img = new Image();
+          img.onload = () => resolve(img);
+          img.onerror = () => reject(new Error("source concept image failed to load"));
+          img.src = `data:image/png;base64,${base64}`;
+        });
+
+        const canvas = document.createElement("canvas");
+        canvas.width = nativeSize.w;
+        canvas.height = nativeSize.h;
+        const ctx = canvas.getContext("2d", { willReadFrequently: true });
+        if (!ctx) throw new Error("2d canvas context unavailable");
+
+        ctx.drawImage(image, crop.x, crop.y, crop.w, crop.h, 0, 0, nativeSize.w, nativeSize.h);
+        const imageData = ctx.getImageData(0, 0, nativeSize.w, nativeSize.h);
+        const data = imageData.data;
+        const centerX = nativeSize.w * 0.49;
+        const centerY = nativeSize.h * 0.48;
+        const checkX = nativeSize.w * 0.5;
+        const checkY = nativeSize.h * 0.8;
+
+        for (let y = 0; y < nativeSize.h; y += 1) {
+          for (let x = 0; x < nativeSize.w; x += 1) {
+            const offset = (y * nativeSize.w + x) * 4;
+            const r = data[offset];
+            const g = data[offset + 1];
+            const b = data[offset + 2];
+            const max = Math.max(r, g, b);
+            const min = Math.min(r, g, b);
+            const saturation = max - min;
+            const luminance = r * 0.299 + g * 0.587 + b * 0.114;
+            const outer = [
+              { x: nativeSize.w * 0.5, y: nativeSize.h * 0.11 },
+              { x: nativeSize.w * 0.77, y: nativeSize.h * 0.25 },
+              { x: nativeSize.w * 0.82, y: nativeSize.h * 0.49 },
+              { x: nativeSize.w * 0.68, y: nativeSize.h * 0.69 },
+              { x: nativeSize.w * 0.5, y: nativeSize.h * 0.82 },
+              { x: nativeSize.w * 0.32, y: nativeSize.h * 0.69 },
+              { x: nativeSize.w * 0.18, y: nativeSize.h * 0.49 },
+              { x: nativeSize.w * 0.23, y: nativeSize.h * 0.25 }
+            ];
+            const inner = [
+              { x: nativeSize.w * 0.5, y: nativeSize.h * 0.22 },
+              { x: nativeSize.w * 0.66, y: nativeSize.h * 0.32 },
+              { x: nativeSize.w * 0.7, y: nativeSize.h * 0.49 },
+              { x: nativeSize.w * 0.6, y: nativeSize.h * 0.61 },
+              { x: nativeSize.w * 0.5, y: nativeSize.h * 0.68 },
+              { x: nativeSize.w * 0.4, y: nativeSize.h * 0.61 },
+              { x: nativeSize.w * 0.3, y: nativeSize.h * 0.49 },
+              { x: nativeSize.w * 0.34, y: nativeSize.h * 0.32 }
+            ];
+            const outerMask = pointInPolygon(x, y, outer) ? 1 : 0;
+            const innerCutout = pointInPolygon(x, y, inner) ? 0 : 1;
+            const dy = (y - centerY) / (nativeSize.h * 0.43);
+            const outerFalloff = 1 - smoothstep(0.78, 1.12, Math.abs(dy));
+            const checkCutout = smoothstep(
+              0.78,
+              1.04,
+              Math.hypot((x - checkX) / (nativeSize.w * 0.32), (y - checkY) / (nativeSize.h * 0.24))
+            );
+            const ring = outerMask * innerCutout * checkCutout;
+            const lowerRouteCutout = y > nativeSize.h * 0.72 && (x < nativeSize.w * 0.35 || x > nativeSize.w * 0.65) ? 0 : 1;
+            const sideRouteCutout = (x < nativeSize.w * 0.2 || x > nativeSize.w * 0.72) && y > nativeSize.h * 0.36 ? 0 : 1;
+            const routeCutout = lowerRouteCutout * sideRouteCutout;
+            const green = smoothstep(18, 112, g - Math.max(r, b) * 0.72 + saturation * 0.16);
+            const cyan = smoothstep(18, 112, Math.min(g, b) - r * 0.66 + saturation * 0.1);
+            const gold = smoothstep(44, 142, r + g * 0.78 - b * 1.5 + saturation * 0.16);
+            const parchment = r > 126 && g > 100 && b > 72 && saturation < 86;
+
+            let keep = Math.max(green * 1.06, cyan * 0.96, gold * 0.16) * ring * routeCutout;
+            if (parchment && green < 0.3 && cyan < 0.32 && gold < 0.5) keep = 0;
+
+            if (keep <= 0.08) {
+              data[offset + 3] = 0;
+              continue;
+            }
+
+            data[offset] = Math.min(255, Math.round(r * 1.02 + gold * 9));
+            data[offset + 1] = Math.min(255, Math.round(g * 1.06 + green * 16 + cyan * 6));
+            data[offset + 2] = Math.min(255, Math.round(b * 1.02 + cyan * 10));
+            data[offset + 3] = Math.round(Math.min(232, 238 * keep * (0.58 + outerFalloff * 0.46)));
+          }
+        }
+
+        ctx.putImageData(imageData, 0, 0);
+        return canvas.toDataURL("image/png");
+
+        function smoothstep(edge0, edge1, value) {
+          const t = Math.max(0, Math.min(1, (value - edge0) / Math.max(1, edge1 - edge0)));
+          return t * t * (3 - 2 * t);
+        }
+
+        function pointInPolygon(x, y, polygon) {
+          let inside = false;
+          for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i, i += 1) {
+            const xi = polygon[i].x;
+            const yi = polygon[i].y;
+            const xj = polygon[j].x;
+            const yj = polygon[j].y;
+            const intersects = ((yi > y) !== (yj > y))
+              && x < ((xj - xi) * (y - yi)) / ((yj - yi) || 1) + xi;
+            if (intersects) inside = !inside;
+          }
+          return inside;
+        }
+      }, {
+        base64: sourceBuffer.toString("base64"),
+        crop: target.crop,
+        nativeSize: target.nativeSize
+      })
+      : target.kind === "locked_stage_frame"
+      ? await page.evaluate(async ({ base64, crop, nativeSize }) => {
+        const image = await new Promise((resolve, reject) => {
+          const img = new Image();
+          img.onload = () => resolve(img);
+          img.onerror = () => reject(new Error("source concept image failed to load"));
+          img.src = `data:image/png;base64,${base64}`;
+        });
+
+        const canvas = document.createElement("canvas");
+        canvas.width = nativeSize.w;
+        canvas.height = nativeSize.h;
+        const ctx = canvas.getContext("2d", { willReadFrequently: true });
+        if (!ctx) throw new Error("2d canvas context unavailable");
+
+        ctx.drawImage(image, crop.x, crop.y, crop.w, crop.h, 0, 0, nativeSize.w, nativeSize.h);
+        const imageData = ctx.getImageData(0, 0, nativeSize.w, nativeSize.h);
+        const data = imageData.data;
+        const centerX = nativeSize.w * 0.49;
+        const centerY = nativeSize.h * 0.49;
+        const numberX = nativeSize.w * 0.5;
+        const numberY = nativeSize.h * 0.36;
+        const lockX = nativeSize.w * 0.5;
+        const lockY = nativeSize.h * 0.67;
+
+        for (let y = 0; y < nativeSize.h; y += 1) {
+          for (let x = 0; x < nativeSize.w; x += 1) {
+            const offset = (y * nativeSize.w + x) * 4;
+            const r = data[offset];
+            const g = data[offset + 1];
+            const b = data[offset + 2];
+            const max = Math.max(r, g, b);
+            const min = Math.min(r, g, b);
+            const saturation = max - min;
+            const luminance = r * 0.299 + g * 0.587 + b * 0.114;
+            const outer = [
+              { x: nativeSize.w * 0.5, y: nativeSize.h * 0.07 },
+              { x: nativeSize.w * 0.74, y: nativeSize.h * 0.2 },
+              { x: nativeSize.w * 0.84, y: nativeSize.h * 0.46 },
+              { x: nativeSize.w * 0.7, y: nativeSize.h * 0.75 },
+              { x: nativeSize.w * 0.5, y: nativeSize.h * 0.9 },
+              { x: nativeSize.w * 0.3, y: nativeSize.h * 0.75 },
+              { x: nativeSize.w * 0.16, y: nativeSize.h * 0.46 },
+              { x: nativeSize.w * 0.26, y: nativeSize.h * 0.2 }
+            ];
+            const inner = [
+              { x: nativeSize.w * 0.5, y: nativeSize.h * 0.22 },
+              { x: nativeSize.w * 0.63, y: nativeSize.h * 0.31 },
+              { x: nativeSize.w * 0.68, y: nativeSize.h * 0.48 },
+              { x: nativeSize.w * 0.61, y: nativeSize.h * 0.62 },
+              { x: nativeSize.w * 0.5, y: nativeSize.h * 0.7 },
+              { x: nativeSize.w * 0.39, y: nativeSize.h * 0.62 },
+              { x: nativeSize.w * 0.32, y: nativeSize.h * 0.48 },
+              { x: nativeSize.w * 0.37, y: nativeSize.h * 0.31 }
+            ];
+            const outerMask = pointInPolygon(x, y, outer) ? 1 : 0;
+            const innerCutout = pointInPolygon(x, y, inner) ? 0 : 1;
+            const dx = (x - centerX) / (nativeSize.w * 0.44);
+            const dy = (y - centerY) / (nativeSize.h * 0.46);
+            const radial = Math.sqrt(dx * dx + dy * dy);
+            const outerFalloff = 1 - smoothstep(0.76, 1.12, radial);
+            const numberCutout = smoothstep(
+              0.78,
+              1.06,
+              Math.hypot((x - numberX) / (nativeSize.w * 0.23), (y - numberY) / (nativeSize.h * 0.22))
+            );
+            const lockCutout = smoothstep(
+              0.72,
+              1.02,
+              Math.hypot((x - lockX) / (nativeSize.w * 0.29), (y - lockY) / (nativeSize.h * 0.23))
+            );
+            const sideRouteCutout = (x < nativeSize.w * 0.2 || x > nativeSize.w * 0.78) && y > nativeSize.h * 0.34 ? 0 : 1;
+            const lowerRouteCutout = y > nativeSize.h * 0.76 && (x < nativeSize.w * 0.36 || x > nativeSize.w * 0.64) ? 0 : 1;
+            const routeCutout = sideRouteCutout * lowerRouteCutout;
+            const red = smoothstep(26, 132, r - Math.max(g, b) * 0.72 + saturation * 0.18);
+            const gold = smoothstep(48, 150, r + g * 0.74 - b * 1.5 + saturation * 0.16);
+            const darkEdge = (1 - smoothstep(52, 136, luminance)) * smoothstep(18, 108, saturation);
+            const parchment = r > 126 && g > 100 && b > 72 && saturation < 82;
+            const brightRoute = r > 168 && g > 158 && b > 136 && saturation < 76;
+
+            let keep = Math.max(red * 1.08, gold * 0.2, darkEdge * 0.28)
+              * outerMask
+              * innerCutout
+              * numberCutout
+              * lockCutout
+              * routeCutout;
+            if ((parchment && red < 0.34 && gold < 0.48) || brightRoute) keep = 0;
+
+            if (keep <= 0.08) {
+              data[offset + 3] = 0;
+              continue;
+            }
+
+            data[offset] = Math.min(255, Math.round(r * 1.05 + red * 22 + gold * 8));
+            data[offset + 1] = Math.min(255, Math.round(g * 0.96 + gold * 10));
+            data[offset + 2] = Math.max(0, Math.round(b * 0.9));
+            data[offset + 3] = Math.round(Math.min(232, 238 * keep * (0.58 + outerFalloff * 0.46)));
+          }
+        }
+
+        ctx.putImageData(imageData, 0, 0);
+        return canvas.toDataURL("image/png");
+
+        function smoothstep(edge0, edge1, value) {
+          const t = Math.max(0, Math.min(1, (value - edge0) / Math.max(1, edge1 - edge0)));
+          return t * t * (3 - 2 * t);
+        }
+
+        function pointInPolygon(x, y, polygon) {
+          let inside = false;
+          for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i, i += 1) {
+            const xi = polygon[i].x;
+            const yi = polygon[i].y;
+            const xj = polygon[j].x;
+            const yj = polygon[j].y;
+            const intersects = ((yi > y) !== (yj > y))
+              && x < ((xj - xi) * (y - yi)) / ((yj - yi) || 1) + xi;
+            if (intersects) inside = !inside;
+          }
+          return inside;
+        }
+      }, {
+        base64: sourceBuffer.toString("base64"),
+        crop: target.crop,
+        nativeSize: target.nativeSize
+      })
+      : target.kind === "sealed_stage_frame"
+      ? await page.evaluate(async ({ base64, crop, nativeSize }) => {
+        const image = await new Promise((resolve, reject) => {
+          const img = new Image();
+          img.onload = () => resolve(img);
+          img.onerror = () => reject(new Error("source concept image failed to load"));
+          img.src = `data:image/png;base64,${base64}`;
+        });
+
+        const canvas = document.createElement("canvas");
+        canvas.width = nativeSize.w;
+        canvas.height = nativeSize.h;
+        const ctx = canvas.getContext("2d", { willReadFrequently: true });
+        if (!ctx) throw new Error("2d canvas context unavailable");
+
+        ctx.drawImage(image, crop.x, crop.y, crop.w, crop.h, 0, 0, nativeSize.w, nativeSize.h);
+        const imageData = ctx.getImageData(0, 0, nativeSize.w, nativeSize.h);
+        const data = imageData.data;
+        const centerX = nativeSize.w * 0.49;
+        const centerY = nativeSize.h * 0.5;
+        const numberX = nativeSize.w * 0.5;
+        const numberY = nativeSize.h * 0.36;
+        const sealX = nativeSize.w * 0.5;
+        const sealY = nativeSize.h * 0.73;
+
+        for (let y = 0; y < nativeSize.h; y += 1) {
+          for (let x = 0; x < nativeSize.w; x += 1) {
+            const offset = (y * nativeSize.w + x) * 4;
+            const r = data[offset];
+            const g = data[offset + 1];
+            const b = data[offset + 2];
+            const max = Math.max(r, g, b);
+            const min = Math.min(r, g, b);
+            const saturation = max - min;
+            const luminance = r * 0.299 + g * 0.587 + b * 0.114;
+            const outer = [
+              { x: nativeSize.w * 0.5, y: nativeSize.h * 0.08 },
+              { x: nativeSize.w * 0.75, y: nativeSize.h * 0.21 },
+              { x: nativeSize.w * 0.83, y: nativeSize.h * 0.49 },
+              { x: nativeSize.w * 0.68, y: nativeSize.h * 0.76 },
+              { x: nativeSize.w * 0.5, y: nativeSize.h * 0.89 },
+              { x: nativeSize.w * 0.32, y: nativeSize.h * 0.76 },
+              { x: nativeSize.w * 0.17, y: nativeSize.h * 0.49 },
+              { x: nativeSize.w * 0.25, y: nativeSize.h * 0.21 }
+            ];
+            const inner = [
+              { x: nativeSize.w * 0.5, y: nativeSize.h * 0.23 },
+              { x: nativeSize.w * 0.63, y: nativeSize.h * 0.32 },
+              { x: nativeSize.w * 0.68, y: nativeSize.h * 0.5 },
+              { x: nativeSize.w * 0.6, y: nativeSize.h * 0.64 },
+              { x: nativeSize.w * 0.5, y: nativeSize.h * 0.72 },
+              { x: nativeSize.w * 0.4, y: nativeSize.h * 0.64 },
+              { x: nativeSize.w * 0.32, y: nativeSize.h * 0.5 },
+              { x: nativeSize.w * 0.37, y: nativeSize.h * 0.32 }
+            ];
+            const outerMask = pointInPolygon(x, y, outer) ? 1 : 0;
+            const innerCutout = pointInPolygon(x, y, inner) ? 0 : 1;
+            const dx = (x - centerX) / (nativeSize.w * 0.44);
+            const dy = (y - centerY) / (nativeSize.h * 0.46);
+            const radial = Math.sqrt(dx * dx + dy * dy);
+            const outerFalloff = 1 - smoothstep(0.76, 1.12, radial);
+            const numberCutout = smoothstep(
+              0.76,
+              1.04,
+              Math.hypot((x - numberX) / (nativeSize.w * 0.26), (y - numberY) / (nativeSize.h * 0.22))
+            );
+            const sealCutout = smoothstep(
+              0.76,
+              1.04,
+              Math.hypot((x - sealX) / (nativeSize.w * 0.3), (y - sealY) / (nativeSize.h * 0.22))
+            );
+            const sideRouteCutout = (x < nativeSize.w * 0.2 || x > nativeSize.w * 0.78) && y > nativeSize.h * 0.34 ? 0 : 1;
+            const lowerRouteCutout = y > nativeSize.h * 0.76 && (x < nativeSize.w * 0.36 || x > nativeSize.w * 0.64) ? 0 : 1;
+            const routeCutout = sideRouteCutout * lowerRouteCutout;
+            const silver = smoothstep(66, 178, luminance) * (1 - smoothstep(52, 132, saturation));
+            const coolEdge = smoothstep(8, 72, b + g * 0.4 - r * 0.86 + saturation * 0.08)
+              * (1 - smoothstep(176, 232, luminance));
+            const gold = smoothstep(50, 146, r + g * 0.72 - b * 1.48 + saturation * 0.14);
+            const darkEdge = (1 - smoothstep(48, 128, luminance)) * smoothstep(16, 104, saturation);
+            const parchment = r > 126 && g > 100 && b > 72 && saturation < 82;
+            const brightRoute = r > 164 && g > 154 && b > 132 && saturation < 78;
+
+            let keep = Math.max(silver * 0.96, coolEdge * 1.02, gold * 0.2, darkEdge * 0.22)
+              * outerMask
+              * innerCutout
+              * numberCutout
+              * sealCutout
+              * routeCutout;
+            if ((parchment && coolEdge < 0.34 && silver < 0.44) || brightRoute) keep = 0;
+
+            if (keep <= 0.08) {
+              data[offset + 3] = 0;
+              continue;
+            }
+
+            data[offset] = Math.min(255, Math.round(r * 0.98 + gold * 6));
+            data[offset + 1] = Math.min(255, Math.round(g * 1.01 + silver * 5));
+            data[offset + 2] = Math.min(255, Math.round(b * 1.03 + coolEdge * 9));
+            data[offset + 3] = Math.round(Math.min(226, 232 * keep * (0.56 + outerFalloff * 0.44)));
+          }
+        }
+
+        ctx.putImageData(imageData, 0, 0);
+        return canvas.toDataURL("image/png");
+
+        function smoothstep(edge0, edge1, value) {
+          const t = Math.max(0, Math.min(1, (value - edge0) / Math.max(1, edge1 - edge0)));
+          return t * t * (3 - 2 * t);
+        }
+
+        function pointInPolygon(x, y, polygon) {
+          let inside = false;
+          for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i, i += 1) {
+            const xi = polygon[i].x;
+            const yi = polygon[i].y;
+            const xj = polygon[j].x;
+            const yj = polygon[j].y;
+            const intersects = ((yi > y) !== (yj > y))
+              && x < ((xj - xi) * (y - yi)) / ((yj - yi) || 1) + xi;
+            if (intersects) inside = !inside;
+          }
+          return inside;
+        }
+      }, {
+        base64: sourceBuffer.toString("base64"),
+        crop: target.crop,
+        nativeSize: target.nativeSize
+      })
+      : target.kind === "world_map_stage_body_wash"
+      ? await page.evaluate(async ({ base64, crop, nativeSize, stateVariant }) => {
+        const image = await new Promise((resolve, reject) => {
+          const img = new Image();
+          img.onload = () => resolve(img);
+          img.onerror = () => reject(new Error("source concept image failed to load"));
+          img.src = `data:image/png;base64,${base64}`;
+        });
+
+        const canvas = document.createElement("canvas");
+        canvas.width = nativeSize.w;
+        canvas.height = nativeSize.h;
+        const ctx = canvas.getContext("2d", { willReadFrequently: true });
+        if (!ctx) throw new Error("2d canvas context unavailable");
+
+        ctx.drawImage(image, crop.x, crop.y, crop.w, crop.h, 0, 0, nativeSize.w, nativeSize.h);
+        const imageData = ctx.getImageData(0, 0, nativeSize.w, nativeSize.h);
+        const data = imageData.data;
+        const centerX = nativeSize.w * 0.49;
+        const centerY = nativeSize.h * 0.5;
+        const grayLockedVariant = stateVariant === "sealed" || stateVariant === "dormant";
+        const numberY = stateVariant === "current"
+          ? nativeSize.h * 0.43
+          : stateVariant === "locked"
+            ? nativeSize.h * 0.32
+            : grayLockedVariant
+              ? nativeSize.h * 0.35
+              : nativeSize.h * 0.36;
+        const numberRx = stateVariant === "locked" ? nativeSize.w * 0.31 : grayLockedVariant ? nativeSize.w * 0.27 : nativeSize.w * 0.21;
+        const numberRy = stateVariant === "locked" ? nativeSize.h * 0.24 : grayLockedVariant ? nativeSize.h * 0.22 : nativeSize.h * 0.17;
+        const lowerIconY = stateVariant === "current" ? nativeSize.h * 0.63 : stateVariant === "locked" ? nativeSize.h * 0.67 : grayLockedVariant ? nativeSize.h * 0.72 : nativeSize.h * 0.77;
+        const lowerIconX = stateVariant === "current" ? nativeSize.w * 0.79 : nativeSize.w * 0.5;
+        const lowerIconRx = stateVariant === "current" ? nativeSize.w * 0.18 : stateVariant === "locked" ? nativeSize.w * 0.38 : grayLockedVariant ? nativeSize.w * 0.32 : nativeSize.w * 0.28;
+        const lowerIconRy = stateVariant === "locked" ? nativeSize.h * 0.27 : grayLockedVariant ? nativeSize.h * 0.24 : nativeSize.h * 0.2;
+
+        for (let y = 0; y < nativeSize.h; y += 1) {
+          for (let x = 0; x < nativeSize.w; x += 1) {
+            const offset = (y * nativeSize.w + x) * 4;
+            const r = data[offset];
+            const g = data[offset + 1];
+            const b = data[offset + 2];
+            const max = Math.max(r, g, b);
+            const min = Math.min(r, g, b);
+            const saturation = max - min;
+            const luminance = r * 0.299 + g * 0.587 + b * 0.114;
+            const outer = [
+              { x: nativeSize.w * 0.5, y: nativeSize.h * 0.09 },
+              { x: nativeSize.w * 0.76, y: nativeSize.h * 0.22 },
+              { x: nativeSize.w * 0.84, y: nativeSize.h * 0.49 },
+              { x: nativeSize.w * 0.68, y: nativeSize.h * 0.77 },
+              { x: nativeSize.w * 0.5, y: nativeSize.h * 0.89 },
+              { x: nativeSize.w * 0.32, y: nativeSize.h * 0.77 },
+              { x: nativeSize.w * 0.16, y: nativeSize.h * 0.49 },
+              { x: nativeSize.w * 0.24, y: nativeSize.h * 0.22 }
+            ];
+            const outerMask = pointInPolygon(x, y, outer) ? 1 : 0;
+            const dx = (x - centerX) / (nativeSize.w * 0.43);
+            const dy = (y - centerY) / (nativeSize.h * 0.45);
+            const radial = Math.sqrt(dx * dx + dy * dy);
+            const outerFalloff = 1 - smoothstep(0.78, 1.12, radial);
+            const numberCutout = smoothstep(
+              0.68,
+              1.0,
+              Math.hypot((x - centerX) / numberRx, (y - numberY) / numberRy)
+            );
+            const lowerCutout = smoothstep(
+              0.74,
+              1.04,
+              Math.hypot((x - lowerIconX) / lowerIconRx, (y - lowerIconY) / lowerIconRy)
+            );
+            const currentMarkerCutout = stateVariant === "current"
+              ? smoothstep(
+                0.78,
+                1.04,
+                Math.hypot((x - centerX) / (nativeSize.w * 0.2), (y - nativeSize.h * 0.08) / (nativeSize.h * 0.14))
+              )
+              : 1;
+            const sideRouteCutout = (x < nativeSize.w * 0.18 || x > nativeSize.w * 0.8) && y > nativeSize.h * 0.34 ? 0 : 1;
+            const lowerRouteCutout = y > nativeSize.h * 0.75 && (x < nativeSize.w * 0.34 || x > nativeSize.w * 0.66) ? 0 : 1;
+            const rightStatusRouteCutout = stateVariant === "current" && x > nativeSize.w * 0.7 && y > nativeSize.h * 0.42 && y < nativeSize.h * 0.68 ? 0 : 1;
+            const routeCutout = sideRouteCutout * lowerRouteCutout * rightStatusRouteCutout;
+            const cyan = smoothstep(24, 122, Math.min(g, b) - r * 0.68 + saturation * 0.12);
+            const blue = smoothstep(14, 92, b - r * 0.56 + (g - r) * 0.12 + saturation * 0.14)
+              * (1 - smoothstep(156, 232, luminance));
+            const green = smoothstep(18, 116, g - Math.max(r, b) * 0.72 + saturation * 0.16);
+            const red = smoothstep(26, 132, r - Math.max(g, b) * 0.72 + saturation * 0.18);
+            const silver = smoothstep(64, 176, luminance) * (1 - smoothstep(52, 132, saturation));
+            const coolEdge = smoothstep(8, 72, b + g * 0.4 - r * 0.86 + saturation * 0.08)
+              * (1 - smoothstep(176, 232, luminance));
+            const gold = smoothstep(48, 150, r + g * 0.74 - b * 1.5 + saturation * 0.16);
+            const darkEdge = (1 - smoothstep(48, 132, luminance)) * smoothstep(18, 108, saturation);
+            const parchment = r > 126 && g > 100 && b > 72 && saturation < 86;
+            const brightRoute = r > 166 && g > 154 && b > 132 && saturation < 78;
+
+            let colorKeep = 0;
+            if (stateVariant === "current") {
+              colorKeep = Math.max(cyan * 1.08, blue * 1.02, gold * 0.24, darkEdge * 0.16);
+            } else if (stateVariant === "completed") {
+              colorKeep = Math.max(green * 1.12, cyan * 0.82, gold * 0.22, darkEdge * 0.16);
+            } else if (grayLockedVariant) {
+              colorKeep = Math.max(silver * 0.98, coolEdge * 1.04, gold * 0.2, darkEdge * 0.2);
+            } else {
+              colorKeep = Math.max(red * 1.12, gold * 0.24, darkEdge * 0.2);
+            }
+
+            let keep = colorKeep
+              * outerMask
+              * outerFalloff
+              * numberCutout
+              * lowerCutout
+              * currentMarkerCutout
+              * routeCutout;
+            if ((parchment && colorKeep < 0.42) || brightRoute) keep = 0;
+
+            if (keep <= 0.06) {
+              data[offset + 3] = 0;
+              continue;
+            }
+
+            if (stateVariant === "current") {
+              data[offset] = Math.min(255, Math.round(r * 0.98 + cyan * 6 + gold * 7));
+              data[offset + 1] = Math.min(255, Math.round(g * 1.03 + cyan * 12 + gold * 5));
+              data[offset + 2] = Math.min(255, Math.round(b * 1.07 + cyan * 17));
+            } else if (stateVariant === "completed") {
+              data[offset] = Math.min(255, Math.round(r * 1.0 + gold * 8));
+              data[offset + 1] = Math.min(255, Math.round(g * 1.07 + green * 16 + cyan * 5));
+              data[offset + 2] = Math.min(255, Math.round(b * 1.02 + cyan * 8));
+            } else if (grayLockedVariant) {
+              data[offset] = Math.min(255, Math.round(r * 0.98 + gold * 6));
+              data[offset + 1] = Math.min(255, Math.round(g * 1.01 + silver * 5));
+              data[offset + 2] = Math.min(255, Math.round(b * 1.03 + coolEdge * 9));
+            } else {
+              data[offset] = Math.min(255, Math.round(r * 1.05 + red * 20 + gold * 8));
+              data[offset + 1] = Math.min(255, Math.round(g * 0.96 + gold * 9));
+              data[offset + 2] = Math.max(0, Math.round(b * 0.9));
+            }
+            data[offset + 3] = Math.round(Math.min(216, 220 * keep * (0.48 + outerFalloff * 0.36)));
+          }
+        }
+
+        ctx.putImageData(imageData, 0, 0);
+        return canvas.toDataURL("image/png");
+
+        function smoothstep(edge0, edge1, value) {
+          const t = Math.max(0, Math.min(1, (value - edge0) / Math.max(1, edge1 - edge0)));
+          return t * t * (3 - 2 * t);
+        }
+
+        function pointInPolygon(x, y, polygon) {
+          let inside = false;
+          for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i, i += 1) {
+            const xi = polygon[i].x;
+            const yi = polygon[i].y;
+            const xj = polygon[j].x;
+            const yj = polygon[j].y;
+            const intersects = ((yi > y) !== (yj > y))
+              && x < ((xj - xi) * (y - yi)) / ((yj - yi) || 1) + xi;
+            if (intersects) inside = !inside;
+          }
+          return inside;
+        }
+      }, {
+        base64: sourceBuffer.toString("base64"),
+        crop: target.crop,
+        nativeSize: target.nativeSize,
+        stateVariant: target.stateVariant
+      })
+      : target.kind === "world_map_route_bead"
+      ? await page.evaluate(async ({ base64, crop, nativeSize }) => {
+        const image = await new Promise((resolve, reject) => {
+          const img = new Image();
+          img.onload = () => resolve(img);
+          img.onerror = () => reject(new Error("source concept image failed to load"));
+          img.src = `data:image/png;base64,${base64}`;
+        });
+
+        const canvas = document.createElement("canvas");
+        canvas.width = nativeSize.w;
+        canvas.height = nativeSize.h;
+        const ctx = canvas.getContext("2d", { willReadFrequently: true });
+        if (!ctx) throw new Error("2d canvas context unavailable");
+
+        const glow = ctx.createRadialGradient(
+          nativeSize.w * 0.5,
+          nativeSize.h * 0.5,
+          nativeSize.w * 0.06,
+          nativeSize.w * 0.5,
+          nativeSize.h * 0.5,
+          nativeSize.w * 0.56
+        );
+        glow.addColorStop(0, "rgba(84, 238, 226, 0.22)");
+        glow.addColorStop(0.48, "rgba(84, 238, 226, 0.1)");
+        glow.addColorStop(1, "rgba(84, 238, 226, 0)");
+        ctx.fillStyle = glow;
+        ctx.fillRect(0, 0, nativeSize.w, nativeSize.h);
+        ctx.drawImage(image, crop.x, crop.y, crop.w, crop.h, 0, 0, nativeSize.w, nativeSize.h);
+
+        const imageData = ctx.getImageData(0, 0, nativeSize.w, nativeSize.h);
+        const data = imageData.data;
+        const centerX = nativeSize.w * 0.5;
+        const centerY = nativeSize.h * 0.5;
+
+        for (let y = 0; y < nativeSize.h; y += 1) {
+          for (let x = 0; x < nativeSize.w; x += 1) {
+            const offset = (y * nativeSize.w + x) * 4;
+            const r = data[offset];
+            const g = data[offset + 1];
+            const b = data[offset + 2];
+            const max = Math.max(r, g, b);
+            const min = Math.min(r, g, b);
+            const saturation = max - min;
+            const luminance = r * 0.299 + g * 0.587 + b * 0.114;
+            const dx = (x - centerX) / (nativeSize.w * 0.48);
+            const dy = (y - centerY) / (nativeSize.h * 0.5);
+            const radial = Math.max(0, 1 - Math.sqrt(dx * dx + dy * dy));
+            const cyan = smoothstep(20, 122, Math.min(g, b) - r * 0.68 + saturation * 0.12);
+            const blue = smoothstep(12, 92, b - r * 0.5 + (g - r) * 0.12 + saturation * 0.12);
+            const whiteHot = smoothstep(180, 246, luminance) * (1 - smoothstep(48, 128, saturation));
+            const parchment = r > 126 && g > 104 && b > 78 && saturation < 84;
+            let keep = Math.max(cyan, blue * 0.84, whiteHot * 0.72) * smoothstep(0, 0.24, radial);
+            if (parchment && keep < 0.62) keep = 0;
+
+            if (keep <= 0.05) {
+              data[offset + 3] = 0;
+              continue;
+            }
+
+            data[offset] = Math.min(255, Math.round(r * 0.82 + luminance * 0.03));
+            data[offset + 1] = Math.min(255, Math.round(g * 1.1 + cyan * 24 + whiteHot * 18));
+            data[offset + 2] = Math.min(255, Math.round(b * 1.14 + cyan * 30 + whiteHot * 20));
+            data[offset + 3] = Math.round(Math.min(226, 236 * keep * (0.5 + radial * 0.5)));
+          }
+        }
+
+        ctx.putImageData(imageData, 0, 0);
+        return canvas.toDataURL("image/png");
+
+        function smoothstep(edge0, edge1, value) {
+          const t = Math.max(0, Math.min(1, (value - edge0) / Math.max(1, edge1 - edge0)));
+          return t * t * (3 - 2 * t);
+        }
+      }, {
+        base64: sourceBuffer.toString("base64"),
+        crop: target.crop,
+        nativeSize: target.nativeSize
       })
       : target.kind === "effect_sheet"
       ? await page.evaluate(async ({ base64, crop, nativeSize, frameSize, effectKind, drawScale, baseAngle, angleRange }) => {

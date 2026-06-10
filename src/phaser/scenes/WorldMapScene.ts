@@ -16,11 +16,22 @@ const WORLD_MAP_RASTER_HOVER_NODE_KEY = "ui_current_stage_halo_concept";
 const WORLD_MAP_RASTER_HOVER_PLAY_KEY = "ui_hover_world_map_play_button_concept";
 const WORLD_MAP_RASTER_DOWN_PLAY_KEY = "ui_down_world_map_play_button_concept";
 const WORLD_MAP_RASTER_CURRENT_MARKER_KEY = "ui_current_stage_marker_concept";
+const WORLD_MAP_RASTER_CURRENT_BODY_KEY = "ui_current_stage_body_wash_concept";
+const WORLD_MAP_RASTER_CURRENT_FRAME_KEY = "ui_current_stage_frame_concept";
 const WORLD_MAP_RASTER_CURRENT_HALO_KEY = "ui_current_stage_halo_concept";
 const WORLD_MAP_RASTER_CURRENT_STATUS_KEY = "ui_current_stage_status_badge_concept";
+const WORLD_MAP_RASTER_COMPLETED_BODY_KEY = "ui_completed_stage_body_wash_concept";
+const WORLD_MAP_RASTER_COMPLETED_FRAME_KEY = "ui_completed_stage_frame_concept";
 const WORLD_MAP_RASTER_COMPLETED_BADGE_KEY = "ui_completed_stage_badge_concept";
+const WORLD_MAP_RASTER_LOCKED_BODY_KEY = "ui_locked_stage_body_wash_concept";
+const WORLD_MAP_RASTER_LOCKED_FRAME_KEY = "ui_locked_stage_frame_concept";
 const WORLD_MAP_RASTER_LOCKED_BADGE_KEY = "ui_locked_stage_badge_concept";
+const WORLD_MAP_RASTER_SEALED_BODY_KEY = "ui_sealed_stage_body_wash_concept";
+const WORLD_MAP_RASTER_SEALED_FRAME_KEY = "ui_sealed_stage_frame_concept";
 const WORLD_MAP_RASTER_SEALED_BADGE_KEY = "ui_sealed_stage_badge_concept";
+const WORLD_MAP_RASTER_DORMANT_BODY_KEY = "ui_dormant_stage_body_wash_concept";
+const WORLD_MAP_RASTER_DORMANT_FRAME_KEY = "ui_dormant_stage_frame_concept";
+const WORLD_MAP_RASTER_ROUTE_PROGRESS_BEAD_KEY = "ui_world_map_route_progress_bead_concept";
 const WORLD_MAP_RASTER_STAGE_NODES: Array<{ x: number; y: number; width: number; height: number }> = [
   { x: 586, y: 760, width: 150, height: 150 },
   { x: 808, y: 756, width: 150, height: 150 },
@@ -98,10 +109,69 @@ function renderWorldMapRasterStage(scene: Phaser.Scene, context: BootContext): v
     .setDisplaySize(1920, 1080)
     .setDepth(0);
 
+  renderWorldMapRouteProgress(scene, context);
   renderWorldMapStageStateBadges(scene, context);
   renderWorldMapRasterHitTarget(scene, 1576, 970, 280, 144, 0xf5c26b, () => handleSceneAction(scene, context, "confirm"));
   renderWorldMapCurrentStageMarker(scene, context);
   renderWorldMapRasterStageNodes(scene, context);
+}
+
+function renderWorldMapRouteProgress(scene: Phaser.Scene, context: BootContext): void {
+  if (!scene.textures.exists(WORLD_MAP_RASTER_ROUTE_PROGRESS_BEAD_KEY)) return;
+
+  const currentStageId = context.run.stageId;
+  const currentStageIndex = context.dataBundle.stages.findIndex((stage) => stage.id === currentStageId);
+  if (currentStageIndex <= 0) return;
+
+  const completedStageIds = new Set(context.save.profile.completedStages);
+  for (let index = 0; index < currentStageIndex; index += 1) {
+    const fromStage = context.dataBundle.stages[index];
+    const toStage = context.dataBundle.stages[index + 1];
+    const fromNode = WORLD_MAP_RASTER_STAGE_NODES[index];
+    const toNode = WORLD_MAP_RASTER_STAGE_NODES[index + 1];
+    if (!fromStage || !toStage || !fromNode || !toNode) continue;
+    if (!completedStageIds.has(fromStage.id)) continue;
+    if (toStage.id !== currentStageId && !completedStageIds.has(toStage.id)) continue;
+
+    const finalLeg = index === currentStageIndex - 1;
+    worldMapRouteBeadPlacements(fromNode, toNode, finalLeg).forEach((bead) => {
+      scene.add.image(bead.x, bead.y, WORLD_MAP_RASTER_ROUTE_PROGRESS_BEAD_KEY)
+        .setDisplaySize(bead.size, bead.size)
+        .setRotation(bead.rotation)
+        .setAlpha(bead.alpha)
+        .setBlendMode(Phaser.BlendModes.ADD)
+        .setDepth(3.82);
+    });
+  }
+}
+
+function worldMapRouteBeadPlacements(
+  fromNode: { x: number; y: number; width: number; height: number },
+  toNode: { x: number; y: number; width: number; height: number },
+  finalLeg: boolean
+): Array<{ x: number; y: number; rotation: number; size: number; alpha: number }> {
+  const dx = toNode.x - fromNode.x;
+  const dy = toNode.y - fromNode.y;
+  const length = Math.hypot(dx, dy);
+  if (length <= 1) return [];
+
+  const fromPad = Math.max(fromNode.width, fromNode.height) * 0.36;
+  const toPad = Math.max(toNode.width, toNode.height) * 0.36;
+  const usableLength = Math.max(0, length - fromPad - toPad);
+  if (usableLength < 24) return [];
+
+  const count = Math.max(1, Math.floor(usableLength / 46));
+  const rotation = Math.atan2(dy, dx);
+  return Array.from({ length: count }, (_, index) => {
+    const progress = (fromPad + usableLength * ((index + 1) / (count + 1))) / length;
+    return {
+      x: fromNode.x + dx * progress,
+      y: fromNode.y + dy * progress,
+      rotation,
+      size: finalLeg ? 44 : 38,
+      alpha: finalLeg ? 0.62 : 0.46
+    };
+  });
 }
 
 function renderWorldMapStageStateBadges(scene: Phaser.Scene, context: BootContext): void {
@@ -115,6 +185,22 @@ function renderWorldMapStageStateBadges(scene: Phaser.Scene, context: BootContex
     if (!node || stage.id === currentStageId) return;
 
     if (completedStageIds.has(stage.id) && scene.textures.exists(WORLD_MAP_RASTER_COMPLETED_BADGE_KEY)) {
+      if (scene.textures.exists(WORLD_MAP_RASTER_COMPLETED_BODY_KEY)) {
+        const body = worldMapCompletedBodyPlacement(node, index);
+        scene.add.image(body.x, body.y, WORLD_MAP_RASTER_COMPLETED_BODY_KEY)
+          .setDisplaySize(body.width, body.height)
+          .setAlpha(body.alpha)
+          .setDepth(5.12);
+      }
+
+      if (scene.textures.exists(WORLD_MAP_RASTER_COMPLETED_FRAME_KEY)) {
+        const frame = worldMapCompletedFramePlacement(node, index);
+        scene.add.image(frame.x, frame.y, WORLD_MAP_RASTER_COMPLETED_FRAME_KEY)
+          .setDisplaySize(frame.width, frame.height)
+          .setAlpha(frame.alpha)
+          .setDepth(5.35);
+      }
+
       const completed = worldMapCompletedBadgePlacement(node, index);
       scene.add.image(completed.x, completed.y, WORLD_MAP_RASTER_COMPLETED_BADGE_KEY)
         .setDisplaySize(completed.size, completed.size)
@@ -125,6 +211,22 @@ function renderWorldMapStageStateBadges(scene: Phaser.Scene, context: BootContex
 
     if (!unlockedStageIds.has(stage.id) && shouldUseWorldMapRedLock(index) && scene.textures.exists(WORLD_MAP_RASTER_LOCKED_BADGE_KEY)) {
       const nextLocked = index === firstLockedIndex;
+      if (scene.textures.exists(WORLD_MAP_RASTER_LOCKED_BODY_KEY)) {
+        const body = worldMapLockedBodyPlacement(node, index, nextLocked);
+        scene.add.image(body.x, body.y, WORLD_MAP_RASTER_LOCKED_BODY_KEY)
+          .setDisplaySize(body.width, body.height)
+          .setAlpha(body.alpha)
+          .setDepth(body.depth);
+      }
+
+      if (scene.textures.exists(WORLD_MAP_RASTER_LOCKED_FRAME_KEY)) {
+        const frame = worldMapLockedFramePlacement(node, index, nextLocked);
+        scene.add.image(frame.x, frame.y, WORLD_MAP_RASTER_LOCKED_FRAME_KEY)
+          .setDisplaySize(frame.width, frame.height)
+          .setAlpha(frame.alpha)
+          .setDepth(frame.depth);
+      }
+
       const lock = worldMapLockedBadgePlacement(node, index);
       const size = nextLocked ? Math.max(lock.size, 76) : lock.size;
       scene.add.image(lock.x, lock.y, WORLD_MAP_RASTER_LOCKED_BADGE_KEY)
@@ -135,12 +237,158 @@ function renderWorldMapStageStateBadges(scene: Phaser.Scene, context: BootContex
     }
 
     if (!unlockedStageIds.has(stage.id) && index === firstLockedIndex && scene.textures.exists(WORLD_MAP_RASTER_SEALED_BADGE_KEY)) {
-      scene.add.image(node.x + node.width * 0.01, node.y + node.height * 0.39, WORLD_MAP_RASTER_SEALED_BADGE_KEY)
+      if (scene.textures.exists(WORLD_MAP_RASTER_SEALED_BODY_KEY)) {
+        const body = worldMapSealedBodyPlacement(node);
+        scene.add.image(body.x, body.y, WORLD_MAP_RASTER_SEALED_BODY_KEY)
+          .setDisplaySize(body.width, body.height)
+          .setAlpha(body.alpha)
+          .setDepth(5.08);
+      }
+
+      if (scene.textures.exists(WORLD_MAP_RASTER_SEALED_FRAME_KEY)) {
+        const frame = worldMapSealedFramePlacement(node);
+        scene.add.image(frame.x, frame.y, WORLD_MAP_RASTER_SEALED_FRAME_KEY)
+          .setDisplaySize(frame.width, frame.height)
+          .setAlpha(frame.alpha)
+          .setDepth(5.32);
+      }
+
+      const sealed = worldMapSealedBadgePlacement(node);
+      scene.add.image(sealed.x, sealed.y, WORLD_MAP_RASTER_SEALED_BADGE_KEY)
         .setDisplaySize(60, 60)
         .setAlpha(0.82)
         .setDepth(6);
+      return;
+    }
+
+    if (!unlockedStageIds.has(stage.id) && index < 9 && scene.textures.exists(WORLD_MAP_RASTER_DORMANT_FRAME_KEY)) {
+      if (scene.textures.exists(WORLD_MAP_RASTER_DORMANT_BODY_KEY)) {
+        const body = worldMapDormantBodyPlacement(node, index);
+        scene.add.image(body.x, body.y, WORLD_MAP_RASTER_DORMANT_BODY_KEY)
+          .setDisplaySize(body.width, body.height)
+          .setAlpha(body.alpha)
+          .setDepth(4.54);
+      }
+
+      const frame = worldMapDormantFramePlacement(node, index);
+      scene.add.image(frame.x, frame.y, WORLD_MAP_RASTER_DORMANT_FRAME_KEY)
+        .setDisplaySize(frame.width, frame.height)
+        .setAlpha(frame.alpha)
+        .setDepth(4.72);
     }
   });
+}
+
+function worldMapCompletedBodyPlacement(
+  node: { x: number; y: number; width: number; height: number },
+  stageIndex: number
+): { x: number; y: number; width: number; height: number; alpha: number } {
+  const alpha = stageIndex <= 2 ? 0.62 : stageIndex <= 4 ? 0.54 : 0.46;
+  return {
+    x: node.x + node.width * 0.02,
+    y: node.y + node.height * 0.04,
+    width: node.width * 1.12,
+    height: node.height * 1.18,
+    alpha
+  };
+}
+
+function worldMapSealedBodyPlacement(
+  node: { x: number; y: number; width: number; height: number }
+): { x: number; y: number; width: number; height: number; alpha: number } {
+  return {
+    x: node.x + node.width * 0.01,
+    y: node.y + node.height * 0.07,
+    width: node.width * 1.1,
+    height: node.height * 1.16,
+    alpha: 0.5
+  };
+}
+
+function worldMapSealedFramePlacement(
+  node: { x: number; y: number; width: number; height: number }
+): { x: number; y: number; width: number; height: number; alpha: number } {
+  return {
+    x: node.x + node.width * 0.01,
+    y: node.y + node.height * 0.05,
+    width: node.width * 1.24,
+    height: node.height * 1.3,
+    alpha: 0.58
+  };
+}
+
+function worldMapDormantBodyPlacement(
+  node: { x: number; y: number; width: number; height: number },
+  stageIndex: number
+): { x: number; y: number; width: number; height: number; alpha: number } {
+  const lowerNode = stageIndex <= 4;
+  return {
+    x: node.x + node.width * 0.01,
+    y: node.y + node.height * (lowerNode ? 0.06 : 0.07),
+    width: node.width * (lowerNode ? 1.12 : 1.08),
+    height: node.height * (lowerNode ? 1.18 : 1.14),
+    alpha: lowerNode ? 0.42 : 0.34
+  };
+}
+
+function worldMapDormantFramePlacement(
+  node: { x: number; y: number; width: number; height: number },
+  stageIndex: number
+): { x: number; y: number; width: number; height: number; alpha: number } {
+  const lowerNode = stageIndex <= 4;
+  return {
+    x: node.x + node.width * 0.01,
+    y: node.y + node.height * (lowerNode ? 0.04 : 0.05),
+    width: node.width * (lowerNode ? 1.26 : 1.2),
+    height: node.height * (lowerNode ? 1.32 : 1.26),
+    alpha: lowerNode ? 0.5 : 0.4
+  };
+}
+
+function worldMapCompletedFramePlacement(
+  node: { x: number; y: number; width: number; height: number },
+  stageIndex: number
+): { x: number; y: number; width: number; height: number; alpha: number } {
+  const alpha = stageIndex <= 2 ? 0.72 : stageIndex <= 4 ? 0.66 : 0.58;
+  return {
+    x: node.x + node.width * 0.02,
+    y: node.y + node.height * 0.02,
+    width: node.width * 1.3,
+    height: node.height * 1.36,
+    alpha
+  };
+}
+
+function worldMapLockedBodyPlacement(
+  node: { x: number; y: number; width: number; height: number },
+  stageIndex: number,
+  nextLocked: boolean
+): { x: number; y: number; width: number; height: number; alpha: number; depth: number } {
+  const upperBossNode = stageIndex >= 13;
+  return {
+    x: node.x + node.width * (upperBossNode ? -0.02 : 0.01),
+    y: node.y + node.height * (upperBossNode ? 0.09 : 0.06),
+    width: node.width * (upperBossNode ? 1.08 : 1.12),
+    height: node.height * (upperBossNode ? 1.1 : 1.18),
+    alpha: nextLocked ? 0.56 : 0.42,
+    depth: nextLocked ? 5.1 : 4.62
+  };
+}
+
+function worldMapLockedFramePlacement(
+  node: { x: number; y: number; width: number; height: number },
+  stageIndex: number,
+  nextLocked: boolean
+): { x: number; y: number; width: number; height: number; alpha: number; depth: number } {
+  const upperBossNode = stageIndex >= 13;
+  return {
+    x: node.x + node.width * (upperBossNode ? -0.02 : 0.01),
+    y: node.y + node.height * (upperBossNode ? 0.08 : 0.05),
+    width: node.width * (upperBossNode ? 1.24 : 1.28),
+    height: node.height * (upperBossNode ? 1.24 : 1.32),
+    alpha: nextLocked ? 0.74 : 0.58,
+    depth: nextLocked ? 5.35 : 4.85
+  };
 }
 
 function worldMapCompletedBadgePlacement(
@@ -178,6 +426,15 @@ function shouldUseWorldMapRedLock(stageIndex: number): boolean {
   return stageIndex >= 9;
 }
 
+function worldMapSealedBadgePlacement(
+  node: { x: number; y: number; width: number; height: number }
+): { x: number; y: number } {
+  return {
+    x: node.x + node.width * 0.01,
+    y: node.y + node.height * 0.39
+  };
+}
+
 function worldMapLockedBadgePlacement(
   node: { x: number; y: number; width: number; height: number },
   stageIndex: number
@@ -200,6 +457,20 @@ function renderWorldMapCurrentStageMarker(scene: Phaser.Scene, context: BootCont
       .setAlpha(0.76)
       .setBlendMode(Phaser.BlendModes.ADD)
       .setDepth(7);
+  }
+
+  if (scene.textures.exists(WORLD_MAP_RASTER_CURRENT_BODY_KEY)) {
+    scene.add.image(node.x + node.width * 0.02, node.y + node.height * 0.04, WORLD_MAP_RASTER_CURRENT_BODY_KEY)
+      .setDisplaySize(node.width * 1.12, node.height * 1.16)
+      .setAlpha(0.66)
+      .setDepth(7.15);
+  }
+
+  if (scene.textures.exists(WORLD_MAP_RASTER_CURRENT_FRAME_KEY)) {
+    scene.add.image(node.x + node.width * 0.02, node.y + node.height * 0.01, WORLD_MAP_RASTER_CURRENT_FRAME_KEY)
+      .setDisplaySize(node.width * 1.34, node.height * 1.38)
+      .setAlpha(0.9)
+      .setDepth(7.3);
   }
 
   if (scene.textures.exists(WORLD_MAP_RASTER_CURRENT_MARKER_KEY)) {

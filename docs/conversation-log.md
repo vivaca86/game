@@ -1904,3 +1904,119 @@ Codex added `tmp/utility-keyboard-focus-raster-state-audit.mjs`. It verifies foc
 Verification passed with `node tmp\utility-keyboard-focus-raster-state-audit.mjs`, `node tmp\keyboard-confirm-raster-state-audit.mjs`, `node tmp\town-raster-toolbar-state-audit.mjs`, `node tmp\runebench-result-lower-button-state-audit.mjs`, `node tmp\ui-raster-hover-audit.mjs`, `node tmp\ui-raster-down-audit.mjs`, `npx.cmd tsc --noEmit`, `npm.cmd run check`, `git diff --check`, and the full `$env:PHASER_SMOKE_PROGRESS='1'; $env:PHASER_SMOKE_PROGRESS_FILE='tmp/phaser-smoke-progress-utility-focus.log'; node tmp\run-phaser-smoke-with-vite.mjs` wrapper. The full smoke ended with `Phaser smoke OK`. `npm.cmd run check` still reports only the existing Vite large JS chunk warning.
 
 This remains partial UI progress, roughly about 72% of the active UI goal. Town/RuneBench/Result now have first utility keyboard-focus evidence, but Dungeon broader focus, Combat/Boss selected focus, WorldMap recomposition, broad disabled coverage, dynamic labels/tooltips, accessibility-safe text, mobile/responsive review, user acceptance, and final concept-match approval remain unfinished.
+
+### Codex
+
+Codex resumed the active UI concept-art goal from a fresh GitHub clone rather than the older local WIP folder. The clone was `main...origin/main` at `9585070 Add other PC handoff notes`, with the latest implementation checkpoint still being the Dungeon keyboard focus pass.
+
+Following `docs/other-pc-handoff-2026-06-09.md`, Codex installed dependencies with `npm.cmd ci` and reran the required full broad smoke before making new UI changes. The first sandboxed smoke attempt failed with Vite `spawn EPERM`, then the escalated rerun completed with `Phaser smoke OK`. This closes the previous handoff note that the latest Dungeon focus commit still needed a completed broad-smoke rerun.
+
+Codex then continued the documented WorldMap recomposition gap. Screenshot and source-crop review showed that the existing stage-5 neutralization was sampling too far right for the 1672x941 concept source: the audit could pass while the visible stage-5 plate, lower seal, and 4-to-5 route still read too blue/cyan in the stage-4 current-state screenshot.
+
+`tools/extract-ui-state-assets.mjs` now applies corrected source-coordinate neutralization over the stage-5 node plate, lower seal, and 4-to-5 route segment. `tmp/ui-worldmap-action-hit-target-audit.mjs` now samples `stage5body`, `stage5lowerSeal`, and `stage5route` at the corrected source locations. The regenerated source/runtime underlay reduces the stale active-state read without adding vector/procedural overlays or a new visual language.
+
+Verification passed with `node tools\extract-ui-state-assets.mjs`, `npm.cmd run assets:generate:dev`, `node tmp\ui-worldmap-action-hit-target-audit.mjs`, `node tmp\route-node-raster-hover-state-audit.mjs`, `npm.cmd run check`, `git diff --check`, and a full `$env:PHASER_SMOKE_PROGRESS='1'; $env:PHASER_SMOKE_PROGRESS_FILE='tmp/phaser-smoke-progress-worldmap-stage5-neutral.log'; node tmp\run-phaser-smoke-with-vite.mjs` run ending in `Phaser smoke OK`. `npm.cmd run check` still reports the existing Vite large JS chunk warning only.
+
+This remains partial UI progress, still around the prior 75% estimate rather than final UI completion. The next best work is still WorldMap body/state recomposition beyond neutralized samples and badges, plus broader disabled/focus coverage, dynamic labels/tooltips, mobile/responsive review, user acceptance, and final concept-match approval.
+
+### Codex
+
+Codex continued the same WorldMap recomposition thread after the stage-5 source-coordinate correction. Updated screenshot review showed a second stale-state issue: even with the cyan/green dominance reduced, the old baked stage-4 current marker and lower current-status badge were still visible as a muted silhouette in runtime states where stage 4 was not current.
+
+`tools/extract-ui-state-assets.mjs` now applies an additional source-aware stage-4 scar patch over the old current marker, lower status badge, and nearby route/status remnants. This keeps the work in the raster concept-art pipeline and does not add vector/procedural overlays or a new marker style. `tmp/ui-worldmap-action-hit-target-audit.mjs` now samples `stage4topMarkerScar` and `stage4statusScar` with tighter dominance thresholds; the latest run reported `stage4topMarkerScar=[115,106,94]` and `stage4statusScar=[122,110,87]`.
+
+Verification passed with `node tools\extract-ui-state-assets.mjs`, `npm.cmd run assets:generate:dev`, `node tmp\ui-worldmap-action-hit-target-audit.mjs`, `node tmp\route-node-raster-hover-state-audit.mjs`, `npm.cmd run check`, `git diff --check`, and a full `$env:PHASER_SMOKE_PROGRESS='1'; $env:PHASER_SMOKE_PROGRESS_FILE='tmp/phaser-smoke-progress-worldmap-stage4-scar-neutral-rerun.log'; node tmp\run-phaser-smoke-with-vite.mjs` run ending in `Phaser smoke OK`. The first broad-smoke wrapper attempt for this pass timed out at 184 seconds during `checkReleasePassiveBatch`; the longer rerun completed and is the counted smoke evidence. `npm.cmd run check` still reports the existing Vite large JS chunk warning only.
+
+This remains partial UI progress, not final WorldMap recomposition. Stage 4 and stage 5 stale-state reads are quieter, but the map still needs real current/completed/locked body variants, lower-node shape recomposition, dynamic labels/tooltips, mobile/responsive review, user acceptance, and final concept-match approval.
+
+### Codex
+
+Codex continued the WorldMap recomposition thread by adding a first runtime current-frame overlay instead of relying only on the neutralized underlay body plus marker/halo/status images.
+
+`tools/extract-ui-state-assets.mjs` now extracts `ui_current_stage_frame_concept` from the original WorldMap concept art. The extraction deliberately masks the baked stage-4 number, top marker, lower status badge, route fragments, and parchment background as much as possible, because copying the whole source node would move wrong old-state material onto other runtime stages. `tools/generate-dev-runtime-assets.mjs`, `src/data/assetManifest.slice.v1.json`, `docs/asset-manifest.slice.v1.json`, and `src/data/releaseCatalogAdapter.ts` register the new asset so it loads in both slice and release mode.
+
+`WorldMapScene` now renders `ui_current_stage_frame_concept` at the current runtime node between the cleaned halo and the marker/status stack. `tmp/ui-worldmap-action-hit-target-audit.mjs` now verifies exactly one current-frame image at the current node for default, progressed, late-lock, and keyboard-selected WorldMap states.
+
+Verification passed with `node tools\extract-ui-state-assets.mjs`, `npm.cmd run assets:generate:dev`, `node tmp\ui-worldmap-action-hit-target-audit.mjs`, `node tmp\route-node-raster-hover-state-audit.mjs`, `npm.cmd run check`, `git diff --check`, and a full `$env:PHASER_SMOKE_PROGRESS='1'; $env:PHASER_SMOKE_PROGRESS_FILE='tmp/phaser-smoke-progress-worldmap-current-frame.log'; node tmp\run-phaser-smoke-with-vite.mjs` run ending in `Phaser smoke OK`. `npm.cmd run check` now reports `manifestAssets=463`, `existingFiles=463`, `missingFiles=0`, and the existing Vite large JS chunk warning only.
+
+This remains partial UI progress, roughly about 76% of the active UI goal. The new current-frame overlay is conservative and does not complete WorldMap body recomposition. Next work should continue with number-safe current/completed/locked body variants, later stage body variants, lower-node shape recomposition, dynamic labels/tooltips, mobile/responsive review, user acceptance, and final concept-match approval.
+
+### Codex
+
+Codex continued the WorldMap runtime-state recomposition work by adding a first completed-frame overlay. The goal was to move completed nodes beyond badge-only composition while still avoiding the user's rejected vector/procedural look.
+
+`tools/extract-ui-state-assets.mjs` now extracts `ui_completed_stage_frame_concept` from the original WorldMap concept. The extraction uses a polygon-band mask and additional cutouts so the source completed node's baked number, check mark, route fragments, and surrounding map/background are not copied as a whole node sticker. `tools/generate-dev-runtime-assets.mjs`, `src/data/assetManifest.slice.v1.json`, `docs/asset-manifest.slice.v1.json`, and `src/data/releaseCatalogAdapter.ts` register the new asset for both slice and release mode.
+
+`WorldMapScene` now renders `ui_completed_stage_frame_concept` under completed badges and above the neutralized underlay. `tmp/ui-worldmap-action-hit-target-audit.mjs` now verifies completed-frame count, placement, display size, alpha, and absence on the runtime current node in default, progressed, late-lock, and keyboard-selected states.
+
+Verification passed with `node tools\extract-ui-state-assets.mjs`, `npm.cmd run assets:generate:dev`, `node tmp\ui-worldmap-action-hit-target-audit.mjs`, `node tmp\route-node-raster-hover-state-audit.mjs`, `npm.cmd run check`, `git diff --check`, and a full `$env:PHASER_SMOKE_PROGRESS='1'; $env:PHASER_SMOKE_PROGRESS_FILE='tmp/phaser-smoke-progress-worldmap-completed-frame.log'; node tmp\run-phaser-smoke-with-vite.mjs` run ending in `Phaser smoke OK`. `npm.cmd run check` now reports `manifestAssets=464`, `existingFiles=464`, `missingFiles=0`, and the existing Vite large JS chunk warning only.
+
+This remains partial UI progress, still roughly about 76-77% of the active UI goal. The completed-frame overlay is intentionally conservative and does not complete WorldMap body recomposition. Next work should continue with stronger number-safe current/completed/locked body variants, later stage body variants, lower-node shape recomposition, dynamic labels/tooltips, mobile/responsive review, user acceptance, and final concept-match approval.
+
+### Codex
+
+Codex continued the same WorldMap runtime-state recomposition thread by adding a first locked-frame overlay for upper red locked nodes. The intent was to make locked state less badge-only while staying inside the user's concept-art/raster requirement and avoiding visible Phaser vector overlays.
+
+`tools/extract-ui-state-assets.mjs` now extracts `ui_locked_stage_frame_concept` from the original WorldMap concept. The extraction masks the baked stage number, lock center, route fragments, parchment/map background, and bright route pieces as much as possible, because copying the whole source locked node would move wrong old-state material onto other runtime stages. `tools/generate-dev-runtime-assets.mjs`, `src/data/assetManifest.slice.v1.json`, `docs/asset-manifest.slice.v1.json`, and `src/data/releaseCatalogAdapter.ts` register the new asset for both slice and release mode.
+
+`WorldMapScene` now renders `ui_locked_stage_frame_concept` under red locked badges and above the neutralized underlay. `tmp/ui-worldmap-action-hit-target-audit.mjs` now verifies locked-frame count, placement, display size, alpha, and absence on the runtime current node in default, progressed, and late-lock WorldMap states.
+
+Verification passed with `node tools\extract-ui-state-assets.mjs`, `npm.cmd run assets:generate:dev`, `node tmp\ui-worldmap-action-hit-target-audit.mjs`, `node tmp\route-node-raster-hover-state-audit.mjs`, `npm.cmd run check`, `git diff --check`, and a full `$env:PHASER_SMOKE_PROGRESS='1'; $env:PHASER_SMOKE_PROGRESS_FILE='tmp/phaser-smoke-progress-worldmap-locked-frame.log'; node tmp\run-phaser-smoke-with-vite.mjs` run ending in `Phaser smoke OK`. `npm.cmd run check` now reports `manifestAssets=465`, `existingFiles=465`, `missingFiles=0`, and the existing Vite large JS chunk warning only.
+
+This remains partial UI progress, roughly about 77% of the active UI goal. The locked-frame overlay is intentionally conservative and does not complete WorldMap body recomposition. Next work should continue with stronger number-safe current/completed/locked body variants, later stage body variants, lower-node shape recomposition, dynamic labels/tooltips, mobile/responsive review, user acceptance, and final concept-match approval.
+
+### Codex
+
+Codex continued the WorldMap state recomposition thread by adding first body-wash overlays for current, completed, and upper red locked WorldMap nodes. The goal was to push the map a step beyond underlay-plus-badge/frame composition while still avoiding the user's rejected vector/procedural direction.
+
+`tools/extract-ui-state-assets.mjs` now extracts `ui_current_stage_body_wash_concept`, `ui_completed_stage_body_wash_concept`, and `ui_locked_stage_body_wash_concept` from the original WorldMap concept. The extraction masks source stage numbers, check/lock/status centers, route fragments, and map/background material. The locked body mask was tightened after image preview because the first extraction still carried a small number/lock fragment; the final locked body wash is intentionally sparse to keep it safe.
+
+`WorldMapScene` now renders current body wash under the current frame/marker/status stack, completed body washes under completed frames/badges, and locked body washes under locked frames/badges. `tools/generate-dev-runtime-assets.mjs`, `src/data/assetManifest.slice.v1.json`, `docs/asset-manifest.slice.v1.json`, and `src/data/releaseCatalogAdapter.ts` register the three assets for slice and release modes.
+
+`tmp/ui-worldmap-action-hit-target-audit.mjs` now verifies current/completed/locked body-wash count, placement, display size, alpha, and current-node absence rules. The keyboard-selected WorldMap audit also verifies the selected current node has the current body wash and no completed/locked body wash overlap.
+
+Verification passed with `node tools\extract-ui-state-assets.mjs`, `npm.cmd run assets:generate:dev`, `node tmp\ui-worldmap-action-hit-target-audit.mjs`, `node tmp\route-node-raster-hover-state-audit.mjs`, `npm.cmd run check`, `git diff --check`, and a full `$env:PHASER_SMOKE_PROGRESS='1'; $env:PHASER_SMOKE_PROGRESS_FILE='tmp/phaser-smoke-progress-worldmap-body-wash.log'; node tmp\run-phaser-smoke-with-vite.mjs` run ending in `Phaser smoke OK`. `npm.cmd run check` now reports `manifestAssets=468`, `existingFiles=468`, `missingFiles=0`, and the existing Vite large JS chunk warning only.
+
+This remains partial UI progress, roughly about 78% of the active UI goal. The body-wash overlays are intentionally conservative and do not complete WorldMap body recomposition. Next work should continue with stronger number-safe state-specific body variants, later stage body variants, lower-node shape recomposition, dynamic labels/tooltips, mobile/responsive review, user acceptance, and final concept-match approval.
+
+### Codex
+
+Codex continued the WorldMap recomposition pass by targeting the remaining badge-only sealed state. Red locked nodes already had body/frame/badge material, but the lower/mid next-locked sealed node still used only `ui_sealed_stage_badge_concept` on top of the neutralized underlay.
+
+`tools/extract-ui-state-assets.mjs` now extracts `ui_sealed_stage_body_wash_concept` and `ui_sealed_stage_frame_concept` from gray WorldMap node material in the original concept. The extraction masks source numbers, route fragments, and surrounding map/background so the assets can move to the runtime next-sealed node without copying a stage-specific screenshot piece.
+
+`WorldMapScene` now renders the sealed body/frame below the sealed badge for the single expected lower/mid next-locked node. `tools/generate-dev-runtime-assets.mjs`, `src/data/assetManifest.slice.v1.json`, `docs/asset-manifest.slice.v1.json`, and `src/data/releaseCatalogAdapter.ts` register both sealed assets for slice and release modes.
+
+`tmp/ui-worldmap-action-hit-target-audit.mjs` now verifies sealed body/frame/badge count, placement, display size, alpha, zero-count late states, and absence on the runtime current node. The keyboard-selected WorldMap audit also verifies the selected current node has no sealed body/frame overlap.
+
+Verification passed with `node tools\extract-ui-state-assets.mjs`, `npm.cmd run assets:generate:dev`, `node tmp\ui-worldmap-action-hit-target-audit.mjs`, `node tmp\route-node-raster-hover-state-audit.mjs`, `npm.cmd run check`, `git diff --check`, and a full `$env:PHASER_SMOKE_PROGRESS='1'; $env:PHASER_SMOKE_PROGRESS_FILE='tmp/phaser-smoke-progress-worldmap-sealed-body-frame.log'; node tmp\run-phaser-smoke-with-vite.mjs` run ending in `Phaser smoke OK`. `npm.cmd run check` now reports `manifestAssets=470`, `existingFiles=470`, `missingFiles=0`, and the existing Vite large JS chunk warning only.
+
+This remains partial UI progress, roughly about 79% of the active UI goal. The sealed stack is no longer badge-only, but full current/completed/locked/sealed node recomposition, stronger number-safe body variants, later stage body variants, lower-node shape recomposition, dynamic labels/tooltips, mobile/responsive review, user acceptance, and final concept-match approval remain unfinished.
+
+### Codex
+
+Codex continued the active concept-art UI goal from the fresh GitHub clone and chose the next WorldMap state gap: non-next lower/mid locked nodes still depended only on the neutralized baked underlay after the sealed body/frame pass. The goal was to reduce that underlay-only look without reintroducing Phaser vector shapes or copying source numbers/routes as whole node stickers.
+
+`tools/extract-ui-state-assets.mjs` now extracts `ui_dormant_stage_body_wash_concept` and `ui_dormant_stage_frame_concept` from the gray WorldMap node material in the original concept art. The body extraction treats `dormant` as a gray locked variant and masks source numbers, lower icon material, route fragments, and background. `tools/generate-dev-runtime-assets.mjs`, `src/data/assetManifest.slice.v1.json`, `docs/asset-manifest.slice.v1.json`, and `src/data/releaseCatalogAdapter.ts` register both assets for dev and release paths.
+
+`WorldMapScene` now renders the dormant body/frame stack for lower/mid locked nodes that are not the single next sealed node and are not upper red locked nodes. The first lower/mid locked node keeps the sealed stack, upper locked nodes keep the red locked stack, and current/completed nodes keep their own runtime state material.
+
+`tmp/ui-worldmap-action-hit-target-audit.mjs` now verifies dormant body/frame count, placement, display size, alpha, zero-count late states, and absence on runtime current / keyboard-selected nodes. The refreshed audit passed with default state `visibleDormantBodies=6`, stage-4-progress state `visibleDormantBodies=4`, and late-lock state `visibleDormantBodies=0`.
+
+Verification passed with `node tools\extract-ui-state-assets.mjs`, `npm.cmd run assets:generate:dev`, `node tmp\ui-worldmap-action-hit-target-audit.mjs`, `node tmp\route-node-raster-hover-state-audit.mjs`, `npm.cmd run check`, `git diff --check`, and full `node tmp\run-phaser-smoke-with-vite.mjs` ending in `Phaser smoke OK`. `npm.cmd run check` now reports `manifestAssets=472`, `existingFiles=472`, `missingFiles=0`, and the existing Vite large JS chunk warning only.
+
+This remains partial UI progress, roughly about 80% of the active UI goal. The dormant overlays are intentionally conservative and do not complete full WorldMap recomposition. Next work should continue with stronger number-safe state-specific body variants, later node variants, lower-node shape recomposition, dynamic labels/tooltips, mobile/responsive review, user acceptance, and final concept-match approval.
+
+### Codex
+
+Codex continued the active concept-art UI goal from the fresh GitHub clone and targeted the next WorldMap mismatch: progressed route segments still depended mostly on baked underlay route cues even though nodes had first runtime current/completed/locked/sealed/dormant material stacks.
+
+`tools/extract-ui-state-assets.mjs` now extracts `ui_world_map_route_progress_bead_concept` from the cyan route material in `assets/concepts/ui/world_map_ui_concept_v001.png`. The asset is a small source-derived raster bead, not a Phaser vector route or a detached procedural line. `tools/generate-dev-runtime-assets.mjs`, `src/data/assetManifest.slice.v1.json`, `docs/asset-manifest.slice.v1.json`, and `src/data/releaseCatalogAdapter.ts` register it for dev and release paths.
+
+`WorldMapScene` now renders route-progress beads additively along completed/progressed route segments before the current node. The placement is generated from existing concept node coordinates, with quieter beads for earlier completed legs and slightly stronger beads on the final leg into the current node.
+
+`tmp/ui-worldmap-action-hit-target-audit.mjs` now verifies route-bead count, placement, display size, alpha, and texture key across the default progressed state, stage-4-progress state, late stage-9-progress state, and keyboard-selected state. The latest run reported `visibleRouteBeads=2`, `visibleRouteBeads=4`, `visibleRouteBeads=12`, and `visibleRouteBeads=0` respectively, so keyboard stage selection does not accidentally show route-progress beads.
+
+Verification passed with `node tools\extract-ui-state-assets.mjs`, `npm.cmd run assets:generate:dev`, `node tmp\ui-worldmap-action-hit-target-audit.mjs`, `node tmp\route-node-raster-hover-state-audit.mjs`, `npm.cmd run check`, `git diff --check`, and full `node tmp\run-phaser-smoke-with-vite.mjs` ending in `Phaser smoke OK`. `npm.cmd run check` now reports `manifestAssets=473`, `existingFiles=473`, `missingFiles=0`, and the existing Vite large JS chunk warning only.
+
+This remains partial UI progress, roughly about 80-81% of the active UI goal. The route beads are a conservative runtime route-progress layer and do not complete full WorldMap route/node recomposition. Next work should continue with stronger number-safe state-specific body variants, later node variants, lower-node shape recomposition, complete route-state material, dynamic labels/tooltips, mobile/responsive review, user acceptance, and final concept-match approval.

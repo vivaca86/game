@@ -611,6 +611,20 @@
       "styleKey": "premium_popup_book"
     },
     {
+      "key": "ui_current_stage_body_wash_concept",
+      "type": "image",
+      "path": "assets/runtime/ui/ui_current_stage_body_wash_concept_v001.png",
+      "nativeSize": { "w": 210, "h": 216 },
+      "styleKey": "premium_popup_book"
+    },
+    {
+      "key": "ui_current_stage_frame_concept",
+      "type": "image",
+      "path": "assets/runtime/ui/ui_current_stage_frame_concept_v001.png",
+      "nativeSize": { "w": 210, "h": 216 },
+      "styleKey": "premium_popup_book"
+    },
+    {
       "key": "ui_current_stage_halo_concept",
       "type": "image",
       "path": "assets/runtime/ui/ui_current_stage_halo_concept_v001.png",
@@ -625,10 +639,38 @@
       "styleKey": "premium_popup_book"
     },
     {
+      "key": "ui_completed_stage_body_wash_concept",
+      "type": "image",
+      "path": "assets/runtime/ui/ui_completed_stage_body_wash_concept_v001.png",
+      "nativeSize": { "w": 210, "h": 220 },
+      "styleKey": "premium_popup_book"
+    },
+    {
+      "key": "ui_completed_stage_frame_concept",
+      "type": "image",
+      "path": "assets/runtime/ui/ui_completed_stage_frame_concept_v001.png",
+      "nativeSize": { "w": 210, "h": 220 },
+      "styleKey": "premium_popup_book"
+    },
+    {
       "key": "ui_completed_stage_badge_concept",
       "type": "image",
       "path": "assets/runtime/ui/ui_completed_stage_badge_concept_v001.png",
       "nativeSize": { "w": 96, "h": 96 },
+      "styleKey": "premium_popup_book"
+    },
+    {
+      "key": "ui_locked_stage_body_wash_concept",
+      "type": "image",
+      "path": "assets/runtime/ui/ui_locked_stage_body_wash_concept_v001.png",
+      "nativeSize": { "w": 210, "h": 220 },
+      "styleKey": "premium_popup_book"
+    },
+    {
+      "key": "ui_locked_stage_frame_concept",
+      "type": "image",
+      "path": "assets/runtime/ui/ui_locked_stage_frame_concept_v001.png",
+      "nativeSize": { "w": 210, "h": 220 },
       "styleKey": "premium_popup_book"
     },
     {
@@ -639,10 +681,45 @@
       "styleKey": "premium_popup_book"
     },
     {
+      "key": "ui_sealed_stage_body_wash_concept",
+      "type": "image",
+      "path": "assets/runtime/ui/ui_sealed_stage_body_wash_concept_v001.png",
+      "nativeSize": { "w": 210, "h": 220 },
+      "styleKey": "premium_popup_book"
+    },
+    {
+      "key": "ui_sealed_stage_frame_concept",
+      "type": "image",
+      "path": "assets/runtime/ui/ui_sealed_stage_frame_concept_v001.png",
+      "nativeSize": { "w": 210, "h": 220 },
+      "styleKey": "premium_popup_book"
+    },
+    {
       "key": "ui_sealed_stage_badge_concept",
       "type": "image",
       "path": "assets/runtime/ui/ui_sealed_stage_badge_concept_v001.png",
       "nativeSize": { "w": 96, "h": 96 },
+      "styleKey": "premium_popup_book"
+    },
+    {
+      "key": "ui_dormant_stage_body_wash_concept",
+      "type": "image",
+      "path": "assets/runtime/ui/ui_dormant_stage_body_wash_concept_v001.png",
+      "nativeSize": { "w": 210, "h": 220 },
+      "styleKey": "premium_popup_book"
+    },
+    {
+      "key": "ui_dormant_stage_frame_concept",
+      "type": "image",
+      "path": "assets/runtime/ui/ui_dormant_stage_frame_concept_v001.png",
+      "nativeSize": { "w": 210, "h": 220 },
+      "styleKey": "premium_popup_book"
+    },
+    {
+      "key": "ui_world_map_route_progress_bead_concept",
+      "type": "image",
+      "path": "assets/runtime/ui/ui_world_map_route_progress_bead_concept_v001.png",
+      "nativeSize": { "w": 80, "h": 100 },
       "styleKey": "premium_popup_book"
     },
     {
