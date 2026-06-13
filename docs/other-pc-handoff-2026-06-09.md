@@ -7,7 +7,7 @@ Repository:
 - GitHub: `https://github.com/vivaca86/game.git`
 - Branch: `main`
 - Latest pushed commit: run `git log -1 --oneline` after pulling.
-- Expected latest commit title after the 2026-06-14 WorldMap route-interaction continuation: `Audit WorldMap route interactions`
+- Expected latest commit title after the 2026-06-14 WorldMap selection route-stack continuation: `Audit WorldMap selection routes`
 
 ## Start On Another PC
 
@@ -22,7 +22,7 @@ npm install
 Expected first commit title in `git log --oneline -5` after the latest continuation:
 
 ```text
-Audit WorldMap route interactions
+Audit WorldMap selection routes
 ```
 
 Expected status:
@@ -125,6 +125,7 @@ Recommended next work:
    - Mobile portrait now has a non-blocking orientation/framing cue in unused letterbox space and suppresses it while readability tooltips are visible.
    - WorldMap now has muted locked/future route thread/bead material separate from completed/current cyan route material.
    - WorldMap route thread/bead material now has interaction evidence during open-node hover/down and locked-node hover/click, including base/current completed routes, muted locked/future routes, placement/style, rotation, and absence of the old route-hover image.
+   - WorldMap open-node pointer click now also has post-click route-stack recomposition evidence: lower/mid/boss selected nodes verify base/current completed route threads/beads, muted locked/future route threads/beads, placement/style, rotation, and absence of the old route-hover image after `context.run.stageId` changes.
    - WorldMap now has neutral lower-node body and frame layers under the first five lower map nodes, separate from current/completed/sealed/dormant state stacks.
    - WorldMap now splits first locked sealed-node body/frame material into lower/base and mid-route variants, with a stage-6/current evidence case for the mid sealed family.
    - WorldMap now splits upper red locked body/frame material into next/base, far non-boss, and boss-sized variants. The stage 14/15 boss locks use the new boss family while the first red lock keeps the base family and non-boss distant locks keep the far family.
@@ -1582,3 +1583,50 @@ Representative route evidence:
 - `tmp/ui-quality/worldmap-route-interactions/red-boss-route-locked-click-v1-1920.png`
 
 Important limitation: this strengthens route-state stability evidence during interaction, but it is still not full WorldMap route recomposition, final selected/focus approval, user acceptance, or release-ready UI.
+
+## 2026-06-14 WorldMap Selection Route-Stack Audit Continuation
+
+Status remains `95% candidate, not final`.
+
+Additional local continuation work:
+
+- Strengthened `tools/ui-worldmap-open-node-selection-audit.mjs`.
+- The audit still clicks lower-open, mid-open, and boss-open unlocked WorldMap stage nodes across 1920x1080, 1280x720, and 390x844.
+- After click, it waits for `context.run.stageId` to become the clicked stage, moves the pointer away, then verifies the selected/current marker, halo, body, frame, and status stack on the clicked node.
+- It now also verifies route-stack recomposition after the selected current stage changes:
+  - base completed route thread/bead count, placement, display size, alpha, and rotation.
+  - current/final route thread/bead count, placement, display size, alpha, and rotation.
+  - muted locked/future route thread/bead count, placement, display size, alpha, and rotation.
+  - zero old `ui_hover_route_node_concept` route-hover images.
+
+Verification for this continuation:
+
+```powershell
+node tools\ui-worldmap-open-node-selection-audit.mjs
+node tools\ui-worldmap-route-interaction-audit.mjs
+node tools\ui-worldmap-open-node-tooltip-audit.mjs
+node tools\ui-worldmap-open-node-down-audit.mjs
+node tools\ui-worldmap-keyboard-tooltip-audit.mjs
+node tools\ui-worldmap-locked-tooltip-audit.mjs
+npx.cmd tsc --noEmit
+git diff --check
+npm.cmd run check
+$env:PHASER_SMOKE_PROGRESS='1'
+$env:PHASER_SMOKE_PROGRESS_FILE='tmp/phaser-smoke-progress-worldmap-selection-route-stack-targeted.log'
+$env:PHASER_SMOKE_ONLY='checkViewScreenshots,checkClickableControls,checkFullInputCoverage,checkUiSkinStates'
+node tmp\run-phaser-smoke-with-vite.mjs
+```
+
+All listed checks passed. `npm.cmd run check` still reports only the existing Vite large JS chunk warning. The strengthened open-node selection audit passed 9 cases and now reports route recomposition counts, including:
+
+- lower-open after selection: route base `0/0`, route current `0/0`, locked route threads `7/7`, locked route beads `9/9`.
+- mid-open after selection: route base threads `6/6`, current threads `1/1`, base beads `10/10`, current beads `1/1`, locked route threads `3/3`, locked route beads `4/4`.
+- boss-open after selection: route base threads `10/10`, current threads `1/1`, base beads `17/17`, current beads `2/2`, locked route threads `0/0`, locked route beads `1/1`.
+
+Representative evidence:
+
+- `tmp/ui-quality/worldmap-open-node-selection/lower-open-open-node-selection-v1-1920.png`
+- `tmp/ui-quality/worldmap-open-node-selection/mid-open-open-node-selection-v1-1920.png`
+- `tmp/ui-quality/worldmap-open-node-selection/boss-open-open-node-selection-v1-1920.png`
+
+Important limitation: this strengthens post-click route recomposition evidence, but the project is still `95% candidate, not final`. Full WorldMap node/body/route recomposition approval, broader selected/focus approval, user acceptance, and release-ready UI remain unfinished.

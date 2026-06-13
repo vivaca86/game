@@ -109,6 +109,12 @@ try {
         targetIndex: auditCase.targetIndex,
         lateCurrent: selectionAudit.expectedLateCurrent,
         currentBody: selectionAudit.visibleCurrentLateBodyImages === 1 ? "late" : "base",
+        routeBaseThreads: `${selectionAudit.visibleRouteBaseThreads}/${selectionAudit.expectedRouteBaseThreads}`,
+        routeCurrentThreads: `${selectionAudit.visibleRouteCurrentThreads}/${selectionAudit.expectedRouteCurrentThreads}`,
+        routeBaseBeads: `${selectionAudit.visibleRouteBaseBeads}/${selectionAudit.expectedRouteBaseBeads}`,
+        routeCurrentBeads: `${selectionAudit.visibleRouteCurrentBeads}/${selectionAudit.expectedRouteCurrentBeads}`,
+        lockedRouteThreads: `${selectionAudit.visibleRouteLockedThreads}/${selectionAudit.expectedRouteLockedThreads}`,
+        lockedRouteBeads: `${selectionAudit.visibleRouteLockedBeads}/${selectionAudit.expectedRouteLockedBeads}`,
         screenshot: path.resolve(screenshot)
       });
     }
@@ -286,6 +292,13 @@ async function readWorldMapOpenNodeSelectionAudit(page, auditCase) {
       ...imageByKey("ui_dormant_stage_frame_concept"),
       ...imageByKey("ui_dormant_stage_mid_frame_concept")
     ];
+    const routeBaseThreadImages = imageByKey("ui_world_map_route_progress_thread_concept");
+    const routeCurrentThreadImages = imageByKey("ui_world_map_route_progress_current_thread_concept");
+    const routeLockedThreadImages = imageByKey("ui_world_map_route_locked_thread_concept");
+    const routeBaseBeadImages = imageByKey("ui_world_map_route_progress_bead_concept");
+    const routeCurrentBeadImages = imageByKey("ui_world_map_route_progress_current_bead_concept");
+    const routeLockedBeadImages = imageByKey("ui_world_map_route_locked_bead_concept");
+    const routeHoverImages = imageByKey("ui_hover_route_node_concept");
     const visibleTextCount = visible.filter((child) => (
       child?.type === "Text"
       && String(child.text ?? "").trim().length > 0
@@ -355,6 +368,173 @@ async function readWorldMapOpenNodeSelectionAudit(page, auditCase) {
     const currentHasNoSealedFrame = sealedFrameImages.every((image) => notNearCurrentNode(image, 0.72));
     const currentHasNoDormantBody = dormantBodyImages.every((image) => notNearCurrentNode(image, 0.72));
     const currentHasNoDormantFrame = dormantFrameImages.every((image) => notNearCurrentNode(image, 0.72));
+    const completedStageIds = new Set(context?.save?.profile?.completedStages ?? []);
+    const unlockedStageIds = new Set([...(context?.save?.profile?.unlockedStages ?? []), currentStageId]);
+    const imageAt = (images, x, y) => images.find((image) => Math.abs(image.x - x) <= 1 && Math.abs(image.y - y) <= 1);
+    const hasImageAt = (images, x, y) => Boolean(imageAt(images, x, y));
+    const rotationOk = (image, rotation) => Math.abs(Number(image?.rotation ?? 0) - rotation) <= 0.015;
+    const routeBeadPlacements = (fromNode, toNode, finalLeg) => {
+      const dx = toNode.x - fromNode.x;
+      const dy = toNode.y - fromNode.y;
+      const length = Math.hypot(dx, dy);
+      if (length <= 1) return [];
+      const fromPad = Math.max(fromNode.width, fromNode.height) * 0.36;
+      const toPad = Math.max(toNode.width, toNode.height) * 0.36;
+      const usableLength = Math.max(0, length - fromPad - toPad);
+      if (usableLength < 24) return [];
+      const count = Math.max(1, Math.floor(usableLength / 46));
+      const rotation = Math.atan2(dy, dx);
+      return Array.from({ length: count }, (_, beadIndex) => {
+        const progress = (fromPad + usableLength * ((beadIndex + 1) / (count + 1))) / length;
+        return {
+          x: fromNode.x + dx * progress,
+          y: fromNode.y + dy * progress,
+          rotation,
+          finalLeg,
+          size: finalLeg ? 44 : 38,
+          minAlpha: finalLeg ? 0.6 : 0.44
+        };
+      });
+    };
+    const routeThreadPlacement = (fromNode, toNode, finalLeg) => {
+      const dx = toNode.x - fromNode.x;
+      const dy = toNode.y - fromNode.y;
+      const length = Math.hypot(dx, dy);
+      if (length <= 1) return undefined;
+      const fromPad = Math.max(fromNode.width, fromNode.height) * 0.43;
+      const toPad = Math.max(toNode.width, toNode.height) * 0.43;
+      const usableLength = Math.max(0, length - fromPad - toPad);
+      if (usableLength < 28) return undefined;
+      const startProgress = fromPad / length;
+      const endProgress = (fromPad + usableLength) / length;
+      return {
+        x: fromNode.x + dx * ((startProgress + endProgress) * 0.5),
+        y: fromNode.y + dy * ((startProgress + endProgress) * 0.5),
+        rotation: Math.atan2(dy, dx),
+        finalLeg,
+        width: usableLength + (finalLeg ? 18 : 12),
+        height: finalLeg ? 30 : 24,
+        minAlpha: finalLeg ? 0.4 : 0.28
+      };
+    };
+    const lockedRouteBeadPlacements = (fromNode, toNode) => {
+      const dx = toNode.x - fromNode.x;
+      const dy = toNode.y - fromNode.y;
+      const length = Math.hypot(dx, dy);
+      if (length <= 1) return [];
+      const fromPad = Math.max(fromNode.width, fromNode.height) * 0.44;
+      const toPad = Math.max(toNode.width, toNode.height) * 0.44;
+      const usableLength = Math.max(0, length - fromPad - toPad);
+      if (usableLength < 34) return [];
+      const count = Math.max(1, Math.floor(usableLength / 76));
+      const rotation = Math.atan2(dy, dx);
+      return Array.from({ length: count }, (_, beadIndex) => {
+        const progress = (fromPad + usableLength * ((beadIndex + 1) / (count + 1))) / length;
+        return {
+          x: fromNode.x + dx * progress,
+          y: fromNode.y + dy * progress,
+          rotation,
+          size: 30,
+          minAlpha: 0.32
+        };
+      });
+    };
+    const lockedRouteThreadPlacement = (fromNode, toNode) => {
+      const dx = toNode.x - fromNode.x;
+      const dy = toNode.y - fromNode.y;
+      const length = Math.hypot(dx, dy);
+      if (length <= 1) return undefined;
+      const fromPad = Math.max(fromNode.width, fromNode.height) * 0.48;
+      const toPad = Math.max(toNode.width, toNode.height) * 0.48;
+      const usableLength = Math.max(0, length - fromPad - toPad);
+      if (usableLength < 26) return undefined;
+      const startProgress = fromPad / length;
+      const endProgress = (fromPad + usableLength) / length;
+      return {
+        x: fromNode.x + dx * ((startProgress + endProgress) * 0.5),
+        y: fromNode.y + dy * ((startProgress + endProgress) * 0.5),
+        rotation: Math.atan2(dy, dx),
+        width: usableLength + 8,
+        height: 18,
+        minAlpha: 0.24
+      };
+    };
+    const expectedRouteThreads = [];
+    const expectedRouteBeads = [];
+    for (let routeIndex = 0; routeIndex < currentIndex; routeIndex += 1) {
+      const fromStage = stages[routeIndex];
+      const toStage = stages[routeIndex + 1];
+      const fromNode = stageNodes[routeIndex];
+      const toNode = stageNodes[routeIndex + 1];
+      if (!fromStage || !toStage || !fromNode || !toNode) continue;
+      if (!completedStageIds.has(fromStage.id)) continue;
+      if (toStage.id !== currentStageId && !completedStageIds.has(toStage.id)) continue;
+      const finalLeg = routeIndex === currentIndex - 1;
+      const thread = routeThreadPlacement(fromNode, toNode, finalLeg);
+      if (thread) expectedRouteThreads.push(thread);
+      expectedRouteBeads.push(...routeBeadPlacements(fromNode, toNode, finalLeg));
+    }
+    const expectedLockedRouteThreads = [];
+    const expectedLockedRouteBeads = [];
+    for (let routeIndex = currentIndex; routeIndex < stages.length - 1; routeIndex += 1) {
+      const toStage = stages[routeIndex + 1];
+      const fromNode = stageNodes[routeIndex];
+      const toNode = stageNodes[routeIndex + 1];
+      if (!toStage || !fromNode || !toNode || unlockedStageIds.has(toStage.id)) continue;
+      const thread = lockedRouteThreadPlacement(fromNode, toNode);
+      if (thread) expectedLockedRouteThreads.push(thread);
+      expectedLockedRouteBeads.push(...lockedRouteBeadPlacements(fromNode, toNode));
+    }
+    const expectedRouteBaseThreads = expectedRouteThreads.filter((placement) => !placement.finalLeg);
+    const expectedRouteCurrentThreads = expectedRouteThreads.filter((placement) => placement.finalLeg);
+    const expectedRouteBaseBeads = expectedRouteBeads.filter((placement) => !placement.finalLeg);
+    const expectedRouteCurrentBeads = expectedRouteBeads.filter((placement) => placement.finalLeg);
+    const routeThreadImagesForPlacement = (placement) => placement.finalLeg ? routeCurrentThreadImages : routeBaseThreadImages;
+    const routeBeadImagesForPlacement = (placement) => placement.finalLeg ? routeCurrentBeadImages : routeBaseBeadImages;
+    const routeThreadsAtExpectedSegments = expectedRouteThreads.every((placement) => (
+      hasImageAt(routeThreadImagesForPlacement(placement), placement.x, placement.y)
+    ));
+    const routeThreadStyleAtExpectedSegments = expectedRouteThreads.every((placement) => {
+      const image = imageAt(routeThreadImagesForPlacement(placement), placement.x, placement.y);
+      return image
+        && Math.abs(image.displayWidth - placement.width) <= 1
+        && Math.abs(image.displayHeight - placement.height) <= 1
+        && Number(image.alpha ?? 1) >= placement.minAlpha
+        && rotationOk(image, placement.rotation);
+    });
+    const routeBeadsAtExpectedSegments = expectedRouteBeads.every((placement) => (
+      hasImageAt(routeBeadImagesForPlacement(placement), placement.x, placement.y)
+    ));
+    const routeBeadStyleAtExpectedSegments = expectedRouteBeads.every((placement) => {
+      const image = imageAt(routeBeadImagesForPlacement(placement), placement.x, placement.y);
+      return image
+        && Math.abs(image.displayWidth - placement.size) <= 1
+        && Math.abs(image.displayHeight - placement.size) <= 1
+        && Number(image.alpha ?? 1) >= placement.minAlpha
+        && rotationOk(image, placement.rotation);
+    });
+    const lockedRouteThreadsAtExpectedSegments = expectedLockedRouteThreads.every((placement) => (
+      hasImageAt(routeLockedThreadImages, placement.x, placement.y)
+    ));
+    const lockedRouteThreadStyleAtExpectedSegments = expectedLockedRouteThreads.every((placement) => {
+      const image = imageAt(routeLockedThreadImages, placement.x, placement.y);
+      return image
+        && Math.abs(image.displayWidth - placement.width) <= 1
+        && Math.abs(image.displayHeight - placement.height) <= 1
+        && Number(image.alpha ?? 1) >= placement.minAlpha
+        && rotationOk(image, placement.rotation);
+    });
+    const lockedRouteBeadsAtExpectedSegments = expectedLockedRouteBeads.every((placement) => (
+      hasImageAt(routeLockedBeadImages, placement.x, placement.y)
+    ));
+    const lockedRouteBeadStyleAtExpectedSegments = expectedLockedRouteBeads.every((placement) => {
+      const image = imageAt(routeLockedBeadImages, placement.x, placement.y);
+      return image
+        && Math.abs(image.displayWidth - placement.size) <= 1
+        && Math.abs(image.displayHeight - placement.size) <= 1
+        && Number(image.alpha ?? 1) >= placement.minAlpha
+        && rotationOk(image, placement.rotation);
+    });
     const tooltip = document.getElementById("game-readability-tooltip");
     const log = context?.run?.log ?? [];
 
@@ -390,6 +570,27 @@ async function readWorldMapOpenNodeSelectionAudit(page, auditCase) {
       currentHasNoSealedFrame,
       currentHasNoDormantBody,
       currentHasNoDormantFrame,
+      visibleRouteHoverImages: routeHoverImages.length,
+      visibleRouteBaseThreads: routeBaseThreadImages.length,
+      expectedRouteBaseThreads: expectedRouteBaseThreads.length,
+      visibleRouteCurrentThreads: routeCurrentThreadImages.length,
+      expectedRouteCurrentThreads: expectedRouteCurrentThreads.length,
+      visibleRouteBaseBeads: routeBaseBeadImages.length,
+      expectedRouteBaseBeads: expectedRouteBaseBeads.length,
+      visibleRouteCurrentBeads: routeCurrentBeadImages.length,
+      expectedRouteCurrentBeads: expectedRouteCurrentBeads.length,
+      visibleRouteLockedThreads: routeLockedThreadImages.length,
+      expectedRouteLockedThreads: expectedLockedRouteThreads.length,
+      visibleRouteLockedBeads: routeLockedBeadImages.length,
+      expectedRouteLockedBeads: expectedLockedRouteBeads.length,
+      routeThreadsAtExpectedSegments,
+      routeThreadStyleAtExpectedSegments,
+      routeBeadsAtExpectedSegments,
+      routeBeadStyleAtExpectedSegments,
+      lockedRouteThreadsAtExpectedSegments,
+      lockedRouteThreadStyleAtExpectedSegments,
+      lockedRouteBeadsAtExpectedSegments,
+      lockedRouteBeadStyleAtExpectedSegments,
       visibleTextCount,
       visibleRectsAboveUnderlay,
       tooltipVisible: tooltip?.dataset?.visible === "true",
@@ -478,6 +679,33 @@ function assertWorldMapOpenNodeSelection(label, audit, seeded, auditCase) {
       currentHasNoDormantBody: audit.currentHasNoDormantBody,
       currentHasNoDormantFrame: audit.currentHasNoDormantFrame
     })}`);
+  }
+  if (audit.visibleRouteHoverImages !== 0) {
+    throw new Error(`${label}: old route hover placeholder remains visible (${audit.visibleRouteHoverImages})`);
+  }
+  const routeCountFields = [
+    ["route base threads", audit.visibleRouteBaseThreads, audit.expectedRouteBaseThreads],
+    ["route current threads", audit.visibleRouteCurrentThreads, audit.expectedRouteCurrentThreads],
+    ["route base beads", audit.visibleRouteBaseBeads, audit.expectedRouteBaseBeads],
+    ["route current beads", audit.visibleRouteCurrentBeads, audit.expectedRouteCurrentBeads],
+    ["locked route threads", audit.visibleRouteLockedThreads, audit.expectedRouteLockedThreads],
+    ["locked route beads", audit.visibleRouteLockedBeads, audit.expectedRouteLockedBeads]
+  ];
+  for (const [name, actual, expected] of routeCountFields) {
+    if (actual !== expected) throw new Error(`${label}: expected ${expected} ${name}, got ${actual}`);
+  }
+  const routePlacementFields = [
+    ["routeThreadsAtExpectedSegments", audit.routeThreadsAtExpectedSegments],
+    ["routeThreadStyleAtExpectedSegments", audit.routeThreadStyleAtExpectedSegments],
+    ["routeBeadsAtExpectedSegments", audit.routeBeadsAtExpectedSegments],
+    ["routeBeadStyleAtExpectedSegments", audit.routeBeadStyleAtExpectedSegments],
+    ["lockedRouteThreadsAtExpectedSegments", audit.lockedRouteThreadsAtExpectedSegments],
+    ["lockedRouteThreadStyleAtExpectedSegments", audit.lockedRouteThreadStyleAtExpectedSegments],
+    ["lockedRouteBeadsAtExpectedSegments", audit.lockedRouteBeadsAtExpectedSegments],
+    ["lockedRouteBeadStyleAtExpectedSegments", audit.lockedRouteBeadStyleAtExpectedSegments]
+  ];
+  for (const [name, ok] of routePlacementFields) {
+    if (!ok) throw new Error(`${label}: route placement/style check failed: ${name}`);
   }
   if (audit.visibleTextCount !== 0 || audit.visibleRectsAboveUnderlay !== 0) {
     throw new Error(`${label}: unexpected Phaser text/vector leak ${JSON.stringify({
