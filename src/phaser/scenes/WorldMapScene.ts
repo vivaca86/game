@@ -21,7 +21,9 @@ const WORLD_MAP_RASTER_CURRENT_FRAME_KEY = "ui_current_stage_frame_concept";
 const WORLD_MAP_RASTER_CURRENT_HALO_KEY = "ui_current_stage_halo_concept";
 const WORLD_MAP_RASTER_CURRENT_STATUS_KEY = "ui_current_stage_status_badge_concept";
 const WORLD_MAP_RASTER_COMPLETED_BODY_KEY = "ui_completed_stage_body_wash_concept";
+const WORLD_MAP_RASTER_COMPLETED_LATE_BODY_KEY = "ui_completed_stage_late_body_wash_concept";
 const WORLD_MAP_RASTER_COMPLETED_FRAME_KEY = "ui_completed_stage_frame_concept";
+const WORLD_MAP_RASTER_COMPLETED_LATE_FRAME_KEY = "ui_completed_stage_late_frame_concept";
 const WORLD_MAP_RASTER_COMPLETED_BADGE_KEY = "ui_completed_stage_badge_concept";
 const WORLD_MAP_RASTER_COMPLETED_LATE_BADGE_KEY = "ui_completed_stage_late_badge_concept";
 const WORLD_MAP_RASTER_LOCKED_BODY_KEY = "ui_locked_stage_body_wash_concept";
@@ -231,17 +233,19 @@ function renderWorldMapStageStateBadges(scene: Phaser.Scene, context: BootContex
 
     const completedBadgeKey = worldMapCompletedBadgeKey(scene, index);
     if (completedStageIds.has(stage.id) && completedBadgeKey) {
-      if (scene.textures.exists(WORLD_MAP_RASTER_COMPLETED_BODY_KEY)) {
+      const completedBodyKey = worldMapCompletedBodyKey(scene, index);
+      if (completedBodyKey) {
         const body = worldMapCompletedBodyPlacement(node, index);
-        scene.add.image(body.x, body.y, WORLD_MAP_RASTER_COMPLETED_BODY_KEY)
+        scene.add.image(body.x, body.y, completedBodyKey)
           .setDisplaySize(body.width, body.height)
           .setAlpha(body.alpha)
           .setDepth(5.12);
       }
 
-      if (scene.textures.exists(WORLD_MAP_RASTER_COMPLETED_FRAME_KEY)) {
+      const completedFrameKey = worldMapCompletedFrameKey(scene, index);
+      if (completedFrameKey) {
         const frame = worldMapCompletedFramePlacement(node, index);
-        scene.add.image(frame.x, frame.y, WORLD_MAP_RASTER_COMPLETED_FRAME_KEY)
+        scene.add.image(frame.x, frame.y, completedFrameKey)
           .setDisplaySize(frame.width, frame.height)
           .setAlpha(frame.alpha)
           .setDepth(5.35);
@@ -466,6 +470,26 @@ function worldMapCompletedBadgePlacement(
     size: stageIndex >= 9 ? 64 : 60,
     alpha: 0.88
   };
+}
+
+function worldMapCompletedBodyKey(scene: Phaser.Scene, stageIndex: number): string | undefined {
+  if (stageIndex > 2 && scene.textures.exists(WORLD_MAP_RASTER_COMPLETED_LATE_BODY_KEY)) {
+    return WORLD_MAP_RASTER_COMPLETED_LATE_BODY_KEY;
+  }
+  if (scene.textures.exists(WORLD_MAP_RASTER_COMPLETED_BODY_KEY)) {
+    return WORLD_MAP_RASTER_COMPLETED_BODY_KEY;
+  }
+  return undefined;
+}
+
+function worldMapCompletedFrameKey(scene: Phaser.Scene, stageIndex: number): string | undefined {
+  if (stageIndex > 2 && scene.textures.exists(WORLD_MAP_RASTER_COMPLETED_LATE_FRAME_KEY)) {
+    return WORLD_MAP_RASTER_COMPLETED_LATE_FRAME_KEY;
+  }
+  if (scene.textures.exists(WORLD_MAP_RASTER_COMPLETED_FRAME_KEY)) {
+    return WORLD_MAP_RASTER_COMPLETED_FRAME_KEY;
+  }
+  return undefined;
 }
 
 function worldMapCompletedBadgeKey(scene: Phaser.Scene, stageIndex: number): string | undefined {

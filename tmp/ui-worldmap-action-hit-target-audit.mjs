@@ -426,8 +426,12 @@ async function runKeyboardStageSelectAudit(browser, baseUrl) {
       const completedBaseImages = visible.filter((child) => child?.type === "Image" && child.texture?.key === "ui_completed_stage_badge_concept" && (child.alpha ?? 1) > 0.05);
       const completedLateImages = visible.filter((child) => child?.type === "Image" && child.texture?.key === "ui_completed_stage_late_badge_concept" && (child.alpha ?? 1) > 0.05);
       const completedImages = [...completedBaseImages, ...completedLateImages];
-      const completedBodyImages = visible.filter((child) => child?.type === "Image" && child.texture?.key === "ui_completed_stage_body_wash_concept" && (child.alpha ?? 1) > 0.05);
-      const completedFrameImages = visible.filter((child) => child?.type === "Image" && child.texture?.key === "ui_completed_stage_frame_concept" && (child.alpha ?? 1) > 0.05);
+      const completedBaseBodyImages = visible.filter((child) => child?.type === "Image" && child.texture?.key === "ui_completed_stage_body_wash_concept" && (child.alpha ?? 1) > 0.05);
+      const completedLateBodyImages = visible.filter((child) => child?.type === "Image" && child.texture?.key === "ui_completed_stage_late_body_wash_concept" && (child.alpha ?? 1) > 0.05);
+      const completedBodyImages = [...completedBaseBodyImages, ...completedLateBodyImages];
+      const completedBaseFrameImages = visible.filter((child) => child?.type === "Image" && child.texture?.key === "ui_completed_stage_frame_concept" && (child.alpha ?? 1) > 0.05);
+      const completedLateFrameImages = visible.filter((child) => child?.type === "Image" && child.texture?.key === "ui_completed_stage_late_frame_concept" && (child.alpha ?? 1) > 0.05);
+      const completedFrameImages = [...completedBaseFrameImages, ...completedLateFrameImages];
       const lockedBodyImages = visible.filter((child) => child?.type === "Image" && child.texture?.key === "ui_locked_stage_body_wash_concept" && (child.alpha ?? 1) > 0.05);
       const sealedBodyImages = visible.filter((child) => child?.type === "Image" && child.texture?.key === "ui_sealed_stage_body_wash_concept" && (child.alpha ?? 1) > 0.05);
       const sealedFrameImages = visible.filter((child) => child?.type === "Image" && child.texture?.key === "ui_sealed_stage_frame_concept" && (child.alpha ?? 1) > 0.05);
@@ -645,16 +649,28 @@ async function runStateOverlayAudit(browser, baseUrl, auditCase) {
         && (child.alpha ?? 1) > 0.05
       ));
       const completedImages = [...completedBaseImages, ...completedLateImages];
-      const completedBodyImages = visible.filter((child) => (
+      const completedBaseBodyImages = visible.filter((child) => (
         child?.type === "Image"
         && child.texture?.key === "ui_completed_stage_body_wash_concept"
         && (child.alpha ?? 1) > 0.05
       ));
-      const completedFrameImages = visible.filter((child) => (
+      const completedLateBodyImages = visible.filter((child) => (
+        child?.type === "Image"
+        && child.texture?.key === "ui_completed_stage_late_body_wash_concept"
+        && (child.alpha ?? 1) > 0.05
+      ));
+      const completedBodyImages = [...completedBaseBodyImages, ...completedLateBodyImages];
+      const completedBaseFrameImages = visible.filter((child) => (
         child?.type === "Image"
         && child.texture?.key === "ui_completed_stage_frame_concept"
         && (child.alpha ?? 1) > 0.05
       ));
+      const completedLateFrameImages = visible.filter((child) => (
+        child?.type === "Image"
+        && child.texture?.key === "ui_completed_stage_late_frame_concept"
+        && (child.alpha ?? 1) > 0.05
+      ));
+      const completedFrameImages = [...completedBaseFrameImages, ...completedLateFrameImages];
       const lockedImages = visible.filter((child) => (
         child?.type === "Image"
         && child.texture?.key === "ui_locked_stage_badge_concept"
@@ -943,6 +959,8 @@ async function runStateOverlayAudit(browser, baseUrl, auditCase) {
         y: node.y + node.height * 0.39
       });
       const completedBadgeImagesForIndex = (stageIndex) => stageIndex > 2 ? completedLateImages : completedBaseImages;
+      const completedBodyImagesForIndex = (stageIndex) => stageIndex > 2 ? completedLateBodyImages : completedBaseBodyImages;
+      const completedFrameImagesForIndex = (stageIndex) => stageIndex > 2 ? completedLateFrameImages : completedBaseFrameImages;
       const completedAtExpectedNodes = expectedCompleted.every(({ node, index }) => (
         hasImageAt(completedBadgeImagesForIndex(index), completedBadgePlacement(node, index).x, completedBadgePlacement(node, index).y)
       ));
@@ -955,22 +973,22 @@ async function runStateOverlayAudit(browser, baseUrl, auditCase) {
           && (image.alpha ?? 1) >= placement.minAlpha;
       });
       const completedBodiesAtExpectedNodes = expectedCompleted.every(({ node, index }) => (
-        hasImageAt(completedBodyImages, completedBodyPlacement(node, index).x, completedBodyPlacement(node, index).y)
+        hasImageAt(completedBodyImagesForIndex(index), completedBodyPlacement(node, index).x, completedBodyPlacement(node, index).y)
       ));
       const completedBodyStyleAtExpectedNodes = expectedCompleted.every(({ node, index }) => {
         const placement = completedBodyPlacement(node, index);
-        const image = imageAt(completedBodyImages, placement.x, placement.y);
+        const image = imageAt(completedBodyImagesForIndex(index), placement.x, placement.y);
         return image
           && Math.abs(image.displayWidth - placement.width) <= 1
           && Math.abs(image.displayHeight - placement.height) <= 1
           && (image.alpha ?? 1) >= placement.minAlpha;
       });
       const completedFramesAtExpectedNodes = expectedCompleted.every(({ node, index }) => (
-        hasImageAt(completedFrameImages, completedFramePlacement(node, index).x, completedFramePlacement(node, index).y)
+        hasImageAt(completedFrameImagesForIndex(index), completedFramePlacement(node, index).x, completedFramePlacement(node, index).y)
       ));
       const completedFrameStyleAtExpectedNodes = expectedCompleted.every(({ node, index }) => {
         const placement = completedFramePlacement(node, index);
-        const image = imageAt(completedFrameImages, placement.x, placement.y);
+        const image = imageAt(completedFrameImagesForIndex(index), placement.x, placement.y);
         return image
           && Math.abs(image.displayWidth - placement.width) <= 1
           && Math.abs(image.displayHeight - placement.height) <= 1
@@ -1160,7 +1178,11 @@ async function runStateOverlayAudit(browser, baseUrl, auditCase) {
           && routeThreadImages.length === expectedRouteThreads.length
           && routeBeadImages.length === expectedRouteBeads.length
           && completedBodyImages.length === expectedCompleted.length
+          && completedBaseBodyImages.length === expectedCompletedBase.length
+          && completedLateBodyImages.length === expectedCompletedLate.length
           && completedFrameImages.length === expectedCompleted.length
+          && completedBaseFrameImages.length === expectedCompletedBase.length
+          && completedLateFrameImages.length === expectedCompletedLate.length
           && currentBodyImages.length === 1
           && lockedBodyImages.length === expectedLocked.length
           && lockedFrameImages.length === expectedLocked.length
@@ -1232,10 +1254,18 @@ async function runStateOverlayAudit(browser, baseUrl, auditCase) {
         completedStyleAtExpectedNodes,
         visibleCompletedBodies: completedBodyImages.length,
         expectedCompletedBodies: expectedCompleted.length,
+        visibleCompletedBaseBodies: completedBaseBodyImages.length,
+        expectedCompletedBaseBodies: expectedCompletedBase.length,
+        visibleCompletedLateBodies: completedLateBodyImages.length,
+        expectedCompletedLateBodies: expectedCompletedLate.length,
         completedBodiesAtExpectedNodes,
         completedBodyStyleAtExpectedNodes,
         visibleCompletedFrames: completedFrameImages.length,
         expectedCompletedFrames: expectedCompleted.length,
+        visibleCompletedBaseFrames: completedBaseFrameImages.length,
+        expectedCompletedBaseFrames: expectedCompletedBase.length,
+        visibleCompletedLateFrames: completedLateFrameImages.length,
+        expectedCompletedLateFrames: expectedCompletedLate.length,
         completedFramesAtExpectedNodes,
         completedFrameStyleAtExpectedNodes,
         visibleLockedBodies: lockedBodyImages.length,

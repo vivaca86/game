@@ -646,9 +646,23 @@
       "styleKey": "premium_popup_book"
     },
     {
+      "key": "ui_completed_stage_late_body_wash_concept",
+      "type": "image",
+      "path": "assets/runtime/ui/ui_completed_stage_late_body_wash_concept_v001.png",
+      "nativeSize": { "w": 210, "h": 220 },
+      "styleKey": "premium_popup_book"
+    },
+    {
       "key": "ui_completed_stage_frame_concept",
       "type": "image",
       "path": "assets/runtime/ui/ui_completed_stage_frame_concept_v001.png",
+      "nativeSize": { "w": 210, "h": 220 },
+      "styleKey": "premium_popup_book"
+    },
+    {
+      "key": "ui_completed_stage_late_frame_concept",
+      "type": "image",
+      "path": "assets/runtime/ui/ui_completed_stage_late_frame_concept_v001.png",
       "nativeSize": { "w": 210, "h": 220 },
       "styleKey": "premium_popup_book"
     },

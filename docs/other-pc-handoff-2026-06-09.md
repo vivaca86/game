@@ -419,3 +419,34 @@ node tmp\run-phaser-smoke-with-vite.mjs
 All listed checks passed. `npm.cmd run check` reports `manifestAssets=475`, `existingFiles=475`, `missingFiles=0`, and only the existing Vite large JS chunk warning.
 
 Important limitation: this is still not full completed-node recomposition. The late badge split improves one later-node variant gap, but completed body/frame variants are still broad shared overlays and the WorldMap still needs stronger stage-family body variants, lower-node shape recomposition, complete route-state material, visible tooltip/readability zones, mobile/responsive review, user acceptance, and final concept-match approval next.
+
+## 2026-06-13 Late Completed-Stack Variant WIP Continuation
+
+Status remains `Partially complete`.
+
+Additional local continuation work:
+
+- Added first conservative WorldMap late completed body/frame material:
+  - `ui_completed_stage_late_body_wash_concept`
+  - `ui_completed_stage_late_frame_concept`
+- Both assets are extracted from the original completed-node crop in `assets/concepts/ui/world_map_ui_concept_v001.png`, but processed as quieter `completedLate` variants so completed nodes after the lower 1-3 group no longer reuse the full lower completed stack.
+- `WorldMapScene` now keeps base completed body/frame/badge assets for completed stages 1-3 and uses late body/frame/badge assets for completed stage indexes after that when the textures exist.
+- `src/data/releaseCatalogAdapter.ts`, `src/data/assetManifest.slice.v1.json`, `docs/asset-manifest.slice.v1.json`, and `tools/generate-dev-runtime-assets.mjs` now register the late completed body/frame assets for dev and release paths.
+- `tmp/ui-worldmap-action-hit-target-audit.mjs` now splits completed body/frame verification into base and late counts. The late stage-9 progress audit reports `visibleCompletedBaseBodies=3`, `expectedCompletedBaseBodies=3`, `visibleCompletedLateBodies=5`, `expectedCompletedLateBodies=5`, `visibleCompletedBaseFrames=3`, `expectedCompletedBaseFrames=3`, `visibleCompletedLateFrames=5`, and `expectedCompletedLateFrames=5`.
+
+Verification for this continuation:
+
+```powershell
+node tools\extract-ui-state-assets.mjs
+npm.cmd run assets:generate:dev
+node tmp\ui-worldmap-action-hit-target-audit.mjs
+node tmp\route-node-raster-hover-state-audit.mjs
+npm.cmd run check
+$env:PHASER_SMOKE_PROGRESS='1'
+$env:PHASER_SMOKE_PROGRESS_FILE='tmp/phaser-smoke-progress-worldmap-late-completed-stack.log'
+node tmp\run-phaser-smoke-with-vite.mjs
+```
+
+All listed checks passed. `npm.cmd run check` reports `manifestAssets=477`, `existingFiles=477`, `missingFiles=0`, and only the existing Vite large JS chunk warning.
+
+Important limitation: this is still not full completed-node recomposition. The late completed stack split improves the mid/late completed-node family, but completed nodes still need stronger stage-family body/frame variants, lower-node silhouette recomposition, complete route-state material, visible tooltip/readability zones, mobile/responsive review, user acceptance, and final concept-match approval next.

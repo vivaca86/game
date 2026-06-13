@@ -591,6 +591,15 @@ const targets = [
     nativeSize: { w: 210, h: 220 }
   },
   {
+    key: "ui_completed_stage_late_frame_concept",
+    kind: "completed_stage_frame",
+    source: path.join(rootDir, "assets", "concepts", "ui", "world_map_ui_concept_v001.png"),
+    output: path.join(rootDir, "assets", "source", "ui", "ui_completed_stage_late_frame_concept_v001.png"),
+    crop: { x: 622, y: 586, w: 170, h: 178 },
+    nativeSize: { w: 210, h: 220 },
+    stateVariant: "completedLate"
+  },
+  {
     key: "ui_completed_stage_body_wash_concept",
     kind: "world_map_stage_body_wash",
     source: path.join(rootDir, "assets", "concepts", "ui", "world_map_ui_concept_v001.png"),
@@ -598,6 +607,15 @@ const targets = [
     crop: { x: 622, y: 586, w: 170, h: 178 },
     nativeSize: { w: 210, h: 220 },
     stateVariant: "completed"
+  },
+  {
+    key: "ui_completed_stage_late_body_wash_concept",
+    kind: "world_map_stage_body_wash",
+    source: path.join(rootDir, "assets", "concepts", "ui", "world_map_ui_concept_v001.png"),
+    output: path.join(rootDir, "assets", "source", "ui", "ui_completed_stage_late_body_wash_concept_v001.png"),
+    crop: { x: 622, y: 586, w: 170, h: 178 },
+    nativeSize: { w: 210, h: 220 },
+    stateVariant: "completedLate"
   },
   {
     key: "ui_locked_stage_frame_concept",
@@ -1398,7 +1416,7 @@ try {
         nativeSize: target.nativeSize
       })
       : target.kind === "completed_stage_frame"
-      ? await page.evaluate(async ({ base64, crop, nativeSize }) => {
+      ? await page.evaluate(async ({ base64, crop, nativeSize, stateVariant }) => {
         const image = await new Promise((resolve, reject) => {
           const img = new Image();
           img.onload = () => resolve(img);
@@ -1419,6 +1437,7 @@ try {
         const centerY = nativeSize.h * 0.48;
         const checkX = nativeSize.w * 0.5;
         const checkY = nativeSize.h * 0.8;
+        const lateVariant = stateVariant === "completedLate";
 
         for (let y = 0; y < nativeSize.h; y += 1) {
           for (let x = 0; x < nativeSize.w; x += 1) {
@@ -1468,7 +1487,10 @@ try {
             const gold = smoothstep(44, 142, r + g * 0.78 - b * 1.5 + saturation * 0.16);
             const parchment = r > 126 && g > 100 && b > 72 && saturation < 86;
 
-            let keep = Math.max(green * 1.06, cyan * 0.96, gold * 0.16) * ring * routeCutout;
+            const colorKeep = lateVariant
+              ? Math.max(green * 0.82, cyan * 0.68, gold * 0.12)
+              : Math.max(green * 1.06, cyan * 0.96, gold * 0.16);
+            let keep = colorKeep * ring * routeCutout;
             if (parchment && green < 0.3 && cyan < 0.32 && gold < 0.5) keep = 0;
 
             if (keep <= 0.08) {
@@ -1476,10 +1498,18 @@ try {
               continue;
             }
 
-            data[offset] = Math.min(255, Math.round(r * 1.02 + gold * 9));
-            data[offset + 1] = Math.min(255, Math.round(g * 1.06 + green * 16 + cyan * 6));
-            data[offset + 2] = Math.min(255, Math.round(b * 1.02 + cyan * 10));
-            data[offset + 3] = Math.round(Math.min(232, 238 * keep * (0.58 + outerFalloff * 0.46)));
+            if (lateVariant) {
+              data[offset] = Math.min(255, Math.round(r * 0.98 + gold * 6));
+              data[offset + 1] = Math.min(255, Math.round(g * 1.01 + green * 9 + cyan * 3));
+              data[offset + 2] = Math.min(255, Math.round(b * 1.0 + cyan * 6));
+            } else {
+              data[offset] = Math.min(255, Math.round(r * 1.02 + gold * 9));
+              data[offset + 1] = Math.min(255, Math.round(g * 1.06 + green * 16 + cyan * 6));
+              data[offset + 2] = Math.min(255, Math.round(b * 1.02 + cyan * 10));
+            }
+            const alphaScale = lateVariant ? 0.78 : 1;
+            const alphaCap = lateVariant ? 200 : 232;
+            data[offset + 3] = Math.round(Math.min(alphaCap, 238 * keep * (0.58 + outerFalloff * 0.46) * alphaScale));
           }
         }
 
@@ -1507,7 +1537,8 @@ try {
       }, {
         base64: sourceBuffer.toString("base64"),
         crop: target.crop,
-        nativeSize: target.nativeSize
+        nativeSize: target.nativeSize,
+        stateVariant: target.stateVariant
       })
       : target.kind === "locked_stage_frame"
       ? await page.evaluate(async ({ base64, crop, nativeSize }) => {
@@ -1784,6 +1815,7 @@ try {
         const centerX = nativeSize.w * 0.49;
         const centerY = nativeSize.h * 0.5;
         const grayLockedVariant = stateVariant === "sealed" || stateVariant === "dormant";
+        const completedLateVariant = stateVariant === "completedLate";
         const numberY = stateVariant === "current"
           ? nativeSize.h * 0.43
           : stateVariant === "locked"
@@ -1791,12 +1823,12 @@ try {
             : grayLockedVariant
               ? nativeSize.h * 0.35
               : nativeSize.h * 0.36;
-        const numberRx = stateVariant === "locked" ? nativeSize.w * 0.31 : grayLockedVariant ? nativeSize.w * 0.27 : nativeSize.w * 0.21;
-        const numberRy = stateVariant === "locked" ? nativeSize.h * 0.24 : grayLockedVariant ? nativeSize.h * 0.22 : nativeSize.h * 0.17;
+        const numberRx = stateVariant === "locked" ? nativeSize.w * 0.31 : grayLockedVariant ? nativeSize.w * 0.27 : completedLateVariant ? nativeSize.w * 0.24 : nativeSize.w * 0.21;
+        const numberRy = stateVariant === "locked" ? nativeSize.h * 0.24 : grayLockedVariant ? nativeSize.h * 0.22 : completedLateVariant ? nativeSize.h * 0.19 : nativeSize.h * 0.17;
         const lowerIconY = stateVariant === "current" ? nativeSize.h * 0.63 : stateVariant === "locked" ? nativeSize.h * 0.67 : grayLockedVariant ? nativeSize.h * 0.72 : nativeSize.h * 0.77;
         const lowerIconX = stateVariant === "current" ? nativeSize.w * 0.79 : nativeSize.w * 0.5;
-        const lowerIconRx = stateVariant === "current" ? nativeSize.w * 0.18 : stateVariant === "locked" ? nativeSize.w * 0.38 : grayLockedVariant ? nativeSize.w * 0.32 : nativeSize.w * 0.28;
-        const lowerIconRy = stateVariant === "locked" ? nativeSize.h * 0.27 : grayLockedVariant ? nativeSize.h * 0.24 : nativeSize.h * 0.2;
+        const lowerIconRx = stateVariant === "current" ? nativeSize.w * 0.18 : stateVariant === "locked" ? nativeSize.w * 0.38 : grayLockedVariant ? nativeSize.w * 0.32 : completedLateVariant ? nativeSize.w * 0.31 : nativeSize.w * 0.28;
+        const lowerIconRy = stateVariant === "locked" ? nativeSize.h * 0.27 : grayLockedVariant ? nativeSize.h * 0.24 : completedLateVariant ? nativeSize.h * 0.22 : nativeSize.h * 0.2;
 
         for (let y = 0; y < nativeSize.h; y += 1) {
           for (let x = 0; x < nativeSize.w; x += 1) {
@@ -1862,6 +1894,8 @@ try {
               colorKeep = Math.max(cyan * 1.08, blue * 1.02, gold * 0.24, darkEdge * 0.16);
             } else if (stateVariant === "completed") {
               colorKeep = Math.max(green * 1.12, cyan * 0.82, gold * 0.22, darkEdge * 0.16);
+            } else if (completedLateVariant) {
+              colorKeep = Math.max(green * 0.86, cyan * 0.56, gold * 0.16, darkEdge * 0.12);
             } else if (grayLockedVariant) {
               colorKeep = Math.max(silver * 0.98, coolEdge * 1.04, gold * 0.2, darkEdge * 0.2);
             } else {
@@ -1890,6 +1924,10 @@ try {
               data[offset] = Math.min(255, Math.round(r * 1.0 + gold * 8));
               data[offset + 1] = Math.min(255, Math.round(g * 1.07 + green * 16 + cyan * 5));
               data[offset + 2] = Math.min(255, Math.round(b * 1.02 + cyan * 8));
+            } else if (completedLateVariant) {
+              data[offset] = Math.min(255, Math.round(r * 0.97 + gold * 5));
+              data[offset + 1] = Math.min(255, Math.round(g * 1.01 + green * 9 + cyan * 3));
+              data[offset + 2] = Math.min(255, Math.round(b * 1.0 + cyan * 5));
             } else if (grayLockedVariant) {
               data[offset] = Math.min(255, Math.round(r * 0.98 + gold * 6));
               data[offset + 1] = Math.min(255, Math.round(g * 1.01 + silver * 5));
@@ -1899,7 +1937,9 @@ try {
               data[offset + 1] = Math.min(255, Math.round(g * 0.96 + gold * 9));
               data[offset + 2] = Math.max(0, Math.round(b * 0.9));
             }
-            data[offset + 3] = Math.round(Math.min(216, 220 * keep * (0.48 + outerFalloff * 0.36)));
+            const alphaScale = completedLateVariant ? 0.78 : 1;
+            const alphaCap = completedLateVariant ? 178 : 216;
+            data[offset + 3] = Math.round(Math.min(alphaCap, 220 * keep * (0.48 + outerFalloff * 0.36) * alphaScale));
           }
         }
 
