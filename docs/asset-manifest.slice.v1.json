@@ -723,6 +723,13 @@
       "styleKey": "premium_popup_book"
     },
     {
+      "key": "ui_locked_stage_boss_body_wash_concept",
+      "type": "image",
+      "path": "assets/runtime/ui/ui_locked_stage_boss_body_wash_concept_v001.png",
+      "nativeSize": { "w": 250, "h": 250 },
+      "styleKey": "premium_popup_book"
+    },
+    {
       "key": "ui_locked_stage_frame_concept",
       "type": "image",
       "path": "assets/runtime/ui/ui_locked_stage_frame_concept_v001.png",
@@ -734,6 +741,13 @@
       "type": "image",
       "path": "assets/runtime/ui/ui_locked_stage_far_frame_concept_v001.png",
       "nativeSize": { "w": 210, "h": 220 },
+      "styleKey": "premium_popup_book"
+    },
+    {
+      "key": "ui_locked_stage_boss_frame_concept",
+      "type": "image",
+      "path": "assets/runtime/ui/ui_locked_stage_boss_frame_concept_v001.png",
+      "nativeSize": { "w": 250, "h": 250 },
       "styleKey": "premium_popup_book"
     },
     {

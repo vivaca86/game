@@ -7,7 +7,7 @@ Repository:
 - GitHub: `https://github.com/vivaca86/game.git`
 - Branch: `main`
 - Latest pushed commit: run `git log -1 --oneline` after pulling.
-- Expected latest commit title after the 2026-06-14 WorldMap mid sealed-node continuation: `Add WorldMap mid sealed node variants`
+- Expected latest commit title after the 2026-06-14 WorldMap boss locked-node continuation: `Add WorldMap boss locked node variants`
 
 ## Start On Another PC
 
@@ -22,7 +22,7 @@ npm install
 Expected first commit title in `git log --oneline -5` after the latest continuation:
 
 ```text
-Add WorldMap mid sealed node variants
+Add WorldMap boss locked node variants
 ```
 
 Expected status:
@@ -124,6 +124,7 @@ Recommended next work:
    - WorldMap now has muted locked/future route thread/bead material separate from completed/current cyan route material.
    - WorldMap now has neutral lower-node body and frame layers under the first five lower map nodes, separate from current/completed/sealed/dormant state stacks.
    - WorldMap now splits first locked sealed-node body/frame material into lower/base and mid-route variants, with a stage-6/current evidence case for the mid sealed family.
+   - WorldMap now splits upper red locked body/frame material into next/base, far non-boss, and boss-sized variants. The stage 14/15 boss locks use the new boss family while the first red lock keeps the base family and non-boss distant locks keep the far family.
    - Continue broader gameplay-critical readable text, broader selected/focus approval, broader disabled-state breadth, final mobile UX review, and user acceptance.
    - Do not put explanatory text directly into the baked concept layers as a shortcut.
 
@@ -1093,3 +1094,47 @@ Representative evidence:
 - `tmp/ui-quality/worldmap/worldmap-progress-mid-sealed-stage6-v1-1920.png`
 
 Important limitation: this improves the sealed-node stage-family split, but it is still not full WorldMap node/body recomposition. Stronger stage-specific current/completed/locked/sealed/dormant body variants, broader disabled/focus/readability coverage outside the audited paths, user acceptance, and final concept-match approval remain.
+
+## 2026-06-14 WorldMap Boss Locked Node WIP Continuation
+
+Status remains `95% candidate, not final`.
+
+Additional local continuation work:
+
+- Added `ui_locked_stage_boss_body_wash_concept` and `ui_locked_stage_boss_frame_concept`.
+- The assets are extracted from the actual upper boss red-lock WorldMap crop and processed with number/lock/route/background-safe masking so the transferable material does not copy a full baked stage sticker.
+- `WorldMapScene` now chooses the boss locked body/frame family for stage indexes 13+ when available. The base red locked family still owns the first/next non-boss red lock, and the far red locked family still owns other non-boss red locks.
+- Updated release sharing, slice/docs manifests, dev runtime generation, and `tmp/ui-worldmap-action-hit-target-audit.mjs`.
+- The WorldMap action audit now splits red locked body/frame verification into next, far, and boss counts. Default, stage-4-progress, and mid-sealed states report 0 next + 4 far + 2 boss locked bodies/frames; late-progress reports 1 next + 3 far + 2 boss locked bodies/frames.
+
+Verification for this continuation:
+
+```powershell
+node tools\extract-ui-state-assets.mjs
+npm.cmd run assets:generate:dev
+node tmp\ui-worldmap-action-hit-target-audit.mjs
+npx.cmd tsc --noEmit
+npm.cmd run assets:audit:strict
+node tools\ui-worldmap-keyboard-tooltip-audit.mjs
+node tools\ui-worldmap-locked-tooltip-audit.mjs
+node tmp\route-node-raster-hover-state-audit.mjs
+npm.cmd run check
+git diff --check
+$env:PHASER_SMOKE_PROGRESS='1'
+$env:PHASER_SMOKE_PROGRESS_FILE='tmp/phaser-smoke-progress-worldmap-boss-lock-targeted.log'
+$env:PHASER_SMOKE_ONLY='checkViewScreenshots,checkClickableControls,checkFullInputCoverage,checkUiSkinStates'
+node tmp\run-phaser-smoke-with-vite.mjs
+```
+
+All listed checks passed. `npm.cmd run assets:audit:strict` reports `manifestAssets=493`, `existingFiles=493`, `missingFiles=0`, and `orphanFiles=0`. `npm.cmd run check` still reports only the existing Vite large JS chunk warning. The targeted smoke ended with `Phaser smoke OK`.
+
+Representative evidence:
+
+- `assets/source/ui/ui_locked_stage_boss_body_wash_concept_v001.png`
+- `assets/source/ui/ui_locked_stage_boss_frame_concept_v001.png`
+- `public/assets/runtime/ui/ui_locked_stage_boss_body_wash_concept_v001.png`
+- `public/assets/runtime/ui/ui_locked_stage_boss_frame_concept_v001.png`
+- `tmp/ui-quality/worldmap/worldmap-state-overlays-v1-1920.png`
+- `tmp/ui-quality/worldmap/worldmap-progress-current-stage9-v1-1920.png`
+
+Important limitation: this improves the upper red locked-node stage-family split, but it is still not full WorldMap node/body recomposition. Stronger stage-specific current/completed/locked/sealed/dormant body variants, broader disabled/focus/readability coverage outside the audited paths, user acceptance, and final concept-match approval remain.

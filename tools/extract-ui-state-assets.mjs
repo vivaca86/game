@@ -653,6 +653,15 @@ const targets = [
     stateVariant: "lockedFar"
   },
   {
+    key: "ui_locked_stage_boss_frame_concept",
+    kind: "locked_stage_frame",
+    source: path.join(rootDir, "assets", "concepts", "ui", "world_map_ui_concept_v001.png"),
+    output: path.join(rootDir, "assets", "source", "ui", "ui_locked_stage_boss_frame_concept_v001.png"),
+    crop: { x: 1000, y: 190, w: 250, h: 250 },
+    nativeSize: { w: 250, h: 250 },
+    stateVariant: "lockedBoss"
+  },
+  {
     key: "ui_locked_stage_body_wash_concept",
     kind: "world_map_stage_body_wash",
     source: path.join(rootDir, "assets", "concepts", "ui", "world_map_ui_concept_v001.png"),
@@ -669,6 +678,15 @@ const targets = [
     crop: { x: 708, y: 222, w: 170, h: 178 },
     nativeSize: { w: 210, h: 220 },
     stateVariant: "lockedFar"
+  },
+  {
+    key: "ui_locked_stage_boss_body_wash_concept",
+    kind: "world_map_stage_body_wash",
+    source: path.join(rootDir, "assets", "concepts", "ui", "world_map_ui_concept_v001.png"),
+    output: path.join(rootDir, "assets", "source", "ui", "ui_locked_stage_boss_body_wash_concept_v001.png"),
+    crop: { x: 1000, y: 190, w: 250, h: 250 },
+    nativeSize: { w: 250, h: 250 },
+    stateVariant: "lockedBoss"
   },
   {
     key: "ui_sealed_stage_frame_concept",
@@ -1976,6 +1994,7 @@ try {
         const lockX = nativeSize.w * 0.5;
         const lockY = nativeSize.h * 0.67;
         const lockedFarVariant = stateVariant === "lockedFar";
+        const lockedBossVariant = stateVariant === "lockedBoss";
 
         for (let y = 0; y < nativeSize.h; y += 1) {
           for (let x = 0; x < nativeSize.w; x += 1) {
@@ -1987,26 +2006,50 @@ try {
             const min = Math.min(r, g, b);
             const saturation = max - min;
             const luminance = r * 0.299 + g * 0.587 + b * 0.114;
-            const outer = [
-              { x: nativeSize.w * 0.5, y: nativeSize.h * 0.07 },
-              { x: nativeSize.w * 0.74, y: nativeSize.h * 0.2 },
-              { x: nativeSize.w * 0.84, y: nativeSize.h * 0.46 },
-              { x: nativeSize.w * 0.7, y: nativeSize.h * 0.75 },
-              { x: nativeSize.w * 0.5, y: nativeSize.h * 0.9 },
-              { x: nativeSize.w * 0.3, y: nativeSize.h * 0.75 },
-              { x: nativeSize.w * 0.16, y: nativeSize.h * 0.46 },
-              { x: nativeSize.w * 0.26, y: nativeSize.h * 0.2 }
-            ];
-            const inner = [
-              { x: nativeSize.w * 0.5, y: nativeSize.h * 0.22 },
-              { x: nativeSize.w * 0.63, y: nativeSize.h * 0.31 },
-              { x: nativeSize.w * 0.68, y: nativeSize.h * 0.48 },
-              { x: nativeSize.w * 0.61, y: nativeSize.h * 0.62 },
-              { x: nativeSize.w * 0.5, y: nativeSize.h * 0.7 },
-              { x: nativeSize.w * 0.39, y: nativeSize.h * 0.62 },
-              { x: nativeSize.w * 0.32, y: nativeSize.h * 0.48 },
-              { x: nativeSize.w * 0.37, y: nativeSize.h * 0.31 }
-            ];
+            const outer = lockedBossVariant
+              ? [
+                { x: nativeSize.w * 0.5, y: nativeSize.h * 0.04 },
+                { x: nativeSize.w * 0.67, y: nativeSize.h * 0.1 },
+                { x: nativeSize.w * 0.89, y: nativeSize.h * 0.2 },
+                { x: nativeSize.w * 0.96, y: nativeSize.h * 0.42 },
+                { x: nativeSize.w * 0.78, y: nativeSize.h * 0.73 },
+                { x: nativeSize.w * 0.5, y: nativeSize.h * 0.88 },
+                { x: nativeSize.w * 0.22, y: nativeSize.h * 0.73 },
+                { x: nativeSize.w * 0.04, y: nativeSize.h * 0.42 },
+                { x: nativeSize.w * 0.11, y: nativeSize.h * 0.2 },
+                { x: nativeSize.w * 0.33, y: nativeSize.h * 0.1 }
+              ]
+              : [
+                { x: nativeSize.w * 0.5, y: nativeSize.h * 0.07 },
+                { x: nativeSize.w * 0.74, y: nativeSize.h * 0.2 },
+                { x: nativeSize.w * 0.84, y: nativeSize.h * 0.46 },
+                { x: nativeSize.w * 0.7, y: nativeSize.h * 0.75 },
+                { x: nativeSize.w * 0.5, y: nativeSize.h * 0.9 },
+                { x: nativeSize.w * 0.3, y: nativeSize.h * 0.75 },
+                { x: nativeSize.w * 0.16, y: nativeSize.h * 0.46 },
+                { x: nativeSize.w * 0.26, y: nativeSize.h * 0.2 }
+              ];
+            const inner = lockedBossVariant
+              ? [
+                { x: nativeSize.w * 0.5, y: nativeSize.h * 0.25 },
+                { x: nativeSize.w * 0.63, y: nativeSize.h * 0.34 },
+                { x: nativeSize.w * 0.69, y: nativeSize.h * 0.49 },
+                { x: nativeSize.w * 0.6, y: nativeSize.h * 0.64 },
+                { x: nativeSize.w * 0.5, y: nativeSize.h * 0.72 },
+                { x: nativeSize.w * 0.4, y: nativeSize.h * 0.64 },
+                { x: nativeSize.w * 0.31, y: nativeSize.h * 0.49 },
+                { x: nativeSize.w * 0.37, y: nativeSize.h * 0.34 }
+              ]
+              : [
+                { x: nativeSize.w * 0.5, y: nativeSize.h * 0.22 },
+                { x: nativeSize.w * 0.63, y: nativeSize.h * 0.31 },
+                { x: nativeSize.w * 0.68, y: nativeSize.h * 0.48 },
+                { x: nativeSize.w * 0.61, y: nativeSize.h * 0.62 },
+                { x: nativeSize.w * 0.5, y: nativeSize.h * 0.7 },
+                { x: nativeSize.w * 0.39, y: nativeSize.h * 0.62 },
+                { x: nativeSize.w * 0.32, y: nativeSize.h * 0.48 },
+                { x: nativeSize.w * 0.37, y: nativeSize.h * 0.31 }
+              ];
             const outerMask = pointInPolygon(x, y, outer) ? 1 : 0;
             const innerCutout = pointInPolygon(x, y, inner) ? 0 : 1;
             const dx = (x - centerX) / (nativeSize.w * 0.44);
@@ -2032,15 +2075,18 @@ try {
             const parchment = r > 126 && g > 100 && b > 72 && saturation < 82;
             const brightRoute = r > 168 && g > 158 && b > 136 && saturation < 76;
 
-            const colorKeep = lockedFarVariant
-              ? Math.max(red * 0.76, gold * 0.16, darkEdge * 0.2)
-              : Math.max(red * 1.08, gold * 0.2, darkEdge * 0.28);
+            const colorKeep = lockedBossVariant
+              ? Math.max(red * 0.66, gold * 0.26, darkEdge * 0.26)
+              : lockedFarVariant
+                ? Math.max(red * 0.76, gold * 0.16, darkEdge * 0.2)
+                : Math.max(red * 1.08, gold * 0.2, darkEdge * 0.28);
             let keep = colorKeep
               * outerMask
               * innerCutout
               * numberCutout
               * lockCutout
               * routeCutout;
+            if (lockedBossVariant && x < nativeSize.w * 0.2 && y < nativeSize.h * 0.24) keep = 0;
             if ((parchment && red < 0.34 && gold < 0.48) || brightRoute) keep = 0;
 
             if (keep <= 0.08) {
@@ -2048,7 +2094,11 @@ try {
               continue;
             }
 
-            if (lockedFarVariant) {
+            if (lockedBossVariant) {
+              data[offset] = Math.min(255, Math.round(r * 0.99 + red * 10 + gold * 8));
+              data[offset + 1] = Math.min(255, Math.round(g * 0.95 + gold * 8));
+              data[offset + 2] = Math.max(0, Math.round(b * 0.86));
+            } else if (lockedFarVariant) {
               data[offset] = Math.min(255, Math.round(r * 0.98 + red * 12 + gold * 5));
               data[offset + 1] = Math.min(255, Math.round(g * 0.94 + gold * 6));
               data[offset + 2] = Math.max(0, Math.round(b * 0.86));
@@ -2057,8 +2107,8 @@ try {
               data[offset + 1] = Math.min(255, Math.round(g * 0.96 + gold * 10));
               data[offset + 2] = Math.max(0, Math.round(b * 0.9));
             }
-            const alphaCap = lockedFarVariant ? 188 : 232;
-            const alphaScale = lockedFarVariant ? 0.78 : 1;
+            const alphaCap = lockedBossVariant ? 178 : lockedFarVariant ? 188 : 232;
+            const alphaScale = lockedBossVariant ? 0.72 : lockedFarVariant ? 0.78 : 1;
             data[offset + 3] = Math.round(Math.min(alphaCap, 238 * keep * (0.58 + outerFalloff * 0.46) * alphaScale));
           }
         }
@@ -2259,7 +2309,8 @@ try {
         const centerX = nativeSize.w * 0.49;
         const centerY = nativeSize.h * 0.5;
         const lockedFarVariant = stateVariant === "lockedFar";
-        const redLockedVariant = stateVariant === "locked" || lockedFarVariant;
+        const lockedBossVariant = stateVariant === "lockedBoss";
+        const redLockedVariant = stateVariant === "locked" || lockedFarVariant || lockedBossVariant;
         const sealedMidVariant = stateVariant === "sealedMid";
         const grayLockedVariant = stateVariant === "sealed" || sealedMidVariant || stateVariant === "dormant" || stateVariant === "dormantMid";
         const completedLateVariant = stateVariant === "completedLate";
@@ -2274,12 +2325,12 @@ try {
             : grayLockedVariant
               ? nativeSize.h * 0.35
               : nativeSize.h * 0.36;
-        const numberRx = redLockedVariant ? nativeSize.w * (lockedFarVariant ? 0.32 : 0.31) : grayLockedVariant ? nativeSize.w * (subduedGrayMidVariant ? 0.29 : 0.27) : completedLateVariant ? nativeSize.w * 0.24 : currentLateVariant ? nativeSize.w * 0.23 : nativeSize.w * 0.21;
-        const numberRy = redLockedVariant ? nativeSize.h * (lockedFarVariant ? 0.25 : 0.24) : grayLockedVariant ? nativeSize.h * (subduedGrayMidVariant ? 0.23 : 0.22) : completedLateVariant ? nativeSize.h * 0.19 : currentLateVariant ? nativeSize.h * 0.18 : nativeSize.h * 0.17;
+        const numberRx = redLockedVariant ? nativeSize.w * (lockedBossVariant ? 0.29 : lockedFarVariant ? 0.32 : 0.31) : grayLockedVariant ? nativeSize.w * (subduedGrayMidVariant ? 0.29 : 0.27) : completedLateVariant ? nativeSize.w * 0.24 : currentLateVariant ? nativeSize.w * 0.23 : nativeSize.w * 0.21;
+        const numberRy = redLockedVariant ? nativeSize.h * (lockedBossVariant ? 0.22 : lockedFarVariant ? 0.25 : 0.24) : grayLockedVariant ? nativeSize.h * (subduedGrayMidVariant ? 0.23 : 0.22) : completedLateVariant ? nativeSize.h * 0.19 : currentLateVariant ? nativeSize.h * 0.18 : nativeSize.h * 0.17;
         const lowerIconY = currentVariant ? nativeSize.h * 0.63 : redLockedVariant ? nativeSize.h * 0.67 : grayLockedVariant ? nativeSize.h * 0.72 : nativeSize.h * 0.77;
         const lowerIconX = currentVariant ? nativeSize.w * 0.79 : nativeSize.w * 0.5;
-        const lowerIconRx = currentVariant ? nativeSize.w * 0.18 : redLockedVariant ? nativeSize.w * 0.38 : grayLockedVariant ? nativeSize.w * 0.32 : completedLateVariant ? nativeSize.w * 0.31 : nativeSize.w * 0.28;
-        const lowerIconRy = redLockedVariant ? nativeSize.h * 0.27 : grayLockedVariant ? nativeSize.h * 0.24 : completedLateVariant ? nativeSize.h * 0.22 : nativeSize.h * 0.2;
+        const lowerIconRx = currentVariant ? nativeSize.w * 0.18 : redLockedVariant ? nativeSize.w * (lockedBossVariant ? 0.34 : 0.38) : grayLockedVariant ? nativeSize.w * 0.32 : completedLateVariant ? nativeSize.w * 0.31 : nativeSize.w * 0.28;
+        const lowerIconRy = redLockedVariant ? nativeSize.h * (lockedBossVariant ? 0.24 : 0.27) : grayLockedVariant ? nativeSize.h * 0.24 : completedLateVariant ? nativeSize.h * 0.22 : nativeSize.h * 0.2;
 
         for (let y = 0; y < nativeSize.h; y += 1) {
           for (let x = 0; x < nativeSize.w; x += 1) {
@@ -2291,16 +2342,29 @@ try {
             const min = Math.min(r, g, b);
             const saturation = max - min;
             const luminance = r * 0.299 + g * 0.587 + b * 0.114;
-            const outer = [
-              { x: nativeSize.w * 0.5, y: nativeSize.h * 0.09 },
-              { x: nativeSize.w * 0.76, y: nativeSize.h * 0.22 },
-              { x: nativeSize.w * 0.84, y: nativeSize.h * 0.49 },
-              { x: nativeSize.w * 0.68, y: nativeSize.h * 0.77 },
-              { x: nativeSize.w * 0.5, y: nativeSize.h * 0.89 },
-              { x: nativeSize.w * 0.32, y: nativeSize.h * 0.77 },
-              { x: nativeSize.w * 0.16, y: nativeSize.h * 0.49 },
-              { x: nativeSize.w * 0.24, y: nativeSize.h * 0.22 }
-            ];
+            const outer = lockedBossVariant
+              ? [
+                { x: nativeSize.w * 0.5, y: nativeSize.h * 0.06 },
+                { x: nativeSize.w * 0.68, y: nativeSize.h * 0.12 },
+                { x: nativeSize.w * 0.88, y: nativeSize.h * 0.23 },
+                { x: nativeSize.w * 0.94, y: nativeSize.h * 0.48 },
+                { x: nativeSize.w * 0.75, y: nativeSize.h * 0.76 },
+                { x: nativeSize.w * 0.5, y: nativeSize.h * 0.89 },
+                { x: nativeSize.w * 0.25, y: nativeSize.h * 0.76 },
+                { x: nativeSize.w * 0.06, y: nativeSize.h * 0.48 },
+                { x: nativeSize.w * 0.12, y: nativeSize.h * 0.23 },
+                { x: nativeSize.w * 0.32, y: nativeSize.h * 0.12 }
+              ]
+              : [
+                { x: nativeSize.w * 0.5, y: nativeSize.h * 0.09 },
+                { x: nativeSize.w * 0.76, y: nativeSize.h * 0.22 },
+                { x: nativeSize.w * 0.84, y: nativeSize.h * 0.49 },
+                { x: nativeSize.w * 0.68, y: nativeSize.h * 0.77 },
+                { x: nativeSize.w * 0.5, y: nativeSize.h * 0.89 },
+                { x: nativeSize.w * 0.32, y: nativeSize.h * 0.77 },
+                { x: nativeSize.w * 0.16, y: nativeSize.h * 0.49 },
+                { x: nativeSize.w * 0.24, y: nativeSize.h * 0.22 }
+              ];
             const outerMask = pointInPolygon(x, y, outer) ? 1 : 0;
             const dx = (x - centerX) / (nativeSize.w * 0.43);
             const dy = (y - centerY) / (nativeSize.h * 0.45);
@@ -2355,6 +2419,8 @@ try {
               colorKeep = Math.max(silver * 0.82, coolEdge * 0.9, gold * 0.14, darkEdge * 0.16);
             } else if (grayLockedVariant) {
               colorKeep = Math.max(silver * 0.98, coolEdge * 1.04, gold * 0.2, darkEdge * 0.2);
+            } else if (lockedBossVariant) {
+              colorKeep = Math.max(red * 0.68, gold * 0.24, darkEdge * 0.18);
             } else if (lockedFarVariant) {
               colorKeep = Math.max(red * 0.8, gold * 0.16, darkEdge * 0.16);
             } else {
@@ -2368,6 +2434,7 @@ try {
               * lowerCutout
               * currentMarkerCutout
               * routeCutout;
+            if (lockedBossVariant && x < nativeSize.w * 0.2 && y < nativeSize.h * 0.24) keep = 0;
             if ((parchment && colorKeep < 0.42) || brightRoute) keep = 0;
 
             if (keep <= 0.06) {
@@ -2403,6 +2470,10 @@ try {
               data[offset] = Math.min(255, Math.round(r * 0.98 + gold * 6));
               data[offset + 1] = Math.min(255, Math.round(g * 1.01 + silver * 5));
               data[offset + 2] = Math.min(255, Math.round(b * 1.03 + coolEdge * 9));
+            } else if (lockedBossVariant) {
+              data[offset] = Math.min(255, Math.round(r * 0.98 + red * 10 + gold * 7));
+              data[offset + 1] = Math.min(255, Math.round(g * 0.94 + gold * 7));
+              data[offset + 2] = Math.max(0, Math.round(b * 0.86));
             } else if (lockedFarVariant) {
               data[offset] = Math.min(255, Math.round(r * 0.98 + red * 12 + gold * 5));
               data[offset + 1] = Math.min(255, Math.round(g * 0.94 + gold * 6));
@@ -2412,8 +2483,8 @@ try {
               data[offset + 1] = Math.min(255, Math.round(g * 0.96 + gold * 9));
               data[offset + 2] = Math.max(0, Math.round(b * 0.9));
             }
-            const alphaScale = completedLateVariant || currentLateVariant || sealedMidVariant || dormantMidVariant || lockedFarVariant ? 0.78 : 1;
-            const alphaCap = completedLateVariant ? 178 : currentLateVariant ? 184 : sealedMidVariant ? 186 : dormantMidVariant ? 176 : lockedFarVariant ? 180 : 216;
+            const alphaScale = completedLateVariant || currentLateVariant || sealedMidVariant || dormantMidVariant || lockedFarVariant || lockedBossVariant ? 0.78 : 1;
+            const alphaCap = completedLateVariant ? 178 : currentLateVariant ? 184 : sealedMidVariant ? 186 : dormantMidVariant ? 176 : lockedBossVariant ? 168 : lockedFarVariant ? 180 : 216;
             data[offset + 3] = Math.round(Math.min(alphaCap, 220 * keep * (0.48 + outerFalloff * 0.36) * alphaScale));
           }
         }
