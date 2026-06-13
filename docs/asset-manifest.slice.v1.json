@@ -653,6 +653,13 @@
       "styleKey": "premium_popup_book"
     },
     {
+      "key": "ui_world_map_lower_node_body_concept",
+      "type": "image",
+      "path": "assets/runtime/ui/ui_world_map_lower_node_body_concept_v001.png",
+      "nativeSize": { "w": 210, "h": 220 },
+      "styleKey": "premium_popup_book"
+    },
+    {
       "key": "ui_completed_stage_body_wash_concept",
       "type": "image",
       "path": "assets/runtime/ui/ui_completed_stage_body_wash_concept_v001.png",

@@ -7,7 +7,7 @@ Repository:
 - GitHub: `https://github.com/vivaca86/game.git`
 - Branch: `main`
 - Latest pushed commit: run `git log -1 --oneline` after pulling.
-- Expected latest commit title after the 2026-06-14 WorldMap locked future route continuation: `Add WorldMap locked future routes`
+- Expected latest commit title after the 2026-06-14 WorldMap lower-node body continuation: `Add WorldMap lower node body layer`
 
 ## Start On Another PC
 
@@ -22,7 +22,7 @@ npm install
 Expected first commit title in `git log --oneline -5` after the latest continuation:
 
 ```text
-Add WorldMap locked future routes
+Add WorldMap lower node body layer
 ```
 
 Expected status:
@@ -122,6 +122,7 @@ Recommended next work:
    - WorldMap direction-key stage selection now shows the same DOM readability tooltip for the selected stage without adding another hover image.
    - Mobile portrait now has a non-blocking orientation/framing cue in unused letterbox space and suppresses it while readability tooltips are visible.
    - WorldMap now has muted locked/future route thread/bead material separate from completed/current cyan route material.
+   - WorldMap now has a neutral lower-node body layer under the first five lower map nodes, separate from current/completed/sealed/dormant state stacks.
    - Continue broader gameplay-critical readable text, broader selected/focus approval, broader disabled-state breadth, final mobile UX review, and user acceptance.
    - Do not put explanatory text directly into the baked concept layers as a shortcut.
 
@@ -957,3 +958,48 @@ Representative evidence:
 - `tmp/ui-quality/worldmap/worldmap-keyboard-stage-select-v1-1920.png`
 
 Important limitation: this improves route-state texture-family separation, but it is still not full WorldMap recomposition. The map still needs deeper node/body variants, lower-node silhouette recomposition, broader disabled/focus coverage outside the audited paths, user acceptance, and final concept-match approval.
+
+## 2026-06-14 WorldMap Lower Node Body WIP Continuation
+
+Status remains `Partially complete`.
+
+Current estimate remains about a 95% candidate of the active UI goal, not final, release-ready, or user-accepted 95%.
+
+Additional local continuation work:
+
+- Added `ui_world_map_lower_node_body_concept`.
+- The asset is extracted from `assets/concepts/ui/world_map_ui_concept_v001.png` from the lower completed-node source family, but processed as a number/check-free neutral paper body so it does not carry the source stage number or completed badge into other runtime states.
+- `WorldMapScene` renders this neutral lower-node body layer on the first five lower map nodes at low depth, after the underlay but below completed/current/locked route overlays and below state body/frame/badge stacks.
+- The layer is deliberately conservative: it reduces baked lower-node silhouettes and old completed/current scars without replacing state-specific current/completed/sealed/dormant material.
+- Updated `tmp/ui-worldmap-action-hit-target-audit.mjs` to verify exactly five lower-node body images, placement, size, and alpha in default, stage-4-progress, and stage-9-progress WorldMap states.
+
+Verification for this continuation:
+
+```powershell
+node tools\extract-ui-state-assets.mjs
+npm.cmd run assets:generate:dev
+npx.cmd tsc --noEmit
+git diff --check
+npm.cmd run assets:audit:strict
+node tmp\ui-worldmap-action-hit-target-audit.mjs
+node tmp\route-node-raster-hover-state-audit.mjs
+node tools\ui-worldmap-keyboard-tooltip-audit.mjs
+node tools\ui-worldmap-locked-tooltip-audit.mjs
+npm.cmd run check
+$env:PHASER_SMOKE_PROGRESS='1'
+$env:PHASER_SMOKE_PROGRESS_FILE='tmp/phaser-smoke-progress-worldmap-lower-node-body-targeted.log'
+$env:PHASER_SMOKE_ONLY='checkViewScreenshots,checkClickableControls,checkFullInputCoverage,checkUiSkinStates'
+node tmp\run-phaser-smoke-with-vite.mjs
+```
+
+All listed checks passed. `npm.cmd run assets:audit:strict` reports `manifestAssets=488`, `existingFiles=488`, `missingFiles=0`, and `orphanFiles=0`. The WorldMap action audit now reports `visibleLowerNodeBodies=5` / `expectedLowerNodeBodies=5` for default, stage-4-progress, and stage-9-progress states, with placement/style checks passing.
+
+Representative evidence:
+
+- `assets/source/ui/ui_world_map_lower_node_body_concept_v001.png`
+- `public/assets/runtime/ui/ui_world_map_lower_node_body_concept_v001.png`
+- `tmp/ui-quality/worldmap/worldmap-state-overlays-v1-1920.png`
+- `tmp/ui-quality/worldmap/worldmap-progress-current-stage4-v1-1920.png`
+- `tmp/ui-quality/worldmap/worldmap-progress-current-stage9-v1-1920.png`
+
+Important limitation: this improves lower-node silhouette recomposition, but it is still not full WorldMap node/body recomposition. The map still needs stronger stage-specific current/completed/locked/sealed/dormant body variants, broader disabled/focus/readability coverage outside the audited paths, user acceptance, and final concept-match approval.

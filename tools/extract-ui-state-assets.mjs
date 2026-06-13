@@ -791,6 +791,14 @@ const targets = [
     nativeSize: { w: 96, h: 96 }
   },
   {
+    key: "ui_world_map_lower_node_body_concept",
+    kind: "world_map_lower_node_body",
+    source: path.join(rootDir, "assets", "concepts", "ui", "world_map_ui_concept_v001.png"),
+    output: path.join(rootDir, "assets", "source", "ui", "ui_world_map_lower_node_body_concept_v001.png"),
+    crop: { x: 622, y: 586, w: 170, h: 178 },
+    nativeSize: { w: 210, h: 220 }
+  },
+  {
     key: "ui_completed_stage_badge_concept",
     kind: "world_map_stage_badge",
     source: path.join(rootDir, "assets", "concepts", "ui", "world_map_ui_concept_v001.png"),
@@ -1413,6 +1421,144 @@ try {
         crop: target.crop,
         nativeSize: target.nativeSize,
         stateVariant: target.stateVariant
+      })
+      : target.kind === "world_map_lower_node_body"
+      ? await page.evaluate(async ({ base64, crop, nativeSize }) => {
+        const image = await new Promise((resolve, reject) => {
+          const img = new Image();
+          img.onload = () => resolve(img);
+          img.onerror = () => reject(new Error("source concept image failed to load"));
+          img.src = `data:image/png;base64,${base64}`;
+        });
+
+        const canvas = document.createElement("canvas");
+        canvas.width = nativeSize.w;
+        canvas.height = nativeSize.h;
+        const ctx = canvas.getContext("2d", { willReadFrequently: true });
+        if (!ctx) throw new Error("2d canvas context unavailable");
+
+        ctx.drawImage(image, crop.x, crop.y, crop.w, crop.h, 0, 0, nativeSize.w, nativeSize.h);
+        const imageData = ctx.getImageData(0, 0, nativeSize.w, nativeSize.h);
+        const data = imageData.data;
+        const centerX = nativeSize.w * 0.5;
+        const centerY = nativeSize.h * 0.5;
+        const numberY = nativeSize.h * 0.36;
+        const checkY = nativeSize.h * 0.78;
+        const outer = [
+          { x: nativeSize.w * 0.5, y: nativeSize.h * 0.09 },
+          { x: nativeSize.w * 0.76, y: nativeSize.h * 0.22 },
+          { x: nativeSize.w * 0.84, y: nativeSize.h * 0.49 },
+          { x: nativeSize.w * 0.68, y: nativeSize.h * 0.77 },
+          { x: nativeSize.w * 0.5, y: nativeSize.h * 0.89 },
+          { x: nativeSize.w * 0.32, y: nativeSize.h * 0.77 },
+          { x: nativeSize.w * 0.16, y: nativeSize.h * 0.49 },
+          { x: nativeSize.w * 0.24, y: nativeSize.h * 0.22 }
+        ];
+
+        for (let y = 0; y < nativeSize.h; y += 1) {
+          for (let x = 0; x < nativeSize.w; x += 1) {
+            const offset = (y * nativeSize.w + x) * 4;
+            const r = data[offset];
+            const g = data[offset + 1];
+            const b = data[offset + 2];
+            const max = Math.max(r, g, b);
+            const min = Math.min(r, g, b);
+            const saturation = max - min;
+            const luminance = r * 0.299 + g * 0.587 + b * 0.114;
+            const outerMask = pointInPolygon(x, y, outer) ? 1 : 0;
+            const radial = Math.hypot((x - centerX) / (nativeSize.w * 0.43), (y - centerY) / (nativeSize.h * 0.45));
+            const outerFalloff = 1 - smoothstep(0.76, 1.13, radial);
+            const numberMask = 1 - smoothstep(
+              0.8,
+              1.18,
+              Math.hypot((x - centerX) / (nativeSize.w * 0.36), (y - numberY) / (nativeSize.h * 0.28))
+            );
+            const checkDistance = Math.hypot((x - centerX) / (nativeSize.w * 0.32), (y - checkY) / (nativeSize.h * 0.21));
+            const checkMask = 1 - smoothstep(
+              0.72,
+              1.04,
+              checkDistance
+            );
+            const centerPatchMask = 1 - smoothstep(
+              0.66,
+              1.04,
+              Math.hypot((x - centerX) / (nativeSize.w * 0.4), (y - numberY) / (nativeSize.h * 0.3))
+            );
+            const symbolMask = Math.max(numberMask, centerPatchMask);
+            const checkCutout = smoothstep(0.78, 1.06, checkDistance);
+            const sideRouteCutout = (x < nativeSize.w * 0.16 || x > nativeSize.w * 0.78) && y > nativeSize.h * 0.36 ? 0 : 1;
+            const lowerRouteCutout = y > nativeSize.h * 0.74 && (x < nativeSize.w * 0.34 || x > nativeSize.w * 0.66) ? 0 : 1;
+            const lowerBadgeCutout = y > nativeSize.h * 0.58 && x > nativeSize.w * 0.16 && x < nativeSize.w * 0.84 ? 0 : 1;
+            const rightArtifactCutout = 1 - smoothstep(0.58, 0.74, x / nativeSize.w) * smoothstep(0.38, 0.64, y / nativeSize.h);
+            const routeCutout = sideRouteCutout * lowerRouteCutout * lowerBadgeCutout * checkCutout * rightArtifactCutout;
+            const paper = smoothstep(70, 190, luminance) * (1 - smoothstep(70, 164, saturation));
+            const gold = smoothstep(42, 142, r + g * 0.72 - b * 1.46 + saturation * 0.16);
+            const green = smoothstep(18, 112, g - Math.max(r, b) * 0.7 + saturation * 0.12);
+            const darkEdge = (1 - smoothstep(48, 138, luminance)) * smoothstep(16, 108, saturation);
+            let keep = Math.max(paper * 0.9, gold * 0.56, green * 0.24, darkEdge * 0.42)
+              * outerMask
+              * outerFalloff
+              * routeCutout;
+            keep = Math.max(keep, centerPatchMask * outerMask * outerFalloff * 0.92);
+            keep *= lowerBadgeCutout;
+
+            if (keep <= 0.035) {
+              data[offset + 3] = 0;
+              continue;
+            }
+
+            const symbolFlatten = Math.max(0, Math.min(1, symbolMask));
+            const symbolR = 130 + paper * 4;
+            const symbolG = 109 + paper * 4;
+            const symbolB = 80 + paper * 3;
+            const neutralR = Math.min(255, (108 + luminance * 0.36 + gold * 16 + darkEdge * 8) * (1 - symbolFlatten) + symbolR * symbolFlatten);
+            const neutralG = Math.min(255, (92 + luminance * 0.32 + gold * 11 + paper * 8) * (1 - symbolFlatten) + symbolG * symbolFlatten);
+            const neutralB = Math.min(255, (70 + luminance * 0.24 + paper * 6 - green * 6) * (1 - symbolFlatten) + symbolB * symbolFlatten);
+            const sourceMix = symbolFlatten > 0.08 ? 0 : 0.18;
+            const warmMix = 1 - sourceMix;
+            const patchStrength = smoothstep(0.08, 0.58, centerPatchMask);
+            const checkSuppress = smoothstep(0.08, 0.68, checkMask);
+            let outR = r * sourceMix + neutralR * warmMix;
+            let outG = g * sourceMix + neutralG * warmMix;
+            let outB = b * sourceMix + neutralB * warmMix;
+            let outA = Math.min(212, 190 * keep * (0.48 + outerFalloff * 0.42 + darkEdge * 0.1));
+            outR = outR * (1 - patchStrength) + 130 * patchStrength;
+            outG = outG * (1 - patchStrength) + 109 * patchStrength;
+            outB = outB * (1 - patchStrength) + 80 * patchStrength;
+            outA = Math.max(outA, 178 * patchStrength * outerMask * outerFalloff * lowerBadgeCutout);
+            outA *= 1 - checkSuppress;
+            data[offset] = Math.round(outR);
+            data[offset + 1] = Math.round(outG);
+            data[offset + 2] = Math.round(outB);
+            data[offset + 3] = Math.round(outA);
+          }
+        }
+
+        ctx.putImageData(imageData, 0, 0);
+        return canvas.toDataURL("image/png");
+
+        function smoothstep(edge0, edge1, value) {
+          const t = Math.max(0, Math.min(1, (value - edge0) / Math.max(1, edge1 - edge0)));
+          return t * t * (3 - 2 * t);
+        }
+
+        function pointInPolygon(x, y, polygon) {
+          let inside = false;
+          for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i, i += 1) {
+            const xi = polygon[i].x;
+            const yi = polygon[i].y;
+            const xj = polygon[j].x;
+            const yj = polygon[j].y;
+            const intersects = ((yi > y) !== (yj > y))
+              && x < ((xj - xi) * (y - yi)) / ((yj - yi) || 1) + xi;
+            if (intersects) inside = !inside;
+          }
+          return inside;
+        }
+      }, {
+        base64: sourceBuffer.toString("base64"),
+        crop: target.crop,
+        nativeSize: target.nativeSize
       })
       : target.kind === "current_stage_frame"
       ? await page.evaluate(async ({ base64, crop, nativeSize, stateVariant }) => {

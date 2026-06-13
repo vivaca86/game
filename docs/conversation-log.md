@@ -2192,3 +2192,15 @@ Added `ui_world_map_route_locked_thread_concept` and `ui_world_map_route_locked_
 Verification passed with `npx.cmd tsc --noEmit`, `git diff --check`, `npm.cmd run assets:audit:strict`, `node tmp\ui-worldmap-action-hit-target-audit.mjs`, `node tmp\route-node-raster-hover-state-audit.mjs`, `node tools\ui-worldmap-keyboard-tooltip-audit.mjs`, `node tools\ui-worldmap-locked-tooltip-audit.mjs`, `npm.cmd run check`, and targeted `$env:PHASER_SMOKE_ONLY='checkViewScreenshots,checkClickableControls,checkFullInputCoverage,checkUiSkinStates'; node tmp\run-phaser-smoke-with-vite.mjs` ending in `Phaser smoke OK`.
 
 This remains a 95% candidate rather than final approval. Route-state texture-family separation is stronger now, but full WorldMap node/body recomposition, lower-node silhouette replacement, broader disabled/focus/readability coverage, user acceptance, and final concept-match approval remain unfinished.
+
+### Codex
+
+Codex continued the 95% candidate UI goal by targeting the remaining WorldMap lower-node silhouette gap. The locked/future route split improved route-state truth, but the lower 1-5 node family still relied mostly on neutralized underlay samples plus state-specific overlays.
+
+Added `ui_world_map_lower_node_body_concept`, a neutral lower-node body layer extracted from the lower completed-node concept crop. The extraction now removes the source number/check badge so the asset can sit under current/completed/sealed/dormant state stacks without carrying a baked state. `WorldMapScene` renders it on the first five lower nodes after the underlay and below route overlays plus state body/frame/badge stacks.
+
+`tmp/ui-worldmap-action-hit-target-audit.mjs` now verifies the lower-node body layer separately. The audit passed in default, stage-4-progress, and stage-9-progress WorldMap states with `visibleLowerNodeBodies=5`, `expectedLowerNodeBodies=5`, and placement/style checks passing.
+
+Verification passed with `node tools\extract-ui-state-assets.mjs`, `npm.cmd run assets:generate:dev`, `npx.cmd tsc --noEmit`, `git diff --check`, `npm.cmd run assets:audit:strict`, `node tmp\ui-worldmap-action-hit-target-audit.mjs`, `node tmp\route-node-raster-hover-state-audit.mjs`, `node tools\ui-worldmap-keyboard-tooltip-audit.mjs`, `node tools\ui-worldmap-locked-tooltip-audit.mjs`, `npm.cmd run check`, and targeted `$env:PHASER_SMOKE_ONLY='checkViewScreenshots,checkClickableControls,checkFullInputCoverage,checkUiSkinStates'; node tmp\run-phaser-smoke-with-vite.mjs` ending in `Phaser smoke OK`.
+
+This improves lower-node silhouette recomposition but is still not final WorldMap node/body recomposition. Stronger stage-specific current/completed/locked/sealed/dormant body variants, broader disabled/focus/readability coverage, user acceptance, and final concept-match approval remain unfinished.

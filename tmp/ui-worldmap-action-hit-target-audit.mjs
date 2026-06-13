@@ -858,6 +858,11 @@ async function runStateOverlayAudit(browser, baseUrl, auditCase) {
         && child.texture?.key === "ui_current_stage_status_badge_concept"
         && (child.alpha ?? 1) > 0.05
       ));
+      const lowerNodeBodyImages = visible.filter((child) => (
+        child?.type === "Image"
+        && child.texture?.key === "ui_world_map_lower_node_body_concept"
+        && (child.alpha ?? 1) > 0.05
+      ));
       const currentIndex = stages.findIndex((stage) => stage.id === currentStageId);
       const currentNode = stageNodes[currentIndex];
       const expectedMarker = currentNode
@@ -1056,6 +1061,16 @@ async function runStateOverlayAudit(browser, baseUrl, auditCase) {
         height: node.height * 1.16,
         minAlpha: 0.64
       });
+      const lowerNodeBodyPlacement = (node, stageIndex) => {
+        const largerSourceNode = stageIndex === 3;
+        return {
+          x: node.x + node.width * 0.02,
+          y: node.y + node.height * (largerSourceNode ? 0.05 : 0.04),
+          width: node.width * (largerSourceNode ? 1.08 : 1.14),
+          height: node.height * (largerSourceNode ? 1.14 : 1.2),
+          minAlpha: largerSourceNode ? 0.42 : 0.48
+        };
+      };
       const completedBodyPlacement = (node, stageIndex) => ({
         x: node.x + node.width * 0.02,
         y: node.y + node.height * 0.04,
@@ -1137,6 +1152,21 @@ async function runStateOverlayAudit(browser, baseUrl, auditCase) {
       const completedBadgeImagesForIndex = (stageIndex) => stageIndex > 2 ? completedLateImages : completedBaseImages;
       const completedBodyImagesForIndex = (stageIndex) => stageIndex > 2 ? completedLateBodyImages : completedBaseBodyImages;
       const completedFrameImagesForIndex = (stageIndex) => stageIndex > 2 ? completedLateFrameImages : completedBaseFrameImages;
+      const expectedLowerNodeBodies = stageNodes
+        .slice(0, 5)
+        .map((node, index) => ({ node, index }));
+      const lowerNodeBodiesAtExpectedNodes = expectedLowerNodeBodies.every(({ node, index }) => {
+        const placement = lowerNodeBodyPlacement(node, index);
+        return hasImageAt(lowerNodeBodyImages, placement.x, placement.y);
+      });
+      const lowerNodeBodyStyleAtExpectedNodes = expectedLowerNodeBodies.every(({ node, index }) => {
+        const placement = lowerNodeBodyPlacement(node, index);
+        const image = imageAt(lowerNodeBodyImages, placement.x, placement.y);
+        return image
+          && Math.abs(image.displayWidth - placement.width) <= 1
+          && Math.abs(image.displayHeight - placement.height) <= 1
+          && (image.alpha ?? 1) >= placement.minAlpha;
+      });
       const completedAtExpectedNodes = expectedCompleted.every(({ node, index }) => (
         hasImageAt(completedBadgeImagesForIndex(index), completedBadgePlacement(node, index).x, completedBadgePlacement(node, index).y)
       ));
@@ -1381,7 +1411,10 @@ async function runStateOverlayAudit(browser, baseUrl, auditCase) {
       ));
 
       return {
-        ok: completedImages.length === expectedCompleted.length
+        ok: lowerNodeBodyImages.length === expectedLowerNodeBodies.length
+          && lowerNodeBodiesAtExpectedNodes
+          && lowerNodeBodyStyleAtExpectedNodes
+          && completedImages.length === expectedCompleted.length
           && completedBaseImages.length === expectedCompletedBase.length
           && completedLateImages.length === expectedCompletedLate.length
           && routeThreadImages.length === expectedRouteThreads.length
@@ -1467,6 +1500,10 @@ async function runStateOverlayAudit(browser, baseUrl, auditCase) {
         currentStageId,
         completedStageIds: [...completedStageIds],
         unlockedStageIds: [...unlockedStageIds],
+        visibleLowerNodeBodies: lowerNodeBodyImages.length,
+        expectedLowerNodeBodies: expectedLowerNodeBodies.length,
+        lowerNodeBodiesAtExpectedNodes,
+        lowerNodeBodyStyleAtExpectedNodes,
         visibleRouteThreads: routeThreadImages.length,
         expectedRouteThreads: expectedRouteThreads.length,
         visibleRouteBaseThreads: routeBaseThreadImages.length,
