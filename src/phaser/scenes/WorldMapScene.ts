@@ -9,7 +9,7 @@ import { sliceRunToSaveRun } from "../../simulation/state/runState";
 import { renderDebugOverlay } from "../../ui/overlays/debugOverlay";
 import { handleSceneAction } from "../bridge/sceneActions";
 import { requireBootContext, storeBootContext } from "../bridge/sceneBridge";
-import { renderActionButton, renderPaperPanel, renderRasterHoverHitTarget, renderSceneShell, renderUiSlot, textStyle } from "../view/sceneShell";
+import { renderActionButton, renderPaperPanel, renderRasterDisabledHitTarget, renderRasterHoverHitTarget, renderSceneShell, renderUiSlot, textStyle } from "../view/sceneShell";
 
 const WORLD_MAP_RASTER_UNDERLAY_KEY = "world_map_raster_underlay_concept";
 const WORLD_MAP_RASTER_HOVER_NODE_KEY = "ui_current_stage_halo_concept";
@@ -686,6 +686,7 @@ function renderWorldMapRasterStageNodes(scene: Phaser.Scene, context: BootContex
       stage
     );
   });
+  renderWorldMapRasterLockedNodeHitTargets(scene, context, unlockedStageIds);
 }
 
 function renderWorldMapRasterNodeHitTarget(
@@ -719,6 +720,45 @@ function renderWorldMapRasterNodeHitTarget(
     tooltipBody: stage.descriptionKo,
     tooltipTone: "choice"
   });
+}
+
+function renderWorldMapRasterLockedNodeHitTargets(
+  scene: Phaser.Scene,
+  context: BootContext,
+  unlockedStageIds: Set<string>
+): void {
+  const firstLockedIndex = context.dataBundle.stages.findIndex((stage) => !unlockedStageIds.has(stage.id));
+  context.dataBundle.stages.forEach((stage, index) => {
+    const node = WORLD_MAP_RASTER_STAGE_NODES[index];
+    if (!node || unlockedStageIds.has(stage.id)) return;
+    renderRasterDisabledHitTarget(scene, node.x, node.y, node.width, node.height, {
+      disabledKey: false,
+      depth: 22,
+      tooltipTitle: `${stage.displayNameKo} · 잠김`,
+      tooltipBody: worldMapLockedStageTooltipBody(context, index, firstLockedIndex),
+      tooltipTone: "danger"
+    });
+  });
+}
+
+function worldMapLockedStageTooltipBody(
+  context: BootContext,
+  stageIndex: number,
+  firstLockedIndex: number
+): string {
+  const stage = context.dataBundle.stages[stageIndex];
+  const firstLockedStage = context.dataBundle.stages[firstLockedIndex];
+  const previousStage = context.dataBundle.stages[stageIndex - 1];
+  const unlockedCount = new Set([...context.save.profile.unlockedStages, context.run.stageId]).size;
+  const totalStages = context.dataBundle.stages.length;
+
+  if (stageIndex === firstLockedIndex && previousStage) {
+    return `${previousStage.displayNameKo} 완료 후 해금됩니다. 현재 해금 ${unlockedCount}/${totalStages}.`;
+  }
+  if (firstLockedStage && stage && firstLockedStage.id !== stage.id) {
+    return `먼저 ${firstLockedStage.displayNameKo}까지 순서대로 해금해야 합니다. 현재 해금 ${unlockedCount}/${totalStages}.`;
+  }
+  return `아직 해금 조건을 만족하지 못했습니다. 현재 해금 ${unlockedCount}/${totalStages}.`;
 }
 
 function renderWorldMapRasterHitTarget(

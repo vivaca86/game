@@ -104,7 +104,7 @@ interface RasterHoverHitTargetOptions extends RasterTooltipOptions {
 interface RasterDisabledHitTargetOptions {
   depth?: number;
   disabledDepth?: number;
-  disabledKey?: string;
+  disabledKey?: string | false;
   disabledX?: number;
   disabledY?: number;
   disabledWidth?: number;
@@ -417,7 +417,7 @@ export function renderRasterDisabledHitTarget(
   options: RasterDisabledHitTargetOptions = {}
 ): Phaser.GameObjects.Rectangle {
   const disabledKey = options.disabledKey ?? UI_RASTER_DISABLED_LOCK_KEY;
-  if (scene.textures.exists(disabledKey)) {
+  if (disabledKey !== false && scene.textures.exists(disabledKey)) {
     scene.add.image(options.disabledX ?? x, options.disabledY ?? y, disabledKey)
       .setDisplaySize(options.disabledWidth ?? 112, options.disabledHeight ?? 112)
       .setAlpha(options.disabledAlpha ?? 0.9)
