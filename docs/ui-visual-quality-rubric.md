@@ -3279,6 +3279,30 @@ The audit verifies Town, WorldMap, Dungeon, Combat, Reward, Event, RuneBench, Bo
 
 This is not final dynamic readability approval. Hidden labels reduce the accessibility-safe text gap, but visible safe tooltip zones, gameplay-critical dynamic readability at 1920/1280/mobile sizes, user acceptance, and final concept-match approval remain unfinished.
 
+## Raster Responsive Sanity Checkpoint
+
+Date: 2026-06-13
+
+Evidence:
+
+- `tools/ui-responsive-raster-audit.mjs`
+- `tmp/ui-quality/responsive/town-desktop-1920.png`
+- `tmp/ui-quality/responsive/worldmap-desktop-1920.png`
+- `tmp/ui-quality/responsive/combat-desktop-1280.png`
+- `tmp/ui-quality/responsive/worldmap-mobile-390x844.png`
+- `tmp/ui-quality/responsive/settings-mobile-390x844.png`
+- `node tools\ui-responsive-raster-audit.mjs`
+
+Current status: `Needs user review`
+
+Completion level: `Partially complete`
+
+This checkpoint adds automated responsive sanity evidence for the ten primary raster scenes at 1920x1080, 1280x720, and 390x844 portrait. The audit verifies that each scene loads its raster underlay, the Phaser canvas fits the viewport using the expected 16:9 `FIT` size, hidden accessibility labels stay hidden, the canvas has a synchronized `aria-label`, and no visible Phaser text or rectangle overlays leak above the raster underlays.
+
+The audit passed for all 30 scene/viewport combinations. At 1920x1080 and 1280x720 the canvas fills the viewport. At 390x844 portrait the canvas renders safely at `390x219`; screenshot review confirms it is not clipped, but it is heavily letterboxed.
+
+This is not final mobile/responsive approval. It reduces the unverified responsive-safety gap, but portrait mobile framing/orientation treatment, visible tooltip/readability zones, user acceptance, and final concept-match approval remain unfinished.
+
 ## Current Remaining Raster-Quality Scope
 
 Status: `Not complete`
@@ -3296,8 +3320,8 @@ The active goal still remains open. The immediate first-view raster concept-unde
 - WorldMap no longer has the hidden center confirm target; primary action is now verified on the visible bottom-right play button, that button has first-pass hover/down art cropped from the original WorldMap concept, the current stage now has a runtime-driven marker plus cleaned concept-derived current halo plus first current body-wash/frame overlays plus lower current-status badge, node hover uses the cleaned halo instead of a detached route token, arrow keys can select the nearest unlocked node by concept-map direction, and completed/locked/sealed/dormant stages now have first-pass runtime raster state material. Completed stages now also have first conservative completed body-wash/frame overlays under the check badge, upper red locked stages now have first conservative locked body-wash/frame overlays under the lock badge, the next lower/mid sealed node now has first conservative sealed body-wash/frame overlays under the sealed badge, and non-next lower/mid locked nodes now have first conservative dormant body/frame overlays. The runtime underlay now neutralizes the strongest baked 1-3 completed checks, lower 1-5 node body colors, stage-4 cyan state colors, the main remaining stage-4 and 4-to-5 route remnants, sampled old red lock centers, and the old stage-4 current-marker/status scars. The 2026-06-11 pass corrected the stage-5 sample locations and further reduced the stage-5 plate/lower-seal/route active-state read; a later same-day pass further reduced the old stage-4 current-state silhouette in non-stage-4 states; the current-frame pass adds one masked, number-safe source-derived current-frame overlay; the completed-frame pass adds one masked, check-safe completed-frame overlay; the locked-frame pass adds one masked, lock-safe red/gold overlay; the body-wash pass adds first masked current/completed/locked material overlays below those frame/badge stacks; the sealed pass adds first masked gray body/frame material below the sealed badge; the dormant pass adds first masked gray body/frame material for non-next lower/mid locked nodes. Red-lock placement is source-aligned for stages 10-15, late-route completed checks are smaller, stage 6/7 completed badges sit closer to their node bases, stage 8 is treated as a quieter route-point marker, and gray seals now emphasize only the next lower/mid locked node. This is still not full current/selected/completed/locked/sealed/dormant-state recomposition: baked route/node geometry remains, lower-node baked silhouettes are only reduced rather than fully recomposed, later stage variants are not complete, body variants are not complete, and broader keyboard focus, visible tooltip/readability zones, mobile/responsive review, and user acceptance remain unfinished.
 - The same WorldMap path now has first source-derived `ui_world_map_route_progress_bead_concept` and `ui_world_map_route_progress_thread_concept` overlays on progressed route segments. They are verified in default, stage-4-progress, stage-9-progress, and keyboard-selected states, but they are still conservative route-progress layers rather than a full dynamic route recomposition system.
 - Combat and Boss now have concept-source-derived raster effect candidates on their raster paths. The Boss stage cue was corrected from a shield-like source to a component-sheet gold starburst source, but effect timing, target-specific placement across all effects, animation readability, and final Boss phase/effect communication are still not final.
-- The current textless raster-only checkpoints now have a first hidden dynamic accessibility-label pass, but they still rely heavily on baked concept information and need visible safe tooltip/readability passes before final UI approval.
+- The current textless raster-only checkpoints now have a first hidden dynamic accessibility-label pass and a first automated responsive sanity pass, but they still rely heavily on baked concept information and need visible safe tooltip/readability plus final mobile presentation review before final UI approval.
 - Raster hover/down feedback is no longer universally invisible: all 10 primary raster concept screens have extracted bitmap hover-state candidates on representative controls and a pressed/down-state candidate on audited controls. The audited pressed states now avoid the shared fallback stamp, Event has a first disabled lock candidate, Combat/Boss have first cost-disabled card lock candidates, Settings has first keyboard-cancel plus keyboard-focus feedback on its audited controls, Reward/Event have first keyboard choice-focus evidence, and Town/RuneBench/Result have first utility keyboard-focus evidence. Final matching-quality selected, broad disabled, focus, deeper per-control pressed, and screen-specific state coverage is still missing.
 - The full UI skin is not a 95-point completion candidate and has no user acceptance yet.
 - `npm.cmd run check` still reports the existing Vite large JS chunk warning, so performance remains tracked separately as `Needs verification`.
-- Broad Phaser smoke is passing for the latest 2026-06-13 WorldMap route-progress thread plus hidden accessibility-label checkpoints, but it remains a long-running regression gate rather than evidence of final UI approval.
+- Broad Phaser smoke is passing for the latest 2026-06-13 WorldMap route-progress thread plus hidden accessibility-label checkpoints, and the raster responsive sanity audit is passing at 1920, 1280, and 390x844. These remain regression/safety gates rather than evidence of final UI approval.

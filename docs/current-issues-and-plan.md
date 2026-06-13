@@ -96,7 +96,7 @@ Detailed continuation handoff:
 
 Current best estimate:
 
-- Overall active UI goal: about 82-83% after the WorldMap route-progress thread plus first hidden dynamic accessibility-label checkpoint, still reported conservatively as WIP rather than final approval.
+- Overall active UI goal: about 83% after the WorldMap route-progress thread, first hidden dynamic accessibility-label checkpoint, and first automated raster responsive sanity audit, still reported conservatively as WIP rather than final approval.
 - Static first-view concept matching is ahead of interaction/dynamic-state work.
 - WorldMap state truth is still a visible unfinished area, though it now has first-pass runtime current/completed/locked/sealed/dormant overlays, first concept-derived route-progress bead/thread overlays, plus progressed-save audits for stage 4 current state and stage 9 current / stage 10 first-red-lock state.
 
@@ -111,6 +111,7 @@ Completed progress in this checkpoint:
 - WorldMap progressed route segments now have a first `ui_world_map_route_progress_bead_concept` overlay cropped from the original concept's cyan route material. The audit verifies default, stage-4-progress, stage-9-progress, and keyboard-selected states so progressed routes show runtime raster material while keyboard selection does not accidentally show route-progress beads.
 - WorldMap progressed route segments now also have a first `ui_world_map_route_progress_thread_concept` overlay cropped/masked from the original concept's cyan route material. The audit verifies route-thread count, placement, size, and alpha in default, stage-4-progress, and stage-9-progress states, and verifies keyboard-selected state still shows zero route-progress thread/bead overlays.
 - The raster Phaser shell now has a first dynamic accessibility-label layer outside the baked concept images. `src/ui/overlays/accessibilityOverlay.ts` creates a visually hidden `#game-accessibility-summary` and synchronizes the game canvas `aria-label` with scene-specific status/control summaries for Town, WorldMap, Dungeon, Combat, Reward, Event, RuneBench, Boss, Result, and Settings. `tools/ui-accessibility-overlay-audit.mjs` verifies all ten primary scenes expose the hidden status layer and canvas label without adding visible text to the concept-art screenshots.
+- The raster Phaser shell now also has a first automated responsive sanity audit. `tools/ui-responsive-raster-audit.mjs` opens Town, WorldMap, Dungeon, Combat, Reward, Event, RuneBench, Boss, Result, and Settings at 1920x1080, 1280x720, and 390x844 portrait. It verifies Phaser FIT canvas sizing, no viewport clipping, raster underlays, zero visible Phaser text/rectangle leaks above the underlays, hidden accessibility layer behavior, and captures screenshots under `tmp/ui-quality/responsive/`.
 - The WorldMap neutralized underlay now also mutes sampled old baked red lock centers.
 - `tmp/ui-worldmap-action-hit-target-audit.mjs` now verifies both the `stage_sunny_gate` completed / `stage_lavender_hall` current state and a progressed release state with stages 1-3 completed and `stage_peach_canal` current.
 - Upper red-lock badges are now aligned to source-concept centers for stages 10-15 and the audit verifies their position, size, and alpha. Mid-route completed badges are smaller than lower 1-3 completed badges so late progression does not cover the route as heavily.
@@ -148,6 +149,7 @@ Completed progress in this checkpoint:
 - The next same-day route-progress bead pass added `ui_world_map_route_progress_bead_concept`, updated the WorldMap audit to check route-bead count/placement/style across default, stage-4-progress, stage-9-progress, and keyboard-selected states, and reran WorldMap audits plus broad smoke with `Phaser smoke OK`.
 - A 2026-06-13 route-progress thread pass added `ui_world_map_route_progress_thread_concept`, updated the WorldMap audit to check route-thread count/placement/style across default, stage-4-progress, stage-9-progress, and keyboard-selected states, and reran WorldMap audits plus broad smoke with `Phaser smoke OK`.
 - A 2026-06-13 accessibility-label pass added the first off-canvas dynamic status/control summaries for all ten primary raster scenes. The new audit passed for Town, WorldMap, Dungeon, Combat, Reward, Event, RuneBench, Boss, Result, and Settings with a 1x1 hidden DOM region plus synchronized canvas `aria-label`. Route-node hover, WorldMap state audit, `npm.cmd run check`, `git diff --check`, and the full broad Phaser smoke also passed after this pass.
+- A 2026-06-13 responsive sanity pass added `tools/ui-responsive-raster-audit.mjs`. It passed across all ten primary raster scenes at 1920x1080, 1280x720, and 390x844. The mobile portrait captures confirm the game is not clipped and the DOM/accessibility layers do not leak, but they also show a narrow 16:9 canvas (`390x219`) with large portrait letterboxing, so mobile portrait UX remains a final-review item rather than approved completion.
 
 Next recommended work:
 
@@ -156,7 +158,8 @@ Next recommended work:
 3. Refine selected/focus/keyboard state art without falling back to Phaser vector overlays. WorldMap directional keyboard selection, Town/Reward/Event/Dungeon/RuneBench/Result keyboard-confirm feedback, Dungeon directional focus, Reward/Event directional choice focus, Town/RuneBench/Result utility focus, Combat/Boss keyboard card/end-turn feedback plus directional focus, and Settings keyboard-cancel plus keyboard-focus feedback now have first evidence, but this is not final keyboard/focus coverage across screens.
 4. Continue deeper pressed/down, disabled, and focus review beyond the audited representative/current controls. Settings' ten audited controls, Town's lower toolbar controls, RuneBench lower confirm, Result lower return, the Town/RuneBench/Result representative utility targets, and Combat/Boss cost-disabled cards now have first evidence, but selected/focus state art, broader disabled-state breadth, remaining legacy UX decisions, and final keyboard-focus approval are still missing.
 5. Continue dynamic labels/tooltips/accessibility-safe text work beyond the first hidden DOM label pass, especially visible safe tooltip zones and any gameplay-critical readable text that cannot stay baked into concept art.
-6. Continue WorldMap recomposition beyond neutralized samples, first-pass badges, the first current/completed/locked/sealed/dormant body/frame overlays, and the first route-progress bead/thread overlays. The latest stage-5/stage-4 corrections and state body/frame/route passes reduce stale state reads but do not replace full current/completed/locked/sealed/dormant body variants or a complete dynamic route-state system.
+6. Continue mobile/responsive review beyond the first automated sanity pass, especially the portrait letterbox presentation and whether the game needs a deliberate mobile framing/orientation treatment.
+7. Continue WorldMap recomposition beyond neutralized samples, first-pass badges, the first current/completed/locked/sealed/dormant body/frame overlays, and the first route-progress bead/thread overlays. The latest stage-5/stage-4 corrections and state body/frame/route passes reduce stale state reads but do not replace full current/completed/locked/sealed/dormant body variants or a complete dynamic route-state system.
 
 Known unfinished scope:
 
@@ -165,6 +168,7 @@ Known unfinished scope:
 - Broad disabled-state coverage beyond Event unaffordable choice and Combat/Boss cost-disabled cards.
 - Screen-specific pressed/down art beyond the currently audited controls.
 - Dynamic readability and visible tooltip/safe-text zones beyond the first hidden accessibility-label layer.
+- Mobile portrait UX/framing beyond the first automated responsive sanity audit. The 390x844 pass proves no clipping but still letterboxes the 16:9 canvas heavily.
 - Broad Phaser smoke is passing for the 2026-06-13 WorldMap route-progress thread plus hidden accessibility-label checkpoints, but it remains a regression gate rather than proof of final UI approval.
 - User acceptance.
 - Final 95% or release-ready UI.

@@ -1755,3 +1755,44 @@ Results:
 Remaining related work:
 
 - This is not final dynamic readability approval. The hidden layer closes the first off-canvas label strategy, but visible tooltip/safe-text zones, mobile/responsive readability review, user acceptance, and final concept-match approval remain unfinished.
+
+## 2026-06-13 Continuation: Raster Responsive Sanity Audit
+
+Status: `Partially complete`.
+
+This follow-up adds the first automated mobile/responsive sanity audit for the ten primary raster concept scenes. It verifies that the fixed 16:9 Phaser canvas scales with `FIT` without clipping and that DOM/accessibility layers do not leak onto concept screenshots. It is evidence for responsive safety, not final mobile UX approval.
+
+Added/changed:
+
+- `tools/ui-responsive-raster-audit.mjs`
+
+Behavior now verified:
+
+- Town, WorldMap, Dungeon, Combat, Reward, Event, RuneBench, Boss, Result, and Settings open at 1920x1080, 1280x720, and 390x844.
+- Each checked scene has its expected raster underlay.
+- The canvas fits the viewport and matches the expected 16:9 Phaser `FIT` size.
+- The hidden accessibility summary stays hidden and the canvas keeps a synchronized `aria-label`.
+- Debug overlay, visible Phaser text, and visible rectangle overlays do not leak above raster underlays in the checked views.
+- Screenshots are captured under `tmp/ui-quality/responsive/`.
+
+Verification run in this continuation:
+
+```powershell
+node tools\ui-responsive-raster-audit.mjs
+```
+
+Results:
+
+- Responsive raster audit passed for all 30 scene/viewport combinations.
+- 1920x1080 captures render at `1920x1080`.
+- 1280x720 captures render at `1280x720`.
+- 390x844 portrait captures render the game canvas at `390x219`, with no clipping or overlay leakage.
+
+Manual screenshot review:
+
+- 1280 desktop captures are suitable as first-pass sanity evidence.
+- Mobile portrait captures are technically safe but heavily letterboxed because the game is fixed 16:9. This remains a mobile presentation/UX approval gap.
+
+Remaining related work:
+
+- This is not final mobile/responsive approval. Next work should decide whether portrait mobile needs a deliberate framing/orientation treatment, and still continue visible tooltip/readability zones, WorldMap recomposition, user acceptance, and final concept-match approval.
