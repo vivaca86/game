@@ -56,6 +56,13 @@ const targets = [
   }
 ];
 
+const viewports = [
+  { key: "desktop-1920", width: 1920, height: 1080 },
+  { key: "desktop-1280", width: 1280, height: 720 },
+  { key: "mobile-390x844", width: 390, height: 844 },
+  { key: "mobile-landscape-844x390", width: 844, height: 390 }
+];
+
 const { chromium } = loadPlaywright();
 const executableCandidates = [
   "C:/Users/i/AppData/Local/ms-playwright/chromium-1217/chrome-win64/chrome.exe",
@@ -83,72 +90,77 @@ try {
   const page = await browser.newPage({ viewport: { width: 1280, height: 720 }, deviceScaleFactor: 1 });
   const results = [];
 
-  for (const target of targets) {
-    await page.goto(new URL(target.pathname, baseUrl).href, { waitUntil: "networkidle" });
-    if (target.setup) await target.setup(page);
-    await page.waitForFunction((expectedScene) => {
-      const game = window.__paperGame;
-      return Boolean(game?.scene?.getScenes?.(true)?.some((scene) => scene.scene?.key === expectedScene));
-    }, target.sceneName, { timeout: 10000 });
-    await page.waitForSelector("#game-accessibility-summary", { timeout: 10000 });
-    await page.waitForFunction(() => {
-      const canvas = document.querySelector("#game-root canvas");
-      return Boolean(canvas?.getAttribute("aria-label"));
-    }, { timeout: 10000 });
+  for (const viewport of viewports) {
+    await page.setViewportSize({ width: viewport.width, height: viewport.height });
 
-    const audit = await page.evaluate(() => {
-      const root = document.getElementById("game-accessibility-summary");
-      const canvas = document.querySelector("#game-root canvas");
-      if (!root || !canvas) return { ok: false, reason: "missing root or canvas" };
+    for (const target of targets) {
+      await page.goto(new URL(target.pathname, baseUrl).href, { waitUntil: "networkidle" });
+      if (target.setup) await target.setup(page);
+      await page.waitForFunction((expectedScene) => {
+        const game = window.__paperGame;
+        return Boolean(game?.scene?.getScenes?.(true)?.some((scene) => scene.scene?.key === expectedScene));
+      }, target.sceneName, { timeout: 10000 });
+      await page.waitForSelector("#game-accessibility-summary", { timeout: 10000 });
+      await page.waitForFunction(() => {
+        const canvas = document.querySelector("#game-root canvas");
+        return Boolean(canvas?.getAttribute("aria-label"));
+      }, { timeout: 10000 });
 
-      const rootStyle = window.getComputedStyle(root);
-      const rootBox = root.getBoundingClientRect();
-      const rootLabel = root.getAttribute("aria-label") ?? "";
-      const canvasLabel = canvas.getAttribute("aria-label") ?? "";
-      const childText = root.textContent ?? "";
-      return {
-        ok: true,
-        scene: root.dataset.scene,
-        title: root.dataset.title,
-        role: root.getAttribute("role"),
-        live: root.getAttribute("aria-live"),
-        atomic: root.getAttribute("aria-atomic"),
-        canvasRole: canvas.getAttribute("role"),
-        rootLabel,
-        canvasLabel,
-        childText,
-        rootWidth: rootBox.width,
-        rootHeight: rootBox.height,
-        position: rootStyle.position,
-        clipPath: rootStyle.clipPath
-      };
-    });
+      const audit = await page.evaluate(() => {
+        const root = document.getElementById("game-accessibility-summary");
+        const canvas = document.querySelector("#game-root canvas");
+        if (!root || !canvas) return { ok: false, reason: "missing root or canvas" };
 
-    if (
-      !audit.ok
-      || audit.scene !== target.sceneName
-      || audit.title !== target.title
-      || audit.role !== "status"
-      || audit.live !== "polite"
-      || audit.atomic !== "true"
-      || audit.canvasRole !== "img"
-      || audit.rootLabel !== audit.canvasLabel
-      || !audit.rootLabel.includes(target.title)
-      || !audit.childText.includes(target.title)
-      || audit.rootWidth > 2
-      || audit.rootHeight > 2
-      || audit.position !== "fixed"
-      || !audit.clipPath.includes("inset")
-    ) {
-      throw new Error(`${target.sceneName}: invalid accessibility overlay ${JSON.stringify(audit, null, 2)}`);
+        const rootStyle = window.getComputedStyle(root);
+        const rootBox = root.getBoundingClientRect();
+        const rootLabel = root.getAttribute("aria-label") ?? "";
+        const canvasLabel = canvas.getAttribute("aria-label") ?? "";
+        const childText = root.textContent ?? "";
+        return {
+          ok: true,
+          scene: root.dataset.scene,
+          title: root.dataset.title,
+          role: root.getAttribute("role"),
+          live: root.getAttribute("aria-live"),
+          atomic: root.getAttribute("aria-atomic"),
+          canvasRole: canvas.getAttribute("role"),
+          rootLabel,
+          canvasLabel,
+          childText,
+          rootWidth: rootBox.width,
+          rootHeight: rootBox.height,
+          position: rootStyle.position,
+          clipPath: rootStyle.clipPath
+        };
+      });
+
+      if (
+        !audit.ok
+        || audit.scene !== target.sceneName
+        || audit.title !== target.title
+        || audit.role !== "status"
+        || audit.live !== "polite"
+        || audit.atomic !== "true"
+        || audit.canvasRole !== "img"
+        || audit.rootLabel !== audit.canvasLabel
+        || !audit.rootLabel.includes(target.title)
+        || !audit.childText.includes(target.title)
+        || audit.rootWidth > 2
+        || audit.rootHeight > 2
+        || audit.position !== "fixed"
+        || !audit.clipPath.includes("inset")
+      ) {
+        throw new Error(`${target.sceneName}/${viewport.key}: invalid accessibility overlay ${JSON.stringify(audit, null, 2)}`);
+      }
+
+      results.push({
+        scene: target.sceneName,
+        viewport: viewport.key,
+        title: target.title,
+        labelLength: audit.rootLabel.length,
+        hiddenBox: `${audit.rootWidth}x${audit.rootHeight}`
+      });
     }
-
-    results.push({
-      scene: target.sceneName,
-      title: target.title,
-      labelLength: audit.rootLabel.length,
-      hiddenBox: `${audit.rootWidth}x${audit.rootHeight}`
-    });
   }
 
   console.log(JSON.stringify({ ok: true, baseUrl, results }, null, 2));

@@ -7,7 +7,7 @@ Repository:
 - GitHub: `https://github.com/vivaca86/game.git`
 - Branch: `main`
 - Latest pushed commit: run `git log -1 --oneline` after pulling.
-- Expected latest commit title after the 2026-06-14 mobile-landscape WorldMap interaction continuation: `Audit landscape WorldMap interactions`
+- Expected latest commit title after the 2026-06-14 mobile-landscape accessibility continuation: `Audit landscape accessibility overlay`
 
 ## Start On Another PC
 
@@ -22,7 +22,7 @@ npm install
 Expected first commit title in `git log --oneline -5` after the latest continuation:
 
 ```text
-Audit landscape WorldMap interactions
+Audit landscape accessibility overlay
 ```
 
 Expected status:
@@ -1936,3 +1936,29 @@ Representative evidence:
 - `tmp/ui-quality/worldmap-keyboard-tooltips/boss-up-keyboard-tooltip-v1-mobile-landscape-844x390.png`
 
 Important limitation: this strengthens mobile landscape WorldMap interaction evidence, but it is not full WorldMap node/body/route recomposition approval, final selected/focus approval, user acceptance, or release-ready proof.
+
+## 2026-06-14 Mobile Landscape Accessibility Overlay Continuation
+
+Status remains `95% candidate, not final`.
+
+Latest implementation/audit continuation:
+
+- Expanded `tools/ui-accessibility-overlay-audit.mjs` from one 1280x720 pass to four viewports: 1920x1080, 1280x720, 390x844 portrait, and 844x390 landscape.
+- The audit still covers Town, WorldMap, Dungeon, Combat, Reward, Event, RuneBench, Boss, Result, and Settings.
+- Each scene/viewport case verifies the hidden `#game-accessibility-summary`, `role=status`, `aria-live=polite`, `aria-atomic=true`, synchronized canvas `role=img` / `aria-label`, hidden 1x1 box, fixed positioning, and clipped visibility.
+
+Commands:
+
+```powershell
+node tools\ui-accessibility-overlay-audit.mjs
+git diff --check
+npm.cmd run check
+```
+
+Result:
+
+- `node tools\ui-accessibility-overlay-audit.mjs` passed 40 scene/viewport cases.
+- `git diff --check` passed.
+- `npm.cmd run check` passed with only the existing Vite large JS chunk warning.
+
+Important limitation: this strengthens hidden accessibility-label evidence across desktop/mobile portrait/mobile landscape, but it is not final visible readability approval, user acceptance, or release-ready proof.

@@ -2446,3 +2446,15 @@ Verification passed with `node tools\ui-worldmap-open-node-tooltip-audit.mjs`, `
 Updated `docs/other-pc-handoff-2026-06-09.md`, `docs/current-issues-and-plan.md`, and `docs/ui-visual-quality-rubric.md` so another PC can see the expanded mobile landscape WorldMap interaction evidence. Representative screenshots include `tmp/ui-quality/worldmap-open-node-tooltips/boss-open-open-node-tooltip-v1-mobile-landscape-844x390.png`, `tmp/ui-quality/worldmap-open-node-down/boss-open-open-node-down-v1-mobile-landscape-844x390.png`, `tmp/ui-quality/worldmap-open-node-selection/boss-open-open-node-selection-v1-mobile-landscape-844x390.png`, and `tmp/ui-quality/worldmap-keyboard-tooltips/boss-up-keyboard-tooltip-v1-mobile-landscape-844x390.png`.
 
 This remains a 95% candidate rather than final approval. Mobile landscape WorldMap interaction evidence is stronger now, but full WorldMap node/body/route recomposition approval, final selected/focus approval, user acceptance, and release-ready UI remain unfinished.
+
+### Codex
+
+Codex continued the active 95% candidate UI goal by extending the hidden accessibility overlay audit into the same four-viewport policy now used by the other responsive/readability gates.
+
+Expanded `tools/ui-accessibility-overlay-audit.mjs` from a single 1280x720 pass to 1920x1080, 1280x720, 390x844 portrait, and 844x390 landscape. The audit still covers Town, WorldMap, Dungeon, Combat, Reward, Event, RuneBench, Boss, Result, and Settings, and now reports 40 scene/viewport cases.
+
+Verification passed with `node tools\ui-accessibility-overlay-audit.mjs`, `git diff --check`, and `npm.cmd run check`. The accessibility audit passed all 40 cases, verifying hidden `#game-accessibility-summary`, `role=status`, `aria-live=polite`, `aria-atomic=true`, synchronized canvas `role=img` / `aria-label`, hidden 1x1 box, fixed positioning, and clipped visibility. `npm.cmd run check` still reports only the existing Vite large JS chunk warning.
+
+Updated `docs/other-pc-handoff-2026-06-09.md`, `docs/current-issues-and-plan.md`, and `docs/ui-visual-quality-rubric.md` so another PC can see the expanded accessibility evidence.
+
+This remains a 95% candidate rather than final approval. Hidden accessibility-label evidence is stronger across desktop/mobile portrait/mobile landscape, but final visible readability approval, final accessibility acceptance, user acceptance, and release-ready UI remain unfinished.
