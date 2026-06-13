@@ -36,9 +36,11 @@ body {
   position: fixed;
   z-index: 9;
   box-sizing: border-box;
-  width: min(336px, calc(100vw - 32px));
-  min-height: 74px;
-  padding: 12px 15px 13px;
+  width: var(--readability-tooltip-width, min(336px, calc(100vw - 32px)));
+  min-height: var(--readability-tooltip-min-height, 74px);
+  max-height: var(--readability-tooltip-max-height, calc(100vh - 32px));
+  overflow: hidden;
+  padding: var(--readability-tooltip-padding, 12px 15px 13px);
   border: 1px solid rgba(86, 58, 31, 0.62);
   border-radius: 8px;
   background:

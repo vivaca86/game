@@ -114,6 +114,12 @@ const targets = [
   }
 ];
 
+const viewports = [
+  { key: "desktop-1920", suffix: "1920", width: 1920, height: 1080, minWidth: 260, minHeight: 60, maxWidthRatio: 0.42, maxHeightRatio: 0.34, allowLetterbox: false },
+  { key: "desktop-1280", suffix: "desktop-1280", width: 1280, height: 720, minWidth: 240, minHeight: 58, maxWidthRatio: 0.48, maxHeightRatio: 0.34, allowLetterbox: false },
+  { key: "mobile-390x844", suffix: "mobile-390x844", width: 390, height: 844, minWidth: 210, minHeight: 48, maxWidthRatio: 0.82, maxHeightRatio: 0.5, allowLetterbox: true }
+];
+
 await mkdir("tmp/ui-quality/readability-tooltips", { recursive: true });
 
 const { chromium } = loadPlaywright();
@@ -143,111 +149,128 @@ try {
   const page = await browser.newPage({ viewport: { width: 1920, height: 1080 }, deviceScaleFactor: 1 });
   const results = [];
 
-  for (const target of targets) {
-    await page.goto(new URL(target.pathname, baseUrl).href, { waitUntil: "networkidle" });
-    if (target.setup) await target.setup(page);
-    await waitForScene(page, target.sceneName);
-    await page.waitForSelector("canvas", { timeout: 10000 });
+  for (const viewport of viewports) {
+    await page.setViewportSize({ width: viewport.width, height: viewport.height });
 
-    const initial = await page.evaluate(() => {
-      const root = document.getElementById("game-readability-tooltip");
-      return {
-        exists: Boolean(root),
-        visible: root?.dataset.visible === "true"
-      };
-    });
-    if (initial.visible) {
-      throw new Error(`${target.sceneName}: tooltip visible before hover`);
-    }
+    for (const target of targets) {
+      await page.goto(new URL(target.pathname, baseUrl).href, { waitUntil: "networkidle" });
+      if (target.setup) await target.setup(page);
+      await waitForScene(page, target.sceneName);
+      await page.waitForSelector("canvas", { timeout: 10000 });
 
-    const canvas = page.locator("canvas");
-    const box = await canvas.boundingBox();
-    if (!box) throw new Error(`${target.sceneName}: missing canvas box`);
-    await page.mouse.move(
-      box.x + (target.hover.x / 1920) * box.width,
-      box.y + (target.hover.y / 1080) * box.height
-    );
-    await page.waitForSelector("#game-readability-tooltip[data-visible='true']", { timeout: 5000 });
+      const initial = await page.evaluate(() => {
+        const root = document.getElementById("game-readability-tooltip");
+        return {
+          exists: Boolean(root),
+          visible: root?.dataset.visible === "true"
+        };
+      });
+      if (initial.visible) {
+        throw new Error(`${target.sceneName}/${viewport.key}: tooltip visible before hover`);
+      }
 
-    const auditTarget = {
-      expectedTitle: target.expectedTitle,
-      expectedTitleIncludes: target.expectedTitleIncludes,
-      minTitleLength: target.minTitleLength
-    };
-    const audit = await page.evaluate(({ target }) => {
-      const root = document.getElementById("game-readability-tooltip");
-      const canvas = document.querySelector("#game-root canvas");
-      if (!root || !canvas) return { ok: false, reason: "missing tooltip or canvas" };
-      const rootBox = root.getBoundingClientRect();
-      const canvasBox = canvas.getBoundingClientRect();
-      const title = root.dataset.title ?? "";
-      const body = root.textContent?.replace(/\s+/g, " ").trim() ?? "";
-      return {
-        ok: true,
-        role: root.getAttribute("role"),
-        live: root.getAttribute("aria-live"),
-        visible: root.dataset.visible === "true",
-        scene: root.dataset.scene,
-        title,
-        body,
-        width: rootBox.width,
-        height: rootBox.height,
-        left: rootBox.left,
-        top: rootBox.top,
-        inViewport: rootBox.left >= 0
-          && rootBox.top >= 0
-          && rootBox.right <= window.innerWidth
-          && rootBox.bottom <= window.innerHeight,
-        inCanvas: rootBox.left >= canvasBox.left - 1
-          && rootBox.top >= canvasBox.top - 1
-          && rootBox.right <= canvasBox.right + 1
-          && rootBox.bottom <= canvasBox.bottom + 1,
-        pointerEvents: window.getComputedStyle(root).pointerEvents,
-        zIndex: Number(window.getComputedStyle(root).zIndex),
-        canvasRole: canvas.getAttribute("role") ?? "",
-        canvasLabelLength: canvas.getAttribute("aria-label")?.length ?? 0,
+      const canvas = page.locator("canvas");
+      const box = await canvas.boundingBox();
+      if (!box) throw new Error(`${target.sceneName}/${viewport.key}: missing canvas box`);
+      await page.mouse.move(
+        box.x + (target.hover.x / 1920) * box.width,
+        box.y + (target.hover.y / 1080) * box.height
+      );
+      await page.waitForSelector("#game-readability-tooltip[data-visible='true']", { timeout: 5000 });
+
+      const auditTarget = {
         expectedTitle: target.expectedTitle,
         expectedTitleIncludes: target.expectedTitleIncludes,
-        minTitleLength: target.minTitleLength ?? 1
+        minTitleLength: target.minTitleLength
       };
-    }, { target: auditTarget });
+      const audit = await page.evaluate(({ target }) => {
+        const root = document.getElementById("game-readability-tooltip");
+        const canvas = document.querySelector("#game-root canvas");
+        if (!root || !canvas) return { ok: false, reason: "missing tooltip or canvas" };
+        const rootBox = root.getBoundingClientRect();
+        const canvasBox = canvas.getBoundingClientRect();
+        const title = root.dataset.title ?? "";
+        const body = root.textContent?.replace(/\s+/g, " ").trim() ?? "";
+        return {
+          ok: true,
+          role: root.getAttribute("role"),
+          live: root.getAttribute("aria-live"),
+          visible: root.dataset.visible === "true",
+          scene: root.dataset.scene,
+          title,
+          body,
+          width: rootBox.width,
+          height: rootBox.height,
+          left: rootBox.left,
+          top: rootBox.top,
+          canvasWidth: canvasBox.width,
+          canvasHeight: canvasBox.height,
+          widthRatio: rootBox.width / canvasBox.width,
+          heightRatio: rootBox.height / canvasBox.height,
+          inViewport: rootBox.left >= 0
+            && rootBox.top >= 0
+            && rootBox.right <= window.innerWidth
+            && rootBox.bottom <= window.innerHeight,
+          inCanvas: rootBox.left >= canvasBox.left - 1
+            && rootBox.top >= canvasBox.top - 1
+            && rootBox.right <= canvasBox.right + 1
+            && rootBox.bottom <= canvasBox.bottom + 1,
+          overlapsCanvas: !(rootBox.right <= canvasBox.left
+            || rootBox.left >= canvasBox.right
+            || rootBox.bottom <= canvasBox.top
+            || rootBox.top >= canvasBox.bottom),
+          pointerEvents: window.getComputedStyle(root).pointerEvents,
+          zIndex: Number(window.getComputedStyle(root).zIndex),
+          canvasRole: canvas.getAttribute("role") ?? "",
+          canvasLabelLength: canvas.getAttribute("aria-label")?.length ?? 0,
+          expectedTitle: target.expectedTitle,
+          expectedTitleIncludes: target.expectedTitleIncludes,
+          minTitleLength: target.minTitleLength ?? 1
+        };
+      }, { target: auditTarget });
 
-    const titleMatches = target.expectedTitle
-      ? audit.title === target.expectedTitle
-      : target.expectedTitleIncludes
-        ? audit.title.includes(target.expectedTitleIncludes)
-        : audit.title.length >= (target.minTitleLength ?? 1);
-    if (
-      !audit.ok
-      || audit.role !== "tooltip"
-      || audit.live !== "polite"
-      || !audit.visible
-      || audit.scene !== target.sceneName
-      || !titleMatches
-      || audit.title.length < (target.minTitleLength ?? 1)
-      || audit.body.length < audit.title.length + 8
-      || audit.width < 260
-      || audit.height < 60
-      || !audit.inViewport
-      || !audit.inCanvas
-      || audit.pointerEvents !== "none"
-      || audit.zIndex < 8
-      || audit.canvasRole !== "img"
-      || audit.canvasLabelLength < 20
-    ) {
-      throw new Error(`${target.sceneName}: invalid readability tooltip ${JSON.stringify(audit, null, 2)}`);
+      const titleMatches = target.expectedTitle
+        ? audit.title === target.expectedTitle
+        : target.expectedTitleIncludes
+          ? audit.title.includes(target.expectedTitleIncludes)
+          : audit.title.length >= (target.minTitleLength ?? 1);
+      if (
+        !audit.ok
+        || audit.role !== "tooltip"
+        || audit.live !== "polite"
+        || !audit.visible
+        || audit.scene !== target.sceneName
+        || !titleMatches
+        || audit.title.length < (target.minTitleLength ?? 1)
+        || audit.body.length < audit.title.length + 8
+        || audit.width < viewport.minWidth
+        || audit.height < viewport.minHeight
+        || audit.widthRatio > viewport.maxWidthRatio
+        || audit.heightRatio > viewport.maxHeightRatio
+        || !audit.inViewport
+        || (viewport.allowLetterbox ? audit.overlapsCanvas : !audit.inCanvas)
+        || audit.pointerEvents !== "none"
+        || audit.zIndex < 8
+        || audit.canvasRole !== "img"
+        || audit.canvasLabelLength < 20
+      ) {
+        throw new Error(`${target.sceneName}/${viewport.key}: invalid readability tooltip ${JSON.stringify(audit, null, 2)}`);
+      }
+
+      const screenshot = path.join("tmp", "ui-quality", "readability-tooltips", `${target.key}-tooltip-v1-${viewport.suffix}.png`);
+      await page.screenshot({ path: screenshot, fullPage: true });
+      results.push({
+        scene: target.sceneName,
+        viewport: viewport.key,
+        title: audit.title,
+        size: `${Math.round(audit.width)}x${Math.round(audit.height)}`,
+        canvas: `${Math.round(audit.canvasWidth)}x${Math.round(audit.canvasHeight)}`,
+        coverage: `${audit.widthRatio.toFixed(2)}x${audit.heightRatio.toFixed(2)}`,
+        screenshot: path.resolve(screenshot)
+      });
+
+      await page.mouse.move(4, 4);
     }
-
-    const screenshot = path.join("tmp", "ui-quality", "readability-tooltips", `${target.key}-tooltip-v1-1920.png`);
-    await page.screenshot({ path: screenshot, fullPage: true });
-    results.push({
-      scene: target.sceneName,
-      title: audit.title,
-      size: `${Math.round(audit.width)}x${Math.round(audit.height)}`,
-      screenshot: path.resolve(screenshot)
-    });
-
-    await page.mouse.move(4, 4);
   }
 
   console.log(JSON.stringify({ ok: true, baseUrl, results }, null, 2));

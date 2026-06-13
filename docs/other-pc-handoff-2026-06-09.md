@@ -7,7 +7,7 @@ Repository:
 - GitHub: `https://github.com/vivaca86/game.git`
 - Branch: `main`
 - Latest pushed commit: run `git log -1 --oneline` after pulling.
-- Expected latest commit title after the 2026-06-14 visible readability-tooltip continuation: `Add visible readability tooltips`
+- Expected latest commit title after the 2026-06-14 responsive readability-tooltip continuation: `Add responsive tooltip placement audit`
 
 ## Start On Another PC
 
@@ -22,7 +22,7 @@ npm install
 Expected first commit title in `git log --oneline -5` after the latest continuation:
 
 ```text
-Add visible readability tooltips
+Add responsive tooltip placement audit
 ```
 
 Expected status:
@@ -39,7 +39,7 @@ The user rejected procedural/vector-looking UI. Continue with these rules:
 - Do not add Phaser rectangle/stroke/vector overlays as visible UI on concept screens.
 - Keyboard focus must reuse the same bitmap language as pointer hover/down where possible.
 - Do not introduce a new focus ring, tint, generic badge, or new visual style without matching the concept source.
-- Keep completion language conservative. Current estimate is about 89%, not final and not 95%.
+- Keep completion language conservative. Current estimate is about 90%, not final and not 95%.
 
 Main reference docs:
 
@@ -117,7 +117,7 @@ Recommended next work:
 
 4. Dynamic labels/tooltips/accessibility:
    - First hidden accessibility labels and first visible tooltip zones now exist.
-   - Continue broader gameplay-critical readable text, disabled explanations, mobile tooltip placement, and user acceptance.
+   - Continue broader gameplay-critical readable text, disabled explanations, selected/focus tooltip consistency, full mobile framing/orientation review, and user acceptance.
    - Do not put explanatory text directly into the baked concept layers as a shortcut.
 
 ## Useful Evidence Paths
@@ -642,3 +642,46 @@ All listed checks passed. The tooltip audit reported these representative titles
 Visual inspection of the Combat and Settings screenshots confirmed the tooltip is readable and does not cover the main playfield in the inspected states.
 
 Important limitation: this is still not final readability approval. It proves representative visible tooltip zones after the hidden accessibility-label pass, but the project still needs broader gameplay-critical readable text decisions, disabled-state explanations, mobile tooltip/framing review, user acceptance, and final 95% concept-match approval next.
+
+## 2026-06-14 Responsive Tooltip Placement WIP Continuation
+
+Status remains `Partially complete`.
+
+Current estimate is about 90% of the active UI goal, not 95%.
+
+Additional local continuation work:
+
+- The readability tooltip now sizes itself from the active Phaser canvas rather than only using a desktop-width default.
+- On narrow portrait letterboxed screens, such as 390x844 where the canvas renders as `390x219`, the tooltip moves into the unused letterbox area above or below the canvas instead of covering the playfield.
+- `src/styles/phaser-shell.css` now accepts tooltip sizing variables for width, min-height, max-height, and padding.
+- `src/ui/overlays/readabilityOverlay.ts` computes responsive tooltip width/max-height from the canvas and uses portrait letterbox placement when enough vertical safe space exists.
+- `tools/ui-readability-tooltip-audit.mjs` now verifies all ten primary raster scenes at:
+  - `1920x1080`
+  - `1280x720`
+  - `390x844`
+- Desktop cases must stay inside the canvas; mobile portrait cases must stay in the viewport and not overlap the canvas.
+
+Verification for this continuation:
+
+```powershell
+npx.cmd tsc --noEmit
+git diff --check
+node tools\ui-readability-tooltip-audit.mjs
+node tools\ui-accessibility-overlay-audit.mjs
+node tools\ui-responsive-raster-audit.mjs
+npm.cmd run check
+$env:PHASER_SMOKE_PROGRESS='1'
+$env:PHASER_SMOKE_PROGRESS_FILE='tmp/phaser-smoke-progress-responsive-tooltip-targeted.log'
+$env:PHASER_SMOKE_ONLY='checkViewScreenshots,checkClickableControls,checkFullInputCoverage,checkUiSkinStates'
+node tmp\run-phaser-smoke-with-vite.mjs
+```
+
+All listed checks passed. The tooltip audit now reports 30 passing scene/viewport cases. Representative mobile results:
+
+- WorldMap mobile: tooltip `289x64`, canvas `390x219`, no canvas overlap.
+- Combat mobile: tooltip `289x83`, canvas `390x219`, no canvas overlap.
+- Settings mobile: tooltip `289x64`, canvas `390x219`, no canvas overlap.
+
+Visual inspection of `worldmap-tooltip-v1-mobile-390x844.png`, `combat-tooltip-v1-mobile-390x844.png`, and `settings-tooltip-v1-mobile-390x844.png` confirmed the tooltip uses the letterbox space and no longer covers the game scene in portrait.
+
+Important limitation: this still does not finish mobile UX. It only fixes and audits tooltip placement in the current portrait letterbox layout. Full mobile framing/orientation treatment, broader gameplay-critical readable text, disabled explanations, selected/focus tooltip consistency, user acceptance, and final 95% concept-match approval remain next.

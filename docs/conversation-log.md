@@ -2108,3 +2108,15 @@ Representative tooltip copy was wired across Town, WorldMap, Dungeon, Combat, Re
 Verification passed with `node tools\ui-readability-tooltip-audit.mjs`, `node tools\ui-accessibility-overlay-audit.mjs`, `node tools\ui-responsive-raster-audit.mjs`, `node tmp\ui-worldmap-action-hit-target-audit.mjs`, `node tmp\route-node-raster-hover-state-audit.mjs`, `npx.cmd tsc --noEmit`, `git diff --check`, and targeted `$env:PHASER_SMOKE_ONLY='checkViewScreenshots,checkClickableControls,checkFullInputCoverage,checkUiSkinStates'; node tmp\run-phaser-smoke-with-vite.mjs` ending in `Phaser smoke OK`. Combat and Settings tooltip screenshots were visually inspected and looked readable without covering the main playfield.
 
 This remains partial UI progress, roughly about 89% of the active UI goal, not 95%. The visible tooltip pass proves representative safe text zones, but broader gameplay-critical text coverage, disabled explanations, mobile tooltip/framing review, user acceptance, and final concept-match approval remain unfinished.
+
+### Codex
+
+Codex continued the tooltip/readability track by tightening the mobile portrait behavior. The first visible tooltip pass proved desktop-safe zones, but screenshot review at 390x844 showed the tooltip could still cover a large portion of the tiny 16:9 canvas because the game currently letterboxes to `390x219` in portrait.
+
+`src/ui/overlays/readabilityOverlay.ts` now sizes the tooltip from the actual Phaser canvas and, on narrow portrait letterboxed screens, places it in the unused letterbox space above or below the canvas instead of over the playfield. `src/styles/phaser-shell.css` exposes width/min-height/max-height/padding CSS variables for that runtime sizing.
+
+`tools/ui-readability-tooltip-audit.mjs` now runs the same ten primary raster tooltip checks at 1920x1080, 1280x720, and 390x844. Desktop cases must remain inside the canvas; mobile portrait cases must remain in the viewport without overlapping the canvas. The audit passed all 30 cases. Representative mobile evidence: WorldMap `289x64` tooltip over a `390x219` canvas with no overlap, Combat `289x83` with no overlap, and Settings `289x64` with no overlap. Visual inspection of the mobile WorldMap, Combat, and Settings captures confirmed that the tooltip uses the letterbox area and no longer hides the game scene.
+
+Verification passed with `npx.cmd tsc --noEmit`, `git diff --check`, `node tools\ui-readability-tooltip-audit.mjs`, `node tools\ui-accessibility-overlay-audit.mjs`, `node tools\ui-responsive-raster-audit.mjs`, `npm.cmd run check`, and targeted `$env:PHASER_SMOKE_ONLY='checkViewScreenshots,checkClickableControls,checkFullInputCoverage,checkUiSkinStates'; node tmp\run-phaser-smoke-with-vite.mjs` ending in `Phaser smoke OK`.
+
+This remains partial UI progress, roughly about 90% of the active UI goal, not 95%. Mobile tooltip placement is now covered, but full mobile framing/orientation treatment, broader gameplay-critical readable text, disabled explanations, selected/focus tooltip consistency, user acceptance, and final concept-match approval remain unfinished.

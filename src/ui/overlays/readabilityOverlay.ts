@@ -72,10 +72,27 @@ function positionTooltip(root: HTMLElement, anchor: ReadabilityTooltipAnchor): v
   const anchorCenterY = canvasBox.top + (anchor.y / VIRTUAL_HEIGHT) * canvasBox.height;
   const anchorWidth = (anchor.width / VIRTUAL_WIDTH) * canvasBox.width;
   const anchorHeight = (anchor.height / VIRTUAL_HEIGHT) * canvasBox.height;
-  const tooltipBox = root.getBoundingClientRect();
-  const tooltipWidth = Math.max(280, tooltipBox.width || 336);
-  const tooltipHeight = Math.max(74, tooltipBox.height || 82);
   const canvasMargin = Math.max(12, Math.min(22, canvasBox.width * 0.014));
+  applyResponsiveTooltipSizing(root, canvasBox.width, canvasBox.height, canvasMargin);
+  const tooltipBox = root.getBoundingClientRect();
+  const compact = canvasBox.width < 700;
+  const tooltipWidth = Math.max(compact ? 220 : 280, tooltipBox.width || (compact ? 260 : 336));
+  const tooltipHeight = Math.max(compact ? 54 : 74, tooltipBox.height || (compact ? 58 : 82));
+  const letterboxTopSpace = canvasBox.top - canvasMargin;
+  const letterboxBottomSpace = window.innerHeight - canvasBox.bottom - canvasMargin;
+  const canUsePortraitLetterbox = compact
+    && Math.max(letterboxTopSpace, letterboxBottomSpace) >= tooltipHeight + canvasMargin;
+  if (canUsePortraitLetterbox) {
+    const preferBelowCanvas = anchorCenterY >= canvasBox.top + canvasBox.height * 0.5;
+    const canUseBottom = letterboxBottomSpace >= tooltipHeight + canvasMargin;
+    const canUseTop = letterboxTopSpace >= tooltipHeight + canvasMargin;
+    const tooltipTop = ((preferBelowCanvas && canUseBottom) || !canUseTop)
+      ? canvasBox.bottom + canvasMargin
+      : canvasBox.top - tooltipHeight - canvasMargin;
+    root.style.left = `${clamp(anchorCenterX - tooltipWidth / 2, canvasMargin, window.innerWidth - tooltipWidth - canvasMargin)}px`;
+    root.style.top = `${clamp(tooltipTop, canvasMargin, window.innerHeight - tooltipHeight - canvasMargin)}px`;
+    return;
+  }
   const above = anchorCenterY > canvasBox.top + canvasBox.height * 0.56;
   const preferredLeft = anchorCenterX - tooltipWidth / 2;
   const preferredTop = above
@@ -93,4 +110,21 @@ function positionTooltip(root: HTMLElement, anchor: ReadabilityTooltipAnchor): v
 function clamp(value: number, min: number, max: number): number {
   if (max < min) return min;
   return Math.max(min, Math.min(max, value));
+}
+
+function applyResponsiveTooltipSizing(
+  root: HTMLElement,
+  canvasWidth: number,
+  canvasHeight: number,
+  canvasMargin: number
+): void {
+  const compact = canvasWidth < 700;
+  const maxWidth = Math.max(180, canvasWidth - canvasMargin * 2);
+  const preferredWidth = compact
+    ? Math.min(maxWidth, Math.max(220, canvasWidth * 0.74))
+    : Math.min(maxWidth, 336);
+  root.style.setProperty("--readability-tooltip-width", `${Math.round(preferredWidth)}px`);
+  root.style.setProperty("--readability-tooltip-min-height", compact ? "54px" : "74px");
+  root.style.setProperty("--readability-tooltip-max-height", `${Math.max(48, Math.round(canvasHeight - canvasMargin * 2))}px`);
+  root.style.setProperty("--readability-tooltip-padding", compact ? "9px 11px 10px" : "12px 15px 13px");
 }
