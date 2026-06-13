@@ -320,6 +320,12 @@ try {
     logEntry: "audit:worldmap_late_lock_stage10",
     screenshot: "tmp/ui-quality/worldmap/worldmap-progress-current-stage9-v1-1920.png"
   });
+  const midSealedStateAudit = await runStateOverlayAudit(browser, baseUrl, {
+    completedCount: 5,
+    currentStageIndex: 5,
+    logEntry: "audit:worldmap_mid_sealed_stage7",
+    screenshot: "tmp/ui-quality/worldmap/worldmap-progress-mid-sealed-stage6-v1-1920.png"
+  });
   const keyboardStageSelectAudit = await runKeyboardStageSelectAudit(browser, baseUrl);
 
   await page.mouse.click(box.x + (1576 / 1920) * box.width, box.y + (970 / 1080) * box.height);
@@ -331,12 +337,14 @@ try {
     stateScreenshot: path.resolve("tmp/ui-quality/worldmap/worldmap-state-overlays-v1-1920.png"),
     progressStateScreenshot: path.resolve("tmp/ui-quality/worldmap/worldmap-progress-current-stage4-v1-1920.png"),
     lateLockStateScreenshot: path.resolve("tmp/ui-quality/worldmap/worldmap-progress-current-stage9-v1-1920.png"),
+    midSealedStateScreenshot: path.resolve("tmp/ui-quality/worldmap/worldmap-progress-mid-sealed-stage6-v1-1920.png"),
     oldCenterClickScene,
     hoverAudit,
     neutralizedUnderlayAudit,
     stateAudit,
     progressStateAudit,
     lateLockStateAudit,
+    midSealedStateAudit,
     keyboardStageSelectAudit,
     finalScene: await activeSceneKey(page)
   }, null, 2));
@@ -462,8 +470,12 @@ async function runKeyboardStageSelectAudit(browser, baseUrl) {
       const lockedNextBodyImages = visible.filter((child) => child?.type === "Image" && child.texture?.key === "ui_locked_stage_body_wash_concept" && (child.alpha ?? 1) > 0.05);
       const lockedFarBodyImages = visible.filter((child) => child?.type === "Image" && child.texture?.key === "ui_locked_stage_far_body_wash_concept" && (child.alpha ?? 1) > 0.05);
       const lockedBodyImages = [...lockedNextBodyImages, ...lockedFarBodyImages];
-      const sealedBodyImages = visible.filter((child) => child?.type === "Image" && child.texture?.key === "ui_sealed_stage_body_wash_concept" && (child.alpha ?? 1) > 0.05);
-      const sealedFrameImages = visible.filter((child) => child?.type === "Image" && child.texture?.key === "ui_sealed_stage_frame_concept" && (child.alpha ?? 1) > 0.05);
+      const sealedBaseBodyImages = visible.filter((child) => child?.type === "Image" && child.texture?.key === "ui_sealed_stage_body_wash_concept" && (child.alpha ?? 1) > 0.05);
+      const sealedMidBodyImages = visible.filter((child) => child?.type === "Image" && child.texture?.key === "ui_sealed_stage_mid_body_wash_concept" && (child.alpha ?? 1) > 0.05);
+      const sealedBodyImages = [...sealedBaseBodyImages, ...sealedMidBodyImages];
+      const sealedBaseFrameImages = visible.filter((child) => child?.type === "Image" && child.texture?.key === "ui_sealed_stage_frame_concept" && (child.alpha ?? 1) > 0.05);
+      const sealedMidFrameImages = visible.filter((child) => child?.type === "Image" && child.texture?.key === "ui_sealed_stage_mid_frame_concept" && (child.alpha ?? 1) > 0.05);
+      const sealedFrameImages = [...sealedBaseFrameImages, ...sealedMidFrameImages];
       const dormantBaseBodyImages = visible.filter((child) => child?.type === "Image" && child.texture?.key === "ui_dormant_stage_body_wash_concept" && (child.alpha ?? 1) > 0.05);
       const dormantMidBodyImages = visible.filter((child) => child?.type === "Image" && child.texture?.key === "ui_dormant_stage_mid_body_wash_concept" && (child.alpha ?? 1) > 0.05);
       const dormantBodyImages = [...dormantBaseBodyImages, ...dormantMidBodyImages];
@@ -757,16 +769,28 @@ async function runStateOverlayAudit(browser, baseUrl, auditCase) {
         && child.texture?.key === "ui_sealed_stage_badge_concept"
         && (child.alpha ?? 1) > 0.05
       ));
-      const sealedBodyImages = visible.filter((child) => (
+      const sealedBaseBodyImages = visible.filter((child) => (
         child?.type === "Image"
         && child.texture?.key === "ui_sealed_stage_body_wash_concept"
         && (child.alpha ?? 1) > 0.05
       ));
-      const sealedFrameImages = visible.filter((child) => (
+      const sealedMidBodyImages = visible.filter((child) => (
+        child?.type === "Image"
+        && child.texture?.key === "ui_sealed_stage_mid_body_wash_concept"
+        && (child.alpha ?? 1) > 0.05
+      ));
+      const sealedBodyImages = [...sealedBaseBodyImages, ...sealedMidBodyImages];
+      const sealedBaseFrameImages = visible.filter((child) => (
         child?.type === "Image"
         && child.texture?.key === "ui_sealed_stage_frame_concept"
         && (child.alpha ?? 1) > 0.05
       ));
+      const sealedMidFrameImages = visible.filter((child) => (
+        child?.type === "Image"
+        && child.texture?.key === "ui_sealed_stage_mid_frame_concept"
+        && (child.alpha ?? 1) > 0.05
+      ));
+      const sealedFrameImages = [...sealedBaseFrameImages, ...sealedMidFrameImages];
       const dormantBaseBodyImages = visible.filter((child) => (
         child?.type === "Image"
         && child.texture?.key === "ui_dormant_stage_body_wash_concept"
@@ -887,8 +911,10 @@ async function runStateOverlayAudit(browser, baseUrl, auditCase) {
       const expectedLockedNext = expectedLocked.filter(({ index }) => index === firstLockedIndex);
       const expectedLockedFar = expectedLocked.filter(({ index }) => index !== firstLockedIndex);
       const expectedSealed = stages
-        .map((stage, index) => ({ stage, node: stageNodes[index] }))
+        .map((stage, index) => ({ stage, node: stageNodes[index], index }))
         .filter(({ stage, node }, index) => node && !unlockedStageIds.has(stage.id) && index < 9 && index === firstLockedIndex);
+      const expectedSealedBase = expectedSealed.filter(({ index }) => index <= 4);
+      const expectedSealedMid = expectedSealed.filter(({ index }) => index > 4);
       const expectedDormant = stages
         .map((stage, index) => ({ stage, node: stageNodes[index], index }))
         .filter(({ stage, node, index }) => node && !unlockedStageIds.has(stage.id) && index < 9 && index !== firstLockedIndex);
@@ -1122,20 +1148,26 @@ async function runStateOverlayAudit(browser, baseUrl, auditCase) {
           minAlpha: nextLocked ? 0.54 : 0.4
         };
       };
-      const sealedBodyPlacement = (node) => ({
-        x: node.x + node.width * 0.01,
-        y: node.y + node.height * 0.07,
-        width: node.width * 1.1,
-        height: node.height * 1.16,
-        minAlpha: 0.48
-      });
-      const sealedFramePlacement = (node) => ({
-        x: node.x + node.width * 0.01,
-        y: node.y + node.height * 0.05,
-        width: node.width * 1.24,
-        height: node.height * 1.3,
-        minAlpha: 0.56
-      });
+      const sealedBodyPlacement = (node, stageIndex) => {
+        const midNode = stageIndex > 4;
+        return {
+          x: node.x + node.width * 0.01,
+          y: node.y + node.height * 0.07,
+          width: node.width * (midNode ? 1.08 : 1.1),
+          height: node.height * (midNode ? 1.14 : 1.16),
+          minAlpha: midNode ? 0.4 : 0.48
+        };
+      };
+      const sealedFramePlacement = (node, stageIndex) => {
+        const midNode = stageIndex > 4;
+        return {
+          x: node.x + node.width * 0.01,
+          y: node.y + node.height * 0.05,
+          width: node.width * (midNode ? 1.2 : 1.24),
+          height: node.height * (midNode ? 1.26 : 1.3),
+          minAlpha: midNode ? 0.46 : 0.56
+        };
+      };
       const dormantBodyPlacement = (node, stageIndex) => {
         const lowerNode = stageIndex <= 4;
         return {
@@ -1160,6 +1192,8 @@ async function runStateOverlayAudit(browser, baseUrl, auditCase) {
       const dormantFrameImagesForIndex = (stageIndex) => stageIndex > 4 ? dormantMidFrameImages : dormantBaseFrameImages;
       const lockedBodyImagesForIndex = (stageIndex) => stageIndex === firstLockedIndex ? lockedNextBodyImages : lockedFarBodyImages;
       const lockedFrameImagesForIndex = (stageIndex) => stageIndex === firstLockedIndex ? lockedNextFrameImages : lockedFarFrameImages;
+      const sealedBodyImagesForIndex = (stageIndex) => stageIndex > 4 ? sealedMidBodyImages : sealedBaseBodyImages;
+      const sealedFrameImagesForIndex = (stageIndex) => stageIndex > 4 ? sealedMidFrameImages : sealedBaseFrameImages;
       const sealedBadgePlacement = (node) => ({
         x: node.x + node.width * 0.01,
         y: node.y + node.height * 0.39
@@ -1277,23 +1311,23 @@ async function runStateOverlayAudit(browser, baseUrl, auditCase) {
           && Math.abs(image.displayHeight - 60) <= 1
           && (image.alpha ?? 1) >= 0.8;
       });
-      const sealedBodiesAtExpectedNodes = expectedSealed.every(({ node }) => (
-        hasImageAt(sealedBodyImages, sealedBodyPlacement(node).x, sealedBodyPlacement(node).y)
+      const sealedBodiesAtExpectedNodes = expectedSealed.every(({ node, index }) => (
+        hasImageAt(sealedBodyImagesForIndex(index), sealedBodyPlacement(node, index).x, sealedBodyPlacement(node, index).y)
       ));
-      const sealedBodyStyleAtExpectedNodes = expectedSealed.every(({ node }) => {
-        const placement = sealedBodyPlacement(node);
-        const image = imageAt(sealedBodyImages, placement.x, placement.y);
+      const sealedBodyStyleAtExpectedNodes = expectedSealed.every(({ node, index }) => {
+        const placement = sealedBodyPlacement(node, index);
+        const image = imageAt(sealedBodyImagesForIndex(index), placement.x, placement.y);
         return image
           && Math.abs(image.displayWidth - placement.width) <= 1
           && Math.abs(image.displayHeight - placement.height) <= 1
           && (image.alpha ?? 1) >= placement.minAlpha;
       });
-      const sealedFramesAtExpectedNodes = expectedSealed.every(({ node }) => (
-        hasImageAt(sealedFrameImages, sealedFramePlacement(node).x, sealedFramePlacement(node).y)
+      const sealedFramesAtExpectedNodes = expectedSealed.every(({ node, index }) => (
+        hasImageAt(sealedFrameImagesForIndex(index), sealedFramePlacement(node, index).x, sealedFramePlacement(node, index).y)
       ));
-      const sealedFrameStyleAtExpectedNodes = expectedSealed.every(({ node }) => {
-        const placement = sealedFramePlacement(node);
-        const image = imageAt(sealedFrameImages, placement.x, placement.y);
+      const sealedFrameStyleAtExpectedNodes = expectedSealed.every(({ node, index }) => {
+        const placement = sealedFramePlacement(node, index);
+        const image = imageAt(sealedFrameImagesForIndex(index), placement.x, placement.y);
         return image
           && Math.abs(image.displayWidth - placement.width) <= 1
           && Math.abs(image.displayHeight - placement.height) <= 1
@@ -1474,7 +1508,11 @@ async function runStateOverlayAudit(browser, baseUrl, auditCase) {
           && lockedFarFrameImages.length === expectedLockedFar.length
           && lockedImages.length === expectedLocked.length
           && sealedBodyImages.length === expectedSealed.length
+          && sealedBaseBodyImages.length === expectedSealedBase.length
+          && sealedMidBodyImages.length === expectedSealedMid.length
           && sealedFrameImages.length === expectedSealed.length
+          && sealedBaseFrameImages.length === expectedSealedBase.length
+          && sealedMidFrameImages.length === expectedSealedMid.length
           && sealedImages.length === expectedSealed.length
           && dormantBodyImages.length === expectedDormant.length
           && dormantBaseBodyImages.length === expectedDormantBase.length
@@ -1608,10 +1646,18 @@ async function runStateOverlayAudit(browser, baseUrl, auditCase) {
         lockedStyleAtExpectedNodes,
         visibleSealedBodies: sealedBodyImages.length,
         expectedSealedBodies: expectedSealed.length,
+        visibleSealedBaseBodies: sealedBaseBodyImages.length,
+        expectedSealedBaseBodies: expectedSealedBase.length,
+        visibleSealedMidBodies: sealedMidBodyImages.length,
+        expectedSealedMidBodies: expectedSealedMid.length,
         sealedBodiesAtExpectedNodes,
         sealedBodyStyleAtExpectedNodes,
         visibleSealedFrames: sealedFrameImages.length,
         expectedSealedFrames: expectedSealed.length,
+        visibleSealedBaseFrames: sealedBaseFrameImages.length,
+        expectedSealedBaseFrames: expectedSealedBase.length,
+        visibleSealedMidFrames: sealedMidFrameImages.length,
+        expectedSealedMidFrames: expectedSealedMid.length,
         sealedFramesAtExpectedNodes,
         sealedFrameStyleAtExpectedNodes,
         visibleSealedBadges: sealedImages.length,

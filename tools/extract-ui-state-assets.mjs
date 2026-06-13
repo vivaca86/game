@@ -679,6 +679,15 @@ const targets = [
     nativeSize: { w: 210, h: 220 }
   },
   {
+    key: "ui_sealed_stage_mid_frame_concept",
+    kind: "sealed_stage_frame",
+    source: path.join(rootDir, "assets", "concepts", "ui", "world_map_ui_concept_v001.png"),
+    output: path.join(rootDir, "assets", "source", "ui", "ui_sealed_stage_mid_frame_concept_v001.png"),
+    crop: { x: 564, y: 356, w: 170, h: 178 },
+    nativeSize: { w: 210, h: 220 },
+    stateVariant: "sealedMid"
+  },
+  {
     key: "ui_sealed_stage_body_wash_concept",
     kind: "world_map_stage_body_wash",
     source: path.join(rootDir, "assets", "concepts", "ui", "world_map_ui_concept_v001.png"),
@@ -686,6 +695,15 @@ const targets = [
     crop: { x: 564, y: 356, w: 170, h: 178 },
     nativeSize: { w: 210, h: 220 },
     stateVariant: "sealed"
+  },
+  {
+    key: "ui_sealed_stage_mid_body_wash_concept",
+    kind: "world_map_stage_body_wash",
+    source: path.join(rootDir, "assets", "concepts", "ui", "world_map_ui_concept_v001.png"),
+    output: path.join(rootDir, "assets", "source", "ui", "ui_sealed_stage_mid_body_wash_concept_v001.png"),
+    crop: { x: 564, y: 356, w: 170, h: 178 },
+    nativeSize: { w: 210, h: 220 },
+    stateVariant: "sealedMid"
   },
   {
     key: "ui_dormant_stage_frame_concept",
@@ -2096,6 +2114,7 @@ try {
         const numberY = nativeSize.h * 0.36;
         const sealX = nativeSize.w * 0.5;
         const sealY = nativeSize.h * 0.73;
+        const sealedMidVariant = stateVariant === "sealedMid";
         const dormantMidVariant = stateVariant === "dormantMid";
 
         for (let y = 0; y < nativeSize.h; y += 1) {
@@ -2155,7 +2174,9 @@ try {
             const parchment = r > 126 && g > 100 && b > 72 && saturation < 82;
             const brightRoute = r > 164 && g > 154 && b > 132 && saturation < 78;
 
-            const colorKeep = dormantMidVariant
+            const colorKeep = sealedMidVariant
+              ? Math.max(silver * 0.86, coolEdge * 0.94, gold * 0.16, darkEdge * 0.18)
+              : dormantMidVariant
               ? Math.max(silver * 0.78, coolEdge * 0.86, gold * 0.14, darkEdge * 0.18)
               : Math.max(silver * 0.96, coolEdge * 1.02, gold * 0.2, darkEdge * 0.22);
             let keep = colorKeep
@@ -2171,7 +2192,11 @@ try {
               continue;
             }
 
-            if (dormantMidVariant) {
+            if (sealedMidVariant) {
+              data[offset] = Math.min(255, Math.round(r * 0.97 + gold * 5));
+              data[offset + 1] = Math.min(255, Math.round(g * 1.0 + silver * 4));
+              data[offset + 2] = Math.min(255, Math.round(b * 1.02 + coolEdge * 7));
+            } else if (dormantMidVariant) {
               data[offset] = Math.min(255, Math.round(r * 0.96 + gold * 4));
               data[offset + 1] = Math.min(255, Math.round(g * 0.99 + silver * 3));
               data[offset + 2] = Math.min(255, Math.round(b * 1.01 + coolEdge * 6));
@@ -2180,8 +2205,8 @@ try {
               data[offset + 1] = Math.min(255, Math.round(g * 1.01 + silver * 5));
               data[offset + 2] = Math.min(255, Math.round(b * 1.03 + coolEdge * 9));
             }
-            const alphaCap = dormantMidVariant ? 188 : 226;
-            const alphaScale = dormantMidVariant ? 0.78 : 1;
+            const alphaCap = sealedMidVariant ? 198 : dormantMidVariant ? 188 : 226;
+            const alphaScale = sealedMidVariant ? 0.86 : dormantMidVariant ? 0.78 : 1;
             data[offset + 3] = Math.round(Math.min(alphaCap, 232 * keep * (0.56 + outerFalloff * 0.44) * alphaScale));
           }
         }
@@ -2235,11 +2260,13 @@ try {
         const centerY = nativeSize.h * 0.5;
         const lockedFarVariant = stateVariant === "lockedFar";
         const redLockedVariant = stateVariant === "locked" || lockedFarVariant;
-        const grayLockedVariant = stateVariant === "sealed" || stateVariant === "dormant" || stateVariant === "dormantMid";
+        const sealedMidVariant = stateVariant === "sealedMid";
+        const grayLockedVariant = stateVariant === "sealed" || sealedMidVariant || stateVariant === "dormant" || stateVariant === "dormantMid";
         const completedLateVariant = stateVariant === "completedLate";
         const currentVariant = stateVariant === "current" || stateVariant === "currentLate";
         const currentLateVariant = stateVariant === "currentLate";
         const dormantMidVariant = stateVariant === "dormantMid";
+        const subduedGrayMidVariant = sealedMidVariant || dormantMidVariant;
         const numberY = currentVariant
           ? nativeSize.h * 0.43
           : redLockedVariant
@@ -2247,8 +2274,8 @@ try {
             : grayLockedVariant
               ? nativeSize.h * 0.35
               : nativeSize.h * 0.36;
-        const numberRx = redLockedVariant ? nativeSize.w * (lockedFarVariant ? 0.32 : 0.31) : grayLockedVariant ? nativeSize.w * (dormantMidVariant ? 0.29 : 0.27) : completedLateVariant ? nativeSize.w * 0.24 : currentLateVariant ? nativeSize.w * 0.23 : nativeSize.w * 0.21;
-        const numberRy = redLockedVariant ? nativeSize.h * (lockedFarVariant ? 0.25 : 0.24) : grayLockedVariant ? nativeSize.h * (dormantMidVariant ? 0.23 : 0.22) : completedLateVariant ? nativeSize.h * 0.19 : currentLateVariant ? nativeSize.h * 0.18 : nativeSize.h * 0.17;
+        const numberRx = redLockedVariant ? nativeSize.w * (lockedFarVariant ? 0.32 : 0.31) : grayLockedVariant ? nativeSize.w * (subduedGrayMidVariant ? 0.29 : 0.27) : completedLateVariant ? nativeSize.w * 0.24 : currentLateVariant ? nativeSize.w * 0.23 : nativeSize.w * 0.21;
+        const numberRy = redLockedVariant ? nativeSize.h * (lockedFarVariant ? 0.25 : 0.24) : grayLockedVariant ? nativeSize.h * (subduedGrayMidVariant ? 0.23 : 0.22) : completedLateVariant ? nativeSize.h * 0.19 : currentLateVariant ? nativeSize.h * 0.18 : nativeSize.h * 0.17;
         const lowerIconY = currentVariant ? nativeSize.h * 0.63 : redLockedVariant ? nativeSize.h * 0.67 : grayLockedVariant ? nativeSize.h * 0.72 : nativeSize.h * 0.77;
         const lowerIconX = currentVariant ? nativeSize.w * 0.79 : nativeSize.w * 0.5;
         const lowerIconRx = currentVariant ? nativeSize.w * 0.18 : redLockedVariant ? nativeSize.w * 0.38 : grayLockedVariant ? nativeSize.w * 0.32 : completedLateVariant ? nativeSize.w * 0.31 : nativeSize.w * 0.28;
@@ -2322,6 +2349,8 @@ try {
               colorKeep = Math.max(green * 1.12, cyan * 0.82, gold * 0.22, darkEdge * 0.16);
             } else if (completedLateVariant) {
               colorKeep = Math.max(green * 0.86, cyan * 0.56, gold * 0.16, darkEdge * 0.12);
+            } else if (sealedMidVariant) {
+              colorKeep = Math.max(silver * 0.88, coolEdge * 0.96, gold * 0.16, darkEdge * 0.18);
             } else if (dormantMidVariant) {
               colorKeep = Math.max(silver * 0.82, coolEdge * 0.9, gold * 0.14, darkEdge * 0.16);
             } else if (grayLockedVariant) {
@@ -2362,6 +2391,10 @@ try {
               data[offset] = Math.min(255, Math.round(r * 0.97 + gold * 5));
               data[offset + 1] = Math.min(255, Math.round(g * 1.01 + green * 9 + cyan * 3));
               data[offset + 2] = Math.min(255, Math.round(b * 1.0 + cyan * 5));
+            } else if (sealedMidVariant) {
+              data[offset] = Math.min(255, Math.round(r * 0.97 + gold * 5));
+              data[offset + 1] = Math.min(255, Math.round(g * 1.0 + silver * 4));
+              data[offset + 2] = Math.min(255, Math.round(b * 1.02 + coolEdge * 7));
             } else if (dormantMidVariant) {
               data[offset] = Math.min(255, Math.round(r * 0.96 + gold * 4));
               data[offset + 1] = Math.min(255, Math.round(g * 0.99 + silver * 3));
@@ -2379,8 +2412,8 @@ try {
               data[offset + 1] = Math.min(255, Math.round(g * 0.96 + gold * 9));
               data[offset + 2] = Math.max(0, Math.round(b * 0.9));
             }
-            const alphaScale = completedLateVariant || currentLateVariant || dormantMidVariant || lockedFarVariant ? 0.78 : 1;
-            const alphaCap = completedLateVariant ? 178 : currentLateVariant ? 184 : dormantMidVariant ? 176 : lockedFarVariant ? 180 : 216;
+            const alphaScale = completedLateVariant || currentLateVariant || sealedMidVariant || dormantMidVariant || lockedFarVariant ? 0.78 : 1;
+            const alphaCap = completedLateVariant ? 178 : currentLateVariant ? 184 : sealedMidVariant ? 186 : dormantMidVariant ? 176 : lockedFarVariant ? 180 : 216;
             data[offset + 3] = Math.round(Math.min(alphaCap, 220 * keep * (0.48 + outerFalloff * 0.36) * alphaScale));
           }
         }

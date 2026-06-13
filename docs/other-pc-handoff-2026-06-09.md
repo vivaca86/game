@@ -7,7 +7,7 @@ Repository:
 - GitHub: `https://github.com/vivaca86/game.git`
 - Branch: `main`
 - Latest pushed commit: run `git log -1 --oneline` after pulling.
-- Expected latest commit title after the 2026-06-14 WorldMap lower-node frame continuation: `Add WorldMap lower node frame layer`
+- Expected latest commit title after the 2026-06-14 WorldMap mid sealed-node continuation: `Add WorldMap mid sealed node variants`
 
 ## Start On Another PC
 
@@ -22,7 +22,7 @@ npm install
 Expected first commit title in `git log --oneline -5` after the latest continuation:
 
 ```text
-Add WorldMap lower node frame layer
+Add WorldMap mid sealed node variants
 ```
 
 Expected status:
@@ -123,6 +123,7 @@ Recommended next work:
    - Mobile portrait now has a non-blocking orientation/framing cue in unused letterbox space and suppresses it while readability tooltips are visible.
    - WorldMap now has muted locked/future route thread/bead material separate from completed/current cyan route material.
    - WorldMap now has neutral lower-node body and frame layers under the first five lower map nodes, separate from current/completed/sealed/dormant state stacks.
+   - WorldMap now splits first locked sealed-node body/frame material into lower/base and mid-route variants, with a stage-6/current evidence case for the mid sealed family.
    - Continue broader gameplay-critical readable text, broader selected/focus approval, broader disabled-state breadth, final mobile UX review, and user acceptance.
    - Do not put explanatory text directly into the baked concept layers as a shortcut.
 
@@ -1048,3 +1049,47 @@ Representative evidence:
 - `tmp/ui-quality/worldmap/worldmap-progress-current-stage9-v1-1920.png`
 
 Important limitation: this strengthens lower-node silhouette recomposition, but it is still not full WorldMap node/body recomposition. The map still needs stronger stage-specific current/completed/locked/sealed/dormant body variants, broader disabled/focus/readability coverage outside the audited paths, user acceptance, and final concept-match approval.
+
+## 2026-06-14 WorldMap Mid Sealed Node WIP Continuation
+
+Status remains `Partially complete`.
+
+Current estimate remains about a 95% candidate of the active UI goal, not final, release-ready, or user-accepted 95%.
+
+Additional local continuation work:
+
+- Added `ui_sealed_stage_mid_body_wash_concept` and `ui_sealed_stage_mid_frame_concept`.
+- The assets are extracted from the existing gray sealed/dormant WorldMap node crop with quieter `sealedMid` processing. They keep the transferable body/frame material number-safe and seal-center-safe, while avoiding the stronger lower sealed texture family on mid-route first-locked nodes.
+- `WorldMapScene` now keeps the base sealed body/frame for first locked lower nodes and uses the mid sealed body/frame for first locked sealed nodes after the lower 1-5 family.
+- Updated release sharing, slice/docs manifests, dev runtime generation, and `tmp/ui-worldmap-action-hit-target-audit.mjs`.
+- The WorldMap action audit now includes a stage-6/current, stage-7 first-locked mid sealed evidence case and verifies base/mid sealed body/frame counts separately.
+
+Verification for this continuation:
+
+```powershell
+node tools\extract-ui-state-assets.mjs
+npm.cmd run assets:generate:dev
+npx.cmd tsc --noEmit
+npm.cmd run assets:audit:strict
+node tmp\ui-worldmap-action-hit-target-audit.mjs
+node tools\ui-worldmap-keyboard-tooltip-audit.mjs
+node tools\ui-worldmap-locked-tooltip-audit.mjs
+node tmp\route-node-raster-hover-state-audit.mjs
+npm.cmd run check
+$env:PHASER_SMOKE_PROGRESS='1'
+$env:PHASER_SMOKE_PROGRESS_FILE='tmp/phaser-smoke-progress-worldmap-sealed-mid-targeted.log'
+$env:PHASER_SMOKE_ONLY='checkViewScreenshots,checkClickableControls,checkFullInputCoverage,checkUiSkinStates'
+node tmp\run-phaser-smoke-with-vite.mjs
+```
+
+All listed checks passed. `npm.cmd run assets:audit:strict` reports `manifestAssets=491`, `existingFiles=491`, `missingFiles=0`, and `orphanFiles=0`. The new mid sealed audit case reports `visibleSealedBaseBodies=0`, `visibleSealedMidBodies=1`, `visibleSealedBaseFrames=0`, and `visibleSealedMidFrames=1`; earlier lower sealed states still report base sealed 1 and mid sealed 0. `npm.cmd run check` still reports only the existing Vite large JS chunk warning. The targeted smoke ended with `Phaser smoke OK`. A parallel route-node hover audit attempt timed out under Playwright resource pressure, then the same audit passed when rerun serially.
+
+Representative evidence:
+
+- `assets/source/ui/ui_sealed_stage_mid_body_wash_concept_v001.png`
+- `assets/source/ui/ui_sealed_stage_mid_frame_concept_v001.png`
+- `public/assets/runtime/ui/ui_sealed_stage_mid_body_wash_concept_v001.png`
+- `public/assets/runtime/ui/ui_sealed_stage_mid_frame_concept_v001.png`
+- `tmp/ui-quality/worldmap/worldmap-progress-mid-sealed-stage6-v1-1920.png`
+
+Important limitation: this improves the sealed-node stage-family split, but it is still not full WorldMap node/body recomposition. Stronger stage-specific current/completed/locked/sealed/dormant body variants, broader disabled/focus/readability coverage outside the audited paths, user acceptance, and final concept-match approval remain.
