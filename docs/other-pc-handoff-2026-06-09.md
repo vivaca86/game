@@ -7,7 +7,7 @@ Repository:
 - GitHub: `https://github.com/vivaca86/game.git`
 - Branch: `main`
 - Latest pushed commit: run `git log -1 --oneline` after pulling.
-- Expected latest commit title after the 2026-06-14 latest responsive/readability continuation: `Document latest responsive audits`
+- Expected latest commit title after the 2026-06-14 broader focus-tooltip continuation: `Broaden focus tooltip audit`
 
 ## Start On Another PC
 
@@ -22,7 +22,7 @@ npm install
 Expected first commit title in `git log --oneline -5` after the latest continuation:
 
 ```text
-Document latest responsive audits
+Broaden focus tooltip audit
 ```
 
 Expected status:
@@ -1747,3 +1747,37 @@ The mobile framing audit passed Town, WorldMap, Dungeon, Combat, Reward, Event, 
 The accessibility overlay audit passed all ten primary scenes with hidden 1x1 status regions plus synchronized canvas labels and no visible text leak.
 
 Important limitation: this strengthens latest responsive/readability/mobile/accessibility evidence for the current 95% candidate, but it is not final mobile UX approval, final UI approval, user acceptance, or release-ready proof.
+
+## 2026-06-14 Broader Keyboard Focus Tooltip Continuation
+
+Status remains `95% candidate, not final`.
+
+Latest implementation/audit continuation:
+
+- Strengthened `tools/ui-keyboard-focus-tooltip-audit.mjs`.
+- The audit now covers 27 keyboard-focus tooltip targets instead of one representative target per scene.
+- It still runs each target at 1920x1080, 1280x720, and 390x844 portrait, so the latest run covered 81 focus-tooltip cases.
+- The expanded target set covers Town expedition/settings/reset, Dungeon room/confirm, Combat card/end turn, Reward first/second choice, Event first/second choice, RuneBench action/confirm, Boss card/end turn, Result action/return, and all ten Settings controls.
+
+Command:
+
+```powershell
+node tools\ui-keyboard-focus-tooltip-audit.mjs
+git diff --check
+npm.cmd run check
+```
+
+Result:
+
+- `node tools\ui-keyboard-focus-tooltip-audit.mjs` passed.
+- `git diff --check` passed.
+- `npm.cmd run check` passed with only the existing Vite large JS chunk warning.
+
+Representative evidence:
+
+- `tmp/ui-quality/focus-tooltips/town-toolbar-reset-focus-tooltip-v1-mobile-390x844.png`
+- `tmp/ui-quality/focus-tooltips/reward-choice-2-focus-tooltip-v1-mobile-390x844.png`
+- `tmp/ui-quality/focus-tooltips/combat-end-turn-focus-tooltip-v1-mobile-390x844.png`
+- `tmp/ui-quality/focus-tooltips/settings-return-town-focus-tooltip-v1-mobile-390x844.png`
+
+Important limitation: this broadens selected/focus/readability evidence, but it is not final full focus approval, user acceptance, final mobile UX approval, or release-ready proof.

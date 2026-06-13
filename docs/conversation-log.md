@@ -2390,3 +2390,13 @@ Verification passed with `node tools\ui-responsive-raster-audit.mjs`, `node tool
 Updated `docs/other-pc-handoff-2026-06-09.md`, `docs/current-issues-and-plan.md`, and `docs/ui-visual-quality-rubric.md` so another PC can see that the latest responsive/readability/mobile/accessibility audits passed on `b71ac4e Document latest broad smoke`.
 
 This remains a 95% candidate rather than final approval. The latest audit rerun strengthens responsive/readability/mobile/accessibility evidence, but final mobile UX approval, broader non-audited selected/focus/readability review, user acceptance, and release-ready UI remain unfinished.
+
+### Codex
+
+Codex continued the active 95% candidate UI goal by broadening the keyboard-focus tooltip audit. The previous official focus-tooltip audit covered one representative focus target per eligible scene, while broader focus state evidence lived partly in separate `tmp` audits and did not prove the DOM readability tooltip on many secondary controls.
+
+Extended `tools/ui-keyboard-focus-tooltip-audit.mjs` from 9 representative targets to 27 focus targets. The expanded target set covers Town expedition/settings/reset, Dungeon room/confirm, Combat card/end turn, Reward first/second choice, Event first/second choice, RuneBench action/confirm, Boss card/end turn, Result action/return, and all ten Settings controls. The audit still runs each target at 1920x1080, 1280x720, and 390x844 portrait, so the latest pass verified 81 focus-tooltip cases.
+
+Verification passed with `node tools\ui-keyboard-focus-tooltip-audit.mjs`, `git diff --check`, and `npm.cmd run check`. The focus audit produced mobile evidence such as `tmp/ui-quality/focus-tooltips/town-toolbar-reset-focus-tooltip-v1-mobile-390x844.png`, `tmp/ui-quality/focus-tooltips/reward-choice-2-focus-tooltip-v1-mobile-390x844.png`, `tmp/ui-quality/focus-tooltips/combat-end-turn-focus-tooltip-v1-mobile-390x844.png`, and `tmp/ui-quality/focus-tooltips/settings-return-town-focus-tooltip-v1-mobile-390x844.png`. `npm.cmd run check` still reports only the existing Vite large JS chunk warning.
+
+This remains a 95% candidate rather than final approval. Focus/readability coverage is broader now, but WorldMap remains on its separate map-selection evidence path, broader gameplay-critical readable text review, final mobile UX approval, user acceptance, and release-ready UI remain unfinished.

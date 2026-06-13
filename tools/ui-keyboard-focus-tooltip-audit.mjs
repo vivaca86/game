@@ -12,7 +12,7 @@ Module._initPaths();
 
 const targets = [
   {
-    key: "town",
+    key: "town-expedition",
     sceneName: "TownScene",
     pathname: "/?entry=town&resetSave=1",
     focusKeys: ["ArrowDown"],
@@ -20,7 +20,23 @@ const targets = [
     expectedFocusValue: "expedition"
   },
   {
-    key: "dungeon",
+    key: "town-toolbar-settings",
+    sceneName: "TownScene",
+    pathname: "/?entry=town&resetSave=1",
+    focusKeys: ["ArrowDown", "ArrowDown"],
+    focusRegistryKey: "townRasterFocusId",
+    expectedFocusValue: "toolbarSettings"
+  },
+  {
+    key: "town-toolbar-reset",
+    sceneName: "TownScene",
+    pathname: "/?entry=town&resetSave=1",
+    focusKeys: ["ArrowDown", "ArrowDown", "ArrowLeft"],
+    focusRegistryKey: "townRasterFocusId",
+    expectedFocusValue: "toolbarReset"
+  },
+  {
+    key: "dungeon-room-node",
     sceneName: "DungeonScene",
     pathname: "/?entry=dungeon&resetSave=1",
     focusKeys: ["ArrowDown"],
@@ -28,7 +44,15 @@ const targets = [
     expectedFocusValue: "room_node"
   },
   {
-    key: "combat",
+    key: "dungeon-bottom-confirm",
+    sceneName: "DungeonScene",
+    pathname: "/?entry=dungeon&resetSave=1",
+    focusKeys: ["ArrowDown", "ArrowDown"],
+    focusRegistryKey: "dungeonRasterFocusId",
+    expectedFocusValue: "bottom_confirm"
+  },
+  {
+    key: "combat-card-1",
     sceneName: "CombatScene",
     pathname: "/?entry=combat&resetSave=1",
     focusKeys: ["ArrowDown"],
@@ -36,7 +60,15 @@ const targets = [
     expectedFocusValue: "card_1"
   },
   {
-    key: "reward",
+    key: "combat-end-turn",
+    sceneName: "CombatScene",
+    pathname: "/?entry=combat&resetSave=1",
+    focusKeys: ["ArrowDown", "ArrowDown"],
+    focusRegistryKey: "combatRasterFocusId",
+    expectedFocusValue: "end_turn"
+  },
+  {
+    key: "reward-choice-1",
     sceneName: "RewardScene",
     pathname: "/?entry=reward&resetSave=1",
     focusKeys: ["ArrowDown"],
@@ -44,7 +76,15 @@ const targets = [
     expectedFocusValue: 0
   },
   {
-    key: "event",
+    key: "reward-choice-2",
+    sceneName: "RewardScene",
+    pathname: "/?entry=reward&resetSave=1",
+    focusKeys: ["ArrowRight", "ArrowRight"],
+    focusRegistryKey: "rewardRasterFocusIndex",
+    expectedFocusValue: 1
+  },
+  {
+    key: "event-choice-1",
     sceneName: "EventScene",
     pathname: "/?data=release&entry=event&resetSave=1&stage=stage_sunny_gate",
     focusKeys: ["ArrowDown"],
@@ -52,7 +92,15 @@ const targets = [
     expectedFocusValue: 0
   },
   {
-    key: "runebench",
+    key: "event-choice-2",
+    sceneName: "EventScene",
+    pathname: "/?data=release&entry=event&resetSave=1&stage=stage_sunny_gate",
+    focusKeys: ["ArrowRight", "ArrowRight"],
+    focusRegistryKey: "eventRasterFocusIndex",
+    expectedFocusValue: 1
+  },
+  {
+    key: "runebench-action-rail",
     sceneName: "RuneBenchScene",
     pathname: "/?entry=rune_bench&resetSave=1&grantRune=rune_paper_spark",
     focusKeys: ["ArrowDown"],
@@ -60,7 +108,15 @@ const targets = [
     expectedFocusValue: "actionRail"
   },
   {
-    key: "boss",
+    key: "runebench-confirm-button",
+    sceneName: "RuneBenchScene",
+    pathname: "/?entry=rune_bench&resetSave=1&grantRune=rune_paper_spark",
+    focusKeys: ["ArrowDown", "ArrowDown"],
+    focusRegistryKey: "runeBenchRasterFocusId",
+    expectedFocusValue: "confirmButton"
+  },
+  {
+    key: "boss-card-1",
     sceneName: "BossScene",
     pathname: "/?entry=boss&resetSave=1",
     focusKeys: ["ArrowDown"],
@@ -68,7 +124,15 @@ const targets = [
     expectedFocusValue: "card_1"
   },
   {
-    key: "result",
+    key: "boss-end-turn",
+    sceneName: "BossScene",
+    pathname: "/?entry=boss&resetSave=1",
+    focusKeys: ["ArrowDown", "ArrowDown"],
+    focusRegistryKey: "bossRasterFocusId",
+    expectedFocusValue: "end_turn"
+  },
+  {
+    key: "result-action-card",
     sceneName: "ResultScene",
     pathname: "/?entry=result&resetSave=1",
     focusKeys: ["ArrowDown"],
@@ -76,7 +140,15 @@ const targets = [
     expectedFocusValue: "actionCard"
   },
   {
-    key: "settings",
+    key: "result-return-button",
+    sceneName: "ResultScene",
+    pathname: "/?entry=result&resetSave=1",
+    focusKeys: ["ArrowDown", "ArrowDown"],
+    focusRegistryKey: "resultRasterFocusId",
+    expectedFocusValue: "returnButton"
+  },
+  {
+    key: "settings-volume-master",
     sceneName: "SettingsScene",
     pathname: "/?entry=town&resetSave=1",
     setup: async (page) => {
@@ -88,6 +160,87 @@ const targets = [
     focusKeys: ["ArrowDown"],
     focusRegistryKey: "settingsRasterFocusId",
     expectedFocusValue: "volumeMaster"
+  },
+  {
+    key: "settings-volume-music",
+    sceneName: "SettingsScene",
+    pathname: "/?entry=town&resetSave=1",
+    setup: openSettingsFromTown,
+    focusKeys: ["ArrowDown", "ArrowDown"],
+    focusRegistryKey: "settingsRasterFocusId",
+    expectedFocusValue: "volumeMusic"
+  },
+  {
+    key: "settings-volume-sfx",
+    sceneName: "SettingsScene",
+    pathname: "/?entry=town&resetSave=1",
+    setup: openSettingsFromTown,
+    focusKeys: ["ArrowDown", "ArrowDown", "ArrowDown"],
+    focusRegistryKey: "settingsRasterFocusId",
+    expectedFocusValue: "volumeSfx"
+  },
+  {
+    key: "settings-display-mode",
+    sceneName: "SettingsScene",
+    pathname: "/?entry=town&resetSave=1",
+    setup: openSettingsFromTown,
+    focusKeys: ["ArrowDown", "ArrowDown", "ArrowDown", "ArrowRight", "ArrowUp", "ArrowUp"],
+    focusRegistryKey: "settingsRasterFocusId",
+    expectedFocusValue: "displayMode"
+  },
+  {
+    key: "settings-large-text",
+    sceneName: "SettingsScene",
+    pathname: "/?entry=town&resetSave=1",
+    setup: openSettingsFromTown,
+    focusKeys: ["ArrowDown", "ArrowDown", "ArrowDown", "ArrowRight", "ArrowUp"],
+    focusRegistryKey: "settingsRasterFocusId",
+    expectedFocusValue: "largeText"
+  },
+  {
+    key: "settings-reduced-motion",
+    sceneName: "SettingsScene",
+    pathname: "/?entry=town&resetSave=1",
+    setup: openSettingsFromTown,
+    focusKeys: ["ArrowDown", "ArrowDown", "ArrowDown", "ArrowRight"],
+    focusRegistryKey: "settingsRasterFocusId",
+    expectedFocusValue: "reducedMotion"
+  },
+  {
+    key: "settings-space-confirm",
+    sceneName: "SettingsScene",
+    pathname: "/?entry=town&resetSave=1",
+    setup: openSettingsFromTown,
+    focusKeys: ["ArrowDown", "ArrowDown", "ArrowDown", "ArrowRight", "ArrowDown"],
+    focusRegistryKey: "settingsRasterFocusId",
+    expectedFocusValue: "spaceConfirm"
+  },
+  {
+    key: "settings-reset-defaults",
+    sceneName: "SettingsScene",
+    pathname: "/?entry=town&resetSave=1",
+    setup: openSettingsFromTown,
+    focusKeys: ["ArrowDown", "ArrowDown", "ArrowDown", "ArrowRight", "ArrowDown", "ArrowRight"],
+    focusRegistryKey: "settingsRasterFocusId",
+    expectedFocusValue: "resetDefaults"
+  },
+  {
+    key: "settings-reset-save",
+    sceneName: "SettingsScene",
+    pathname: "/?entry=town&resetSave=1",
+    setup: openSettingsFromTown,
+    focusKeys: ["ArrowDown", "ArrowDown", "ArrowDown", "ArrowRight", "ArrowDown", "ArrowRight", "ArrowUp"],
+    focusRegistryKey: "settingsRasterFocusId",
+    expectedFocusValue: "resetSave"
+  },
+  {
+    key: "settings-return-town",
+    sceneName: "SettingsScene",
+    pathname: "/?entry=town&resetSave=1",
+    setup: openSettingsFromTown,
+    focusKeys: ["ArrowDown", "ArrowDown", "ArrowDown", "ArrowRight", "ArrowDown", "ArrowRight", "ArrowDown"],
+    focusRegistryKey: "settingsRasterFocusId",
+    expectedFocusValue: "returnTown"
   }
 ];
 
@@ -206,6 +359,13 @@ async function waitForScene(page, sceneName) {
     const game = window.__paperGame;
     return Boolean(game?.scene?.getScenes?.(true)?.some((scene) => scene.scene?.key === expectedScene));
   }, sceneName, { timeout: 10000 });
+}
+
+async function openSettingsFromTown(page) {
+  const canvas = page.locator("canvas");
+  const box = await canvas.boundingBox();
+  if (!box) throw new Error("settings setup: missing canvas");
+  await page.mouse.click(box.x + (1010 / 1920) * box.width, box.y + (806 / 1080) * box.height);
 }
 
 async function hideDebugOverlay(page) {
