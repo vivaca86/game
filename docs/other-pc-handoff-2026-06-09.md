@@ -7,7 +7,7 @@ Repository:
 - GitHub: `https://github.com/vivaca86/game.git`
 - Branch: `main`
 - Latest pushed commit: run `git log -1 --oneline` after pulling.
-- Expected latest commit title after the 2026-06-14 WorldMap open-node target-stack continuation: `Audit WorldMap open target stacks`
+- Expected latest commit title after the 2026-06-14 WorldMap route-interaction continuation: `Audit WorldMap route interactions`
 
 ## Start On Another PC
 
@@ -22,7 +22,7 @@ npm install
 Expected first commit title in `git log --oneline -5` after the latest continuation:
 
 ```text
-Audit WorldMap open target stacks
+Audit WorldMap route interactions
 ```
 
 Expected status:
@@ -124,6 +124,7 @@ Recommended next work:
    - WorldMap open-node pointer click now has lower/mid/boss route-family evidence that the selected/current marker, halo, body, frame, and status stack moves to the clicked node without conflicting completed/locked/sealed/dormant overlays.
    - Mobile portrait now has a non-blocking orientation/framing cue in unused letterbox space and suppresses it while readability tooltips are visible.
    - WorldMap now has muted locked/future route thread/bead material separate from completed/current cyan route material.
+   - WorldMap route thread/bead material now has interaction evidence during open-node hover/down and locked-node hover/click, including base/current completed routes, muted locked/future routes, placement/style, rotation, and absence of the old route-hover image.
    - WorldMap now has neutral lower-node body and frame layers under the first five lower map nodes, separate from current/completed/sealed/dormant state stacks.
    - WorldMap now splits first locked sealed-node body/frame material into lower/base and mid-route variants, with a stage-6/current evidence case for the mid sealed family.
    - WorldMap now splits upper red locked body/frame material into next/base, far non-boss, and boss-sized variants. The stage 14/15 boss locks use the new boss family while the first red lock keeps the base family and non-boss distant locks keep the far family.
@@ -1536,3 +1537,48 @@ Representative evidence:
 - `tmp/ui-quality/worldmap-open-node-down/boss-open-open-node-down-v1-1920.png`
 
 Important limitation: this strengthens open-node target completed-stack evidence, but it is still not full WorldMap node/body recomposition, final selected/focus approval, user acceptance, or release-ready UI.
+
+## 2026-06-14 WorldMap Route-Interaction Audit Continuation
+
+Status remains `95% candidate, not final`.
+
+Additional local continuation work:
+
+- Added `tools/ui-worldmap-route-interaction-audit.mjs`.
+- The new audit verifies that WorldMap route overlays stay stable during node interactions:
+  - open-node hover and pointer-down for lower-open, mid-open, and boss-open targets.
+  - locked-node hover and click for sealed-next, dormant-mid, red-far, red-next, and red-boss targets.
+- It checks base completed route threads/beads, current/final route threads/beads, and muted locked/future route threads/beads against expected counts, placement, display size, alpha, and rotation.
+- It also verifies the old `ui_hover_route_node_concept` route-hover image does not leak back into the route interaction path.
+
+Verification for this continuation:
+
+```powershell
+node tools\ui-worldmap-route-interaction-audit.mjs
+node tools\ui-worldmap-open-node-tooltip-audit.mjs
+node tools\ui-worldmap-open-node-down-audit.mjs
+node tools\ui-worldmap-open-node-selection-audit.mjs
+node tools\ui-worldmap-keyboard-tooltip-audit.mjs
+node tools\ui-worldmap-locked-tooltip-audit.mjs
+npx.cmd tsc --noEmit
+git diff --check
+npm.cmd run check
+$env:PHASER_SMOKE_PROGRESS='1'
+$env:PHASER_SMOKE_PROGRESS_FILE='tmp/phaser-smoke-progress-worldmap-route-interaction-targeted.log'
+$env:PHASER_SMOKE_ONLY='checkViewScreenshots,checkClickableControls,checkFullInputCoverage,checkUiSkinStates'
+node tmp\run-phaser-smoke-with-vite.mjs
+```
+
+All listed checks passed when rerun serially. A first attempt to run three browser audits in parallel timed out from resource contention; the stale audit processes were stopped and each audit passed on serial rerun. The new route-interaction audit passed 48 interaction cases across 1920x1080, 1280x720, and 390x844.
+
+Representative route evidence:
+
+- `tmp/ui-quality/worldmap-route-interactions/lower-open-route-hover-v1-1920.png`
+- `tmp/ui-quality/worldmap-route-interactions/lower-open-route-down-v1-1920.png`
+- `tmp/ui-quality/worldmap-route-interactions/mid-open-route-down-v1-1920.png`
+- `tmp/ui-quality/worldmap-route-interactions/boss-open-route-down-v1-1920.png`
+- `tmp/ui-quality/worldmap-route-interactions/sealed-next-route-locked-click-v1-1920.png`
+- `tmp/ui-quality/worldmap-route-interactions/red-next-route-locked-click-v1-1920.png`
+- `tmp/ui-quality/worldmap-route-interactions/red-boss-route-locked-click-v1-1920.png`
+
+Important limitation: this strengthens route-state stability evidence during interaction, but it is still not full WorldMap route recomposition, final selected/focus approval, user acceptance, or release-ready UI.
