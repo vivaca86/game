@@ -1367,3 +1367,10 @@
 - Impact: Mobile screenshots could be technically unclipped but still poor to play: the tooltip protected DOM readability while hiding the map, cards, or settings controls it was explaining.
 - Resolution: `readabilityOverlay.ts` now detects narrow portrait letterbox layouts and moves the tooltip into unused space above or below the canvas when there is enough room. `ui-readability-tooltip-audit.mjs` now runs all ten primary scenes at 1920x1080, 1280x720, and 390x844. Desktop tooltips must stay inside the canvas; mobile portrait tooltips must stay in the viewport and avoid canvas overlap.
 - Prevention: Any mobile tooltip or helper-text pass must inspect actual screenshots, not only DOM bounds. In letterboxed portrait layouts, prefer safe letterbox space before covering the game canvas.
+
+### Problem: Disabled raster controls showed lock art without explaining the blocked condition
+
+- Cause: Event unaffordable choices and Combat/Boss cost-disabled cards had source-derived lock stamps and blocked input behavior, but `renderRasterDisabledHitTarget` did not expose a readable reason through the DOM tooltip layer.
+- Impact: A player could see that a control was locked but not know whether the reason was HP, gold, current energy, or an adjusted card cost. This weakened the UI's gameplay readability even though the disabled art itself was audited.
+- Resolution: `renderRasterDisabledHitTarget` now accepts tooltip title/body/tone metadata and shows a danger-tone readability tooltip while remaining inert. Event disabled choices explain missing HP/gold conditions. Combat/Boss disabled cards use `getCombatCardCostAtIndex` to report current energy versus adjusted required energy. The disabled audits now verify tooltip role/aria, danger tone, bounds, screenshot evidence, and unchanged blocked click/keyboard behavior.
+- Prevention: Disabled-state audits should check both the visual lock material and the reason text. The explanation must use the same gameplay eligibility path as the blocked action, especially for card costs affected by runes, passives, discounts, or penalties.

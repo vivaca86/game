@@ -2,7 +2,7 @@ import Phaser from "phaser";
 import type { BootContext } from "../../app/bootContext";
 import type { InputAction } from "../../input/actions";
 import { bindKeyboardActions } from "../../input/bindings";
-import { canPlayCardAtIndex, getActiveIntent, getCombatantData } from "../../simulation/systems/combat/combatSystem";
+import { canPlayCardAtIndex, getActiveIntent, getCombatantData, getCombatCardCostAtIndex } from "../../simulation/systems/combat/combatSystem";
 import { resolveCombatFeedbackEffectKey, resolveCombatFeedbackFrame } from "../../simulation/state/combatFeedback";
 import { renderDebugOverlay } from "../../ui/overlays/debugOverlay";
 import { handleSceneAction } from "../bridge/sceneActions";
@@ -444,6 +444,7 @@ export function renderCombatRasterCardHand(
     const action = `card_${index + 1}` as InputAction;
     const playable = canPlayCardAtIndex(context.run, context.dataBundle, index);
     if (!playable) {
+      const adjustedCost = getCombatCardCostAtIndex(context.run, context.dataBundle, index) ?? card.cost;
       blockedActions[action] = true;
       renderRasterDisabledHitTarget(scene, x, cardY, cardWidth, cardHeight, {
         depth: 22,
@@ -452,7 +453,10 @@ export function renderCombatRasterCardHand(
         disabledY: cardY - 92,
         disabledWidth: 88,
         disabledHeight: 88,
-        disabledAlpha: 0.9
+        disabledAlpha: 0.9,
+        tooltipTitle: `${card.displayNameKo} · 기운 부족`,
+        tooltipBody: `현재 기운 ${context.run.player.energy}입니다. 이 카드를 사용하려면 기운 ${adjustedCost}가 필요합니다.`,
+        tooltipTone: "danger"
       });
       return;
     }

@@ -157,6 +157,58 @@ function assertNoBlockedAction(target, beforeStats, afterStats) {
   if (afterStats.log.length !== beforeStats.log.length) throw new Error(`${target.label}: disabled click added log entry`);
 }
 
+async function captureTooltipAudit(page, target, box) {
+  await page.mouse.move(box.x + (target.clickX / 1920) * box.width, box.y + (target.clickY / 1080) * box.height);
+  await page.waitForSelector("#game-readability-tooltip[data-visible='true']", { timeout: 5000 });
+  const audit = await page.evaluate((sceneName) => {
+    const root = document.getElementById("game-readability-tooltip");
+    const canvas = document.querySelector("#game-root canvas");
+    if (!root || !canvas) return { ok: false, reason: "missing tooltip or canvas" };
+    const rootBox = root.getBoundingClientRect();
+    const canvasBox = canvas.getBoundingClientRect();
+    return {
+      ok: true,
+      title: root.dataset.title ?? "",
+      body: root.textContent?.replace(/\s+/g, " ").trim() ?? "",
+      tone: root.dataset.tone ?? "",
+      role: root.getAttribute("role") ?? "",
+      live: root.getAttribute("aria-live") ?? "",
+      scene: root.dataset.scene ?? "",
+      width: rootBox.width,
+      height: rootBox.height,
+      inViewport: rootBox.left >= 0
+        && rootBox.top >= 0
+        && rootBox.right <= window.innerWidth
+        && rootBox.bottom <= window.innerHeight,
+      inCanvas: rootBox.left >= canvasBox.left - 1
+        && rootBox.top >= canvasBox.top - 1
+        && rootBox.right <= canvasBox.right + 1
+        && rootBox.bottom <= canvasBox.bottom + 1,
+      pointerEvents: window.getComputedStyle(root).pointerEvents,
+      expectedScene: sceneName
+    };
+  }, target.sceneName);
+  if (
+    !audit.ok
+    || audit.role !== "tooltip"
+    || audit.live !== "polite"
+    || audit.scene !== target.sceneName
+    || audit.tone !== "danger"
+    || !audit.title.includes("기운 부족")
+    || !audit.body.includes("현재 기운")
+    || audit.width < 260
+    || audit.height < 60
+    || !audit.inViewport
+    || !audit.inCanvas
+    || audit.pointerEvents !== "none"
+  ) {
+    throw new Error(`${target.label}: invalid disabled tooltip ${JSON.stringify(audit, null, 2)}`);
+  }
+  const screenshot = `tmp/ui-quality/disabled/${target.label}-tooltip-v1-1920.png`;
+  await page.screenshot({ path: screenshot, fullPage: true });
+  return { ...audit, screenshot: path.resolve(screenshot) };
+}
+
 await mkdir("tmp/ui-quality/disabled", { recursive: true });
 
 const { chromium } = loadPlaywright();
@@ -195,6 +247,7 @@ try {
 
     const box = await canvas.boundingBox();
     if (!box) throw new Error(`${target.label}: missing canvas box`);
+    const tooltipAudit = await captureTooltipAudit(page, target, box);
     await page.mouse.click(box.x + (target.clickX / 1920) * box.width, box.y + (target.clickY / 1080) * box.height);
     await page.waitForTimeout(180);
     const clickStats = await captureStats(page, target);
@@ -208,6 +261,7 @@ try {
     results.push({
       label: target.label,
       screenshot: path.resolve(`tmp/ui-quality/disabled/${target.label}-v1-1920.png`),
+      tooltipAudit,
       initialStats,
       clickStats,
       keyboardStats

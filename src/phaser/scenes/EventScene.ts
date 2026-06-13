@@ -118,7 +118,10 @@ function renderEventRasterChoice(
       disabledY: y - 178,
       disabledWidth: 112,
       disabledHeight: 112,
-      disabledAlpha: 0.92
+      disabledAlpha: 0.92,
+      tooltipTitle: `${choice.displayNameKo} · 조건 부족`,
+      tooltipBody: eventDisabledTooltipBody(context, choice),
+      tooltipTone: "danger"
     });
     return undefined;
   }
@@ -141,6 +144,25 @@ function renderEventRasterChoice(
     tooltipBody: choice.descriptionKo,
     tooltipTone: "choice"
   });
+}
+
+function eventDisabledTooltipBody(context: BootContext, choice: EventChoice): string {
+  const missing = (choice.cost ?? [])
+    .map((effect) => {
+      const amount = effect.value.amount ?? 0;
+      if (effect.op === "spend_currency" && context.run.player.gold < amount) {
+        return `골드 ${amount} 필요 / 현재 ${context.run.player.gold}`;
+      }
+      if (effect.op === "spend_hp" && context.run.player.hp <= amount) {
+        return `체력 ${amount + 1} 이상 필요 / 현재 ${context.run.player.hp}`;
+      }
+      return undefined;
+    })
+    .filter((item): item is string => Boolean(item));
+
+  return missing.length > 0
+    ? missing.join(", ")
+    : `현재 상태로 선택할 수 없습니다. 비용: ${costLabel(choice)}`;
 }
 
 function createEventRasterKeyboardHandler(

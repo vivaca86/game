@@ -4,7 +4,7 @@ import type { BossPhase } from "../../data/schema";
 import type { InputAction } from "../../input/actions";
 import { bindKeyboardActions } from "../../input/bindings";
 import { getCurrentRoom } from "../../simulation/state/runState";
-import { canPlayCardAtIndex, getActiveIntent, getCombatantData } from "../../simulation/systems/combat/combatSystem";
+import { canPlayCardAtIndex, getActiveIntent, getCombatantData, getCombatCardCostAtIndex } from "../../simulation/systems/combat/combatSystem";
 import { renderDebugOverlay } from "../../ui/overlays/debugOverlay";
 import { handleSceneAction } from "../bridge/sceneActions";
 import { requireBootContext } from "../bridge/sceneBridge";
@@ -262,6 +262,7 @@ function renderBossRasterCardTargets(
     const action = `card_${index + 1}` as InputAction;
     const playable = canPlayCardAtIndex(context.run, context.dataBundle, index);
     if (!playable) {
+      const adjustedCost = getCombatCardCostAtIndex(context.run, context.dataBundle, index) ?? card?.cost ?? 0;
       blockedActions[action] = true;
       renderRasterDisabledHitTarget(scene, x, cardY, cardWidth, cardHeight, {
         depth: 22,
@@ -270,7 +271,10 @@ function renderBossRasterCardTargets(
         disabledY: cardY - 44,
         disabledWidth: 124,
         disabledHeight: 124,
-        disabledAlpha: 0.88
+        disabledAlpha: 0.88,
+        tooltipTitle: `${card?.displayNameKo ?? action} · 기운 부족`,
+        tooltipBody: `현재 기운 ${context.run.player.energy}입니다. 이 카드를 사용하려면 기운 ${adjustedCost}가 필요합니다.`,
+        tooltipTone: "danger"
       });
       return;
     }

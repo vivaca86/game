@@ -7,7 +7,7 @@ Repository:
 - GitHub: `https://github.com/vivaca86/game.git`
 - Branch: `main`
 - Latest pushed commit: run `git log -1 --oneline` after pulling.
-- Expected latest commit title after the 2026-06-14 responsive readability-tooltip continuation: `Add responsive tooltip placement audit`
+- Expected latest commit title after the 2026-06-14 disabled explanation-tooltip continuation: `Add disabled explanation tooltips`
 
 ## Start On Another PC
 
@@ -22,7 +22,7 @@ npm install
 Expected first commit title in `git log --oneline -5` after the latest continuation:
 
 ```text
-Add responsive tooltip placement audit
+Add disabled explanation tooltips
 ```
 
 Expected status:
@@ -39,7 +39,7 @@ The user rejected procedural/vector-looking UI. Continue with these rules:
 - Do not add Phaser rectangle/stroke/vector overlays as visible UI on concept screens.
 - Keyboard focus must reuse the same bitmap language as pointer hover/down where possible.
 - Do not introduce a new focus ring, tint, generic badge, or new visual style without matching the concept source.
-- Keep completion language conservative. Current estimate is about 90%, not final and not 95%.
+- Keep completion language conservative. Current estimate is about 91%, not final and not 95%.
 
 Main reference docs:
 
@@ -117,7 +117,7 @@ Recommended next work:
 
 4. Dynamic labels/tooltips/accessibility:
    - First hidden accessibility labels and first visible tooltip zones now exist.
-   - Continue broader gameplay-critical readable text, disabled explanations, selected/focus tooltip consistency, full mobile framing/orientation review, and user acceptance.
+   - Continue broader gameplay-critical readable text, selected/focus tooltip consistency, broader disabled-state breadth, full mobile framing/orientation review, and user acceptance.
    - Do not put explanatory text directly into the baked concept layers as a shortcut.
 
 ## Useful Evidence Paths
@@ -685,3 +685,42 @@ All listed checks passed. The tooltip audit now reports 30 passing scene/viewpor
 Visual inspection of `worldmap-tooltip-v1-mobile-390x844.png`, `combat-tooltip-v1-mobile-390x844.png`, and `settings-tooltip-v1-mobile-390x844.png` confirmed the tooltip uses the letterbox space and no longer covers the game scene in portrait.
 
 Important limitation: this still does not finish mobile UX. It only fixes and audits tooltip placement in the current portrait letterbox layout. Full mobile framing/orientation treatment, broader gameplay-critical readable text, disabled explanations, selected/focus tooltip consistency, user acceptance, and final 95% concept-match approval remain next.
+
+## 2026-06-14 Disabled Explanation Tooltip WIP Continuation
+
+Status remains `Partially complete`.
+
+Current estimate is about 91% of the active UI goal, not 95%.
+
+Additional local continuation work:
+
+- `renderRasterDisabledHitTarget` now accepts tooltip title/body/tone metadata and shows the same DOM readability tooltip on hover/down while keeping disabled hit targets inert and non-clickable.
+- Event unaffordable raster choices now explain missing HP/gold conditions. Example audit result: `주인의 숨은 서랍 · 조건 부족`, body `체력 5 이상 필요 / 현재 1`.
+- Combat and Boss cost-disabled cards now explain current energy versus required energy using `getCombatCardCostAtIndex`, so rune/passive/discount/penalty adjusted costs match gameplay. Example audit result: `무대 덧대기 · 기운 부족`, body `현재 기운 0입니다. 이 카드를 사용하려면 기운 2가 필요합니다.`
+- The existing disabled raster lock images remain the visible state art; this pass adds explanation through the DOM tooltip layer instead of adding new Phaser text or vector overlays.
+
+Verification for this continuation:
+
+```powershell
+npx.cmd tsc --noEmit
+git diff --check
+node tmp\ui-disabled-raster-audit.mjs
+node tmp\combat-boss-disabled-raster-state-audit.mjs
+node tools\ui-readability-tooltip-audit.mjs
+node tools\ui-accessibility-overlay-audit.mjs
+npm.cmd run check
+$env:PHASER_SMOKE_PROGRESS='1'
+$env:PHASER_SMOKE_PROGRESS_FILE='tmp/phaser-smoke-progress-disabled-tooltip-targeted.log'
+$env:PHASER_SMOKE_ONLY='checkViewScreenshots,checkClickableControls,checkFullInputCoverage,checkUiSkinStates'
+node tmp\run-phaser-smoke-with-vite.mjs
+```
+
+All listed checks passed. One `node tools\ui-readability-tooltip-audit.mjs` attempt failed during Chromium screenshot capture because the page closed, then the immediate rerun passed all 30 scene/viewport cases. Count the rerun as the passing evidence.
+
+Visual evidence:
+
+- `tmp/ui-quality/disabled/event-disabled-tooltip-v1-1920.png`
+- `tmp/ui-quality/disabled/combat-disabled-card-tooltip-v1-1920.png`
+- `tmp/ui-quality/disabled/boss-disabled-card-tooltip-v1-1920.png`
+
+Important limitation: this is first disabled explanation coverage, not final broad disabled approval. Existing evidence now covers Event unaffordable choices and Combat/Boss cost-disabled cards. Other disabled/locked controls, selected/focus tooltip consistency, full mobile framing/orientation treatment, user acceptance, and final 95% concept-match approval remain next.

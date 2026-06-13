@@ -73,7 +73,13 @@ interface PressFeedbackOptions {
   downStrokeWidth?: number;
 }
 
-interface RasterHoverHitTargetOptions {
+interface RasterTooltipOptions {
+  tooltipTitle?: string;
+  tooltipBody?: string;
+  tooltipTone?: ReadabilityTooltipTone;
+}
+
+interface RasterHoverHitTargetOptions extends RasterTooltipOptions {
   depth?: number;
   hoverDepth?: number;
   downDepth?: number;
@@ -93,9 +99,6 @@ interface RasterHoverHitTargetOptions {
   hoverAlpha?: number;
   downAlpha?: number;
   idleAlpha?: number;
-  tooltipTitle?: string;
-  tooltipBody?: string;
-  tooltipTone?: ReadabilityTooltipTone;
 }
 
 interface RasterDisabledHitTargetOptions {
@@ -107,6 +110,9 @@ interface RasterDisabledHitTargetOptions {
   disabledWidth?: number;
   disabledHeight?: number;
   disabledAlpha?: number;
+  tooltipTitle?: string;
+  tooltipBody?: string;
+  tooltipTone?: ReadabilityTooltipTone;
 }
 
 export function renderSceneShell(
@@ -420,6 +426,14 @@ export function renderRasterDisabledHitTarget(
 
   const hitTarget = scene.add.rectangle(x, y, width, height, 0xffffff, 0.001).setDepth(options.depth ?? 21);
   hitTarget.setInteractive({ useHandCursor: false });
+  const showDisabledTooltip = () => showRasterTooltip(scene, x, y, width, height, options);
+  const showIdle = () => hideReadabilityTooltip();
+  hitTarget.on("pointerover", showDisabledTooltip);
+  hitTarget.on("pointerout", showIdle);
+  hitTarget.on("pointerdown", showDisabledTooltip);
+  hitTarget.on("pointerupoutside", showIdle);
+  hitTarget.setData("showRasterHover", showDisabledTooltip);
+  hitTarget.setData("showRasterIdle", showIdle);
   return hitTarget;
 }
 
@@ -494,7 +508,7 @@ function showRasterTooltip(
   y: number,
   width: number,
   height: number,
-  options: RasterHoverHitTargetOptions
+  options: RasterTooltipOptions
 ): void {
   if (!options.tooltipTitle) return;
   showReadabilityTooltip({

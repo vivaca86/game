@@ -2120,3 +2120,15 @@ Codex continued the tooltip/readability track by tightening the mobile portrait 
 Verification passed with `npx.cmd tsc --noEmit`, `git diff --check`, `node tools\ui-readability-tooltip-audit.mjs`, `node tools\ui-accessibility-overlay-audit.mjs`, `node tools\ui-responsive-raster-audit.mjs`, `npm.cmd run check`, and targeted `$env:PHASER_SMOKE_ONLY='checkViewScreenshots,checkClickableControls,checkFullInputCoverage,checkUiSkinStates'; node tmp\run-phaser-smoke-with-vite.mjs` ending in `Phaser smoke OK`.
 
 This remains partial UI progress, roughly about 90% of the active UI goal, not 95%. Mobile tooltip placement is now covered, but full mobile framing/orientation treatment, broader gameplay-critical readable text, disabled explanations, selected/focus tooltip consistency, user acceptance, and final concept-match approval remain unfinished.
+
+### Codex
+
+Codex continued the dynamic readability work by targeting disabled explanations. Before this pass, Event unaffordable choices and Combat/Boss cost-disabled cards had raster lock stamps and blocked input behavior, but the player could not inspect why the control was locked through the visible tooltip layer.
+
+`renderRasterDisabledHitTarget` now accepts tooltip title/body/tone metadata and shows the same DOM readability tooltip on hover/down while keeping the disabled hit target inert and non-clickable. `EventScene` now explains missing HP/gold conditions on unaffordable raster choices. `CombatScene` and `BossScene` now explain current energy versus required energy for cost-disabled cards, using `getCombatCardCostAtIndex` so adjusted costs match the gameplay path.
+
+`tmp/ui-disabled-raster-audit.mjs` now verifies the Event disabled tooltip plus unchanged blocked click behavior. `tmp/combat-boss-disabled-raster-state-audit.mjs` now verifies Combat/Boss disabled card tooltips, lock stamp placement, no hover/down leakage, no Phaser text/vector leakage, and unchanged blocked pointer/keyboard behavior. Visual screenshots reviewed: `event-disabled-tooltip-v1-1920.png`, `combat-disabled-card-tooltip-v1-1920.png`, and `boss-disabled-card-tooltip-v1-1920.png`.
+
+Verification passed with `npx.cmd tsc --noEmit`, `git diff --check`, `node tmp\ui-disabled-raster-audit.mjs`, `node tmp\combat-boss-disabled-raster-state-audit.mjs`, `node tools\ui-readability-tooltip-audit.mjs`, `node tools\ui-accessibility-overlay-audit.mjs`, `npm.cmd run check`, and targeted `$env:PHASER_SMOKE_ONLY='checkViewScreenshots,checkClickableControls,checkFullInputCoverage,checkUiSkinStates'; node tmp\run-phaser-smoke-with-vite.mjs` ending in `Phaser smoke OK`. One readability-tooltip audit attempt failed during Chromium screenshot capture, then the immediate rerun passed all 30 scene/viewport cases.
+
+This remains partial UI progress, roughly about 91% of the active UI goal, not 95%. Disabled explanations now cover the audited Event and Combat/Boss disabled paths, but broader disabled-state breadth, selected/focus tooltip consistency, full mobile framing/orientation treatment, user acceptance, and final concept-match approval remain unfinished.

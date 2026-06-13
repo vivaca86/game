@@ -146,6 +146,53 @@ try {
   }
 
   const canvasBox = await canvas.boundingBox();
+  await page.mouse.move(canvasBox.x + (1450 / 1920) * canvasBox.width, canvasBox.y + (848 / 1080) * canvasBox.height);
+  await page.waitForSelector("#game-readability-tooltip[data-visible='true']", { timeout: 5000 });
+  const tooltipAudit = await page.evaluate(() => {
+    const root = document.getElementById("game-readability-tooltip");
+    const canvas = document.querySelector("#game-root canvas");
+    if (!root || !canvas) return { ok: false, reason: "missing tooltip or canvas" };
+    const rootBox = root.getBoundingClientRect();
+    const canvasBox = canvas.getBoundingClientRect();
+    return {
+      ok: true,
+      title: root.dataset.title ?? "",
+      body: root.textContent?.replace(/\s+/g, " ").trim() ?? "",
+      tone: root.dataset.tone ?? "",
+      role: root.getAttribute("role") ?? "",
+      live: root.getAttribute("aria-live") ?? "",
+      scene: root.dataset.scene ?? "",
+      width: rootBox.width,
+      height: rootBox.height,
+      inViewport: rootBox.left >= 0
+        && rootBox.top >= 0
+        && rootBox.right <= window.innerWidth
+        && rootBox.bottom <= window.innerHeight,
+      inCanvas: rootBox.left >= canvasBox.left - 1
+        && rootBox.top >= canvasBox.top - 1
+        && rootBox.right <= canvasBox.right + 1
+        && rootBox.bottom <= canvasBox.bottom + 1,
+      pointerEvents: window.getComputedStyle(root).pointerEvents
+    };
+  });
+  if (
+    !tooltipAudit.ok
+    || tooltipAudit.role !== "tooltip"
+    || tooltipAudit.live !== "polite"
+    || tooltipAudit.scene !== "EventScene"
+    || tooltipAudit.tone !== "danger"
+    || !tooltipAudit.title.includes("조건 부족")
+    || tooltipAudit.body.length < tooltipAudit.title.length + 8
+    || tooltipAudit.width < 260
+    || tooltipAudit.height < 60
+    || !tooltipAudit.inViewport
+    || !tooltipAudit.inCanvas
+    || tooltipAudit.pointerEvents !== "none"
+  ) {
+    throw new Error(`Invalid disabled event tooltip: ${JSON.stringify(tooltipAudit, null, 2)}`);
+  }
+  await page.screenshot({ path: "tmp/ui-quality/disabled/event-disabled-tooltip-v1-1920.png", fullPage: true });
+
   await page.mouse.click(canvasBox.x + (1450 / 1920) * canvasBox.width, canvasBox.y + (848 / 1080) * canvasBox.height);
   await page.waitForTimeout(180);
 
@@ -164,7 +211,9 @@ try {
   console.log(JSON.stringify({
     baseUrl,
     screenshot: path.resolve("tmp/ui-quality/disabled/event-disabled-raster-v1-1920.png"),
+    tooltipScreenshot: path.resolve("tmp/ui-quality/disabled/event-disabled-tooltip-v1-1920.png"),
     initialAudit,
+    tooltipAudit,
     clickAudit
   }, null, 2));
 } finally {
