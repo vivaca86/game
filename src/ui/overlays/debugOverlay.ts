@@ -1,10 +1,12 @@
 import type { BootContext } from "../../app/bootContext";
 import { createDebugSummary } from "../../debug/debugActions";
 import { renderAccessibilityOverlay } from "./accessibilityOverlay";
+import { renderMobileFramingCue } from "./mobileFramingOverlay";
 import { hideReadabilityTooltip } from "./readabilityOverlay";
 
 export function renderDebugOverlay(context: BootContext, sceneName: string): void {
   renderAccessibilityOverlay(context, sceneName);
+  renderMobileFramingCue(sceneName);
   hideReadabilityTooltip();
 
   const root = document.getElementById("debug-overlay");

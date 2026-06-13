@@ -7,7 +7,7 @@ Repository:
 - GitHub: `https://github.com/vivaca86/game.git`
 - Branch: `main`
 - Latest pushed commit: run `git log -1 --oneline` after pulling.
-- Expected latest commit title after the 2026-06-14 WorldMap keyboard-selection tooltip continuation: `Add WorldMap keyboard selection tooltips`
+- Expected latest commit title after the 2026-06-14 mobile portrait framing continuation: `Add mobile portrait framing cue`
 
 ## Start On Another PC
 
@@ -22,7 +22,7 @@ npm install
 Expected first commit title in `git log --oneline -5` after the latest continuation:
 
 ```text
-Add WorldMap keyboard selection tooltips
+Add mobile portrait framing cue
 ```
 
 Expected status:
@@ -39,7 +39,7 @@ The user rejected procedural/vector-looking UI. Continue with these rules:
 - Do not add Phaser rectangle/stroke/vector overlays as visible UI on concept screens.
 - Keyboard focus must reuse the same bitmap language as pointer hover/down where possible.
 - Do not introduce a new focus ring, tint, generic badge, or new visual style without matching the concept source.
-- Keep completion language conservative. Current estimate is about 94%, not final and not 95%.
+- Keep completion language conservative. Current estimate is about a 95% candidate, not final, release-ready, or user-accepted 95%.
 
 Main reference docs:
 
@@ -120,7 +120,8 @@ Recommended next work:
    - Representative keyboard-focus tooltip evidence now exists for Town, Dungeon, Combat, Reward, Event, RuneBench, Boss, Result, and Settings.
    - WorldMap locked/sealed/dormant nodes now expose danger-tone explanation tooltips through tooltip-only disabled hit targets.
    - WorldMap direction-key stage selection now shows the same DOM readability tooltip for the selected stage without adding another hover image.
-   - Continue broader gameplay-critical readable text, broader selected/focus approval, broader disabled-state breadth, full mobile framing/orientation review, and user acceptance.
+   - Mobile portrait now has a non-blocking orientation/framing cue in unused letterbox space and suppresses it while readability tooltips are visible.
+   - Continue broader gameplay-critical readable text, broader selected/focus approval, broader disabled-state breadth, final mobile UX review, and user acceptance.
    - Do not put explanatory text directly into the baked concept layers as a shortcut.
 
 ## Useful Evidence Paths
@@ -865,3 +866,45 @@ Representative evidence:
 - `tmp/ui-quality/worldmap-keyboard-tooltips/late-right-keyboard-tooltip-v1-mobile-390x844.png`
 
 Important limitation: this closes the missing WorldMap selected-stage tooltip evidence, not full selected/focus approval. Full WorldMap node/route recomposition, broader disabled/focus coverage outside the audited paths, mobile framing/orientation review, user acceptance, and final 95% concept-match approval remain next.
+
+## 2026-06-14 Mobile Portrait Framing Cue WIP Continuation
+
+Status remains `Partially complete`.
+
+Current estimate is about a 95% candidate of the active UI goal, not final, release-ready, or user-accepted 95%.
+
+Additional local continuation work:
+
+- Added `src/ui/overlays/mobileFramingOverlay.ts`, a DOM status cue that appears only when the Phaser FIT canvas is heavily letterboxed in narrow portrait layout.
+- `renderDebugOverlay` now syncs the mobile framing cue with the same scene-level DOM overlay pass as accessibility labels and tooltip reset.
+- The cue stays outside the canvas in unused portrait letterbox space, uses `pointer-events: none`, and hides on desktop 1920x1080, desktop 1280x720, and 844x390 landscape.
+- `readabilityOverlay.ts` suppresses the framing cue immediately whenever a detailed readability tooltip is visible, so card/node/control explanations keep priority.
+- Added `tools/ui-mobile-framing-audit.mjs`.
+
+Verification for this continuation:
+
+```powershell
+npx.cmd tsc --noEmit
+git diff --check
+node tools\ui-mobile-framing-audit.mjs
+node tools\ui-responsive-raster-audit.mjs
+node tools\ui-readability-tooltip-audit.mjs
+node tools\ui-accessibility-overlay-audit.mjs
+npm.cmd run check
+node tools\ui-keyboard-focus-tooltip-audit.mjs
+$env:PHASER_SMOKE_PROGRESS='1'
+$env:PHASER_SMOKE_PROGRESS_FILE='tmp/phaser-smoke-progress-mobile-framing-targeted.log'
+$env:PHASER_SMOKE_ONLY='checkViewScreenshots,checkClickableControls,checkFullInputCoverage,checkUiSkinStates'
+node tmp\run-phaser-smoke-with-vite.mjs
+```
+
+All listed checks passed. The new mobile framing audit verified all ten primary scenes at 390x844, 1920x1080, 1280x720, and 844x390 landscape. It also verified tooltip suppression on Combat mobile: the framing cue stayed `data-visible=true` but `data-suppressed=true`, `aria-hidden=true`, `opacity=0`, and `visibility=hidden` while the readability tooltip was visible.
+
+Representative evidence:
+
+- `tmp/ui-quality/mobile-framing/worldmap-framing-v1-mobile-390x844.png`
+- `tmp/ui-quality/mobile-framing/combat-framing-v1-mobile-390x844.png`
+- `tmp/ui-quality/mobile-framing/settings-framing-v1-mobile-390x844.png`
+- `tmp/ui-quality/mobile-framing/combat-tooltip-suppresses-framing-v1-mobile-390x844.png`
+
+Important limitation: this closes the first deliberate portrait framing/orientation cue, not final mobile UX approval. Full WorldMap node/route recomposition, broader disabled/focus coverage outside the audited paths, broader gameplay-critical readable text, user acceptance, and final concept-match approval remain next.

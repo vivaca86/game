@@ -1,3 +1,5 @@
+import { setMobileFramingCueSuppressed } from "./mobileFramingOverlay";
+
 const READABILITY_ROOT_ID = "game-readability-tooltip";
 const VIRTUAL_WIDTH = 1920;
 const VIRTUAL_HEIGHT = 1080;
@@ -20,6 +22,7 @@ interface ReadabilityTooltipOptions {
 }
 
 export function showReadabilityTooltip(options: ReadabilityTooltipOptions): void {
+  setMobileFramingCueSuppressed(true);
   const root = ensureReadabilityRoot();
   root.dataset.visible = "true";
   root.dataset.scene = options.sceneName;
@@ -34,6 +37,7 @@ export function showReadabilityTooltip(options: ReadabilityTooltipOptions): void
 
 export function hideReadabilityTooltip(): void {
   const root = document.getElementById(READABILITY_ROOT_ID);
+  setMobileFramingCueSuppressed(false);
   if (!root) return;
   root.dataset.visible = "false";
   root.removeAttribute("data-title");
