@@ -2400,3 +2400,13 @@ Extended `tools/ui-keyboard-focus-tooltip-audit.mjs` from 9 representative targe
 Verification passed with `node tools\ui-keyboard-focus-tooltip-audit.mjs`, `git diff --check`, and `npm.cmd run check`. The focus audit produced mobile evidence such as `tmp/ui-quality/focus-tooltips/town-toolbar-reset-focus-tooltip-v1-mobile-390x844.png`, `tmp/ui-quality/focus-tooltips/reward-choice-2-focus-tooltip-v1-mobile-390x844.png`, `tmp/ui-quality/focus-tooltips/combat-end-turn-focus-tooltip-v1-mobile-390x844.png`, and `tmp/ui-quality/focus-tooltips/settings-return-town-focus-tooltip-v1-mobile-390x844.png`. `npm.cmd run check` still reports only the existing Vite large JS chunk warning.
 
 This remains a 95% candidate rather than final approval. Focus/readability coverage is broader now, but WorldMap remains on its separate map-selection evidence path, broader gameplay-critical readable text review, final mobile UX approval, user acceptance, and release-ready UI remain unfinished.
+
+### Codex
+
+Codex continued the active 95% candidate UI goal by turning the scattered disabled/readability checks into an official reproducible audit. The prior evidence for Event unaffordable choices and Combat/Boss cost-disabled cards existed mostly in `tmp` scripts and 1920 screenshots, while WorldMap locked-node disabled evidence already had a dedicated `tools` audit.
+
+Added `tools/ui-disabled-readability-audit.mjs`. It verifies Event unaffordable choice, Combat cost-disabled card, and Boss cost-disabled card at 1920x1080, 1280x720, and 390x844 portrait. Each case checks visible disabled lock art, danger-tone DOM tooltip role/aria, safe desktop canvas or mobile letterbox placement, no Phaser text/vector leak, and blocked pointer/keyboard behavior. The audit passed all 9 cases and produced screenshots under `tmp/ui-quality/disabled-readability/`, including the mobile Event, Combat, and Boss disabled-tooltip cases.
+
+Verification passed with `node tools\ui-disabled-readability-audit.mjs`, `node tools\ui-worldmap-locked-tooltip-audit.mjs`, `git diff --check`, and `npm.cmd run check`. The WorldMap locked audit passed all 15 locked-node cases again across 1920x1080, 1280x720, and 390x844. `npm.cmd run check` still reports only the existing Vite large JS chunk warning.
+
+This remains a 95% candidate rather than final approval. Disabled/readability evidence is broader and easier to rerun now, but full disabled approval across every possible control, final mobile UX approval, user acceptance, and release-ready UI remain unfinished.

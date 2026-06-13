@@ -7,7 +7,7 @@ Repository:
 - GitHub: `https://github.com/vivaca86/game.git`
 - Branch: `main`
 - Latest pushed commit: run `git log -1 --oneline` after pulling.
-- Expected latest commit title after the 2026-06-14 broader focus-tooltip continuation: `Broaden focus tooltip audit`
+- Expected latest commit title after the 2026-06-14 disabled-readability continuation: `Add disabled readability audit`
 
 ## Start On Another PC
 
@@ -22,7 +22,7 @@ npm install
 Expected first commit title in `git log --oneline -5` after the latest continuation:
 
 ```text
-Broaden focus tooltip audit
+Add disabled readability audit
 ```
 
 Expected status:
@@ -1781,3 +1781,40 @@ Representative evidence:
 - `tmp/ui-quality/focus-tooltips/settings-return-town-focus-tooltip-v1-mobile-390x844.png`
 
 Important limitation: this broadens selected/focus/readability evidence, but it is not final full focus approval, user acceptance, final mobile UX approval, or release-ready proof.
+
+## 2026-06-14 Disabled Readability Audit Continuation
+
+Status remains `95% candidate, not final`.
+
+Latest implementation/audit continuation:
+
+- Added `tools/ui-disabled-readability-audit.mjs`.
+- The new audit promotes the previously scattered Event/Combat/Boss disabled-readability checks into a reproducible official `tools` command.
+- It covers Event unaffordable choice, Combat cost-disabled card, and Boss cost-disabled card at 1920x1080, 1280x720, and 390x844 portrait.
+- It verifies disabled lock art, danger-tone DOM readability tooltip, safe desktop/mobile placement, no Phaser text/vector leak, and blocked pointer/keyboard behavior.
+- Re-ran `tools/ui-worldmap-locked-tooltip-audit.mjs` so the same continuation also has current WorldMap locked/sealed/dormant/red disabled evidence across 1920x1080, 1280x720, and 390x844.
+
+Commands:
+
+```powershell
+node tools\ui-disabled-readability-audit.mjs
+node tools\ui-worldmap-locked-tooltip-audit.mjs
+git diff --check
+npm.cmd run check
+```
+
+Result:
+
+- `node tools\ui-disabled-readability-audit.mjs` passed 9 disabled-readability cases.
+- `node tools\ui-worldmap-locked-tooltip-audit.mjs` passed 15 WorldMap locked-node cases.
+- `git diff --check` passed.
+- `npm.cmd run check` passed with only the existing Vite large JS chunk warning.
+
+Representative evidence:
+
+- `tmp/ui-quality/disabled-readability/event-disabled-choice-tooltip-v1-mobile-390x844.png`
+- `tmp/ui-quality/disabled-readability/combat-disabled-card-tooltip-v1-mobile-390x844.png`
+- `tmp/ui-quality/disabled-readability/boss-disabled-card-tooltip-v1-mobile-390x844.png`
+- `tmp/ui-quality/worldmap-locked-tooltips/red-boss-locked-tooltip-v1-mobile-390x844.png`
+
+Important limitation: this makes disabled/readability evidence more reproducible and broader across desktop/mobile, but it is not full disabled approval across every possible control, final UI approval, user acceptance, or release-ready proof.
