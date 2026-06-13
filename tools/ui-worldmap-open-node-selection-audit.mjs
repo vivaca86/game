@@ -49,7 +49,8 @@ const auditCases = [
 const viewports = [
   { key: "desktop-1920", suffix: "1920", width: 1920, height: 1080 },
   { key: "desktop-1280", suffix: "desktop-1280", width: 1280, height: 720 },
-  { key: "mobile-390x844", suffix: "mobile-390x844", width: 390, height: 844 }
+  { key: "mobile-390x844", suffix: "mobile-390x844", width: 390, height: 844 },
+  { key: "mobile-landscape-844x390", suffix: "mobile-landscape-844x390", width: 844, height: 390 }
 ];
 
 await mkdir("tmp/ui-quality/worldmap-open-node-selection", { recursive: true });

@@ -49,7 +49,8 @@ const auditCases = [
 const viewports = [
   { key: "desktop-1920", suffix: "1920", width: 1920, height: 1080, minWidth: 260, minHeight: 60, maxWidthRatio: 0.42, maxHeightRatio: 0.34, allowLetterbox: false },
   { key: "desktop-1280", suffix: "desktop-1280", width: 1280, height: 720, minWidth: 240, minHeight: 58, maxWidthRatio: 0.48, maxHeightRatio: 0.34, allowLetterbox: false },
-  { key: "mobile-390x844", suffix: "mobile-390x844", width: 390, height: 844, minWidth: 210, minHeight: 48, maxWidthRatio: 0.82, maxHeightRatio: 0.5, allowLetterbox: true }
+  { key: "mobile-390x844", suffix: "mobile-390x844", width: 390, height: 844, minWidth: 210, minHeight: 48, maxWidthRatio: 0.82, maxHeightRatio: 0.5, allowLetterbox: true },
+  { key: "mobile-landscape-844x390", suffix: "mobile-landscape-844x390", width: 844, height: 390, minWidth: 210, minHeight: 48, maxWidthRatio: 0.78, maxHeightRatio: 0.42, allowLetterbox: false }
 ];
 
 await mkdir("tmp/ui-quality/worldmap-open-node-down", { recursive: true });

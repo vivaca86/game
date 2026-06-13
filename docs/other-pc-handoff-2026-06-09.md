@@ -7,7 +7,7 @@ Repository:
 - GitHub: `https://github.com/vivaca86/game.git`
 - Branch: `main`
 - Latest pushed commit: run `git log -1 --oneline` after pulling.
-- Expected latest commit title after the 2026-06-14 mobile-landscape focus/disabled continuation: `Audit landscape focus disabled states`
+- Expected latest commit title after the 2026-06-14 mobile-landscape WorldMap interaction continuation: `Audit landscape WorldMap interactions`
 
 ## Start On Another PC
 
@@ -22,7 +22,7 @@ npm install
 Expected first commit title in `git log --oneline -5` after the latest continuation:
 
 ```text
-Audit landscape focus disabled states
+Audit landscape WorldMap interactions
 ```
 
 Expected status:
@@ -1893,3 +1893,46 @@ Representative evidence:
 - `tmp/ui-quality/worldmap-locked-tooltips/red-boss-locked-tooltip-v1-mobile-landscape-844x390.png`
 
 Important limitation: this strengthens mobile landscape focus/disabled/readability evidence for the current 95% candidate, but it is not final full focus approval, full disabled approval, final mobile UX approval, user acceptance, or release-ready proof.
+
+## 2026-06-14 Mobile Landscape WorldMap Interaction Continuation
+
+Status remains `95% candidate, not final`.
+
+Latest implementation/audit continuation:
+
+- Expanded `tools/ui-worldmap-open-node-tooltip-audit.mjs` with `mobile-landscape-844x390`.
+- Expanded `tools/ui-worldmap-open-node-down-audit.mjs` with `mobile-landscape-844x390`.
+- Expanded `tools/ui-worldmap-open-node-selection-audit.mjs` with `mobile-landscape-844x390`.
+- Expanded `tools/ui-worldmap-route-interaction-audit.mjs` with `mobile-landscape-844x390`.
+- Expanded `tools/ui-worldmap-keyboard-tooltip-audit.mjs` with `mobile-landscape-844x390`.
+
+Commands:
+
+```powershell
+node tools\ui-worldmap-open-node-tooltip-audit.mjs
+node tools\ui-worldmap-open-node-down-audit.mjs
+node tools\ui-worldmap-open-node-selection-audit.mjs
+node tools\ui-worldmap-route-interaction-audit.mjs
+node tools\ui-worldmap-keyboard-tooltip-audit.mjs
+git diff --check
+npm.cmd run check
+```
+
+Result:
+
+- `node tools\ui-worldmap-open-node-tooltip-audit.mjs` passed 12 cases: lower-open, mid-open, and boss-open across 1920x1080, 1280x720, 390x844 portrait, and 844x390 landscape.
+- `node tools\ui-worldmap-open-node-down-audit.mjs` passed 12 cases across the same open-node families and viewports.
+- `node tools\ui-worldmap-open-node-selection-audit.mjs` passed 12 post-click selected/current route-family cases across the same viewports.
+- `node tools\ui-worldmap-route-interaction-audit.mjs` passed 64 route interaction cases: open hover/down plus locked hover/click across lower/mid/boss open and sealed/dormant/red/boss locked families at the same four viewports.
+- `node tools\ui-worldmap-keyboard-tooltip-audit.mjs` passed 12 keyboard-selected tooltip cases: lower-left, late-right, and boss-up across the same four viewports.
+- `git diff --check` passed.
+- `npm.cmd run check` passed with only the existing Vite large JS chunk warning.
+
+Representative evidence:
+
+- `tmp/ui-quality/worldmap-open-node-tooltips/boss-open-open-node-tooltip-v1-mobile-landscape-844x390.png`
+- `tmp/ui-quality/worldmap-open-node-down/boss-open-open-node-down-v1-mobile-landscape-844x390.png`
+- `tmp/ui-quality/worldmap-open-node-selection/boss-open-open-node-selection-v1-mobile-landscape-844x390.png`
+- `tmp/ui-quality/worldmap-keyboard-tooltips/boss-up-keyboard-tooltip-v1-mobile-landscape-844x390.png`
+
+Important limitation: this strengthens mobile landscape WorldMap interaction evidence, but it is not full WorldMap node/body/route recomposition approval, final selected/focus approval, user acceptance, or release-ready proof.
