@@ -136,6 +136,10 @@ try {
         currentBody: hoverAudit.visibleCurrentLateBodyImages === 1 ? "late" : "base",
         currentFrame: hoverAudit.visibleCurrentLateFrameImages === 1 ? "late" : "base",
         currentStatusImages: hoverAudit.visibleCurrentStatusImages,
+        targetStateFamily: hoverAudit.targetStateFamily,
+        targetBody: hoverAudit.targetBodyAtTarget ? "ok" : "missing",
+        targetFrame: hoverAudit.targetFrameAtTarget ? "ok" : "missing",
+        targetBadge: hoverAudit.targetBadgeAtTarget ? "ok" : "missing",
         firstLockedIndex: hoverAudit.firstLockedIndex,
         screenshot: path.resolve(screenshot)
       });
@@ -255,6 +259,8 @@ async function readWorldMapTooltipAudit(page, auditCase) {
     const currentNode = stageNodes[currentIndex];
     const unlockedStageIds = new Set([...(context?.save?.profile?.unlockedStages ?? []), currentStageId]);
     const firstLockedIndex = stages.findIndex((stage) => !unlockedStageIds.has(stage.id));
+    const targetIndex = auditCase.targetIndex;
+    const targetNode = stageNodes[targetIndex];
     const visible = (scene?.children?.list ?? []).filter((child) => child?.visible !== false && child.alpha !== 0);
     const children = scene?.children?.list ?? [];
     const underlayIndex = children.findIndex((child) => (
@@ -291,33 +297,27 @@ async function readWorldMapTooltipAudit(page, auditCase) {
       ...imageByKey("ui_completed_stage_late_frame_concept")
     ];
     const lockedBadgeImages = imageByKey("ui_locked_stage_badge_concept");
-    const lockedBodyImages = [
-      ...imageByKey("ui_locked_stage_body_wash_concept"),
-      ...imageByKey("ui_locked_stage_far_body_wash_concept"),
-      ...imageByKey("ui_locked_stage_boss_body_wash_concept")
-    ];
-    const lockedFrameImages = [
-      ...imageByKey("ui_locked_stage_frame_concept"),
-      ...imageByKey("ui_locked_stage_far_frame_concept"),
-      ...imageByKey("ui_locked_stage_boss_frame_concept")
-    ];
+    const lockedNextBodyImages = imageByKey("ui_locked_stage_body_wash_concept");
+    const lockedFarBodyImages = imageByKey("ui_locked_stage_far_body_wash_concept");
+    const lockedBossBodyImages = imageByKey("ui_locked_stage_boss_body_wash_concept");
+    const lockedBodyImages = [...lockedNextBodyImages, ...lockedFarBodyImages, ...lockedBossBodyImages];
+    const lockedNextFrameImages = imageByKey("ui_locked_stage_frame_concept");
+    const lockedFarFrameImages = imageByKey("ui_locked_stage_far_frame_concept");
+    const lockedBossFrameImages = imageByKey("ui_locked_stage_boss_frame_concept");
+    const lockedFrameImages = [...lockedNextFrameImages, ...lockedFarFrameImages, ...lockedBossFrameImages];
     const sealedBadgeImages = imageByKey("ui_sealed_stage_badge_concept");
-    const sealedBodyImages = [
-      ...imageByKey("ui_sealed_stage_body_wash_concept"),
-      ...imageByKey("ui_sealed_stage_mid_body_wash_concept")
-    ];
-    const sealedFrameImages = [
-      ...imageByKey("ui_sealed_stage_frame_concept"),
-      ...imageByKey("ui_sealed_stage_mid_frame_concept")
-    ];
-    const dormantBodyImages = [
-      ...imageByKey("ui_dormant_stage_body_wash_concept"),
-      ...imageByKey("ui_dormant_stage_mid_body_wash_concept")
-    ];
-    const dormantFrameImages = [
-      ...imageByKey("ui_dormant_stage_frame_concept"),
-      ...imageByKey("ui_dormant_stage_mid_frame_concept")
-    ];
+    const sealedBaseBodyImages = imageByKey("ui_sealed_stage_body_wash_concept");
+    const sealedMidBodyImages = imageByKey("ui_sealed_stage_mid_body_wash_concept");
+    const sealedBodyImages = [...sealedBaseBodyImages, ...sealedMidBodyImages];
+    const sealedBaseFrameImages = imageByKey("ui_sealed_stage_frame_concept");
+    const sealedMidFrameImages = imageByKey("ui_sealed_stage_mid_frame_concept");
+    const sealedFrameImages = [...sealedBaseFrameImages, ...sealedMidFrameImages];
+    const dormantBaseBodyImages = imageByKey("ui_dormant_stage_body_wash_concept");
+    const dormantMidBodyImages = imageByKey("ui_dormant_stage_mid_body_wash_concept");
+    const dormantBodyImages = [...dormantBaseBodyImages, ...dormantMidBodyImages];
+    const dormantBaseFrameImages = imageByKey("ui_dormant_stage_frame_concept");
+    const dormantMidFrameImages = imageByKey("ui_dormant_stage_mid_frame_concept");
+    const dormantFrameImages = [...dormantBaseFrameImages, ...dormantMidFrameImages];
     const defaultDisabledStampCount = visible.filter((child) => (
       child?.type === "Image"
       && child.texture?.key === "ui_disabled_lock_stamp_concept"
@@ -392,6 +392,209 @@ async function readWorldMapTooltipAudit(page, auditCase) {
     const currentHasNoSealedFrame = sealedFrameImages.every((image) => notNearCurrentNode(image, 0.72));
     const currentHasNoDormantBody = dormantBodyImages.every((image) => notNearCurrentNode(image, 0.72));
     const currentHasNoDormantFrame = dormantFrameImages.every((image) => notNearCurrentNode(image, 0.72));
+    const imageAt = (images, x, y) => images.find((image) => Math.abs(image.x - x) <= 1 && Math.abs(image.y - y) <= 1);
+    const nearTargetNode = (image, scale) => targetNode && (
+      Math.abs(image.x - targetNode.x) < targetNode.width * scale
+      && Math.abs(image.y - targetNode.y) < targetNode.height * scale
+    );
+    const targetIsSealed = targetIndex === firstLockedIndex && targetIndex < 9;
+    const targetIsDormant = targetIndex !== firstLockedIndex && targetIndex < 9;
+    const targetIsRedLock = targetIndex >= 9;
+    const targetIsRedNext = targetIsRedLock && targetIndex === firstLockedIndex && targetIndex < 13;
+    const targetIsRedFar = targetIsRedLock && targetIndex !== firstLockedIndex && targetIndex < 13;
+    const targetIsRedBoss = targetIndex >= 13;
+    const targetStateFamily = targetIsRedBoss
+      ? "red-boss"
+      : targetIsRedNext
+        ? "red-next"
+        : targetIsRedFar
+          ? "red-far"
+          : targetIsSealed
+            ? (targetIndex > 4 ? "sealed-mid" : "sealed-base")
+            : targetIsDormant
+              ? (targetIndex > 4 ? "dormant-mid" : "dormant-base")
+              : "unknown";
+    const lockedBodyPlacement = (node, stageIndex) => {
+      const nextLocked = stageIndex === firstLockedIndex;
+      const upperBossNode = stageIndex >= 13;
+      return {
+        x: node.x + node.width * (upperBossNode ? -0.02 : 0.01),
+        y: node.y + node.height * (upperBossNode ? 0.09 : 0.06),
+        width: node.width * (upperBossNode ? 1.08 : 1.12),
+        height: node.height * (upperBossNode ? 1.1 : 1.18),
+        minAlpha: nextLocked ? 0.54 : 0.4
+      };
+    };
+    const lockedFramePlacement = (node, stageIndex) => {
+      const nextLocked = stageIndex === firstLockedIndex;
+      const upperBossNode = stageIndex >= 13;
+      return {
+        x: node.x + node.width * (upperBossNode ? -0.02 : 0.01),
+        y: node.y + node.height * (upperBossNode ? 0.08 : 0.05),
+        width: node.width * (upperBossNode ? 1.24 : 1.28),
+        height: node.height * (upperBossNode ? 1.24 : 1.32),
+        minAlpha: nextLocked ? 0.72 : 0.56
+      };
+    };
+    const lockedBadgePlacement = (node, stageIndex) => {
+      const sourceAligned = {
+        9: { x: 646, y: 285, size: 70 },
+        10: { x: 787, y: 337, size: 70 },
+        11: { x: 941, y: 358, size: 70 },
+        12: { x: 1068, y: 343, size: 70 },
+        13: { x: 1208, y: 232, size: 76 },
+        14: { x: 1311, y: 378, size: 76 }
+      }[stageIndex];
+      const base = sourceAligned
+        ?? (stageIndex >= 13
+          ? { x: node.x - node.width * 0.34, y: node.y + node.height * 0.36, size: 76 }
+          : stageIndex >= 11
+            ? { x: node.x - node.width * 0.12, y: node.y + node.height * 0.36, size: 70 }
+            : { x: node.x - node.width * 0.06, y: node.y + node.height * 0.36, size: 70 });
+      const nextLocked = stageIndex === firstLockedIndex;
+      return {
+        ...base,
+        size: nextLocked ? Math.max(base.size, 76) : base.size,
+        minAlpha: nextLocked ? 0.9 : 0.82
+      };
+    };
+    const sealedBodyPlacement = (node, stageIndex) => {
+      const midNode = stageIndex > 4;
+      return {
+        x: node.x + node.width * 0.01,
+        y: node.y + node.height * 0.07,
+        width: node.width * (midNode ? 1.08 : 1.1),
+        height: node.height * (midNode ? 1.14 : 1.16),
+        minAlpha: midNode ? 0.4 : 0.48
+      };
+    };
+    const sealedFramePlacement = (node, stageIndex) => {
+      const midNode = stageIndex > 4;
+      return {
+        x: node.x + node.width * 0.01,
+        y: node.y + node.height * 0.05,
+        width: node.width * (midNode ? 1.2 : 1.24),
+        height: node.height * (midNode ? 1.26 : 1.3),
+        minAlpha: midNode ? 0.46 : 0.56
+      };
+    };
+    const sealedBadgePlacement = (node) => ({
+      x: node.x + node.width * 0.01,
+      y: node.y + node.height * 0.39,
+      size: 60,
+      minAlpha: 0.8
+    });
+    const dormantBodyPlacement = (node, stageIndex) => {
+      const lowerNode = stageIndex <= 4;
+      return {
+        x: node.x + node.width * 0.01,
+        y: node.y + node.height * (lowerNode ? 0.06 : 0.07),
+        width: node.width * (lowerNode ? 1.12 : 1.08),
+        height: node.height * (lowerNode ? 1.18 : 1.14),
+        minAlpha: lowerNode ? 0.4 : 0.32
+      };
+    };
+    const dormantFramePlacement = (node, stageIndex) => {
+      const lowerNode = stageIndex <= 4;
+      return {
+        x: node.x + node.width * 0.01,
+        y: node.y + node.height * (lowerNode ? 0.04 : 0.05),
+        width: node.width * (lowerNode ? 1.26 : 1.2),
+        height: node.height * (lowerNode ? 1.32 : 1.26),
+        minAlpha: lowerNode ? 0.48 : 0.38
+      };
+    };
+    const targetBodyImages = targetIsRedBoss
+      ? lockedBossBodyImages
+      : targetIsRedNext
+        ? lockedNextBodyImages
+        : targetIsRedFar
+          ? lockedFarBodyImages
+          : targetIsSealed
+            ? (targetIndex > 4 ? sealedMidBodyImages : sealedBaseBodyImages)
+            : targetIsDormant
+              ? (targetIndex > 4 ? dormantMidBodyImages : dormantBaseBodyImages)
+              : [];
+    const targetFrameImages = targetIsRedBoss
+      ? lockedBossFrameImages
+      : targetIsRedNext
+        ? lockedNextFrameImages
+        : targetIsRedFar
+          ? lockedFarFrameImages
+          : targetIsSealed
+            ? (targetIndex > 4 ? sealedMidFrameImages : sealedBaseFrameImages)
+            : targetIsDormant
+              ? (targetIndex > 4 ? dormantMidFrameImages : dormantBaseFrameImages)
+              : [];
+    const targetBodyPlacement = targetNode && targetIsRedLock
+      ? lockedBodyPlacement(targetNode, targetIndex)
+      : targetNode && targetIsSealed
+        ? sealedBodyPlacement(targetNode, targetIndex)
+        : targetNode && targetIsDormant
+          ? dormantBodyPlacement(targetNode, targetIndex)
+          : undefined;
+    const targetFramePlacement = targetNode && targetIsRedLock
+      ? lockedFramePlacement(targetNode, targetIndex)
+      : targetNode && targetIsSealed
+        ? sealedFramePlacement(targetNode, targetIndex)
+        : targetNode && targetIsDormant
+          ? dormantFramePlacement(targetNode, targetIndex)
+          : undefined;
+    const targetBadgePlacement = targetNode && targetIsRedLock
+      ? lockedBadgePlacement(targetNode, targetIndex)
+      : targetNode && targetIsSealed
+        ? sealedBadgePlacement(targetNode)
+        : undefined;
+    const targetBodyImage = targetBodyPlacement
+      ? imageAt(targetBodyImages, targetBodyPlacement.x, targetBodyPlacement.y)
+      : undefined;
+    const targetFrameImage = targetFramePlacement
+      ? imageAt(targetFrameImages, targetFramePlacement.x, targetFramePlacement.y)
+      : undefined;
+    const targetBadgeImage = targetBadgePlacement
+      ? imageAt(targetIsRedLock ? lockedBadgeImages : sealedBadgeImages, targetBadgePlacement.x, targetBadgePlacement.y)
+      : undefined;
+    const targetBodyAtTarget = Boolean(targetBodyImage);
+    const targetFrameAtTarget = Boolean(targetFrameImage);
+    const targetBadgeAtTarget = targetIsDormant ? true : Boolean(targetBadgeImage);
+    const targetBodyStyleAtTarget = Boolean(targetBodyImage && targetBodyPlacement
+      && Math.abs(targetBodyImage.displayWidth - targetBodyPlacement.width) <= 1
+      && Math.abs(targetBodyImage.displayHeight - targetBodyPlacement.height) <= 1
+      && Number(targetBodyImage.alpha ?? 1) >= targetBodyPlacement.minAlpha);
+    const targetFrameStyleAtTarget = Boolean(targetFrameImage && targetFramePlacement
+      && Math.abs(targetFrameImage.displayWidth - targetFramePlacement.width) <= 1
+      && Math.abs(targetFrameImage.displayHeight - targetFramePlacement.height) <= 1
+      && Number(targetFrameImage.alpha ?? 1) >= targetFramePlacement.minAlpha);
+    const targetBadgeStyleAtTarget = targetIsDormant || Boolean(targetBadgeImage && targetBadgePlacement
+      && Math.abs(targetBadgeImage.displayWidth - targetBadgePlacement.size) <= 1
+      && Math.abs(targetBadgeImage.displayHeight - targetBadgePlacement.size) <= 1
+      && Number(targetBadgeImage.alpha ?? 1) >= targetBadgePlacement.minAlpha);
+    const targetHasNoCurrentStack = [
+      ...markerImages,
+      ...haloImages,
+      ...currentBodyImages,
+      ...currentFrameImages,
+      ...statusImages
+    ].every((image) => !nearTargetNode(image, 0.6));
+    const targetHasNoCompletedStack = [
+      ...completedImages,
+      ...completedBodyImages,
+      ...completedFrameImages
+    ].every((image) => !nearTargetNode(image, 0.72));
+    const targetHasNoWrongRedLockStack = targetIsRedLock || [
+      ...lockedBadgeImages,
+      ...lockedBodyImages,
+      ...lockedFrameImages
+    ].every((image) => !nearTargetNode(image, 0.72));
+    const targetHasNoWrongSealedStack = targetIsSealed || [
+      ...sealedBadgeImages,
+      ...sealedBodyImages,
+      ...sealedFrameImages
+    ].every((image) => !nearTargetNode(image, 0.72));
+    const targetHasNoWrongDormantStack = targetIsDormant || [
+      ...dormantBodyImages,
+      ...dormantFrameImages
+    ].every((image) => !nearTargetNode(image, 0.72));
 
     const tooltip = readTooltip(root, canvas);
     return {
@@ -400,6 +603,19 @@ async function readWorldMapTooltipAudit(page, auditCase) {
       currentIndex,
       targetStageId: stages[auditCase.targetIndex]?.id,
       targetStageName: stages[auditCase.targetIndex]?.displayNameKo,
+      targetIndex,
+      targetStateFamily,
+      targetBodyAtTarget,
+      targetBodyStyleAtTarget,
+      targetFrameAtTarget,
+      targetFrameStyleAtTarget,
+      targetBadgeAtTarget,
+      targetBadgeStyleAtTarget,
+      targetHasNoCurrentStack,
+      targetHasNoCompletedStack,
+      targetHasNoWrongRedLockStack,
+      targetHasNoWrongSealedStack,
+      targetHasNoWrongDormantStack,
       expectedLateCurrent,
       underlayVisible: underlayIndex >= 0,
       visibleCurrentMarkerImages: markerImages.length,
@@ -563,6 +779,44 @@ function assertWorldMapLockedTooltip(label, audit, auditCase, viewport, seeded) 
     throw new Error(`${label}: expected first locked index ${auditCase.expectedFirstLockedIndex}, got ${audit.firstLockedIndex}`);
   }
   if (audit.targetUnlocked) throw new Error(`${label}: target stage unexpectedly unlocked`);
+  if (audit.targetStateFamily === "unknown") {
+    throw new Error(`${label}: unknown locked target state family for index ${audit.targetIndex}`);
+  }
+  if (!audit.targetBodyAtTarget || !audit.targetBodyStyleAtTarget) {
+    throw new Error(`${label}: locked target body missing or incorrectly styled ${JSON.stringify({
+      targetStateFamily: audit.targetStateFamily,
+      targetBodyAtTarget: audit.targetBodyAtTarget,
+      targetBodyStyleAtTarget: audit.targetBodyStyleAtTarget
+    })}`);
+  }
+  if (!audit.targetFrameAtTarget || !audit.targetFrameStyleAtTarget) {
+    throw new Error(`${label}: locked target frame missing or incorrectly styled ${JSON.stringify({
+      targetStateFamily: audit.targetStateFamily,
+      targetFrameAtTarget: audit.targetFrameAtTarget,
+      targetFrameStyleAtTarget: audit.targetFrameStyleAtTarget
+    })}`);
+  }
+  if (!audit.targetBadgeAtTarget || !audit.targetBadgeStyleAtTarget) {
+    throw new Error(`${label}: locked target badge missing or incorrectly styled ${JSON.stringify({
+      targetStateFamily: audit.targetStateFamily,
+      targetBadgeAtTarget: audit.targetBadgeAtTarget,
+      targetBadgeStyleAtTarget: audit.targetBadgeStyleAtTarget
+    })}`);
+  }
+  if (!audit.targetHasNoCurrentStack
+    || !audit.targetHasNoCompletedStack
+    || !audit.targetHasNoWrongRedLockStack
+    || !audit.targetHasNoWrongSealedStack
+    || !audit.targetHasNoWrongDormantStack) {
+    throw new Error(`${label}: locked target has conflicting state overlays ${JSON.stringify({
+      targetStateFamily: audit.targetStateFamily,
+      targetHasNoCurrentStack: audit.targetHasNoCurrentStack,
+      targetHasNoCompletedStack: audit.targetHasNoCompletedStack,
+      targetHasNoWrongRedLockStack: audit.targetHasNoWrongRedLockStack,
+      targetHasNoWrongSealedStack: audit.targetHasNoWrongSealedStack,
+      targetHasNoWrongDormantStack: audit.targetHasNoWrongDormantStack
+    })}`);
+  }
   if (audit.defaultDisabledStampCount !== 0) {
     throw new Error(`${label}: unexpected default disabled stamp images on WorldMap (${audit.defaultDisabledStampCount})`);
   }
