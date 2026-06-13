@@ -7,7 +7,7 @@ Repository:
 - GitHub: `https://github.com/vivaca86/game.git`
 - Branch: `main`
 - Latest pushed commit: run `git log -1 --oneline` after pulling.
-- Expected latest commit title after the 2026-06-14 WorldMap boss locked-node continuation: `Add WorldMap boss locked node variants`
+- Expected latest commit title after the 2026-06-14 WorldMap boss locked-tooltip continuation: `Audit WorldMap boss locked tooltip`
 
 ## Start On Another PC
 
@@ -22,7 +22,7 @@ npm install
 Expected first commit title in `git log --oneline -5` after the latest continuation:
 
 ```text
-Add WorldMap boss locked node variants
+Audit WorldMap boss locked tooltip
 ```
 
 Expected status:
@@ -118,7 +118,7 @@ Recommended next work:
 4. Dynamic labels/tooltips/accessibility:
    - First hidden accessibility labels and first visible tooltip zones now exist.
    - Representative keyboard-focus tooltip evidence now exists for Town, Dungeon, Combat, Reward, Event, RuneBench, Boss, Result, and Settings.
-   - WorldMap locked/sealed/dormant nodes now expose danger-tone explanation tooltips through tooltip-only disabled hit targets.
+   - WorldMap locked/sealed/dormant nodes now expose danger-tone explanation tooltips through tooltip-only disabled hit targets, including the boss-sized red locked-node family.
    - WorldMap direction-key stage selection now shows the same DOM readability tooltip for the selected stage without adding another hover image.
    - Mobile portrait now has a non-blocking orientation/framing cue in unused letterbox space and suppresses it while readability tooltips are visible.
    - WorldMap now has muted locked/future route thread/bead material separate from completed/current cyan route material.
@@ -1138,3 +1138,29 @@ Representative evidence:
 - `tmp/ui-quality/worldmap/worldmap-progress-current-stage9-v1-1920.png`
 
 Important limitation: this improves the upper red locked-node stage-family split, but it is still not full WorldMap node/body recomposition. Stronger stage-specific current/completed/locked/sealed/dormant body variants, broader disabled/focus/readability coverage outside the audited paths, user acceptance, and final concept-match approval remain.
+
+## 2026-06-14 WorldMap Boss Locked Tooltip Audit Continuation
+
+Status remains `95% candidate, not final`.
+
+Additional local continuation work:
+
+- Extended `tools/ui-worldmap-locked-tooltip-audit.mjs` with a `red-boss` case.
+- The new case seeds stage index 13 as the first boss-sized red locked node, hovers/clicks `stage_dream_arcade`, and verifies the danger-tone DOM tooltip while keeping the current stage unchanged.
+- The audit now covers five WorldMap locked-node families across 1920x1080, 1280x720, and 390x844: sealed-next, dormant-mid, red-far, red-next, and red-boss.
+
+Verification for this continuation:
+
+```powershell
+node tools\ui-worldmap-locked-tooltip-audit.mjs
+```
+
+The audit passed with 15 cases. The new boss case reported `stageId=stage_dream_arcade`, title `꿈빛 오락실 · 잠김`, `currentStageId=stage_morning_observatory`, and `firstLockedIndex=13` at all three viewport sizes.
+
+Representative evidence:
+
+- `tmp/ui-quality/worldmap-locked-tooltips/red-boss-locked-tooltip-v1-1920.png`
+- `tmp/ui-quality/worldmap-locked-tooltips/red-boss-locked-tooltip-v1-desktop-1280.png`
+- `tmp/ui-quality/worldmap-locked-tooltips/red-boss-locked-tooltip-v1-mobile-390x844.png`
+
+Important limitation: this strengthens boss locked-node readability evidence, but it is still not full WorldMap node/body recomposition, final disabled/focus coverage, user acceptance, or release-ready UI.

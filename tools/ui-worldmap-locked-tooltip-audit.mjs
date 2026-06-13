@@ -52,6 +52,12 @@ const auditCases = [
     seed: { completedCount: 8, currentStageIndex: 8 },
     targetIndex: 9,
     expectedFirstLockedIndex: 9
+  },
+  {
+    key: "red-boss",
+    seed: { completedCount: 12, currentStageIndex: 12 },
+    targetIndex: 13,
+    expectedFirstLockedIndex: 13
   }
 ];
 

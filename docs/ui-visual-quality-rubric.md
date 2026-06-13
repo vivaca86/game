@@ -3666,6 +3666,8 @@ Evidence:
 - `tmp/ui-quality/worldmap-locked-tooltips/dormant-mid-locked-tooltip-v1-1920.png`
 - `tmp/ui-quality/worldmap-locked-tooltips/red-far-locked-tooltip-v1-1920.png`
 - `tmp/ui-quality/worldmap-locked-tooltips/red-next-locked-tooltip-v1-mobile-390x844.png`
+- `tmp/ui-quality/worldmap-locked-tooltips/red-boss-locked-tooltip-v1-1920.png`
+- `tmp/ui-quality/worldmap-locked-tooltips/red-boss-locked-tooltip-v1-mobile-390x844.png`
 - `node tools\ui-worldmap-locked-tooltip-audit.mjs`
 - `node tmp\ui-worldmap-action-hit-target-audit.mjs`
 - `node tools\ui-readability-tooltip-audit.mjs`
@@ -3682,7 +3684,7 @@ Completion level: `Partially complete`
 
 This checkpoint extends disabled/readability coverage to WorldMap locked nodes. `renderRasterDisabledHitTarget` can now run as a tooltip-only hit target with `disabledKey: false`, so WorldMap can expose readable explanations over already-rendered locked/sealed/dormant node art without adding an extra generic lock stamp. The tooltip stays danger-toned, role/aria-backed, non-clickable, and safe in desktop canvas or mobile letterbox placement.
 
-The audit covers sealed-next, dormant-mid, far red locked, and next red locked states at 1920x1080, 1280x720, and 390x844. It verifies the scene remains `WorldMapScene`, the current stage is unchanged after click, the target stage remains locked, no default disabled stamp becomes visible, tooltip title/body/tone/role/aria are correct, and canvas/accessibility metadata remains intact.
+The audit covers sealed-next, dormant-mid, far red locked, next red locked, and boss red locked states at 1920x1080, 1280x720, and 390x844. It verifies the scene remains `WorldMapScene`, the current stage is unchanged after click, the target stage remains locked, no default disabled stamp becomes visible, tooltip title/body/tone/role/aria are correct, and canvas/accessibility metadata remains intact. The boss case seeds `stage_dream_arcade` as the first boss-sized locked node and verifies `꿈빛 오락실 · 잠김` with `firstLockedIndex=13`.
 
 Remaining scope: full WorldMap node and route recomposition, broader disabled-state breadth outside the audited paths, full selected/focus approval, full mobile framing/orientation review, user acceptance, and final concept-match approval.
 
@@ -3920,6 +3922,8 @@ Evidence:
 - `public/assets/runtime/ui/ui_locked_stage_boss_frame_concept_v001.png`
 - `tmp/ui-quality/worldmap/worldmap-state-overlays-v1-1920.png`
 - `tmp/ui-quality/worldmap/worldmap-progress-current-stage9-v1-1920.png`
+- `tmp/ui-quality/worldmap-locked-tooltips/red-boss-locked-tooltip-v1-1920.png`
+- `tmp/ui-quality/worldmap-locked-tooltips/red-boss-locked-tooltip-v1-mobile-390x844.png`
 - `node tmp\ui-worldmap-action-hit-target-audit.mjs`
 - `node tools\ui-worldmap-keyboard-tooltip-audit.mjs`
 - `node tools\ui-worldmap-locked-tooltip-audit.mjs`
@@ -3935,6 +3939,8 @@ This checkpoint splits upper red locked-node body/frame material into next/base,
 `WorldMapScene` uses the boss locked family for stage indexes 13+ when available, while the first/next non-boss red lock keeps the base family and other non-boss red locks keep the far family. The WorldMap action audit now verifies default, stage-4-progress, and mid-sealed states as 0 next + 4 far + 2 boss locked bodies/frames, and late-progress as 1 next + 3 far + 2 boss locked bodies/frames.
 
 Remaining scope: this improves one upper locked-node stage-family gap, but it is still not full WorldMap node/body recomposition. Stronger stage-specific current/completed/locked/sealed/dormant body variants, broader disabled/focus/readability coverage, user acceptance, and final concept-match approval remain.
+
+Follow-up evidence: `tools/ui-worldmap-locked-tooltip-audit.mjs` now includes `red-boss`, so the new boss locked family has locked-condition tooltip proof in addition to body/frame visual proof. The boss tooltip audit passes at 1920x1080, 1280x720, and 390x844 with `stage_dream_arcade`, `꿈빛 오락실 · 잠김`, unchanged current stage, no default disabled stamp, and safe mobile letterbox placement.
 
 ## Current Remaining Raster-Quality Scope
 

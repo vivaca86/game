@@ -1437,3 +1437,10 @@
 - Impact: The WorldMap audit could prove next/far separation, but not that the upper boss-sized red locks had their own source-derived material. This left the locked-node family flatter than the current/completed/dormant/sealed families after their route-band splits.
 - Resolution: Added `ui_locked_stage_boss_body_wash_concept` and `ui_locked_stage_boss_frame_concept`, extracted from the actual upper boss red-lock crop with number/lock/route/background-safe masking. `WorldMapScene` now chooses the boss locked family for stage indexes 13+ when available, while keeping base for first/next non-boss red locks and far for other non-boss red locks. `tmp/ui-worldmap-action-hit-target-audit.mjs` now verifies next/far/boss locked body and frame counts separately.
 - Prevention: Locked-state audits should track boss-size red locks as their own texture family. When node geometry changes enough to alter placement and silhouette, do not count a shared distant-lock texture as complete stage-family evidence.
+
+### Problem: Boss red locked nodes had visual family evidence but no locked-tooltip evidence
+
+- Cause: After the boss red locked-node body/frame split, `tools/ui-worldmap-locked-tooltip-audit.mjs` still covered sealed-next, dormant-mid, far red, and next red locked nodes only. The new boss-sized locked family was verified by the WorldMap action audit, but not by the disabled/readability tooltip audit.
+- Impact: Boss locked nodes could have source-derived state art while lacking dedicated proof that they also expose the same danger-tone explanation, remain non-clickable, and keep mobile tooltip placement safe.
+- Resolution: Added a `red-boss` case to `tools/ui-worldmap-locked-tooltip-audit.mjs`. It seeds `stage_dream_arcade` as the first boss-sized locked node, verifies `꿈빛 오락실 · 잠김` tooltip content, unchanged current stage, no default disabled stamp, and safe placement across 1920x1080, 1280x720, and 390x844.
+- Prevention: Whenever a new WorldMap locked visual family is added, extend both the visual state audit and the locked-tooltip audit. State art and blocked-condition readability must stay paired.

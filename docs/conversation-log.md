@@ -2240,3 +2240,13 @@ Added `ui_locked_stage_boss_body_wash_concept` and `ui_locked_stage_boss_frame_c
 Verification passed with `node tools\extract-ui-state-assets.mjs`, `npm.cmd run assets:generate:dev`, `node tmp\ui-worldmap-action-hit-target-audit.mjs`, `npx.cmd tsc --noEmit`, `npm.cmd run assets:audit:strict`, `node tools\ui-worldmap-keyboard-tooltip-audit.mjs`, `node tools\ui-worldmap-locked-tooltip-audit.mjs`, `node tmp\route-node-raster-hover-state-audit.mjs`, `npm.cmd run check`, `git diff --check`, and targeted `$env:PHASER_SMOKE_ONLY='checkViewScreenshots,checkClickableControls,checkFullInputCoverage,checkUiSkinStates'; node tmp\run-phaser-smoke-with-vite.mjs` ending in `Phaser smoke OK`. `npm.cmd run check` still reports only the existing Vite large JS chunk warning.
 
 This remains a 95% candidate rather than final approval. The boss red locked split is stronger now, but full stage-specific WorldMap node/body variants, broader disabled/focus/readability coverage outside audited paths, user acceptance, and final concept-match approval remain unfinished.
+
+### Codex
+
+Codex continued the 95% candidate UI goal by closing the audit gap created by the new boss red locked-node family. The action/state audit verified the boss body/frame texture split, but the locked-node tooltip audit still only covered sealed-next, dormant-mid, far red locked, and next red locked nodes.
+
+Extended `tools/ui-worldmap-locked-tooltip-audit.mjs` with a `red-boss` case. It seeds `stage_dream_arcade` as the first boss-sized locked node, then verifies the danger-tone DOM tooltip, non-clicking behavior, absence of the default disabled stamp, canvas accessibility metadata, and safe desktop/mobile placement across 1920x1080, 1280x720, and 390x844.
+
+Verification passed with `node tools\ui-worldmap-locked-tooltip-audit.mjs`. The audit now reports 15 passing cases. The new boss case reported `stageId=stage_dream_arcade`, title `꿈빛 오락실 · 잠김`, `currentStageId=stage_morning_observatory`, and `firstLockedIndex=13` at all three viewport sizes. Reviewed screenshots: `tmp/ui-quality/worldmap-locked-tooltips/red-boss-locked-tooltip-v1-1920.png` and `tmp/ui-quality/worldmap-locked-tooltips/red-boss-locked-tooltip-v1-mobile-390x844.png`.
+
+This remains a 95% candidate rather than final approval. Boss locked-node readability evidence is stronger now, but full WorldMap recomposition, broader disabled/focus/readability coverage outside audited paths, user acceptance, and final concept-match approval remain unfinished.
