@@ -7,7 +7,7 @@ Repository:
 - GitHub: `https://github.com/vivaca86/game.git`
 - Branch: `main`
 - Latest pushed commit: run `git log -1 --oneline` after pulling.
-- Expected latest commit title after the 2026-06-14 latest broad-smoke continuation: `Document latest broad smoke`
+- Expected latest commit title after the 2026-06-14 latest responsive/readability continuation: `Document latest responsive audits`
 
 ## Start On Another PC
 
@@ -22,7 +22,7 @@ npm install
 Expected first commit title in `git log --oneline -5` after the latest continuation:
 
 ```text
-Document latest broad smoke
+Document latest responsive audits
 ```
 
 Expected status:
@@ -1717,3 +1717,33 @@ The full run passed these gates:
 - `checkBossResultFlow`
 
 Important limitation: this is strong latest regression evidence for the current 95% candidate, but it is not final UI approval, user acceptance, or release-ready proof.
+
+## 2026-06-14 Latest Responsive/Readability Audit Continuation
+
+Status remains `95% candidate, not final`.
+
+Latest verification-only continuation:
+
+- Latest verified HEAD before this documentation checkpoint was `b71ac4e Document latest broad smoke`.
+- No game code changed in this continuation.
+- Re-ran the responsive, readability-tooltip, mobile-framing, and accessibility overlay audits on latest HEAD.
+- Result: all four audits passed.
+
+Commands:
+
+```powershell
+node tools\ui-responsive-raster-audit.mjs
+node tools\ui-readability-tooltip-audit.mjs
+node tools\ui-mobile-framing-audit.mjs
+node tools\ui-accessibility-overlay-audit.mjs
+```
+
+The responsive raster audit passed all ten primary scenes at 1920x1080, 1280x720, and 390x844 portrait, with screenshots under `tmp/ui-quality/responsive/`.
+
+The readability tooltip audit passed all ten primary scenes at the same three viewport sizes, with screenshots under `tmp/ui-quality/readability-tooltips/`. Mobile tooltip cases remain in the portrait letterbox space rather than over the 16:9 playfield.
+
+The mobile framing audit passed Town, WorldMap, Dungeon, Combat, Reward, Event, RuneBench, Boss, Result, and Settings across 390x844 portrait, 1920x1080, 1280x720, and 844x390 landscape. Portrait shows the bottom framing cue; desktop and landscape hide it. The Combat mobile suppression case also passed: when a detailed readability tooltip is visible, the framing cue is suppressed and `aria-hidden=true`.
+
+The accessibility overlay audit passed all ten primary scenes with hidden 1x1 status regions plus synchronized canvas labels and no visible text leak.
+
+Important limitation: this strengthens latest responsive/readability/mobile/accessibility evidence for the current 95% candidate, but it is not final mobile UX approval, final UI approval, user acceptance, or release-ready proof.

@@ -2380,3 +2380,13 @@ Ran `node tmp\run-phaser-smoke-with-vite.mjs` with `PHASER_SMOKE_PROGRESS=1`, pr
 The full run passed Town/Combat/Boss page checks, view screenshots, clickable controls, full input coverage, Settings surface, UI skin states, save/reload, production save reset, combat actions, release catalog mode, release gem/rune effect, release enemy intent batch, release stage route batch, release event batch, release passive batch, core run loop, scene flow plus rune effect, and boss result flow.
 
 This strengthens the current 95% candidate evidence, but it remains a regression gate rather than final UI approval. User acceptance, release-readiness, broader non-audited selected/focus/readability/mobile review, and final concept-match approval remain unfinished.
+
+### Codex
+
+Codex answered the active 95% question conservatively: the project is a `95% candidate`, not final or user-accepted 95%. To strengthen that status on latest HEAD after the broad-smoke documentation commit, Codex reran the responsive/readability/mobile/accessibility evidence stack.
+
+Verification passed with `node tools\ui-responsive-raster-audit.mjs`, `node tools\ui-readability-tooltip-audit.mjs`, `node tools\ui-mobile-framing-audit.mjs`, and `node tools\ui-accessibility-overlay-audit.mjs`. The responsive audit passed all ten primary scenes at 1920x1080, 1280x720, and 390x844. The readability tooltip audit passed the same scene/viewport set. The mobile framing audit passed portrait/desktop/1280/landscape cases for all ten scenes plus Combat tooltip suppression. The accessibility audit passed all ten scenes with hidden 1x1 status regions and synchronized canvas labels.
+
+Updated `docs/other-pc-handoff-2026-06-09.md`, `docs/current-issues-and-plan.md`, and `docs/ui-visual-quality-rubric.md` so another PC can see that the latest responsive/readability/mobile/accessibility audits passed on `b71ac4e Document latest broad smoke`.
+
+This remains a 95% candidate rather than final approval. The latest audit rerun strengthens responsive/readability/mobile/accessibility evidence, but final mobile UX approval, broader non-audited selected/focus/readability review, user acceptance, and release-ready UI remain unfinished.
