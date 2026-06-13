@@ -23,6 +23,7 @@ const WORLD_MAP_RASTER_CURRENT_LATE_FRAME_KEY = "ui_current_stage_late_frame_con
 const WORLD_MAP_RASTER_CURRENT_HALO_KEY = "ui_current_stage_halo_concept";
 const WORLD_MAP_RASTER_CURRENT_STATUS_KEY = "ui_current_stage_status_badge_concept";
 const WORLD_MAP_RASTER_LOWER_NODE_BODY_KEY = "ui_world_map_lower_node_body_concept";
+const WORLD_MAP_RASTER_LOWER_NODE_FRAME_KEY = "ui_world_map_lower_node_frame_concept";
 const WORLD_MAP_RASTER_COMPLETED_BODY_KEY = "ui_completed_stage_body_wash_concept";
 const WORLD_MAP_RASTER_COMPLETED_LATE_BODY_KEY = "ui_completed_stage_late_body_wash_concept";
 const WORLD_MAP_RASTER_COMPLETED_FRAME_KEY = "ui_completed_stage_frame_concept";
@@ -140,13 +141,25 @@ function renderWorldMapRasterStage(scene: Phaser.Scene, context: BootContext): v
 }
 
 function renderWorldMapLowerNodeBodies(scene: Phaser.Scene): void {
-  if (!scene.textures.exists(WORLD_MAP_RASTER_LOWER_NODE_BODY_KEY)) return;
+  const hasBody = scene.textures.exists(WORLD_MAP_RASTER_LOWER_NODE_BODY_KEY);
+  const hasFrame = scene.textures.exists(WORLD_MAP_RASTER_LOWER_NODE_FRAME_KEY);
+  if (!hasBody && !hasFrame) return;
   WORLD_MAP_RASTER_STAGE_NODES.slice(0, 5).forEach((node, index) => {
-    const body = worldMapLowerNodeBodyPlacement(node, index);
-    scene.add.image(body.x, body.y, WORLD_MAP_RASTER_LOWER_NODE_BODY_KEY)
-      .setDisplaySize(body.width, body.height)
-      .setAlpha(body.alpha)
-      .setDepth(2.58);
+    if (hasBody) {
+      const body = worldMapLowerNodeBodyPlacement(node, index);
+      scene.add.image(body.x, body.y, WORLD_MAP_RASTER_LOWER_NODE_BODY_KEY)
+        .setDisplaySize(body.width, body.height)
+        .setAlpha(body.alpha)
+        .setDepth(2.58);
+    }
+
+    if (hasFrame) {
+      const frame = worldMapLowerNodeFramePlacement(node, index);
+      scene.add.image(frame.x, frame.y, WORLD_MAP_RASTER_LOWER_NODE_FRAME_KEY)
+        .setDisplaySize(frame.width, frame.height)
+        .setAlpha(frame.alpha)
+        .setDepth(2.72);
+    }
   });
 }
 
@@ -161,6 +174,20 @@ function worldMapLowerNodeBodyPlacement(
     width: node.width * (largerSourceNode ? 1.08 : 1.14),
     height: node.height * (largerSourceNode ? 1.14 : 1.2),
     alpha: largerSourceNode ? 0.44 : 0.5
+  };
+}
+
+function worldMapLowerNodeFramePlacement(
+  node: { x: number; y: number; width: number; height: number },
+  stageIndex: number
+): { x: number; y: number; width: number; height: number; alpha: number } {
+  const largerSourceNode = stageIndex === 3;
+  return {
+    x: node.x + node.width * 0.02,
+    y: node.y + node.height * (largerSourceNode ? 0.03 : 0.02),
+    width: node.width * (largerSourceNode ? 1.18 : 1.28),
+    height: node.height * (largerSourceNode ? 1.24 : 1.34),
+    alpha: largerSourceNode ? 0.48 : 0.56
   };
 }
 

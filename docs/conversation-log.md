@@ -2204,3 +2204,15 @@ Added `ui_world_map_lower_node_body_concept`, a neutral lower-node body layer ex
 Verification passed with `node tools\extract-ui-state-assets.mjs`, `npm.cmd run assets:generate:dev`, `npx.cmd tsc --noEmit`, `git diff --check`, `npm.cmd run assets:audit:strict`, `node tmp\ui-worldmap-action-hit-target-audit.mjs`, `node tmp\route-node-raster-hover-state-audit.mjs`, `node tools\ui-worldmap-keyboard-tooltip-audit.mjs`, `node tools\ui-worldmap-locked-tooltip-audit.mjs`, `npm.cmd run check`, and targeted `$env:PHASER_SMOKE_ONLY='checkViewScreenshots,checkClickableControls,checkFullInputCoverage,checkUiSkinStates'; node tmp\run-phaser-smoke-with-vite.mjs` ending in `Phaser smoke OK`.
 
 This improves lower-node silhouette recomposition but is still not final WorldMap node/body recomposition. Stronger stage-specific current/completed/locked/sealed/dormant body variants, broader disabled/focus/readability coverage, user acceptance, and final concept-match approval remain unfinished.
+
+### Codex
+
+Codex continued the 95% candidate UI goal by adding the missing companion frame for the WorldMap lower 1-5 neutral node layer. The prior lower-node body pass reduced baked silhouettes, but those nodes still lacked a separate warm rim/frame layer beneath the route and state stacks.
+
+Added `ui_world_map_lower_node_frame_concept`, a number/check-free frame asset extracted from the lower completed-node concept crop. The extraction mirrors the cleaner left-side rim to avoid carrying right-side route fragments into the reusable frame. `tools/generate-dev-runtime-assets.mjs`, `src/data/assetManifest.slice.v1.json`, `docs/asset-manifest.slice.v1.json`, and `src/data/releaseCatalogAdapter.ts` now register the asset for runtime and release use.
+
+`WorldMapScene` renders the lower-node frame on the first five map nodes above the neutral lower-node body and below route overlays plus current/completed/sealed/dormant state stacks. `tmp/ui-worldmap-action-hit-target-audit.mjs` now verifies lower-node frame counts and placement/style separately from lower-node body counts. The audit passed in default, stage-4-progress, and stage-9-progress states with `visibleLowerNodeFrames=5`, `expectedLowerNodeFrames=5`, and placement/style checks passing.
+
+Verification passed with `node tools\extract-ui-state-assets.mjs`, `npm.cmd run assets:generate:dev`, `npx.cmd tsc --noEmit`, `npm.cmd run assets:audit:strict`, `node tmp\ui-worldmap-action-hit-target-audit.mjs`, `node tmp\route-node-raster-hover-state-audit.mjs`, `node tools\ui-worldmap-keyboard-tooltip-audit.mjs`, `node tools\ui-worldmap-locked-tooltip-audit.mjs`, `npm.cmd run check`, and targeted `$env:PHASER_SMOKE_ONLY='checkViewScreenshots,checkClickableControls,checkFullInputCoverage,checkUiSkinStates'; node tmp\run-phaser-smoke-with-vite.mjs` ending in `Phaser smoke OK`.
+
+This remains a 95% candidate rather than final approval. The lower-node body/frame pair is stronger now, but full stage-specific WorldMap node/body variants, broader disabled/focus/readability coverage outside audited paths, user acceptance, and final concept-match approval remain unfinished.

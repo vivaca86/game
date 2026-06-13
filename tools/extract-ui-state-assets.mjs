@@ -799,6 +799,14 @@ const targets = [
     nativeSize: { w: 210, h: 220 }
   },
   {
+    key: "ui_world_map_lower_node_frame_concept",
+    kind: "world_map_lower_node_frame",
+    source: path.join(rootDir, "assets", "concepts", "ui", "world_map_ui_concept_v001.png"),
+    output: path.join(rootDir, "assets", "source", "ui", "ui_world_map_lower_node_frame_concept_v001.png"),
+    crop: { x: 622, y: 586, w: 170, h: 178 },
+    nativeSize: { w: 210, h: 220 }
+  },
+  {
     key: "ui_completed_stage_badge_concept",
     kind: "world_map_stage_badge",
     source: path.join(rootDir, "assets", "concepts", "ui", "world_map_ui_concept_v001.png"),
@@ -1554,6 +1562,142 @@ try {
             if (intersects) inside = !inside;
           }
           return inside;
+        }
+      }, {
+        base64: sourceBuffer.toString("base64"),
+        crop: target.crop,
+        nativeSize: target.nativeSize
+      })
+      : target.kind === "world_map_lower_node_frame"
+      ? await page.evaluate(async ({ base64, crop, nativeSize }) => {
+        const image = await new Promise((resolve, reject) => {
+          const img = new Image();
+          img.onload = () => resolve(img);
+          img.onerror = () => reject(new Error("source concept image failed to load"));
+          img.src = `data:image/png;base64,${base64}`;
+        });
+
+        const canvas = document.createElement("canvas");
+        canvas.width = nativeSize.w;
+        canvas.height = nativeSize.h;
+        const ctx = canvas.getContext("2d", { willReadFrequently: true });
+        if (!ctx) throw new Error("2d canvas context unavailable");
+
+        ctx.drawImage(image, crop.x, crop.y, crop.w, crop.h, 0, 0, nativeSize.w, nativeSize.h);
+        const imageData = ctx.getImageData(0, 0, nativeSize.w, nativeSize.h);
+        const data = imageData.data;
+        const sourceData = new Uint8ClampedArray(data);
+        const centerX = nativeSize.w * 0.5;
+        const centerY = nativeSize.h * 0.49;
+        const outer = [
+          { x: nativeSize.w * 0.5, y: nativeSize.h * 0.08 },
+          { x: nativeSize.w * 0.76, y: nativeSize.h * 0.22 },
+          { x: nativeSize.w * 0.84, y: nativeSize.h * 0.49 },
+          { x: nativeSize.w * 0.68, y: nativeSize.h * 0.77 },
+          { x: nativeSize.w * 0.5, y: nativeSize.h * 0.89 },
+          { x: nativeSize.w * 0.32, y: nativeSize.h * 0.77 },
+          { x: nativeSize.w * 0.16, y: nativeSize.h * 0.49 },
+          { x: nativeSize.w * 0.24, y: nativeSize.h * 0.22 }
+        ];
+        const inner = [
+          { x: nativeSize.w * 0.5, y: nativeSize.h * 0.22 },
+          { x: nativeSize.w * 0.63, y: nativeSize.h * 0.32 },
+          { x: nativeSize.w * 0.69, y: nativeSize.h * 0.5 },
+          { x: nativeSize.w * 0.6, y: nativeSize.h * 0.63 },
+          { x: nativeSize.w * 0.5, y: nativeSize.h * 0.71 },
+          { x: nativeSize.w * 0.4, y: nativeSize.h * 0.63 },
+          { x: nativeSize.w * 0.31, y: nativeSize.h * 0.5 },
+          { x: nativeSize.w * 0.37, y: nativeSize.h * 0.32 }
+        ];
+
+        for (let y = 0; y < nativeSize.h; y += 1) {
+          for (let x = 0; x < nativeSize.w; x += 1) {
+            const offset = (y * nativeSize.w + x) * 4;
+            const readX = x > centerX ? Math.max(0, Math.min(nativeSize.w - 1, Math.round(nativeSize.w - x - 1))) : x;
+            const sourceOffset = (y * nativeSize.w + readX) * 4;
+            const r = sourceData[sourceOffset];
+            const g = sourceData[sourceOffset + 1];
+            const b = sourceData[sourceOffset + 2];
+            const max = Math.max(r, g, b);
+            const min = Math.min(r, g, b);
+            const saturation = max - min;
+            const luminance = r * 0.299 + g * 0.587 + b * 0.114;
+            const outerMask = pointInPolygon(x, y, outer) ? 1 : 0;
+            const innerCutout = pointInPolygon(x, y, inner) ? 0 : 1;
+            const radial = Math.hypot((x - centerX) / (nativeSize.w * 0.43), (y - centerY) / (nativeSize.h * 0.45));
+            const outerFalloff = 1 - smoothstep(0.76, 1.14, radial);
+            const outerEdgeBand = 1 - smoothstep(8, 24, distanceToPolygonEdges(x, y, outer));
+            const innerEdgeBand = 1 - smoothstep(6, 18, distanceToPolygonEdges(x, y, inner));
+            const frameEdgeBand = Math.max(outerEdgeBand, innerEdgeBand * 0.76);
+            const lowerBadgeCutout = y > nativeSize.h * 0.58 && x > nativeSize.w * 0.16 && x < nativeSize.w * 0.84 ? 0 : 1;
+            const sideRouteCutout = (x < nativeSize.w * 0.18 || x > nativeSize.w * 0.78) && y > nativeSize.h * 0.36 ? 0 : 1;
+            const lowerRouteCutout = y > nativeSize.h * 0.74 && (x < nativeSize.w * 0.34 || x > nativeSize.w * 0.66) ? 0 : 1;
+            const rightArtifactCutout = 1 - smoothstep(0.58, 0.74, x / nativeSize.w) * smoothstep(0.38, 0.64, y / nativeSize.h);
+            const gold = smoothstep(42, 146, r + g * 0.74 - b * 1.48 + saturation * 0.16);
+            const paperEdge = smoothstep(62, 176, luminance) * (1 - smoothstep(70, 160, saturation));
+            const darkEdge = (1 - smoothstep(50, 136, luminance)) * smoothstep(16, 108, saturation);
+            let keep = Math.max(gold * 0.92, paperEdge * 0.42, darkEdge * 0.74)
+              * outerMask
+              * innerCutout
+              * outerFalloff
+              * frameEdgeBand
+              * lowerBadgeCutout
+              * sideRouteCutout
+              * lowerRouteCutout
+              * rightArtifactCutout;
+
+            if (keep <= 0.045) {
+              data[offset + 3] = 0;
+              continue;
+            }
+
+            const warmR = Math.min(255, 118 + luminance * 0.34 + gold * 34 + darkEdge * 18);
+            const warmG = Math.min(255, 92 + luminance * 0.29 + gold * 26 + paperEdge * 8);
+            const warmB = Math.min(255, 58 + luminance * 0.18 + paperEdge * 7);
+            const sourceMix = 0.24;
+            data[offset] = Math.round(r * sourceMix + warmR * (1 - sourceMix));
+            data[offset + 1] = Math.round(g * sourceMix + warmG * (1 - sourceMix));
+            data[offset + 2] = Math.round(b * sourceMix + warmB * (1 - sourceMix));
+            data[offset + 3] = Math.round(Math.min(226, 218 * keep * (0.54 + outerFalloff * 0.42)));
+          }
+        }
+
+        ctx.putImageData(imageData, 0, 0);
+        return canvas.toDataURL("image/png");
+
+        function smoothstep(edge0, edge1, value) {
+          const t = Math.max(0, Math.min(1, (value - edge0) / Math.max(1, edge1 - edge0)));
+          return t * t * (3 - 2 * t);
+        }
+
+        function pointInPolygon(x, y, polygon) {
+          let inside = false;
+          for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i, i += 1) {
+            const xi = polygon[i].x;
+            const yi = polygon[i].y;
+            const xj = polygon[j].x;
+            const yj = polygon[j].y;
+            const intersects = ((yi > y) !== (yj > y))
+              && x < ((xj - xi) * (y - yi)) / ((yj - yi) || 1) + xi;
+            if (intersects) inside = !inside;
+          }
+          return inside;
+        }
+
+        function distanceToPolygonEdges(x, y, polygon) {
+          let distance = Infinity;
+          for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i, i += 1) {
+            distance = Math.min(distance, distanceToSegment(x, y, polygon[j].x, polygon[j].y, polygon[i].x, polygon[i].y));
+          }
+          return distance;
+        }
+
+        function distanceToSegment(px, py, ax, ay, bx, by) {
+          const dx = bx - ax;
+          const dy = by - ay;
+          if (dx === 0 && dy === 0) return Math.hypot(px - ax, py - ay);
+          const t = Math.max(0, Math.min(1, ((px - ax) * dx + (py - ay) * dy) / (dx * dx + dy * dy)));
+          return Math.hypot(px - (ax + t * dx), py - (ay + t * dy));
         }
       }, {
         base64: sourceBuffer.toString("base64"),

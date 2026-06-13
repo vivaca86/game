@@ -863,6 +863,11 @@ async function runStateOverlayAudit(browser, baseUrl, auditCase) {
         && child.texture?.key === "ui_world_map_lower_node_body_concept"
         && (child.alpha ?? 1) > 0.05
       ));
+      const lowerNodeFrameImages = visible.filter((child) => (
+        child?.type === "Image"
+        && child.texture?.key === "ui_world_map_lower_node_frame_concept"
+        && (child.alpha ?? 1) > 0.05
+      ));
       const currentIndex = stages.findIndex((stage) => stage.id === currentStageId);
       const currentNode = stageNodes[currentIndex];
       const expectedMarker = currentNode
@@ -1071,6 +1076,16 @@ async function runStateOverlayAudit(browser, baseUrl, auditCase) {
           minAlpha: largerSourceNode ? 0.42 : 0.48
         };
       };
+      const lowerNodeFramePlacement = (node, stageIndex) => {
+        const largerSourceNode = stageIndex === 3;
+        return {
+          x: node.x + node.width * 0.02,
+          y: node.y + node.height * (largerSourceNode ? 0.03 : 0.02),
+          width: node.width * (largerSourceNode ? 1.18 : 1.28),
+          height: node.height * (largerSourceNode ? 1.24 : 1.34),
+          minAlpha: largerSourceNode ? 0.46 : 0.54
+        };
+      };
       const completedBodyPlacement = (node, stageIndex) => ({
         x: node.x + node.width * 0.02,
         y: node.y + node.height * 0.04,
@@ -1162,6 +1177,18 @@ async function runStateOverlayAudit(browser, baseUrl, auditCase) {
       const lowerNodeBodyStyleAtExpectedNodes = expectedLowerNodeBodies.every(({ node, index }) => {
         const placement = lowerNodeBodyPlacement(node, index);
         const image = imageAt(lowerNodeBodyImages, placement.x, placement.y);
+        return image
+          && Math.abs(image.displayWidth - placement.width) <= 1
+          && Math.abs(image.displayHeight - placement.height) <= 1
+          && (image.alpha ?? 1) >= placement.minAlpha;
+      });
+      const lowerNodeFramesAtExpectedNodes = expectedLowerNodeBodies.every(({ node, index }) => {
+        const placement = lowerNodeFramePlacement(node, index);
+        return hasImageAt(lowerNodeFrameImages, placement.x, placement.y);
+      });
+      const lowerNodeFrameStyleAtExpectedNodes = expectedLowerNodeBodies.every(({ node, index }) => {
+        const placement = lowerNodeFramePlacement(node, index);
+        const image = imageAt(lowerNodeFrameImages, placement.x, placement.y);
         return image
           && Math.abs(image.displayWidth - placement.width) <= 1
           && Math.abs(image.displayHeight - placement.height) <= 1
@@ -1414,6 +1441,9 @@ async function runStateOverlayAudit(browser, baseUrl, auditCase) {
         ok: lowerNodeBodyImages.length === expectedLowerNodeBodies.length
           && lowerNodeBodiesAtExpectedNodes
           && lowerNodeBodyStyleAtExpectedNodes
+          && lowerNodeFrameImages.length === expectedLowerNodeBodies.length
+          && lowerNodeFramesAtExpectedNodes
+          && lowerNodeFrameStyleAtExpectedNodes
           && completedImages.length === expectedCompleted.length
           && completedBaseImages.length === expectedCompletedBase.length
           && completedLateImages.length === expectedCompletedLate.length
@@ -1504,6 +1534,10 @@ async function runStateOverlayAudit(browser, baseUrl, auditCase) {
         expectedLowerNodeBodies: expectedLowerNodeBodies.length,
         lowerNodeBodiesAtExpectedNodes,
         lowerNodeBodyStyleAtExpectedNodes,
+        visibleLowerNodeFrames: lowerNodeFrameImages.length,
+        expectedLowerNodeFrames: expectedLowerNodeBodies.length,
+        lowerNodeFramesAtExpectedNodes,
+        lowerNodeFrameStyleAtExpectedNodes,
         visibleRouteThreads: routeThreadImages.length,
         expectedRouteThreads: expectedRouteThreads.length,
         visibleRouteBaseThreads: routeBaseThreadImages.length,
