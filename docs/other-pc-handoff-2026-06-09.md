@@ -7,7 +7,7 @@ Repository:
 - GitHub: `https://github.com/vivaca86/game.git`
 - Branch: `main`
 - Latest pushed commit: run `git log -1 --oneline` after pulling.
-- Expected latest commit title after the 2026-06-14 WorldMap open-node selection continuation: `Audit WorldMap open node selection states`
+- Expected latest commit title after the 2026-06-14 WorldMap keyboard selection-state continuation: `Audit WorldMap keyboard selection states`
 
 ## Start On Another PC
 
@@ -22,7 +22,7 @@ npm install
 Expected first commit title in `git log --oneline -5` after the latest continuation:
 
 ```text
-Audit WorldMap open node selection states
+Audit WorldMap keyboard selection states
 ```
 
 Expected status:
@@ -119,7 +119,7 @@ Recommended next work:
    - First hidden accessibility labels and first visible tooltip zones now exist.
    - Representative keyboard-focus tooltip evidence now exists for Town, Dungeon, Combat, Reward, Event, RuneBench, Boss, Result, and Settings.
    - WorldMap locked/sealed/dormant nodes now expose danger-tone explanation tooltips through tooltip-only disabled hit targets, including the boss-sized red locked-node family.
-   - WorldMap direction-key stage selection now shows the same DOM readability tooltip for the selected stage without adding another hover image.
+   - WorldMap direction-key stage selection now shows the same DOM readability tooltip for the selected stage without adding another hover image, and now verifies the selected/current marker, halo, body, frame, and status stack across lower, mid, and boss routes.
    - WorldMap open-node pointer click now has lower/mid/boss route-family evidence that the selected/current marker, halo, body, frame, and status stack moves to the clicked node without conflicting completed/locked/sealed/dormant overlays.
    - Mobile portrait now has a non-blocking orientation/framing cue in unused letterbox space and suppresses it while readability tooltips are visible.
    - WorldMap now has muted locked/future route thread/bead material separate from completed/current cyan route material.
@@ -1317,3 +1317,42 @@ Representative evidence:
 - `tmp/ui-quality/worldmap-open-node-selection/boss-open-open-node-selection-v1-mobile-390x844.png`
 
 Important limitation: this strengthens open stage-node selected/current-state evidence, but it is still not full WorldMap node/body recomposition, final selected/focus approval, user acceptance, or release-ready UI.
+
+## 2026-06-14 WorldMap Keyboard Selection-State Audit Continuation
+
+Status remains `95% candidate, not final`.
+
+Additional local continuation work:
+
+- Extended `tools/ui-worldmap-keyboard-tooltip-audit.mjs` beyond tooltip/halo checks.
+- The audit still covers lower-left, late-right, and boss-up direction-key selections across 1920x1080, 1280x720, and 390x844.
+- It now also verifies the selected/current marker, halo, body, frame, and status badge are anchored to the keyboard-selected node.
+- It verifies base current material for lower-left, late current material for late-right and boss-up, no conflicting completed/locked/sealed/dormant overlays on the selected node, no Phaser text/vector overlay leaks, and a `flow:stage_select:<stageId>` log entry.
+
+Verification for this continuation:
+
+```powershell
+node tools\ui-worldmap-keyboard-tooltip-audit.mjs
+node tools\ui-worldmap-open-node-selection-audit.mjs
+npx.cmd tsc --noEmit
+git diff --check
+npm.cmd run check
+$env:PHASER_SMOKE_PROGRESS='1'
+$env:PHASER_SMOKE_PROGRESS_FILE='tmp/phaser-smoke-progress-worldmap-keyboard-selection-state-targeted.log'
+$env:PHASER_SMOKE_ONLY='checkViewScreenshots,checkClickableControls,checkFullInputCoverage,checkUiSkinStates'
+node tmp\run-phaser-smoke-with-vite.mjs
+```
+
+All listed checks passed. The strengthened keyboard tooltip audit passed with 9 cases:
+
+- lower-left to `stage_sunny_gate` at 1920, 1280, and 390x844, with one current marker, one current halo, one base current body/frame, and one current status badge.
+- late-right to `stage_prism_school` at 1920, 1280, and 390x844, with one current marker, one current halo, one late current body/frame, and one current status badge.
+- boss-up to `stage_dream_arcade` at 1920, 1280, and 390x844, with one current marker, one current halo, one late current body/frame, and one current status badge.
+
+Representative evidence:
+
+- `tmp/ui-quality/worldmap-keyboard-tooltips/boss-up-keyboard-tooltip-v1-1920.png`
+- `tmp/ui-quality/worldmap-keyboard-tooltips/boss-up-keyboard-tooltip-v1-desktop-1280.png`
+- `tmp/ui-quality/worldmap-keyboard-tooltips/boss-up-keyboard-tooltip-v1-mobile-390x844.png`
+
+Important limitation: this strengthens keyboard selected/current-state evidence, but it is still not full WorldMap node/body recomposition, final selected/focus approval, user acceptance, or release-ready UI.

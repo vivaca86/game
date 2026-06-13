@@ -1452,6 +1452,13 @@
 - Resolution: Added a `boss-up` case to `tools/ui-worldmap-keyboard-tooltip-audit.mjs`. It seeds the upper route, presses `ArrowUp` from stage index 12, selects `stage_dream_arcade`, verifies one current halo, no Phaser text/vector leak, choice-tone DOM tooltip content, and safe placement across 1920x1080, 1280x720, and 390x844.
 - Prevention: Keyboard-selection audits should include every major WorldMap node family, not only lower and mid route examples. When a node family receives separate visual or disabled-tooltip evidence, check whether its unlocked selected-stage path also needs evidence.
 
+### Problem: WorldMap keyboard-selected stages only proved tooltip and halo, not the full current stack
+
+- Cause: After the boss-up addition, `tools/ui-worldmap-keyboard-tooltip-audit.mjs` proved the selected-stage tooltip and exactly one current halo, but it did not inspect the full post-selection marker/body/frame/status stack or verify that completed/locked/sealed/dormant overlays were absent from the keyboard-selected node.
+- Impact: Keyboard selection could look covered while still leaving a gap versus pointer click selection, which now verifies the full current stack. That weakened selected/focus evidence for lower, mid, and boss WorldMap route families.
+- Resolution: Strengthened `tools/ui-worldmap-keyboard-tooltip-audit.mjs` so lower-left, late-right, and boss-up cases now also verify the current marker, halo, body, frame, and status badge are anchored to the selected node. The audit checks base current material for the lower target, late current material for mid/boss targets, no conflicting completed/locked/sealed/dormant overlays on the selected node, no Phaser text/vector leak, and a `flow:stage_select:<stageId>` log entry.
+- Prevention: Keyboard-selection audits should match pointer-selection state depth when both paths select the same WorldMap node families. A tooltip and one halo are not enough evidence for selected/current-state quality when body/frame/status stacks are part of the visual language.
+
 ### Problem: Open WorldMap stage-node hover had no route-family tooltip audit
 
 - Cause: The representative readability tooltip audit hovered the WorldMap play button, while the locked-node and keyboard-selection audits covered disabled and keyboard paths. Pointer hover/click on unlocked stage nodes, especially the boss-sized node family, did not have a dedicated route-family audit.
