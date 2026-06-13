@@ -2250,3 +2250,13 @@ Extended `tools/ui-worldmap-locked-tooltip-audit.mjs` with a `red-boss` case. It
 Verification passed with `node tools\ui-worldmap-locked-tooltip-audit.mjs`. The audit now reports 15 passing cases. The new boss case reported `stageId=stage_dream_arcade`, title `꿈빛 오락실 · 잠김`, `currentStageId=stage_morning_observatory`, and `firstLockedIndex=13` at all three viewport sizes. Reviewed screenshots: `tmp/ui-quality/worldmap-locked-tooltips/red-boss-locked-tooltip-v1-1920.png` and `tmp/ui-quality/worldmap-locked-tooltips/red-boss-locked-tooltip-v1-mobile-390x844.png`.
 
 This remains a 95% candidate rather than final approval. Boss locked-node readability evidence is stronger now, but full WorldMap recomposition, broader disabled/focus/readability coverage outside audited paths, user acceptance, and final concept-match approval remain unfinished.
+
+### Codex
+
+Codex continued the 95% candidate UI goal by closing the boss/top route gap in the WorldMap keyboard-selected tooltip audit. The existing keyboard tooltip audit already proved lower-left and late-right selected-stage paths, but it did not prove the upper boss-sized route node.
+
+Extended `tools/ui-worldmap-keyboard-tooltip-audit.mjs` with a `boss-up` case. It seeds the upper route around stage index 12, presses `ArrowUp`, selects `stage_dream_arcade`, and verifies the same choice-tone DOM readability tooltip without enabling an extra hover image. The audit still checks one current halo only, no visible Phaser text/vector leak, canvas accessibility metadata, and safe desktop/mobile placement.
+
+Verification passed with `node tools\ui-worldmap-keyboard-tooltip-audit.mjs`, `npx.cmd tsc --noEmit`, `git diff --check`, `npm.cmd run check`, and targeted `$env:PHASER_SMOKE_ONLY='checkViewScreenshots,checkClickableControls,checkFullInputCoverage,checkUiSkinStates'; node tmp\run-phaser-smoke-with-vite.mjs` ending in `Phaser smoke OK`. The keyboard tooltip audit now reports 9 passing cases, and the new boss-up screenshots reviewed were `tmp/ui-quality/worldmap-keyboard-tooltips/boss-up-keyboard-tooltip-v1-1920.png` and `tmp/ui-quality/worldmap-keyboard-tooltips/boss-up-keyboard-tooltip-v1-mobile-390x844.png`.
+
+This remains a 95% candidate rather than final approval. Boss/top selected-stage readability evidence is stronger now, but full WorldMap recomposition, broader disabled/focus/readability coverage outside audited paths, user acceptance, and final concept-match approval remain unfinished.

@@ -1444,3 +1444,10 @@
 - Impact: Boss locked nodes could have source-derived state art while lacking dedicated proof that they also expose the same danger-tone explanation, remain non-clickable, and keep mobile tooltip placement safe.
 - Resolution: Added a `red-boss` case to `tools/ui-worldmap-locked-tooltip-audit.mjs`. It seeds `stage_dream_arcade` as the first boss-sized locked node, verifies `꿈빛 오락실 · 잠김` tooltip content, unchanged current stage, no default disabled stamp, and safe placement across 1920x1080, 1280x720, and 390x844.
 - Prevention: Whenever a new WorldMap locked visual family is added, extend both the visual state audit and the locked-tooltip audit. State art and blocked-condition readability must stay paired.
+
+### Problem: Boss/top WorldMap keyboard-selected stage lacked selected-stage tooltip evidence
+
+- Cause: The WorldMap keyboard-selected tooltip audit covered lower-left and late-right open-stage paths, but not the upper boss route. The boss locked-tooltip audit proved the disabled boss node explanation, yet it did not prove that an unlocked boss-sized node could be selected by keyboard and show the selected-stage choice tooltip.
+- Impact: The project could claim WorldMap keyboard-selected readability while still leaving the top/boss route as an unproven exception. That weakened the 95% candidate claim because the visually largest stage family did not have selected-stage tooltip evidence.
+- Resolution: Added a `boss-up` case to `tools/ui-worldmap-keyboard-tooltip-audit.mjs`. It seeds the upper route, presses `ArrowUp` from stage index 12, selects `stage_dream_arcade`, verifies one current halo, no Phaser text/vector leak, choice-tone DOM tooltip content, and safe placement across 1920x1080, 1280x720, and 390x844.
+- Prevention: Keyboard-selection audits should include every major WorldMap node family, not only lower and mid route examples. When a node family receives separate visual or disabled-tooltip evidence, check whether its unlocked selected-stage path also needs evidence.

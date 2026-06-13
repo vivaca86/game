@@ -40,6 +40,12 @@ const auditCases = [
     seed: { completedCount: 8, currentStageIndex: 8 },
     keyPress: "ArrowRight",
     targetIndex: 7
+  },
+  {
+    key: "boss-up",
+    seed: { completedCount: 14, currentStageIndex: 12 },
+    keyPress: "ArrowUp",
+    targetIndex: 13
   }
 ];
 
