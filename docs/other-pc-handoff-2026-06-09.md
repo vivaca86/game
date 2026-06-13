@@ -7,7 +7,7 @@ Repository:
 - GitHub: `https://github.com/vivaca86/game.git`
 - Branch: `main`
 - Latest pushed commit: run `git log -1 --oneline` after pulling.
-- Expected latest commit title after the 2026-06-14 WorldMap boss keyboard-tooltip continuation: `Audit WorldMap boss keyboard tooltip`
+- Expected latest commit title after the 2026-06-14 WorldMap open-node tooltip continuation: `Audit WorldMap open node tooltips`
 
 ## Start On Another PC
 
@@ -22,7 +22,7 @@ npm install
 Expected first commit title in `git log --oneline -5` after the latest continuation:
 
 ```text
-Audit WorldMap boss keyboard tooltip
+Audit WorldMap open node tooltips
 ```
 
 Expected status:
@@ -1197,3 +1197,42 @@ Representative evidence:
 - `tmp/ui-quality/worldmap-keyboard-tooltips/boss-up-keyboard-tooltip-v1-mobile-390x844.png`
 
 Important limitation: this strengthens boss/top selected-stage readability evidence, but it is still not full WorldMap node/body recomposition, final selected/focus approval, user acceptance, or release-ready UI.
+
+## 2026-06-14 WorldMap Open Node Tooltip Audit Continuation
+
+Status remains `95% candidate, not final`.
+
+Additional local continuation work:
+
+- Added `tools/ui-worldmap-open-node-tooltip-audit.mjs`.
+- The new audit verifies unlocked WorldMap stage-node pointer hover/click paths for lower-open, mid-open, and boss-open route families.
+- It checks that open nodes show the choice-tone DOM readability tooltip, display exactly two `ui_current_stage_halo_concept` images during hover (the current stage halo plus the hovered target halo), avoid Phaser text/vector overlay leaks, stay safely placed on desktop/mobile, and click-select into the hovered stage.
+
+Verification for this continuation:
+
+```powershell
+node tools\ui-worldmap-open-node-tooltip-audit.mjs
+npx.cmd tsc --noEmit
+git diff --check
+node tools\ui-worldmap-keyboard-tooltip-audit.mjs
+node tools\ui-worldmap-locked-tooltip-audit.mjs
+npm.cmd run check
+$env:PHASER_SMOKE_PROGRESS='1'
+$env:PHASER_SMOKE_PROGRESS_FILE='tmp/phaser-smoke-progress-worldmap-open-node-tooltip-targeted.log'
+$env:PHASER_SMOKE_ONLY='checkViewScreenshots,checkClickableControls,checkFullInputCoverage,checkUiSkinStates'
+node tmp\run-phaser-smoke-with-vite.mjs
+```
+
+All listed checks passed. The new open-node tooltip audit passed with 9 cases:
+
+- lower-open to `stage_sunny_gate` at 1920, 1280, and 390x844.
+- mid-open to `stage_prism_school` at 1920, 1280, and 390x844.
+- boss-open to `stage_dream_arcade` at 1920, 1280, and 390x844.
+
+Representative evidence:
+
+- `tmp/ui-quality/worldmap-open-node-tooltips/boss-open-open-node-tooltip-v1-1920.png`
+- `tmp/ui-quality/worldmap-open-node-tooltips/boss-open-open-node-tooltip-v1-desktop-1280.png`
+- `tmp/ui-quality/worldmap-open-node-tooltips/boss-open-open-node-tooltip-v1-mobile-390x844.png`
+
+Important limitation: this strengthens open stage-node pointer readability evidence, but it is still not full WorldMap node/body recomposition, final selected/focus approval, user acceptance, or release-ready UI.

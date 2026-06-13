@@ -1451,3 +1451,10 @@
 - Impact: The project could claim WorldMap keyboard-selected readability while still leaving the top/boss route as an unproven exception. That weakened the 95% candidate claim because the visually largest stage family did not have selected-stage tooltip evidence.
 - Resolution: Added a `boss-up` case to `tools/ui-worldmap-keyboard-tooltip-audit.mjs`. It seeds the upper route, presses `ArrowUp` from stage index 12, selects `stage_dream_arcade`, verifies one current halo, no Phaser text/vector leak, choice-tone DOM tooltip content, and safe placement across 1920x1080, 1280x720, and 390x844.
 - Prevention: Keyboard-selection audits should include every major WorldMap node family, not only lower and mid route examples. When a node family receives separate visual or disabled-tooltip evidence, check whether its unlocked selected-stage path also needs evidence.
+
+### Problem: Open WorldMap stage-node hover had no route-family tooltip audit
+
+- Cause: The representative readability tooltip audit hovered the WorldMap play button, while the locked-node and keyboard-selection audits covered disabled and keyboard paths. Pointer hover/click on unlocked stage nodes, especially the boss-sized node family, did not have a dedicated route-family audit.
+- Impact: The project could prove that stage nodes were clickable through broader input smoke, but not that open lower/mid/boss nodes showed the same safe choice-tone tooltip and concept-derived hover halo without Phaser text/vector leakage.
+- Resolution: Added `tools/ui-worldmap-open-node-tooltip-audit.mjs`. It verifies lower-open, mid-open, and boss-open unlocked nodes across 1920x1080, 1280x720, and 390x844, requiring choice-tone tooltip content, exactly two halo images during hover, safe desktop/mobile placement, and successful click selection into the hovered stage.
+- Prevention: Keep pointer hover, keyboard selection, and locked/disabled node audits separate. A WorldMap node family should not be counted as fully readable unless all relevant input paths have evidence.
