@@ -1473,6 +1473,13 @@
 - Resolution: Added `tools/ui-worldmap-open-node-down-audit.mjs`. It verifies lower-open, mid-open, and boss-open nodes across 1920x1080, 1280x720, and 390x844, requiring the expected pressed halo dimensions, alpha `0.98`, retained choice-tone tooltip, no Phaser text/vector leak, safe placement, and pointer-up stage selection.
 - Prevention: For WorldMap node families, keep hover/click and pressed/down audits separate when the same bitmap family is reused at different size/alpha. A working click path is not enough evidence for pressed-state visual quality.
 
+### Problem: Open WorldMap hover/down states did not prove the original current stack stayed stable
+
+- Cause: The open-node tooltip and down audits proved target hover/pressed halo feedback plus tooltip behavior, but they only checked that a current halo existed at the current node. They did not verify the full current marker/body/frame/status stack or the absence of conflicting completed/locked/sealed/dormant overlays on the original current node while another node was hovered or pressed.
+- Impact: Hover/down evidence could pass while still leaving a gap where the current visual stack might shift, lose a layer, use the wrong base/late material family, or blend with stale state overlays during pointer interaction.
+- Resolution: Strengthened `tools/ui-worldmap-open-node-tooltip-audit.mjs` and `tools/ui-worldmap-open-node-down-audit.mjs`. Both now verify lower-open, mid-open, and boss-open cases across 1920x1080, 1280x720, and 390x844 with the original current marker, current halo, current body, current frame, and current status badge anchored to the original current node. They also check base current material for the lower current state, late current material for mid/boss current states, no conflicting current-node overlays, and no Phaser text/vector leak while the target node shows hover/pressed halo feedback.
+- Prevention: Pointer hover/down audits should verify both sides of the interaction: target feedback and source/current-state stability. When an interaction adds a temporary target halo, do not count that as enough unless the persistent current stack remains intact.
+
 ### Problem: Open WorldMap stage-node clicks did not prove the selected/current stack moved cleanly
 
 - Cause: The open-node tooltip audit proved hover readability and eventual click selection, and the down audit proved the pressed halo, but neither inspected the rebuilt WorldMap scene after pointer-up. A click could update `run.stageId` while leaving the selected/current marker stack, body/frame family choice, or conflicting completed/locked/sealed/dormant overlays insufficiently verified on lower, mid, and boss route families.

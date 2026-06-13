@@ -7,7 +7,7 @@ Repository:
 - GitHub: `https://github.com/vivaca86/game.git`
 - Branch: `main`
 - Latest pushed commit: run `git log -1 --oneline` after pulling.
-- Expected latest commit title after the 2026-06-14 WorldMap keyboard selection-state continuation: `Audit WorldMap keyboard selection states`
+- Expected latest commit title after the 2026-06-14 WorldMap open-node current-stack continuation: `Audit WorldMap open node current stacks`
 
 ## Start On Another PC
 
@@ -22,7 +22,7 @@ npm install
 Expected first commit title in `git log --oneline -5` after the latest continuation:
 
 ```text
-Audit WorldMap keyboard selection states
+Audit WorldMap open node current stacks
 ```
 
 Expected status:
@@ -120,6 +120,7 @@ Recommended next work:
    - Representative keyboard-focus tooltip evidence now exists for Town, Dungeon, Combat, Reward, Event, RuneBench, Boss, Result, and Settings.
    - WorldMap locked/sealed/dormant nodes now expose danger-tone explanation tooltips through tooltip-only disabled hit targets, including the boss-sized red locked-node family.
    - WorldMap direction-key stage selection now shows the same DOM readability tooltip for the selected stage without adding another hover image, and now verifies the selected/current marker, halo, body, frame, and status stack across lower, mid, and boss routes.
+   - WorldMap open-node hover/down now verifies the existing current marker, halo, body, frame, and status stack stays anchored to the current node while the target node shows hover/pressed halo feedback.
    - WorldMap open-node pointer click now has lower/mid/boss route-family evidence that the selected/current marker, halo, body, frame, and status stack moves to the clicked node without conflicting completed/locked/sealed/dormant overlays.
    - Mobile portrait now has a non-blocking orientation/framing cue in unused letterbox space and suppresses it while readability tooltips are visible.
    - WorldMap now has muted locked/future route thread/bead material separate from completed/current cyan route material.
@@ -1356,3 +1357,47 @@ Representative evidence:
 - `tmp/ui-quality/worldmap-keyboard-tooltips/boss-up-keyboard-tooltip-v1-mobile-390x844.png`
 
 Important limitation: this strengthens keyboard selected/current-state evidence, but it is still not full WorldMap node/body recomposition, final selected/focus approval, user acceptance, or release-ready UI.
+
+## 2026-06-14 WorldMap Open Node Current-Stack Audit Continuation
+
+Status remains `95% candidate, not final`.
+
+Additional local continuation work:
+
+- Strengthened `tools/ui-worldmap-open-node-tooltip-audit.mjs`.
+- Strengthened `tools/ui-worldmap-open-node-down-audit.mjs`.
+- Both audits still cover lower-open, mid-open, and boss-open unlocked stage nodes across 1920x1080, 1280x720, and 390x844.
+- During hover, the tooltip audit now verifies the current marker, current halo, current body, current frame, and current status badge stay anchored to the original current node while the target node receives the second hover halo.
+- During pointer-down, the down audit now verifies the same current stack remains anchored to the original current node while the target node receives the pressed-size halo.
+- Both audits verify base current material for the lower current state, late current material for mid/boss current states, no conflicting completed/locked/sealed/dormant overlays on the current node, and no Phaser text/vector overlay leaks.
+
+Verification for this continuation:
+
+```powershell
+node tools\ui-worldmap-open-node-tooltip-audit.mjs
+node tools\ui-worldmap-open-node-down-audit.mjs
+node tools\ui-worldmap-keyboard-tooltip-audit.mjs
+node tools\ui-worldmap-open-node-selection-audit.mjs
+npx.cmd tsc --noEmit
+git diff --check
+npm.cmd run check
+$env:PHASER_SMOKE_PROGRESS='1'
+$env:PHASER_SMOKE_PROGRESS_FILE='tmp/phaser-smoke-progress-worldmap-open-node-current-stack-targeted.log'
+$env:PHASER_SMOKE_ONLY='checkViewScreenshots,checkClickableControls,checkFullInputCoverage,checkUiSkinStates'
+node tmp\run-phaser-smoke-with-vite.mjs
+```
+
+All listed checks passed. The strengthened hover and down audits each passed with 9 cases:
+
+- lower-open cases keep one current marker, one base current body/frame, one current status badge, and two halos during hover/down.
+- mid-open cases keep one current marker, one late current body/frame, one current status badge, and two halos during hover/down.
+- boss-open cases keep one current marker, one late current body/frame, one current status badge, and two halos during hover/down.
+
+Representative evidence:
+
+- `tmp/ui-quality/worldmap-open-node-tooltips/boss-open-open-node-tooltip-v1-1920.png`
+- `tmp/ui-quality/worldmap-open-node-tooltips/boss-open-open-node-tooltip-v1-mobile-390x844.png`
+- `tmp/ui-quality/worldmap-open-node-down/boss-open-open-node-down-v1-1920.png`
+- `tmp/ui-quality/worldmap-open-node-down/boss-open-open-node-down-v1-mobile-390x844.png`
+
+Important limitation: this strengthens open-node hover/down current-stack evidence, but it is still not full WorldMap node/body recomposition, final selected/focus approval, user acceptance, or release-ready UI.
