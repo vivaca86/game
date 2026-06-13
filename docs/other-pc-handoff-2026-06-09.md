@@ -522,3 +522,38 @@ node tmp\run-phaser-smoke-with-vite.mjs
 All listed checks passed. `npm.cmd run check` reports `manifestAssets=481`, `existingFiles=481`, `missingFiles=0`, and only the existing Vite large JS chunk warning plus one plugin timing warning.
 
 Important limitation: this is still not full WorldMap current-node recomposition. The late current stack split improves one stage-family gap, but current nodes still need stronger stage-specific body/frame variants, lower-node silhouette recomposition, complete route material, visible tooltip/readability zones, mobile/responsive review, user acceptance, and final concept-match approval next.
+
+## 2026-06-13 Mid Dormant-Node Stack Variant WIP Continuation
+
+Status remains `Partially complete`.
+
+Current estimate is about 87% of the active UI goal, not 95%.
+
+Additional local continuation work:
+
+- Added first conservative WorldMap mid dormant-node material:
+  - `ui_dormant_stage_mid_body_wash_concept`
+  - `ui_dormant_stage_mid_frame_concept`
+- Both assets are extracted from the gray/metal dormant source crop in `assets/concepts/ui/world_map_ui_concept_v001.png`, but processed as quieter `dormantMid` variants.
+- `WorldMapScene` now keeps the base dormant body/frame textures for lower dormant locked nodes and uses the mid dormant body/frame textures for dormant locked stage indexes after stage 5 when those textures exist.
+- `src/data/releaseCatalogAdapter.ts`, `src/data/assetManifest.slice.v1.json`, `docs/asset-manifest.slice.v1.json`, and `tools/generate-dev-runtime-assets.mjs` now register the mid dormant body/frame assets for dev/runtime and release paths.
+- `tmp/ui-worldmap-action-hit-target-audit.mjs` now splits dormant body/frame verification into base and mid counts. Default state reports 2 base + 4 mid dormant bodies/frames. Stage-4-progress reports 0 base + 4 mid dormant bodies/frames. Stage-9 late-progress reports zero dormant body/frame assets.
+
+Verification for this continuation:
+
+```powershell
+node tools\extract-ui-state-assets.mjs
+npm.cmd run assets:generate:dev
+node tmp\ui-worldmap-action-hit-target-audit.mjs
+node tmp\route-node-raster-hover-state-audit.mjs
+npm.cmd run check
+git diff --check
+$env:PHASER_SMOKE_PROGRESS='1'
+$env:PHASER_SMOKE_PROGRESS_FILE='tmp/phaser-smoke-progress-worldmap-dormant-mid-stack-targeted.log'
+$env:PHASER_SMOKE_ONLY='checkViewScreenshots,checkReleaseStageRouteBatch'
+node tmp\run-phaser-smoke-with-vite.mjs
+```
+
+All listed checks passed. `npm.cmd run check` reports `manifestAssets=483`, `existingFiles=483`, `missingFiles=0`, and only the existing Vite large JS chunk warning.
+
+Important limitation: this is still not full WorldMap dormant-node recomposition. The mid dormant split improves one lower/mid locked-node family gap, but dormant nodes still need stronger stage-specific bodies, lower-node silhouette recomposition, complete route material, visible tooltip/readability zones, mobile/responsive review, user acceptance, and final concept-match approval next.

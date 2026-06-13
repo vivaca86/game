@@ -35,7 +35,9 @@ const WORLD_MAP_RASTER_SEALED_BODY_KEY = "ui_sealed_stage_body_wash_concept";
 const WORLD_MAP_RASTER_SEALED_FRAME_KEY = "ui_sealed_stage_frame_concept";
 const WORLD_MAP_RASTER_SEALED_BADGE_KEY = "ui_sealed_stage_badge_concept";
 const WORLD_MAP_RASTER_DORMANT_BODY_KEY = "ui_dormant_stage_body_wash_concept";
+const WORLD_MAP_RASTER_DORMANT_MID_BODY_KEY = "ui_dormant_stage_mid_body_wash_concept";
 const WORLD_MAP_RASTER_DORMANT_FRAME_KEY = "ui_dormant_stage_frame_concept";
+const WORLD_MAP_RASTER_DORMANT_MID_FRAME_KEY = "ui_dormant_stage_mid_frame_concept";
 const WORLD_MAP_RASTER_ROUTE_PROGRESS_THREAD_KEY = "ui_world_map_route_progress_thread_concept";
 const WORLD_MAP_RASTER_ROUTE_PROGRESS_CURRENT_THREAD_KEY = "ui_world_map_route_progress_current_thread_concept";
 const WORLD_MAP_RASTER_ROUTE_PROGRESS_BEAD_KEY = "ui_world_map_route_progress_bead_concept";
@@ -339,17 +341,19 @@ function renderWorldMapStageStateBadges(scene: Phaser.Scene, context: BootContex
       return;
     }
 
-    if (!unlockedStageIds.has(stage.id) && index < 9 && scene.textures.exists(WORLD_MAP_RASTER_DORMANT_FRAME_KEY)) {
-      if (scene.textures.exists(WORLD_MAP_RASTER_DORMANT_BODY_KEY)) {
+    const dormantFrameKey = worldMapDormantFrameKey(scene, index);
+    if (!unlockedStageIds.has(stage.id) && index < 9 && dormantFrameKey) {
+      const dormantBodyKey = worldMapDormantBodyKey(scene, index);
+      if (dormantBodyKey) {
         const body = worldMapDormantBodyPlacement(node, index);
-        scene.add.image(body.x, body.y, WORLD_MAP_RASTER_DORMANT_BODY_KEY)
+        scene.add.image(body.x, body.y, dormantBodyKey)
           .setDisplaySize(body.width, body.height)
           .setAlpha(body.alpha)
           .setDepth(4.54);
       }
 
       const frame = worldMapDormantFramePlacement(node, index);
-      scene.add.image(frame.x, frame.y, WORLD_MAP_RASTER_DORMANT_FRAME_KEY)
+      scene.add.image(frame.x, frame.y, dormantFrameKey)
         .setDisplaySize(frame.width, frame.height)
         .setAlpha(frame.alpha)
         .setDepth(4.72);
@@ -421,6 +425,26 @@ function worldMapDormantFramePlacement(
     height: node.height * (lowerNode ? 1.32 : 1.26),
     alpha: lowerNode ? 0.5 : 0.4
   };
+}
+
+function worldMapDormantBodyKey(scene: Phaser.Scene, stageIndex: number): string | undefined {
+  if (stageIndex > 4 && scene.textures.exists(WORLD_MAP_RASTER_DORMANT_MID_BODY_KEY)) {
+    return WORLD_MAP_RASTER_DORMANT_MID_BODY_KEY;
+  }
+  if (scene.textures.exists(WORLD_MAP_RASTER_DORMANT_BODY_KEY)) {
+    return WORLD_MAP_RASTER_DORMANT_BODY_KEY;
+  }
+  return undefined;
+}
+
+function worldMapDormantFrameKey(scene: Phaser.Scene, stageIndex: number): string | undefined {
+  if (stageIndex > 4 && scene.textures.exists(WORLD_MAP_RASTER_DORMANT_MID_FRAME_KEY)) {
+    return WORLD_MAP_RASTER_DORMANT_MID_FRAME_KEY;
+  }
+  if (scene.textures.exists(WORLD_MAP_RASTER_DORMANT_FRAME_KEY)) {
+    return WORLD_MAP_RASTER_DORMANT_FRAME_KEY;
+  }
+  return undefined;
 }
 
 function worldMapCompletedFramePlacement(

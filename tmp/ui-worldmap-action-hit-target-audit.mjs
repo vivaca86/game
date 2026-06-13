@@ -462,8 +462,12 @@ async function runKeyboardStageSelectAudit(browser, baseUrl) {
       const lockedBodyImages = visible.filter((child) => child?.type === "Image" && child.texture?.key === "ui_locked_stage_body_wash_concept" && (child.alpha ?? 1) > 0.05);
       const sealedBodyImages = visible.filter((child) => child?.type === "Image" && child.texture?.key === "ui_sealed_stage_body_wash_concept" && (child.alpha ?? 1) > 0.05);
       const sealedFrameImages = visible.filter((child) => child?.type === "Image" && child.texture?.key === "ui_sealed_stage_frame_concept" && (child.alpha ?? 1) > 0.05);
-      const dormantBodyImages = visible.filter((child) => child?.type === "Image" && child.texture?.key === "ui_dormant_stage_body_wash_concept" && (child.alpha ?? 1) > 0.05);
-      const dormantFrameImages = visible.filter((child) => child?.type === "Image" && child.texture?.key === "ui_dormant_stage_frame_concept" && (child.alpha ?? 1) > 0.05);
+      const dormantBaseBodyImages = visible.filter((child) => child?.type === "Image" && child.texture?.key === "ui_dormant_stage_body_wash_concept" && (child.alpha ?? 1) > 0.05);
+      const dormantMidBodyImages = visible.filter((child) => child?.type === "Image" && child.texture?.key === "ui_dormant_stage_mid_body_wash_concept" && (child.alpha ?? 1) > 0.05);
+      const dormantBodyImages = [...dormantBaseBodyImages, ...dormantMidBodyImages];
+      const dormantBaseFrameImages = visible.filter((child) => child?.type === "Image" && child.texture?.key === "ui_dormant_stage_frame_concept" && (child.alpha ?? 1) > 0.05);
+      const dormantMidFrameImages = visible.filter((child) => child?.type === "Image" && child.texture?.key === "ui_dormant_stage_mid_frame_concept" && (child.alpha ?? 1) > 0.05);
+      const dormantFrameImages = [...dormantBaseFrameImages, ...dormantMidFrameImages];
       const routeBaseThreadImages = visible.filter((child) => child?.type === "Image" && child.texture?.key === "ui_world_map_route_progress_thread_concept" && (child.alpha ?? 1) > 0.05);
       const routeCurrentThreadImages = visible.filter((child) => child?.type === "Image" && child.texture?.key === "ui_world_map_route_progress_current_thread_concept" && (child.alpha ?? 1) > 0.05);
       const routeThreadImages = [...routeBaseThreadImages, ...routeCurrentThreadImages];
@@ -743,16 +747,28 @@ async function runStateOverlayAudit(browser, baseUrl, auditCase) {
         && child.texture?.key === "ui_sealed_stage_frame_concept"
         && (child.alpha ?? 1) > 0.05
       ));
-      const dormantBodyImages = visible.filter((child) => (
+      const dormantBaseBodyImages = visible.filter((child) => (
         child?.type === "Image"
         && child.texture?.key === "ui_dormant_stage_body_wash_concept"
         && (child.alpha ?? 1) > 0.05
       ));
-      const dormantFrameImages = visible.filter((child) => (
+      const dormantMidBodyImages = visible.filter((child) => (
+        child?.type === "Image"
+        && child.texture?.key === "ui_dormant_stage_mid_body_wash_concept"
+        && (child.alpha ?? 1) > 0.05
+      ));
+      const dormantBodyImages = [...dormantBaseBodyImages, ...dormantMidBodyImages];
+      const dormantBaseFrameImages = visible.filter((child) => (
         child?.type === "Image"
         && child.texture?.key === "ui_dormant_stage_frame_concept"
         && (child.alpha ?? 1) > 0.05
       ));
+      const dormantMidFrameImages = visible.filter((child) => (
+        child?.type === "Image"
+        && child.texture?.key === "ui_dormant_stage_mid_frame_concept"
+        && (child.alpha ?? 1) > 0.05
+      ));
+      const dormantFrameImages = [...dormantBaseFrameImages, ...dormantMidFrameImages];
       const routeBaseThreadImages = visible.filter((child) => (
         child?.type === "Image"
         && child.texture?.key === "ui_world_map_route_progress_thread_concept"
@@ -834,6 +850,8 @@ async function runStateOverlayAudit(browser, baseUrl, auditCase) {
       const expectedDormant = stages
         .map((stage, index) => ({ stage, node: stageNodes[index], index }))
         .filter(({ stage, node, index }) => node && !unlockedStageIds.has(stage.id) && index < 9 && index !== firstLockedIndex);
+      const expectedDormantBase = expectedDormant.filter(({ index }) => index <= 4);
+      const expectedDormantMid = expectedDormant.filter(({ index }) => index > 4);
       const imageAt = (images, x, y) => images.find((image) => Math.abs(image.x - x) <= 1 && Math.abs(image.y - y) <= 1);
       const hasImageAt = (images, x, y) => Boolean(imageAt(images, x, y));
       const routeBeadPlacements = (fromNode, toNode, finalLeg) => {
@@ -1026,6 +1044,8 @@ async function runStateOverlayAudit(browser, baseUrl, auditCase) {
           minAlpha: lowerNode ? 0.48 : 0.38
         };
       };
+      const dormantBodyImagesForIndex = (stageIndex) => stageIndex > 4 ? dormantMidBodyImages : dormantBaseBodyImages;
+      const dormantFrameImagesForIndex = (stageIndex) => stageIndex > 4 ? dormantMidFrameImages : dormantBaseFrameImages;
       const sealedBadgePlacement = (node) => ({
         x: node.x + node.width * 0.01,
         y: node.y + node.height * 0.39
@@ -1135,22 +1155,22 @@ async function runStateOverlayAudit(browser, baseUrl, auditCase) {
           && (image.alpha ?? 1) >= placement.minAlpha;
       });
       const dormantBodiesAtExpectedNodes = expectedDormant.every(({ node, index }) => (
-        hasImageAt(dormantBodyImages, dormantBodyPlacement(node, index).x, dormantBodyPlacement(node, index).y)
+        hasImageAt(dormantBodyImagesForIndex(index), dormantBodyPlacement(node, index).x, dormantBodyPlacement(node, index).y)
       ));
       const dormantBodyStyleAtExpectedNodes = expectedDormant.every(({ node, index }) => {
         const placement = dormantBodyPlacement(node, index);
-        const image = imageAt(dormantBodyImages, placement.x, placement.y);
+        const image = imageAt(dormantBodyImagesForIndex(index), placement.x, placement.y);
         return image
           && Math.abs(image.displayWidth - placement.width) <= 1
           && Math.abs(image.displayHeight - placement.height) <= 1
           && (image.alpha ?? 1) >= placement.minAlpha;
       });
       const dormantFramesAtExpectedNodes = expectedDormant.every(({ node, index }) => (
-        hasImageAt(dormantFrameImages, dormantFramePlacement(node, index).x, dormantFramePlacement(node, index).y)
+        hasImageAt(dormantFrameImagesForIndex(index), dormantFramePlacement(node, index).x, dormantFramePlacement(node, index).y)
       ));
       const dormantFrameStyleAtExpectedNodes = expectedDormant.every(({ node, index }) => {
         const placement = dormantFramePlacement(node, index);
-        const image = imageAt(dormantFrameImages, placement.x, placement.y);
+        const image = imageAt(dormantFrameImagesForIndex(index), placement.x, placement.y);
         return image
           && Math.abs(image.displayWidth - placement.width) <= 1
           && Math.abs(image.displayHeight - placement.height) <= 1
@@ -1280,7 +1300,11 @@ async function runStateOverlayAudit(browser, baseUrl, auditCase) {
           && sealedFrameImages.length === expectedSealed.length
           && sealedImages.length === expectedSealed.length
           && dormantBodyImages.length === expectedDormant.length
+          && dormantBaseBodyImages.length === expectedDormantBase.length
+          && dormantMidBodyImages.length === expectedDormantMid.length
           && dormantFrameImages.length === expectedDormant.length
+          && dormantBaseFrameImages.length === expectedDormantBase.length
+          && dormantMidFrameImages.length === expectedDormantMid.length
           && completedAtExpectedNodes
           && completedStyleAtExpectedNodes
           && completedBodiesAtExpectedNodes
@@ -1391,10 +1415,18 @@ async function runStateOverlayAudit(browser, baseUrl, auditCase) {
         sealedStyleAtExpectedNodes,
         visibleDormantBodies: dormantBodyImages.length,
         expectedDormantBodies: expectedDormant.length,
+        visibleDormantBaseBodies: dormantBaseBodyImages.length,
+        expectedDormantBaseBodies: expectedDormantBase.length,
+        visibleDormantMidBodies: dormantMidBodyImages.length,
+        expectedDormantMidBodies: expectedDormantMid.length,
         dormantBodiesAtExpectedNodes,
         dormantBodyStyleAtExpectedNodes,
         visibleDormantFrames: dormantFrameImages.length,
         expectedDormantFrames: expectedDormant.length,
+        visibleDormantBaseFrames: dormantBaseFrameImages.length,
+        expectedDormantBaseFrames: expectedDormantBase.length,
+        visibleDormantMidFrames: dormantMidFrameImages.length,
+        expectedDormantMidFrames: expectedDormantMid.length,
         dormantFramesAtExpectedNodes,
         dormantFrameStyleAtExpectedNodes,
         visibleCurrentMarkerImages: markerImages.length,
