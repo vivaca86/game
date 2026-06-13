@@ -116,6 +116,10 @@ try {
         currentBody: downAudit.visibleCurrentLateBodyImages === 1 ? "late" : "base",
         currentFrame: downAudit.visibleCurrentLateFrameImages === 1 ? "late" : "base",
         currentStatusImages: downAudit.visibleCurrentStatusImages,
+        targetCompletedFamily: downAudit.targetCompletedFamily,
+        targetCompletedBody: downAudit.targetCompletedBodyAtTarget ? "ok" : "missing",
+        targetCompletedFrame: downAudit.targetCompletedFrameAtTarget ? "ok" : "missing",
+        targetCompletedBadge: downAudit.targetCompletedBadgeAtTarget ? "ok" : "missing",
         screenshot: path.resolve(screenshot)
       });
 
@@ -251,18 +255,15 @@ async function readWorldMapOpenNodeDownAudit(page, auditCase) {
     const currentFrameImages = [...currentBaseFrameImages, ...currentLateFrameImages];
     const haloImages = imageByKey("ui_current_stage_halo_concept");
     const statusImages = imageByKey("ui_current_stage_status_badge_concept");
-    const completedImages = [
-      ...imageByKey("ui_completed_stage_badge_concept"),
-      ...imageByKey("ui_completed_stage_late_badge_concept")
-    ];
-    const completedBodyImages = [
-      ...imageByKey("ui_completed_stage_body_wash_concept"),
-      ...imageByKey("ui_completed_stage_late_body_wash_concept")
-    ];
-    const completedFrameImages = [
-      ...imageByKey("ui_completed_stage_frame_concept"),
-      ...imageByKey("ui_completed_stage_late_frame_concept")
-    ];
+    const completedBaseImages = imageByKey("ui_completed_stage_badge_concept");
+    const completedLateImages = imageByKey("ui_completed_stage_late_badge_concept");
+    const completedImages = [...completedBaseImages, ...completedLateImages];
+    const completedBaseBodyImages = imageByKey("ui_completed_stage_body_wash_concept");
+    const completedLateBodyImages = imageByKey("ui_completed_stage_late_body_wash_concept");
+    const completedBodyImages = [...completedBaseBodyImages, ...completedLateBodyImages];
+    const completedBaseFrameImages = imageByKey("ui_completed_stage_frame_concept");
+    const completedLateFrameImages = imageByKey("ui_completed_stage_late_frame_concept");
+    const completedFrameImages = [...completedBaseFrameImages, ...completedLateFrameImages];
     const lockedBadgeImages = imageByKey("ui_locked_stage_badge_concept");
     const lockedBodyImages = [
       ...imageByKey("ui_locked_stage_body_wash_concept"),
@@ -374,6 +375,103 @@ async function readWorldMapOpenNodeDownAudit(page, auditCase) {
     const currentHasNoSealedFrame = sealedFrameImages.every((image) => notNearCurrentNode(image, 0.72));
     const currentHasNoDormantBody = dormantBodyImages.every((image) => notNearCurrentNode(image, 0.72));
     const currentHasNoDormantFrame = dormantFrameImages.every((image) => notNearCurrentNode(image, 0.72));
+    const imageAt = (images, x, y) => images.find((image) => Math.abs(image.x - x) <= 1 && Math.abs(image.y - y) <= 1);
+    const nearTargetNode = (image, scale) => targetNode && (
+      Math.abs(image.x - targetNode.x) < targetNode.width * scale
+      && Math.abs(image.y - targetNode.y) < targetNode.height * scale
+    );
+    const completedBadgePlacement = (node, stageIndex) => {
+      if (stageIndex <= 2) {
+        return {
+          x: node.x + node.width * 0.03,
+          y: node.y + node.height * 0.32,
+          size: 78,
+          minAlpha: 0.94
+        };
+      }
+      const midRoutePlacements = {
+        5: { dx: -0.04, dy: 0.43, size: 52, minAlpha: 0.8 },
+        6: { dx: 0.2, dy: 0.38, size: 52, minAlpha: 0.8 },
+        7: { dx: 0.02, dy: 0.32, size: 44, minAlpha: 0.7 },
+        8: { dx: 0.04, dy: 0.36, size: 54, minAlpha: 0.8 }
+      };
+      const placed = midRoutePlacements[stageIndex];
+      if (placed) {
+        return {
+          x: node.x + node.width * placed.dx,
+          y: node.y + node.height * placed.dy,
+          size: placed.size,
+          minAlpha: placed.minAlpha
+        };
+      }
+      return {
+        x: node.x + node.width * 0.02,
+        y: node.y + node.height * 0.31,
+        size: stageIndex >= 9 ? 64 : 60,
+        minAlpha: 0.86
+      };
+    };
+    const completedBodyPlacement = (node, stageIndex) => ({
+      x: node.x + node.width * 0.02,
+      y: node.y + node.height * 0.04,
+      width: node.width * 1.12,
+      height: node.height * 1.18,
+      minAlpha: stageIndex <= 2 ? 0.6 : stageIndex <= 4 ? 0.52 : 0.44
+    });
+    const completedFramePlacement = (node, stageIndex) => ({
+      x: node.x + node.width * 0.02,
+      y: node.y + node.height * 0.02,
+      width: node.width * 1.3,
+      height: node.height * 1.36,
+      minAlpha: stageIndex <= 2 ? 0.7 : stageIndex <= 4 ? 0.64 : 0.56
+    });
+    const targetCompletedFamily = auditCase.targetIndex > 2 ? "completed-late" : "completed-base";
+    const targetCompletedBadgeImages = auditCase.targetIndex > 2 ? completedLateImages : completedBaseImages;
+    const targetCompletedBodyImages = auditCase.targetIndex > 2 ? completedLateBodyImages : completedBaseBodyImages;
+    const targetCompletedFrameImages = auditCase.targetIndex > 2 ? completedLateFrameImages : completedBaseFrameImages;
+    const targetBadgePlacement = targetNode ? completedBadgePlacement(targetNode, auditCase.targetIndex) : undefined;
+    const targetBodyPlacement = targetNode ? completedBodyPlacement(targetNode, auditCase.targetIndex) : undefined;
+    const targetFramePlacement = targetNode ? completedFramePlacement(targetNode, auditCase.targetIndex) : undefined;
+    const targetBadgeImage = targetBadgePlacement
+      ? imageAt(targetCompletedBadgeImages, targetBadgePlacement.x, targetBadgePlacement.y)
+      : undefined;
+    const targetBodyImage = targetBodyPlacement
+      ? imageAt(targetCompletedBodyImages, targetBodyPlacement.x, targetBodyPlacement.y)
+      : undefined;
+    const targetFrameImage = targetFramePlacement
+      ? imageAt(targetCompletedFrameImages, targetFramePlacement.x, targetFramePlacement.y)
+      : undefined;
+    const targetCompletedBadgeAtTarget = Boolean(targetBadgeImage);
+    const targetCompletedBodyAtTarget = Boolean(targetBodyImage);
+    const targetCompletedFrameAtTarget = Boolean(targetFrameImage);
+    const targetCompletedBadgeStyleAtTarget = Boolean(targetBadgeImage && targetBadgePlacement
+      && Math.abs(targetBadgeImage.displayWidth - targetBadgePlacement.size) <= 1
+      && Math.abs(targetBadgeImage.displayHeight - targetBadgePlacement.size) <= 1
+      && Number(targetBadgeImage.alpha ?? 1) >= targetBadgePlacement.minAlpha);
+    const targetCompletedBodyStyleAtTarget = Boolean(targetBodyImage && targetBodyPlacement
+      && Math.abs(targetBodyImage.displayWidth - targetBodyPlacement.width) <= 1
+      && Math.abs(targetBodyImage.displayHeight - targetBodyPlacement.height) <= 1
+      && Number(targetBodyImage.alpha ?? 1) >= targetBodyPlacement.minAlpha);
+    const targetCompletedFrameStyleAtTarget = Boolean(targetFrameImage && targetFramePlacement
+      && Math.abs(targetFrameImage.displayWidth - targetFramePlacement.width) <= 1
+      && Math.abs(targetFrameImage.displayHeight - targetFramePlacement.height) <= 1
+      && Number(targetFrameImage.alpha ?? 1) >= targetFramePlacement.minAlpha);
+    const targetHasNoCurrentStack = [
+      ...markerImages,
+      ...currentBodyImages,
+      ...currentFrameImages,
+      ...statusImages
+    ].every((image) => !nearTargetNode(image, 0.6));
+    const targetHasNoLockedStack = [
+      ...lockedBadgeImages,
+      ...lockedBodyImages,
+      ...lockedFrameImages,
+      ...sealedBadgeImages,
+      ...sealedBodyImages,
+      ...sealedFrameImages,
+      ...dormantBodyImages,
+      ...dormantFrameImages
+    ].every((image) => !nearTargetNode(image, 0.72));
 
     return {
       activeScene: game?.scene?.getScenes?.(true)?.[0]?.scene?.key ?? "none",
@@ -381,6 +479,15 @@ async function readWorldMapOpenNodeDownAudit(page, auditCase) {
       targetStageId: targetStage?.id,
       targetStageName: targetStage?.displayNameKo,
       targetUnlocked: unlockedStageIds.has(targetStage?.id),
+      targetCompletedFamily,
+      targetCompletedBadgeAtTarget,
+      targetCompletedBadgeStyleAtTarget,
+      targetCompletedBodyAtTarget,
+      targetCompletedBodyStyleAtTarget,
+      targetCompletedFrameAtTarget,
+      targetCompletedFrameStyleAtTarget,
+      targetHasNoCurrentStack,
+      targetHasNoLockedStack,
       expectedLateCurrent,
       underlayVisible: underlayIndex >= 0,
       visibleCurrentMarkerImages: markerImages.length,
@@ -478,6 +585,34 @@ function assertWorldMapOpenNodeDown(label, audit, auditCase, viewport, seeded) {
     throw new Error(`${label}: expected target stage ${seeded.targetStageId}, got ${audit.targetStageId}`);
   }
   if (!audit.targetUnlocked) throw new Error(`${label}: target stage is not unlocked`);
+  if (!audit.targetCompletedBadgeAtTarget || !audit.targetCompletedBadgeStyleAtTarget) {
+    throw new Error(`${label}: target completed badge missing or incorrectly styled during down state ${JSON.stringify({
+      targetCompletedFamily: audit.targetCompletedFamily,
+      targetCompletedBadgeAtTarget: audit.targetCompletedBadgeAtTarget,
+      targetCompletedBadgeStyleAtTarget: audit.targetCompletedBadgeStyleAtTarget
+    })}`);
+  }
+  if (!audit.targetCompletedBodyAtTarget || !audit.targetCompletedBodyStyleAtTarget) {
+    throw new Error(`${label}: target completed body missing or incorrectly styled during down state ${JSON.stringify({
+      targetCompletedFamily: audit.targetCompletedFamily,
+      targetCompletedBodyAtTarget: audit.targetCompletedBodyAtTarget,
+      targetCompletedBodyStyleAtTarget: audit.targetCompletedBodyStyleAtTarget
+    })}`);
+  }
+  if (!audit.targetCompletedFrameAtTarget || !audit.targetCompletedFrameStyleAtTarget) {
+    throw new Error(`${label}: target completed frame missing or incorrectly styled during down state ${JSON.stringify({
+      targetCompletedFamily: audit.targetCompletedFamily,
+      targetCompletedFrameAtTarget: audit.targetCompletedFrameAtTarget,
+      targetCompletedFrameStyleAtTarget: audit.targetCompletedFrameStyleAtTarget
+    })}`);
+  }
+  if (!audit.targetHasNoCurrentStack || !audit.targetHasNoLockedStack) {
+    throw new Error(`${label}: target has conflicting state overlays during down state ${JSON.stringify({
+      targetCompletedFamily: audit.targetCompletedFamily,
+      targetHasNoCurrentStack: audit.targetHasNoCurrentStack,
+      targetHasNoLockedStack: audit.targetHasNoLockedStack
+    })}`);
+  }
   if (!audit.markerAtCurrentStage || audit.visibleCurrentMarkerImages !== 1) {
     throw new Error(`${label}: current marker changed during down state ${JSON.stringify({
       visibleCurrentMarkerImages: audit.visibleCurrentMarkerImages,

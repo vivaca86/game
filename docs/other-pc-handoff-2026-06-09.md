@@ -7,7 +7,7 @@ Repository:
 - GitHub: `https://github.com/vivaca86/game.git`
 - Branch: `main`
 - Latest pushed commit: run `git log -1 --oneline` after pulling.
-- Expected latest commit title after the 2026-06-14 WorldMap locked-node target-stack continuation: `Audit WorldMap locked target stacks`
+- Expected latest commit title after the 2026-06-14 WorldMap open-node target-stack continuation: `Audit WorldMap open target stacks`
 
 ## Start On Another PC
 
@@ -22,7 +22,7 @@ npm install
 Expected first commit title in `git log --oneline -5` after the latest continuation:
 
 ```text
-Audit WorldMap locked target stacks
+Audit WorldMap open target stacks
 ```
 
 Expected status:
@@ -120,7 +120,7 @@ Recommended next work:
    - Representative keyboard-focus tooltip evidence now exists for Town, Dungeon, Combat, Reward, Event, RuneBench, Boss, Result, and Settings.
    - WorldMap locked/sealed/dormant nodes now expose danger-tone explanation tooltips through tooltip-only disabled hit targets, including the boss-sized red locked-node family. The locked-node audit now also verifies the original current marker, halo, body, frame, and status stack stays anchored during locked hover/click, and that the hovered/clicked locked target keeps its own sealed/dormant/red-far/red-next/red-boss body/frame/badge family without conflicting overlays.
    - WorldMap direction-key stage selection now shows the same DOM readability tooltip for the selected stage without adding another hover image, and now verifies the selected/current marker, halo, body, frame, and status stack across lower, mid, and boss routes.
-   - WorldMap open-node hover/down now verifies the existing current marker, halo, body, frame, and status stack stays anchored to the current node while the target node shows hover/pressed halo feedback.
+   - WorldMap open-node hover/down now verifies the existing current marker, halo, body, frame, and status stack stays anchored to the current node while the target node shows hover/pressed halo feedback, and now also verifies the target open node keeps its completed base/late body, frame, and badge stack during hover/down without conflicting current or locked overlays.
    - WorldMap open-node pointer click now has lower/mid/boss route-family evidence that the selected/current marker, halo, body, frame, and status stack moves to the clicked node without conflicting completed/locked/sealed/dormant overlays.
    - Mobile portrait now has a non-blocking orientation/framing cue in unused letterbox space and suppresses it while readability tooltips are visible.
    - WorldMap now has muted locked/future route thread/bead material separate from completed/current cyan route material.
@@ -1488,3 +1488,51 @@ Representative evidence:
 - `tmp/ui-quality/worldmap-locked-tooltips/red-boss-locked-tooltip-v1-1920.png`
 
 Important limitation: this strengthens locked-target disabled-state evidence, but it is still not full WorldMap node/body recomposition, final selected/focus approval, user acceptance, or release-ready UI.
+
+## 2026-06-14 WorldMap Open Target-Stack Audit Continuation
+
+Status remains `95% candidate, not final`.
+
+Additional local continuation work:
+
+- Strengthened `tools/ui-worldmap-open-node-tooltip-audit.mjs` again.
+- Strengthened `tools/ui-worldmap-open-node-down-audit.mjs` again.
+- Both audits still cover lower-open, mid-open, and boss-open unlocked stage nodes across 1920x1080, 1280x720, and 390x844.
+- During hover and pointer-down, the target open node now directly verifies its own completed state stack:
+  - lower-open uses the `completed-base` body/frame/badge family.
+  - mid-open and boss-open use the `completed-late` body/frame/badge family.
+- The same audits verify the target has no current marker/body/frame/status stack and no locked/sealed/dormant stack while hover/down feedback is active.
+
+Verification for this continuation:
+
+```powershell
+node tools\ui-worldmap-open-node-tooltip-audit.mjs
+node tools\ui-worldmap-open-node-down-audit.mjs
+node tools\ui-worldmap-open-node-selection-audit.mjs
+node tools\ui-worldmap-keyboard-tooltip-audit.mjs
+node tools\ui-worldmap-locked-tooltip-audit.mjs
+npx.cmd tsc --noEmit
+git diff --check
+npm.cmd run check
+$env:PHASER_SMOKE_PROGRESS='1'
+$env:PHASER_SMOKE_PROGRESS_FILE='tmp/phaser-smoke-progress-worldmap-open-target-stack-targeted.log'
+$env:PHASER_SMOKE_ONLY='checkViewScreenshots,checkClickableControls,checkFullInputCoverage,checkUiSkinStates'
+node tmp\run-phaser-smoke-with-vite.mjs
+```
+
+All listed checks passed. The strengthened open tooltip and down audits each passed 9 cases and reported:
+
+- lower-open target completed family `completed-base` with target completed body/frame/badge `ok`.
+- mid-open target completed family `completed-late` with target completed body/frame/badge `ok`.
+- boss-open target completed family `completed-late` with target completed body/frame/badge `ok`.
+
+Representative evidence:
+
+- `tmp/ui-quality/worldmap-open-node-tooltips/lower-open-open-node-tooltip-v1-1920.png`
+- `tmp/ui-quality/worldmap-open-node-tooltips/mid-open-open-node-tooltip-v1-1920.png`
+- `tmp/ui-quality/worldmap-open-node-tooltips/boss-open-open-node-tooltip-v1-1920.png`
+- `tmp/ui-quality/worldmap-open-node-down/lower-open-open-node-down-v1-1920.png`
+- `tmp/ui-quality/worldmap-open-node-down/mid-open-open-node-down-v1-1920.png`
+- `tmp/ui-quality/worldmap-open-node-down/boss-open-open-node-down-v1-1920.png`
+
+Important limitation: this strengthens open-node target completed-stack evidence, but it is still not full WorldMap node/body recomposition, final selected/focus approval, user acceptance, or release-ready UI.
