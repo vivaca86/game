@@ -2458,3 +2458,17 @@ Verification passed with `node tools\ui-accessibility-overlay-audit.mjs`, `git d
 Updated `docs/other-pc-handoff-2026-06-09.md`, `docs/current-issues-and-plan.md`, and `docs/ui-visual-quality-rubric.md` so another PC can see the expanded accessibility evidence.
 
 This remains a 95% candidate rather than final approval. Hidden accessibility-label evidence is stronger across desktop/mobile portrait/mobile landscape, but final visible readability approval, final accessibility acceptance, user acceptance, and release-ready UI remain unfinished.
+
+### Codex
+
+Codex continued the active 95% candidate UI goal with a latest full broad-smoke verification after `5e588d5 Audit landscape accessibility overlay`. The recent turns mostly expanded official audits and documentation, but the broad smoke evidence still pointed at an older checkpoint.
+
+Ran the full broad Phaser smoke with no `PHASER_SMOKE_ONLY` filter, progress enabled, and progress log `tmp/phaser-smoke-progress-latest-5e588d5-full.log`. The run ended with `Phaser smoke OK`.
+
+The full run passed Town/Combat/Boss page checks, view screenshots, clickable controls, full input coverage, Settings surface, UI skin states, save/reload, production save reset, combat actions, release catalog mode, release gem/rune effect, release enemy intent batch, release stage route batch, release event batch, release passive batch, core run loop, scene flow plus rune effect, and boss result flow.
+
+Verification also passed with `git diff --check` and `npm.cmd run check`. `npm.cmd run check` still reports only the existing Vite large JS chunk warning.
+
+Updated `docs/other-pc-handoff-2026-06-09.md`, `docs/current-issues-and-plan.md`, and `docs/ui-visual-quality-rubric.md` so another PC can see that the current latest HEAD has a full broad-smoke pass.
+
+This strengthens the current 95% candidate evidence, but it remains a regression gate rather than final UI approval. User acceptance, release-readiness, broader non-audited selected/focus/readability/mobile review, and final concept-match approval remain unfinished.

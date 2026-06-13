@@ -7,7 +7,7 @@ Repository:
 - GitHub: `https://github.com/vivaca86/game.git`
 - Branch: `main`
 - Latest pushed commit: run `git log -1 --oneline` after pulling.
-- Expected latest commit title after the 2026-06-14 mobile-landscape accessibility continuation: `Audit landscape accessibility overlay`
+- Expected latest commit title after the 2026-06-14 latest full broad-smoke continuation: `Document latest full broad smoke`
 
 ## Start On Another PC
 
@@ -22,7 +22,7 @@ npm install
 Expected first commit title in `git log --oneline -5` after the latest continuation:
 
 ```text
-Audit landscape accessibility overlay
+Document latest full broad smoke
 ```
 
 Expected status:
@@ -1962,3 +1962,34 @@ Result:
 - `npm.cmd run check` passed with only the existing Vite large JS chunk warning.
 
 Important limitation: this strengthens hidden accessibility-label evidence across desktop/mobile portrait/mobile landscape, but it is not final visible readability approval, user acceptance, or release-ready proof.
+
+## 2026-06-14 Latest HEAD Full Broad Smoke Continuation
+
+Status remains `95% candidate, not final`.
+
+Latest verification-only continuation:
+
+- Latest verified HEAD before this documentation checkpoint was `5e588d5 Audit landscape accessibility overlay`.
+- Ran the full broad Phaser smoke with no `PHASER_SMOKE_ONLY` filter.
+- Progress log path: `tmp/phaser-smoke-progress-latest-5e588d5-full.log`.
+- Result: `Phaser smoke OK`.
+
+Commands:
+
+```powershell
+$env:PHASER_SMOKE_PROGRESS='1'
+$env:PHASER_SMOKE_PROGRESS_FILE='tmp/phaser-smoke-progress-latest-5e588d5-full.log'
+Remove-Item Env:PHASER_SMOKE_ONLY -ErrorAction SilentlyContinue
+node tmp\run-phaser-smoke-with-vite.mjs
+git diff --check
+npm.cmd run check
+```
+
+Result:
+
+- Full broad smoke passed Town/Combat/Boss page checks, view screenshots, clickable controls, full input coverage, Settings surface, UI skin states, save/reload, production save reset, combat actions, release catalog mode, release gem/rune effect, release enemy intent batch, release stage route batch, release event batch, release passive batch, core run loop, scene flow plus rune effect, and boss result flow.
+- The wrapper ended with `Phaser smoke OK`.
+- `git diff --check` passed.
+- `npm.cmd run check` passed with only the existing Vite large JS chunk warning.
+
+Important limitation: this strengthens latest HEAD regression evidence for the current 95% candidate, but it is not final UI approval, user acceptance, or release-ready proof.
