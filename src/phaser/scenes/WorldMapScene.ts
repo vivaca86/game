@@ -23,6 +23,7 @@ const WORLD_MAP_RASTER_CURRENT_STATUS_KEY = "ui_current_stage_status_badge_conce
 const WORLD_MAP_RASTER_COMPLETED_BODY_KEY = "ui_completed_stage_body_wash_concept";
 const WORLD_MAP_RASTER_COMPLETED_FRAME_KEY = "ui_completed_stage_frame_concept";
 const WORLD_MAP_RASTER_COMPLETED_BADGE_KEY = "ui_completed_stage_badge_concept";
+const WORLD_MAP_RASTER_COMPLETED_LATE_BADGE_KEY = "ui_completed_stage_late_badge_concept";
 const WORLD_MAP_RASTER_LOCKED_BODY_KEY = "ui_locked_stage_body_wash_concept";
 const WORLD_MAP_RASTER_LOCKED_FRAME_KEY = "ui_locked_stage_frame_concept";
 const WORLD_MAP_RASTER_LOCKED_BADGE_KEY = "ui_locked_stage_badge_concept";
@@ -228,7 +229,8 @@ function renderWorldMapStageStateBadges(scene: Phaser.Scene, context: BootContex
     const node = WORLD_MAP_RASTER_STAGE_NODES[index];
     if (!node || stage.id === currentStageId) return;
 
-    if (completedStageIds.has(stage.id) && scene.textures.exists(WORLD_MAP_RASTER_COMPLETED_BADGE_KEY)) {
+    const completedBadgeKey = worldMapCompletedBadgeKey(scene, index);
+    if (completedStageIds.has(stage.id) && completedBadgeKey) {
       if (scene.textures.exists(WORLD_MAP_RASTER_COMPLETED_BODY_KEY)) {
         const body = worldMapCompletedBodyPlacement(node, index);
         scene.add.image(body.x, body.y, WORLD_MAP_RASTER_COMPLETED_BODY_KEY)
@@ -246,7 +248,7 @@ function renderWorldMapStageStateBadges(scene: Phaser.Scene, context: BootContex
       }
 
       const completed = worldMapCompletedBadgePlacement(node, index);
-      scene.add.image(completed.x, completed.y, WORLD_MAP_RASTER_COMPLETED_BADGE_KEY)
+      scene.add.image(completed.x, completed.y, completedBadgeKey)
         .setDisplaySize(completed.size, completed.size)
         .setAlpha(completed.alpha)
         .setDepth(6);
@@ -464,6 +466,16 @@ function worldMapCompletedBadgePlacement(
     size: stageIndex >= 9 ? 64 : 60,
     alpha: 0.88
   };
+}
+
+function worldMapCompletedBadgeKey(scene: Phaser.Scene, stageIndex: number): string | undefined {
+  if (stageIndex > 2 && scene.textures.exists(WORLD_MAP_RASTER_COMPLETED_LATE_BADGE_KEY)) {
+    return WORLD_MAP_RASTER_COMPLETED_LATE_BADGE_KEY;
+  }
+  if (scene.textures.exists(WORLD_MAP_RASTER_COMPLETED_BADGE_KEY)) {
+    return WORLD_MAP_RASTER_COMPLETED_BADGE_KEY;
+  }
+  return undefined;
 }
 
 function shouldUseWorldMapRedLock(stageIndex: number): boolean {

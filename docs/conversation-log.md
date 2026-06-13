@@ -2020,3 +2020,17 @@ Codex continued the active concept-art UI goal from the fresh GitHub clone and t
 Verification passed with `node tools\extract-ui-state-assets.mjs`, `npm.cmd run assets:generate:dev`, `node tmp\ui-worldmap-action-hit-target-audit.mjs`, `node tmp\route-node-raster-hover-state-audit.mjs`, `npm.cmd run check`, `git diff --check`, and full `node tmp\run-phaser-smoke-with-vite.mjs` ending in `Phaser smoke OK`. `npm.cmd run check` now reports `manifestAssets=473`, `existingFiles=473`, `missingFiles=0`, and the existing Vite large JS chunk warning only.
 
 This remains partial UI progress, roughly about 80-81% of the active UI goal. The route beads are a conservative runtime route-progress layer and do not complete full WorldMap route/node recomposition. Next work should continue with stronger number-safe state-specific body variants, later node variants, lower-node shape recomposition, complete route-state material, dynamic labels/tooltips, mobile/responsive review, user acceptance, and final concept-match approval.
+
+### Codex
+
+Codex continued the active 95% concept-art UI goal and targeted the next WorldMap variant gap: completed nodes after the lower 1-3 group were still reusing the same `ui_completed_stage_badge_concept` texture. Their placement was smaller, but the texture itself still read like the lower completed check had been pasted onto mid/late route nodes.
+
+`tools/extract-ui-state-assets.mjs` now extracts `ui_completed_stage_late_badge_concept` from the original WorldMap completed-badge crop with a `completedLate` processing variant. The late variant uses a narrower mask and quieter alpha/color treatment while staying source-derived from `assets/concepts/ui/world_map_ui_concept_v001.png`.
+
+`WorldMapScene` now keeps `ui_completed_stage_badge_concept` for completed stages 1-3 and uses `ui_completed_stage_late_badge_concept` for later completed stages when that texture is available. `tools/generate-dev-runtime-assets.mjs`, `src/data/assetManifest.slice.v1.json`, `docs/asset-manifest.slice.v1.json`, and `src/data/releaseCatalogAdapter.ts` register the asset for dev/runtime and release paths.
+
+`tmp/ui-worldmap-action-hit-target-audit.mjs` now splits completed badge evidence into base and late counts instead of only checking total completed badges. The default and stage-4-progress audits reported no late badges, while the stage-9 late-progress audit reported `visibleCompletedBaseBadges=3`, `expectedCompletedBaseBadges=3`, `visibleCompletedLateBadges=5`, and `expectedCompletedLateBadges=5`.
+
+Verification passed with `node tools\extract-ui-state-assets.mjs`, `npm.cmd run assets:generate:dev`, `node tmp\ui-worldmap-action-hit-target-audit.mjs`, `node tmp\route-node-raster-hover-state-audit.mjs`, `npm.cmd run check`, and full `$env:PHASER_SMOKE_PROGRESS='1'; $env:PHASER_SMOKE_PROGRESS_FILE='tmp/phaser-smoke-progress-worldmap-late-completed-badge.log'; node tmp\run-phaser-smoke-with-vite.mjs` ending in `Phaser smoke OK`. `npm.cmd run check` reports `manifestAssets=475`, `existingFiles=475`, `missingFiles=0`, and the existing Vite large JS chunk warning only.
+
+This remains partial UI progress, roughly about 83-84% of the active UI goal. The late badge split improves one later-node variant gap, but full completed-node recomposition, stronger stage-family body/frame variants, lower-node shape recomposition, complete route-state material, visible tooltip/readability zones, mobile/responsive review, user acceptance, and final concept-match approval remain unfinished.

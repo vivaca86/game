@@ -206,6 +206,7 @@ const sharedUiRasterAssetKeys = new Set([
   "ui_completed_stage_body_wash_concept",
   "ui_completed_stage_frame_concept",
   "ui_completed_stage_badge_concept",
+  "ui_completed_stage_late_badge_concept",
   "ui_locked_stage_body_wash_concept",
   "ui_locked_stage_frame_concept",
   "ui_locked_stage_badge_concept",

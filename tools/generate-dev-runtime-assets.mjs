@@ -121,6 +121,7 @@ const sourcePassthroughAssets = new Map([
   ["ui_completed_stage_body_wash_concept", path.join(rootDir, "assets", "source", "ui", "ui_completed_stage_body_wash_concept_v001.png")],
   ["ui_completed_stage_frame_concept", path.join(rootDir, "assets", "source", "ui", "ui_completed_stage_frame_concept_v001.png")],
   ["ui_completed_stage_badge_concept", path.join(rootDir, "assets", "source", "ui", "ui_completed_stage_badge_concept_v001.png")],
+  ["ui_completed_stage_late_badge_concept", path.join(rootDir, "assets", "source", "ui", "ui_completed_stage_late_badge_concept_v001.png")],
   ["ui_locked_stage_body_wash_concept", path.join(rootDir, "assets", "source", "ui", "ui_locked_stage_body_wash_concept_v001.png")],
   ["ui_locked_stage_frame_concept", path.join(rootDir, "assets", "source", "ui", "ui_locked_stage_frame_concept_v001.png")],
   ["ui_locked_stage_badge_concept", path.join(rootDir, "assets", "source", "ui", "ui_locked_stage_badge_concept_v001.png")],

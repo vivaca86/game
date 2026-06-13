@@ -389,3 +389,33 @@ node tmp\run-phaser-smoke-with-vite.mjs
 All listed checks passed. The WorldMap audit reported `visibleRouteBeads=2` in the default progressed state, `visibleRouteBeads=4` in the stage-4-progress state, `visibleRouteBeads=12` in the late stage-9-progress state, and `visibleRouteBeads=0` in keyboard-selected state. `npm.cmd run check` reports `manifestAssets=473`, `existingFiles=473`, `missingFiles=0`, and only the existing Vite large JS chunk warning.
 
 Important limitation: this is still not full WorldMap route recomposition. The route beads are a first conservative runtime overlay, not a complete dynamic route-state system. Continue with stronger number-safe state-specific body variants, later node variants, lower-node shape recomposition, complete route material, dynamic labels/tooltips, mobile/responsive review, user acceptance, and final concept-match approval next.
+
+## 2026-06-13 Late Completed-Badge Variant WIP Continuation
+
+Status remains `Partially complete`.
+
+Additional local continuation work:
+
+- Added first conservative WorldMap late completed-badge material:
+  - `ui_completed_stage_late_badge_concept`
+- The asset is extracted from the original completed badge source crop in `assets/concepts/ui/world_map_ui_concept_v001.png`, but processed as a narrower/quieter `completedLate` variant so completed nodes after the lower 1-3 group do not reuse the exact same lower-node check texture.
+- `WorldMapScene` now keeps `ui_completed_stage_badge_concept` for completed stages 1-3 and uses `ui_completed_stage_late_badge_concept` for completed stage indexes after that when the texture exists.
+- `src/data/releaseCatalogAdapter.ts`, `src/data/assetManifest.slice.v1.json`, `docs/asset-manifest.slice.v1.json`, and `tools/generate-dev-runtime-assets.mjs` now register the late completed badge for dev and release paths.
+- `tmp/ui-worldmap-action-hit-target-audit.mjs` now splits completed badge verification into base and late counts. The late stage-9 progress audit reports `visibleCompletedBaseBadges=3`, `expectedCompletedBaseBadges=3`, `visibleCompletedLateBadges=5`, and `expectedCompletedLateBadges=5`.
+
+Verification for this continuation:
+
+```powershell
+node tools\extract-ui-state-assets.mjs
+npm.cmd run assets:generate:dev
+node tmp\ui-worldmap-action-hit-target-audit.mjs
+node tmp\route-node-raster-hover-state-audit.mjs
+npm.cmd run check
+$env:PHASER_SMOKE_PROGRESS='1'
+$env:PHASER_SMOKE_PROGRESS_FILE='tmp/phaser-smoke-progress-worldmap-late-completed-badge.log'
+node tmp\run-phaser-smoke-with-vite.mjs
+```
+
+All listed checks passed. `npm.cmd run check` reports `manifestAssets=475`, `existingFiles=475`, `missingFiles=0`, and only the existing Vite large JS chunk warning.
+
+Important limitation: this is still not full completed-node recomposition. The late badge split improves one later-node variant gap, but completed body/frame variants are still broad shared overlays and the WorldMap still needs stronger stage-family body variants, lower-node shape recomposition, complete route-state material, visible tooltip/readability zones, mobile/responsive review, user acceptance, and final concept-match approval next.

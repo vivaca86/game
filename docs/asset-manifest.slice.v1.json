@@ -660,6 +660,13 @@
       "styleKey": "premium_popup_book"
     },
     {
+      "key": "ui_completed_stage_late_badge_concept",
+      "type": "image",
+      "path": "assets/runtime/ui/ui_completed_stage_late_badge_concept_v001.png",
+      "nativeSize": { "w": 96, "h": 96 },
+      "styleKey": "premium_popup_book"
+    },
+    {
       "key": "ui_locked_stage_body_wash_concept",
       "type": "image",
       "path": "assets/runtime/ui/ui_locked_stage_body_wash_concept_v001.png",

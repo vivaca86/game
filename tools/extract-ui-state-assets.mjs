@@ -692,6 +692,15 @@ const targets = [
     stateVariant: "completed"
   },
   {
+    key: "ui_completed_stage_late_badge_concept",
+    kind: "world_map_stage_badge",
+    source: path.join(rootDir, "assets", "concepts", "ui", "world_map_ui_concept_v001.png"),
+    output: path.join(rootDir, "assets", "source", "ui", "ui_completed_stage_late_badge_concept_v001.png"),
+    crop: { x: 486, y: 680, w: 55, h: 58 },
+    nativeSize: { w: 96, h: 96 },
+    stateVariant: "completedLate"
+  },
+  {
     key: "ui_locked_stage_badge_concept",
     kind: "world_map_stage_badge",
     source: path.join(rootDir, "assets", "concepts", "ui", "world_map_ui_concept_v001.png"),
@@ -1218,8 +1227,8 @@ try {
         const data = imageData.data;
         const centerX = nativeSize.w * 0.5;
         const centerY = stateVariant === "sealed" ? nativeSize.h * 0.46 : stateVariant === "locked" ? nativeSize.h * 0.48 : nativeSize.h * 0.5;
-        const radiusX = nativeSize.w * (stateVariant === "locked" ? 0.43 : stateVariant === "sealed" ? 0.35 : 0.42);
-        const radiusY = nativeSize.h * (stateVariant === "locked" ? 0.42 : stateVariant === "sealed" ? 0.38 : 0.43);
+        const radiusX = nativeSize.w * (stateVariant === "locked" ? 0.43 : stateVariant === "sealed" ? 0.35 : stateVariant === "completedLate" ? 0.37 : 0.42);
+        const radiusY = nativeSize.h * (stateVariant === "locked" ? 0.42 : stateVariant === "sealed" ? 0.38 : stateVariant === "completedLate" ? 0.38 : 0.43);
 
         for (let y = 0; y < nativeSize.h; y += 1) {
           for (let x = 0; x < nativeSize.w; x += 1) {
@@ -1260,6 +1269,12 @@ try {
               data[offset] = Math.min(255, Math.round(r * 1.02 + silver * 9));
               data[offset + 1] = Math.min(255, Math.round(g * 1.03 + silver * 9));
               data[offset + 2] = Math.min(255, Math.round(b * 1.08 + silver * 12 + coolEdge * 6));
+            } else if (stateVariant === "completedLate") {
+              keep = Math.max(green * 0.84, gold * 0.68, coolEdge * 0.26) * radial;
+              if (parchment && green < 0.24 && gold < 0.3 && coolEdge < 0.42) keep = 0;
+              data[offset] = Math.min(255, Math.round(r * 0.98 + gold * 6));
+              data[offset + 1] = Math.min(255, Math.round(g * 1.01 + green * 10 + coolEdge * 4));
+              data[offset + 2] = Math.min(255, Math.round(b * 0.98 + coolEdge * 9));
             } else {
               keep = Math.max(green, gold * 0.86) * radial;
               if (parchment && green < 0.22 && gold < 0.32) keep = 0;
@@ -1272,7 +1287,9 @@ try {
               data[offset + 3] = 0;
               continue;
             }
-            data[offset + 3] = Math.round(Math.min(242, 238 * keep * (0.58 + radial * 0.5)));
+            const alphaScale = stateVariant === "completedLate" ? 0.82 : 1;
+            const alphaCap = stateVariant === "completedLate" ? 218 : 242;
+            data[offset + 3] = Math.round(Math.min(alphaCap, 238 * keep * (0.58 + radial * 0.5) * alphaScale));
           }
         }
 
