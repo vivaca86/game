@@ -487,3 +487,38 @@ All listed checks passed. `npm.cmd run check` reports `manifestAssets=479`, `exi
 Broad smoke note: a full `node tmp\run-phaser-smoke-with-vite.mjs` attempt with progress logging reached `checkBossResultFlow OK`, meaning every logged smoke step reached OK, but the wrapper process did not exit before the 600s command timeout. The targeted route/view smoke above completed with `Phaser smoke OK`. Rerun broad smoke on the next PC if a full wrapper-returning gate is required.
 
 Important limitation: this is still not full WorldMap route recomposition. The current-leg split improves route texture-family evidence, but the route system remains a conservative overlay on top of a neutralized concept underlay. Continue with complete route material, stronger stage-family node variants, lower-node silhouette recomposition, visible tooltip/readability zones, mobile/responsive review, user acceptance, and final concept-match approval next.
+
+## 2026-06-13 Late Current-Node Stack Variant WIP Continuation
+
+Status remains `Partially complete`.
+
+Current estimate is about 86% of the active UI goal, not 95%.
+
+Additional local continuation work:
+
+- Added first conservative WorldMap late current-node material:
+  - `ui_current_stage_late_body_wash_concept`
+  - `ui_current_stage_late_frame_concept`
+- Both assets are extracted from the original current-node crop in `assets/concepts/ui/world_map_ui_concept_v001.png`, but processed as quieter `currentLate` variants for later route nodes.
+- `WorldMapScene` now keeps the base current body/frame textures for lower and stage-4 current states, and uses the late current body/frame textures for current stage indexes after stage 5 when those textures exist.
+- `src/data/releaseCatalogAdapter.ts`, `src/data/assetManifest.slice.v1.json`, `docs/asset-manifest.slice.v1.json`, and `tools/generate-dev-runtime-assets.mjs` now register the late current body/frame assets for dev/runtime and release paths.
+- `tmp/ui-worldmap-action-hit-target-audit.mjs` now splits current body/frame verification into base and late counts. The default, stage-4-progress, and keyboard-selected audits report one base current body/frame and zero late current body/frame. The stage-9 late-progress audit reports zero base current body/frame and one late current body/frame.
+
+Verification for this continuation:
+
+```powershell
+node tools\extract-ui-state-assets.mjs
+npm.cmd run assets:generate:dev
+node tmp\ui-worldmap-action-hit-target-audit.mjs
+node tmp\route-node-raster-hover-state-audit.mjs
+npm.cmd run check
+git diff --check
+$env:PHASER_SMOKE_PROGRESS='1'
+$env:PHASER_SMOKE_PROGRESS_FILE='tmp/phaser-smoke-progress-worldmap-current-late-stack-targeted.log'
+$env:PHASER_SMOKE_ONLY='checkViewScreenshots,checkReleaseStageRouteBatch'
+node tmp\run-phaser-smoke-with-vite.mjs
+```
+
+All listed checks passed. `npm.cmd run check` reports `manifestAssets=481`, `existingFiles=481`, `missingFiles=0`, and only the existing Vite large JS chunk warning plus one plugin timing warning.
+
+Important limitation: this is still not full WorldMap current-node recomposition. The late current stack split improves one stage-family gap, but current nodes still need stronger stage-specific body/frame variants, lower-node silhouette recomposition, complete route material, visible tooltip/readability zones, mobile/responsive review, user acceptance, and final concept-match approval next.

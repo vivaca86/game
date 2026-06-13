@@ -17,7 +17,9 @@ const WORLD_MAP_RASTER_HOVER_PLAY_KEY = "ui_hover_world_map_play_button_concept"
 const WORLD_MAP_RASTER_DOWN_PLAY_KEY = "ui_down_world_map_play_button_concept";
 const WORLD_MAP_RASTER_CURRENT_MARKER_KEY = "ui_current_stage_marker_concept";
 const WORLD_MAP_RASTER_CURRENT_BODY_KEY = "ui_current_stage_body_wash_concept";
+const WORLD_MAP_RASTER_CURRENT_LATE_BODY_KEY = "ui_current_stage_late_body_wash_concept";
 const WORLD_MAP_RASTER_CURRENT_FRAME_KEY = "ui_current_stage_frame_concept";
+const WORLD_MAP_RASTER_CURRENT_LATE_FRAME_KEY = "ui_current_stage_late_frame_concept";
 const WORLD_MAP_RASTER_CURRENT_HALO_KEY = "ui_current_stage_halo_concept";
 const WORLD_MAP_RASTER_CURRENT_STATUS_KEY = "ui_current_stage_status_badge_concept";
 const WORLD_MAP_RASTER_COMPLETED_BODY_KEY = "ui_completed_stage_body_wash_concept";
@@ -565,15 +567,17 @@ function renderWorldMapCurrentStageMarker(scene: Phaser.Scene, context: BootCont
       .setDepth(7);
   }
 
-  if (scene.textures.exists(WORLD_MAP_RASTER_CURRENT_BODY_KEY)) {
-    scene.add.image(node.x + node.width * 0.02, node.y + node.height * 0.04, WORLD_MAP_RASTER_CURRENT_BODY_KEY)
+  const currentBodyKey = worldMapCurrentBodyKey(scene, currentStageIndex);
+  if (currentBodyKey) {
+    scene.add.image(node.x + node.width * 0.02, node.y + node.height * 0.04, currentBodyKey)
       .setDisplaySize(node.width * 1.12, node.height * 1.16)
       .setAlpha(0.66)
       .setDepth(7.15);
   }
 
-  if (scene.textures.exists(WORLD_MAP_RASTER_CURRENT_FRAME_KEY)) {
-    scene.add.image(node.x + node.width * 0.02, node.y + node.height * 0.01, WORLD_MAP_RASTER_CURRENT_FRAME_KEY)
+  const currentFrameKey = worldMapCurrentFrameKey(scene, currentStageIndex);
+  if (currentFrameKey) {
+    scene.add.image(node.x + node.width * 0.02, node.y + node.height * 0.01, currentFrameKey)
       .setDisplaySize(node.width * 1.34, node.height * 1.38)
       .setAlpha(0.9)
       .setDepth(7.3);
@@ -592,6 +596,26 @@ function renderWorldMapCurrentStageMarker(scene: Phaser.Scene, context: BootCont
       .setAlpha(0.98)
       .setDepth(8);
   }
+}
+
+function worldMapCurrentBodyKey(scene: Phaser.Scene, stageIndex: number): string | undefined {
+  if (stageIndex > 4 && scene.textures.exists(WORLD_MAP_RASTER_CURRENT_LATE_BODY_KEY)) {
+    return WORLD_MAP_RASTER_CURRENT_LATE_BODY_KEY;
+  }
+  if (scene.textures.exists(WORLD_MAP_RASTER_CURRENT_BODY_KEY)) {
+    return WORLD_MAP_RASTER_CURRENT_BODY_KEY;
+  }
+  return undefined;
+}
+
+function worldMapCurrentFrameKey(scene: Phaser.Scene, stageIndex: number): string | undefined {
+  if (stageIndex > 4 && scene.textures.exists(WORLD_MAP_RASTER_CURRENT_LATE_FRAME_KEY)) {
+    return WORLD_MAP_RASTER_CURRENT_LATE_FRAME_KEY;
+  }
+  if (scene.textures.exists(WORLD_MAP_RASTER_CURRENT_FRAME_KEY)) {
+    return WORLD_MAP_RASTER_CURRENT_FRAME_KEY;
+  }
+  return undefined;
 }
 
 function renderWorldMapRasterStageNodes(scene: Phaser.Scene, context: BootContext): void {

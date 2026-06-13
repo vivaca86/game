@@ -134,16 +134,28 @@ try {
       && child.texture?.key === "ui_current_stage_marker_concept"
       && (child.alpha ?? 1) > 0.05
     ));
-    const bodyImages = visible.filter((child) => (
+    const currentBaseBodyImages = visible.filter((child) => (
       child?.type === "Image"
       && child.texture?.key === "ui_current_stage_body_wash_concept"
       && (child.alpha ?? 1) > 0.05
     ));
-    const frameImages = visible.filter((child) => (
+    const currentLateBodyImages = visible.filter((child) => (
+      child?.type === "Image"
+      && child.texture?.key === "ui_current_stage_late_body_wash_concept"
+      && (child.alpha ?? 1) > 0.05
+    ));
+    const bodyImages = [...currentBaseBodyImages, ...currentLateBodyImages];
+    const currentBaseFrameImages = visible.filter((child) => (
       child?.type === "Image"
       && child.texture?.key === "ui_current_stage_frame_concept"
       && (child.alpha ?? 1) > 0.05
     ));
+    const currentLateFrameImages = visible.filter((child) => (
+      child?.type === "Image"
+      && child.texture?.key === "ui_current_stage_late_frame_concept"
+      && (child.alpha ?? 1) > 0.05
+    ));
+    const frameImages = [...currentBaseFrameImages, ...currentLateFrameImages];
     const haloImages = visible.filter((child) => (
       child?.type === "Image"
       && child.texture?.key === "ui_current_stage_halo_concept"
@@ -162,20 +174,27 @@ try {
       && expectedNode
       && Math.abs(haloImages[0].x - (expectedNode.x + 2)) <= 1
       && Math.abs(haloImages[0].y - (expectedNode.y + 4)) <= 1;
+    const expectedLateCurrent = currentStageIndex > 4;
+    const expectedCurrentBodyImages = expectedLateCurrent ? currentLateBodyImages : currentBaseBodyImages;
+    const expectedCurrentFrameImages = expectedLateCurrent ? currentLateFrameImages : currentBaseFrameImages;
     const bodyAtCurrentStage = bodyImages.length === 1
+      && expectedCurrentBodyImages.length === 1
+      && (expectedLateCurrent ? currentBaseBodyImages.length === 0 : currentLateBodyImages.length === 0)
       && expectedNode
-      && Math.abs(bodyImages[0].x - (expectedNode.x + expectedNode.width * 0.02)) <= 1
-      && Math.abs(bodyImages[0].y - (expectedNode.y + expectedNode.height * 0.04)) <= 1
-      && Math.abs(bodyImages[0].displayWidth - expectedNode.width * 1.12) <= 1
-      && Math.abs(bodyImages[0].displayHeight - expectedNode.height * 1.16) <= 1
-      && (bodyImages[0].alpha ?? 1) >= 0.64;
+      && Math.abs(expectedCurrentBodyImages[0].x - (expectedNode.x + expectedNode.width * 0.02)) <= 1
+      && Math.abs(expectedCurrentBodyImages[0].y - (expectedNode.y + expectedNode.height * 0.04)) <= 1
+      && Math.abs(expectedCurrentBodyImages[0].displayWidth - expectedNode.width * 1.12) <= 1
+      && Math.abs(expectedCurrentBodyImages[0].displayHeight - expectedNode.height * 1.16) <= 1
+      && (expectedCurrentBodyImages[0].alpha ?? 1) >= 0.64;
     const frameAtCurrentStage = frameImages.length === 1
+      && expectedCurrentFrameImages.length === 1
+      && (expectedLateCurrent ? currentBaseFrameImages.length === 0 : currentLateFrameImages.length === 0)
       && expectedNode
-      && Math.abs(frameImages[0].x - (expectedNode.x + expectedNode.width * 0.02)) <= 1
-      && Math.abs(frameImages[0].y - (expectedNode.y + expectedNode.height * 0.01)) <= 1
-      && Math.abs(frameImages[0].displayWidth - expectedNode.width * 1.34) <= 1
-      && Math.abs(frameImages[0].displayHeight - expectedNode.height * 1.38) <= 1
-      && (frameImages[0].alpha ?? 1) >= 0.88;
+      && Math.abs(expectedCurrentFrameImages[0].x - (expectedNode.x + expectedNode.width * 0.02)) <= 1
+      && Math.abs(expectedCurrentFrameImages[0].y - (expectedNode.y + expectedNode.height * 0.01)) <= 1
+      && Math.abs(expectedCurrentFrameImages[0].displayWidth - expectedNode.width * 1.34) <= 1
+      && Math.abs(expectedCurrentFrameImages[0].displayHeight - expectedNode.height * 1.38) <= 1
+      && (expectedCurrentFrameImages[0].alpha ?? 1) >= 0.88;
     const statusAtCurrentStage = statusImages.length === 1
       && expectedNode
       && Math.abs(statusImages[0].x - (expectedNode.x + expectedNode.width * 0.1)) <= 1
@@ -204,8 +223,12 @@ try {
       visibleCurrentHaloImages: haloImages.length,
       haloAtCurrentStage: Boolean(haloAtCurrentStage),
       visibleCurrentBodyImages: bodyImages.length,
+      visibleCurrentBaseBodyImages: currentBaseBodyImages.length,
+      visibleCurrentLateBodyImages: currentLateBodyImages.length,
       bodyAtCurrentStage: Boolean(bodyAtCurrentStage),
       visibleCurrentFrameImages: frameImages.length,
+      visibleCurrentBaseFrameImages: currentBaseFrameImages.length,
+      visibleCurrentLateFrameImages: currentLateFrameImages.length,
       frameAtCurrentStage: Boolean(frameAtCurrentStage),
       visibleCurrentStatusImages: statusImages.length,
       statusAtCurrentStage: Boolean(statusAtCurrentStage),
@@ -419,8 +442,12 @@ async function runKeyboardStageSelectAudit(browser, baseUrl) {
       const currentIndex = stages.findIndex((stage) => stage.id === currentStageId);
       const currentNode = stageNodes[currentIndex];
       const markerImages = visible.filter((child) => child?.type === "Image" && child.texture?.key === "ui_current_stage_marker_concept" && (child.alpha ?? 1) > 0.05);
-      const bodyImages = visible.filter((child) => child?.type === "Image" && child.texture?.key === "ui_current_stage_body_wash_concept" && (child.alpha ?? 1) > 0.05);
-      const frameImages = visible.filter((child) => child?.type === "Image" && child.texture?.key === "ui_current_stage_frame_concept" && (child.alpha ?? 1) > 0.05);
+      const currentBaseBodyImages = visible.filter((child) => child?.type === "Image" && child.texture?.key === "ui_current_stage_body_wash_concept" && (child.alpha ?? 1) > 0.05);
+      const currentLateBodyImages = visible.filter((child) => child?.type === "Image" && child.texture?.key === "ui_current_stage_late_body_wash_concept" && (child.alpha ?? 1) > 0.05);
+      const bodyImages = [...currentBaseBodyImages, ...currentLateBodyImages];
+      const currentBaseFrameImages = visible.filter((child) => child?.type === "Image" && child.texture?.key === "ui_current_stage_frame_concept" && (child.alpha ?? 1) > 0.05);
+      const currentLateFrameImages = visible.filter((child) => child?.type === "Image" && child.texture?.key === "ui_current_stage_late_frame_concept" && (child.alpha ?? 1) > 0.05);
+      const frameImages = [...currentBaseFrameImages, ...currentLateFrameImages];
       const haloImages = visible.filter((child) => child?.type === "Image" && child.texture?.key === "ui_current_stage_halo_concept" && (child.alpha ?? 1) > 0.05);
       const statusImages = visible.filter((child) => child?.type === "Image" && child.texture?.key === "ui_current_stage_status_badge_concept" && (child.alpha ?? 1) > 0.05);
       const completedBaseImages = visible.filter((child) => child?.type === "Image" && child.texture?.key === "ui_completed_stage_badge_concept" && (child.alpha ?? 1) > 0.05);
@@ -462,20 +489,27 @@ async function runKeyboardStageSelectAudit(browser, baseUrl) {
         && currentNode
         && Math.abs(haloImages[0].x - (currentNode.x + 2)) <= 1
         && Math.abs(haloImages[0].y - (currentNode.y + 4)) <= 1;
+      const expectedLateCurrent = currentIndex > 4;
+      const expectedCurrentBodyImages = expectedLateCurrent ? currentLateBodyImages : currentBaseBodyImages;
+      const expectedCurrentFrameImages = expectedLateCurrent ? currentLateFrameImages : currentBaseFrameImages;
       const bodyAtSelectedStage = bodyImages.length === 1
+        && expectedCurrentBodyImages.length === 1
+        && (expectedLateCurrent ? currentBaseBodyImages.length === 0 : currentLateBodyImages.length === 0)
         && currentNode
-        && Math.abs(bodyImages[0].x - (currentNode.x + currentNode.width * 0.02)) <= 1
-        && Math.abs(bodyImages[0].y - (currentNode.y + currentNode.height * 0.04)) <= 1
-        && Math.abs(bodyImages[0].displayWidth - currentNode.width * 1.12) <= 1
-        && Math.abs(bodyImages[0].displayHeight - currentNode.height * 1.16) <= 1
-        && (bodyImages[0].alpha ?? 1) >= 0.64;
+        && Math.abs(expectedCurrentBodyImages[0].x - (currentNode.x + currentNode.width * 0.02)) <= 1
+        && Math.abs(expectedCurrentBodyImages[0].y - (currentNode.y + currentNode.height * 0.04)) <= 1
+        && Math.abs(expectedCurrentBodyImages[0].displayWidth - currentNode.width * 1.12) <= 1
+        && Math.abs(expectedCurrentBodyImages[0].displayHeight - currentNode.height * 1.16) <= 1
+        && (expectedCurrentBodyImages[0].alpha ?? 1) >= 0.64;
       const frameAtSelectedStage = frameImages.length === 1
+        && expectedCurrentFrameImages.length === 1
+        && (expectedLateCurrent ? currentBaseFrameImages.length === 0 : currentLateFrameImages.length === 0)
         && currentNode
-        && Math.abs(frameImages[0].x - (currentNode.x + currentNode.width * 0.02)) <= 1
-        && Math.abs(frameImages[0].y - (currentNode.y + currentNode.height * 0.01)) <= 1
-        && Math.abs(frameImages[0].displayWidth - currentNode.width * 1.34) <= 1
-        && Math.abs(frameImages[0].displayHeight - currentNode.height * 1.38) <= 1
-        && (frameImages[0].alpha ?? 1) >= 0.88;
+        && Math.abs(expectedCurrentFrameImages[0].x - (currentNode.x + currentNode.width * 0.02)) <= 1
+        && Math.abs(expectedCurrentFrameImages[0].y - (currentNode.y + currentNode.height * 0.01)) <= 1
+        && Math.abs(expectedCurrentFrameImages[0].displayWidth - currentNode.width * 1.34) <= 1
+        && Math.abs(expectedCurrentFrameImages[0].displayHeight - currentNode.height * 1.38) <= 1
+        && (expectedCurrentFrameImages[0].alpha ?? 1) >= 0.88;
       const statusAtSelectedStage = statusImages.length === 1
         && currentNode
         && Math.abs(statusImages[0].x - (currentNode.x + currentNode.width * 0.1)) <= 1
@@ -542,8 +576,12 @@ async function runKeyboardStageSelectAudit(browser, baseUrl) {
         visibleCurrentHaloImages: haloImages.length,
         haloAtSelectedStage: Boolean(haloAtSelectedStage),
         visibleCurrentBodyImages: bodyImages.length,
+        visibleCurrentBaseBodyImages: currentBaseBodyImages.length,
+        visibleCurrentLateBodyImages: currentLateBodyImages.length,
         bodyAtSelectedStage: Boolean(bodyAtSelectedStage),
         visibleCurrentFrameImages: frameImages.length,
+        visibleCurrentBaseFrameImages: currentBaseFrameImages.length,
+        visibleCurrentLateFrameImages: currentLateFrameImages.length,
         frameAtSelectedStage: Boolean(frameAtSelectedStage),
         visibleCurrentStatusImages: statusImages.length,
         statusAtSelectedStage: Boolean(statusAtSelectedStage),
@@ -742,16 +780,28 @@ async function runStateOverlayAudit(browser, baseUrl, auditCase) {
         && child.texture?.key === "ui_current_stage_marker_concept"
         && (child.alpha ?? 1) > 0.05
       ));
-      const currentBodyImages = visible.filter((child) => (
+      const currentBaseBodyImages = visible.filter((child) => (
         child?.type === "Image"
         && child.texture?.key === "ui_current_stage_body_wash_concept"
         && (child.alpha ?? 1) > 0.05
       ));
-      const frameImages = visible.filter((child) => (
+      const currentLateBodyImages = visible.filter((child) => (
+        child?.type === "Image"
+        && child.texture?.key === "ui_current_stage_late_body_wash_concept"
+        && (child.alpha ?? 1) > 0.05
+      ));
+      const currentBodyImages = [...currentBaseBodyImages, ...currentLateBodyImages];
+      const currentBaseFrameImages = visible.filter((child) => (
         child?.type === "Image"
         && child.texture?.key === "ui_current_stage_frame_concept"
         && (child.alpha ?? 1) > 0.05
       ));
+      const currentLateFrameImages = visible.filter((child) => (
+        child?.type === "Image"
+        && child.texture?.key === "ui_current_stage_late_frame_concept"
+        && (child.alpha ?? 1) > 0.05
+      ));
+      const frameImages = [...currentBaseFrameImages, ...currentLateFrameImages];
       const haloImages = visible.filter((child) => (
         child?.type === "Image"
         && child.texture?.key === "ui_current_stage_halo_concept"
@@ -1136,20 +1186,27 @@ async function runStateOverlayAudit(browser, baseUrl, auditCase) {
         && currentNode
         && Math.abs(haloImages[0].x - (currentNode.x + 2)) <= 1
         && Math.abs(haloImages[0].y - (currentNode.y + 4)) <= 1;
+      const expectedLateCurrent = currentIndex > 4;
+      const expectedCurrentBodyImages = expectedLateCurrent ? currentLateBodyImages : currentBaseBodyImages;
+      const expectedCurrentFrameImages = expectedLateCurrent ? currentLateFrameImages : currentBaseFrameImages;
       const bodyAtCurrentStage = currentBodyImages.length === 1
+        && expectedCurrentBodyImages.length === 1
+        && (expectedLateCurrent ? currentBaseBodyImages.length === 0 : currentLateBodyImages.length === 0)
         && currentNode
-        && Math.abs(currentBodyImages[0].x - currentBodyPlacement(currentNode).x) <= 1
-        && Math.abs(currentBodyImages[0].y - currentBodyPlacement(currentNode).y) <= 1
-        && Math.abs(currentBodyImages[0].displayWidth - currentBodyPlacement(currentNode).width) <= 1
-        && Math.abs(currentBodyImages[0].displayHeight - currentBodyPlacement(currentNode).height) <= 1
-        && (currentBodyImages[0].alpha ?? 1) >= currentBodyPlacement(currentNode).minAlpha;
+        && Math.abs(expectedCurrentBodyImages[0].x - currentBodyPlacement(currentNode).x) <= 1
+        && Math.abs(expectedCurrentBodyImages[0].y - currentBodyPlacement(currentNode).y) <= 1
+        && Math.abs(expectedCurrentBodyImages[0].displayWidth - currentBodyPlacement(currentNode).width) <= 1
+        && Math.abs(expectedCurrentBodyImages[0].displayHeight - currentBodyPlacement(currentNode).height) <= 1
+        && (expectedCurrentBodyImages[0].alpha ?? 1) >= currentBodyPlacement(currentNode).minAlpha;
       const frameAtCurrentStage = frameImages.length === 1
+        && expectedCurrentFrameImages.length === 1
+        && (expectedLateCurrent ? currentBaseFrameImages.length === 0 : currentLateFrameImages.length === 0)
         && currentNode
-        && Math.abs(frameImages[0].x - (currentNode.x + currentNode.width * 0.02)) <= 1
-        && Math.abs(frameImages[0].y - (currentNode.y + currentNode.height * 0.01)) <= 1
-        && Math.abs(frameImages[0].displayWidth - currentNode.width * 1.34) <= 1
-        && Math.abs(frameImages[0].displayHeight - currentNode.height * 1.38) <= 1
-        && (frameImages[0].alpha ?? 1) >= 0.88;
+        && Math.abs(expectedCurrentFrameImages[0].x - (currentNode.x + currentNode.width * 0.02)) <= 1
+        && Math.abs(expectedCurrentFrameImages[0].y - (currentNode.y + currentNode.height * 0.01)) <= 1
+        && Math.abs(expectedCurrentFrameImages[0].displayWidth - currentNode.width * 1.34) <= 1
+        && Math.abs(expectedCurrentFrameImages[0].displayHeight - currentNode.height * 1.38) <= 1
+        && (expectedCurrentFrameImages[0].alpha ?? 1) >= 0.88;
       const statusAtCurrentStage = statusImages.length === 1
         && currentNode
         && Math.abs(statusImages[0].x - (currentNode.x + currentNode.width * 0.1)) <= 1
@@ -1212,6 +1269,10 @@ async function runStateOverlayAudit(browser, baseUrl, auditCase) {
           && completedBaseFrameImages.length === expectedCompletedBase.length
           && completedLateFrameImages.length === expectedCompletedLate.length
           && currentBodyImages.length === 1
+          && currentBaseBodyImages.length === (expectedLateCurrent ? 0 : 1)
+          && currentLateBodyImages.length === (expectedLateCurrent ? 1 : 0)
+          && currentBaseFrameImages.length === (expectedLateCurrent ? 0 : 1)
+          && currentLateFrameImages.length === (expectedLateCurrent ? 1 : 0)
           && lockedBodyImages.length === expectedLocked.length
           && lockedFrameImages.length === expectedLocked.length
           && lockedImages.length === expectedLocked.length
@@ -1341,8 +1402,16 @@ async function runStateOverlayAudit(browser, baseUrl, auditCase) {
         visibleCurrentHaloImages: haloImages.length,
         haloAtCurrentStage: Boolean(haloAtCurrentStage),
         visibleCurrentBodyImages: currentBodyImages.length,
+        visibleCurrentBaseBodyImages: currentBaseBodyImages.length,
+        expectedCurrentBaseBodyImages: expectedLateCurrent ? 0 : 1,
+        visibleCurrentLateBodyImages: currentLateBodyImages.length,
+        expectedCurrentLateBodyImages: expectedLateCurrent ? 1 : 0,
         bodyAtCurrentStage: Boolean(bodyAtCurrentStage),
         visibleCurrentFrameImages: frameImages.length,
+        visibleCurrentBaseFrameImages: currentBaseFrameImages.length,
+        expectedCurrentBaseFrameImages: expectedLateCurrent ? 0 : 1,
+        visibleCurrentLateFrameImages: currentLateFrameImages.length,
+        expectedCurrentLateFrameImages: expectedLateCurrent ? 1 : 0,
         frameAtCurrentStage: Boolean(frameAtCurrentStage),
         visibleCurrentStatusImages: statusImages.length,
         statusAtCurrentStage: Boolean(statusAtCurrentStage),
