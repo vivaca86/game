@@ -42,8 +42,10 @@ const WORLD_MAP_RASTER_DORMANT_FRAME_KEY = "ui_dormant_stage_frame_concept";
 const WORLD_MAP_RASTER_DORMANT_MID_FRAME_KEY = "ui_dormant_stage_mid_frame_concept";
 const WORLD_MAP_RASTER_ROUTE_PROGRESS_THREAD_KEY = "ui_world_map_route_progress_thread_concept";
 const WORLD_MAP_RASTER_ROUTE_PROGRESS_CURRENT_THREAD_KEY = "ui_world_map_route_progress_current_thread_concept";
+const WORLD_MAP_RASTER_ROUTE_LOCKED_THREAD_KEY = "ui_world_map_route_locked_thread_concept";
 const WORLD_MAP_RASTER_ROUTE_PROGRESS_BEAD_KEY = "ui_world_map_route_progress_bead_concept";
 const WORLD_MAP_RASTER_ROUTE_PROGRESS_CURRENT_BEAD_KEY = "ui_world_map_route_progress_current_bead_concept";
+const WORLD_MAP_RASTER_ROUTE_LOCKED_BEAD_KEY = "ui_world_map_route_locked_bead_concept";
 const WORLD_MAP_KEYBOARD_TOOLTIP_STAGE_ID_KEY = "worldMapKeyboardTooltipStageId";
 const WORLD_MAP_RASTER_STAGE_NODES: Array<{ x: number; y: number; width: number; height: number }> = [
   { x: 586, y: 760, width: 150, height: 150 },
@@ -123,6 +125,7 @@ function renderWorldMapRasterStage(scene: Phaser.Scene, context: BootContext): v
     .setDepth(0);
 
   renderWorldMapRouteProgress(scene, context);
+  renderWorldMapLockedFutureRoutes(scene, context);
   renderWorldMapStageStateBadges(scene, context);
   renderWorldMapRasterHitTarget(scene, 1576, 970, 280, 144, 0xf5c26b, () => handleSceneAction(scene, context, "confirm"), {
     tooltipTitle: "던전 진입",
@@ -135,6 +138,8 @@ function renderWorldMapRasterStage(scene: Phaser.Scene, context: BootContext): v
 }
 
 function renderWorldMapRouteProgress(scene: Phaser.Scene, context: BootContext): void {
+  if (isWorldMapKeyboardSelectionPending(scene)) return;
+
   const hasRouteThread = scene.textures.exists(WORLD_MAP_RASTER_ROUTE_PROGRESS_THREAD_KEY);
   const hasCurrentRouteThread = scene.textures.exists(WORLD_MAP_RASTER_ROUTE_PROGRESS_CURRENT_THREAD_KEY);
   const hasRouteBead = scene.textures.exists(WORLD_MAP_RASTER_ROUTE_PROGRESS_BEAD_KEY);
@@ -183,6 +188,45 @@ function renderWorldMapRouteProgress(scene: Phaser.Scene, context: BootContext):
   }
 }
 
+function renderWorldMapLockedFutureRoutes(scene: Phaser.Scene, context: BootContext): void {
+  if (isWorldMapKeyboardSelectionPending(scene)) return;
+  const hasLockedThread = scene.textures.exists(WORLD_MAP_RASTER_ROUTE_LOCKED_THREAD_KEY);
+  const hasLockedBead = scene.textures.exists(WORLD_MAP_RASTER_ROUTE_LOCKED_BEAD_KEY);
+  if (!hasLockedThread && !hasLockedBead) return;
+
+  const currentStageIndex = context.dataBundle.stages.findIndex((stage) => stage.id === context.run.stageId);
+  if (currentStageIndex < 0) return;
+
+  const unlockedStageIds = new Set([...context.save.profile.unlockedStages, context.run.stageId]);
+  for (let index = currentStageIndex; index < context.dataBundle.stages.length - 1; index += 1) {
+    const toStage = context.dataBundle.stages[index + 1];
+    const fromNode = WORLD_MAP_RASTER_STAGE_NODES[index];
+    const toNode = WORLD_MAP_RASTER_STAGE_NODES[index + 1];
+    if (!toStage || !fromNode || !toNode || unlockedStageIds.has(toStage.id)) continue;
+
+    if (hasLockedThread) {
+      const thread = worldMapLockedRouteThreadPlacement(fromNode, toNode);
+      if (thread) {
+        scene.add.image(thread.x, thread.y, WORLD_MAP_RASTER_ROUTE_LOCKED_THREAD_KEY)
+          .setDisplaySize(thread.width, thread.height)
+          .setRotation(thread.rotation)
+          .setAlpha(thread.alpha)
+          .setDepth(3.28);
+      }
+    }
+
+    if (hasLockedBead) {
+      worldMapLockedRouteBeadPlacements(fromNode, toNode).forEach((bead) => {
+        scene.add.image(bead.x, bead.y, WORLD_MAP_RASTER_ROUTE_LOCKED_BEAD_KEY)
+          .setDisplaySize(bead.size, bead.size)
+          .setRotation(bead.rotation)
+          .setAlpha(bead.alpha)
+          .setDepth(3.4);
+      });
+    }
+  }
+}
+
 function worldMapRouteThreadKey(scene: Phaser.Scene, finalLeg: boolean): string | undefined {
   if (finalLeg && scene.textures.exists(WORLD_MAP_RASTER_ROUTE_PROGRESS_CURRENT_THREAD_KEY)) {
     return WORLD_MAP_RASTER_ROUTE_PROGRESS_CURRENT_THREAD_KEY;
@@ -201,6 +245,10 @@ function worldMapRouteBeadKey(scene: Phaser.Scene, finalLeg: boolean): string | 
     return WORLD_MAP_RASTER_ROUTE_PROGRESS_BEAD_KEY;
   }
   return undefined;
+}
+
+function isWorldMapKeyboardSelectionPending(scene: Phaser.Scene): boolean {
+  return Boolean(scene.registry.get(WORLD_MAP_KEYBOARD_TOOLTIP_STAGE_ID_KEY));
 }
 
 function worldMapRouteThreadPlacement(
@@ -255,6 +303,60 @@ function worldMapRouteBeadPlacements(
       rotation,
       size: finalLeg ? 44 : 38,
       alpha: finalLeg ? 0.62 : 0.46
+    };
+  });
+}
+
+function worldMapLockedRouteThreadPlacement(
+  fromNode: { x: number; y: number; width: number; height: number },
+  toNode: { x: number; y: number; width: number; height: number }
+): { x: number; y: number; rotation: number; width: number; height: number; alpha: number } | undefined {
+  const dx = toNode.x - fromNode.x;
+  const dy = toNode.y - fromNode.y;
+  const length = Math.hypot(dx, dy);
+  if (length <= 1) return undefined;
+
+  const fromPad = Math.max(fromNode.width, fromNode.height) * 0.48;
+  const toPad = Math.max(toNode.width, toNode.height) * 0.48;
+  const usableLength = Math.max(0, length - fromPad - toPad);
+  if (usableLength < 26) return undefined;
+
+  const startProgress = fromPad / length;
+  const endProgress = (fromPad + usableLength) / length;
+  return {
+    x: fromNode.x + dx * ((startProgress + endProgress) * 0.5),
+    y: fromNode.y + dy * ((startProgress + endProgress) * 0.5),
+    rotation: Math.atan2(dy, dx),
+    width: usableLength + 8,
+    height: 18,
+    alpha: 0.26
+  };
+}
+
+function worldMapLockedRouteBeadPlacements(
+  fromNode: { x: number; y: number; width: number; height: number },
+  toNode: { x: number; y: number; width: number; height: number }
+): Array<{ x: number; y: number; rotation: number; size: number; alpha: number }> {
+  const dx = toNode.x - fromNode.x;
+  const dy = toNode.y - fromNode.y;
+  const length = Math.hypot(dx, dy);
+  if (length <= 1) return [];
+
+  const fromPad = Math.max(fromNode.width, fromNode.height) * 0.44;
+  const toPad = Math.max(toNode.width, toNode.height) * 0.44;
+  const usableLength = Math.max(0, length - fromPad - toPad);
+  if (usableLength < 34) return [];
+
+  const count = Math.max(1, Math.floor(usableLength / 76));
+  const rotation = Math.atan2(dy, dx);
+  return Array.from({ length: count }, (_, index) => {
+    const progress = (fromPad + usableLength * ((index + 1) / (count + 1))) / length;
+    return {
+      x: fromNode.x + dx * progress,
+      y: fromNode.y + dy * progress,
+      rotation,
+      size: 30,
+      alpha: 0.34
     };
   });
 }

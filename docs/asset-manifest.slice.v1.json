@@ -793,6 +793,13 @@
       "styleKey": "premium_popup_book"
     },
     {
+      "key": "ui_world_map_route_locked_bead_concept",
+      "type": "image",
+      "path": "assets/runtime/ui/ui_world_map_route_locked_bead_concept_v001.png",
+      "nativeSize": { "w": 80, "h": 100 },
+      "styleKey": "premium_popup_book"
+    },
+    {
       "key": "ui_world_map_route_progress_thread_concept",
       "type": "image",
       "path": "assets/runtime/ui/ui_world_map_route_progress_thread_concept_v001.png",
@@ -803,6 +810,13 @@
       "key": "ui_world_map_route_progress_current_thread_concept",
       "type": "image",
       "path": "assets/runtime/ui/ui_world_map_route_progress_current_thread_concept_v001.png",
+      "nativeSize": { "w": 220, "h": 56 },
+      "styleKey": "premium_popup_book"
+    },
+    {
+      "key": "ui_world_map_route_locked_thread_concept",
+      "type": "image",
+      "path": "assets/runtime/ui/ui_world_map_route_locked_thread_concept_v001.png",
       "nativeSize": { "w": 220, "h": 56 },
       "styleKey": "premium_popup_book"
     },

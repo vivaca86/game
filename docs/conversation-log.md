@@ -2180,3 +2180,15 @@ Added `tools/ui-mobile-framing-audit.mjs`. It verifies Town, WorldMap, Dungeon, 
 Verification passed with `npx.cmd tsc --noEmit`, `git diff --check`, `node tools\ui-mobile-framing-audit.mjs`, `node tools\ui-responsive-raster-audit.mjs`, `node tools\ui-readability-tooltip-audit.mjs`, `node tools\ui-accessibility-overlay-audit.mjs`, `npm.cmd run check`, `node tools\ui-keyboard-focus-tooltip-audit.mjs`, and targeted `$env:PHASER_SMOKE_ONLY='checkViewScreenshots,checkClickableControls,checkFullInputCoverage,checkUiSkinStates'; node tmp\run-phaser-smoke-with-vite.mjs` ending in `Phaser smoke OK`.
 
 This is now about a 95% candidate for the active UI goal, not final or release-ready. The first deliberate mobile portrait framing cue is covered, but full WorldMap node/route recomposition, broader disabled/focus coverage beyond audited paths, broader gameplay-critical readable text, user acceptance, and final concept-match approval remain unfinished.
+
+### Codex
+
+Codex continued the 95% candidate UI goal by targeting the remaining WorldMap route-state gap. Completed and current route legs already had cyan source-derived overlays, but locked/future route segments still leaned on the baked underlay rather than a separate runtime material family.
+
+Added `ui_world_map_route_locked_thread_concept` and `ui_world_map_route_locked_bead_concept`. `tools/extract-ui-state-assets.mjs` now extracts them from the WorldMap route crop with muted gray locked processing, `tools/generate-dev-runtime-assets.mjs` copies them into the runtime asset pack, and both slice/release manifests share the keys. `WorldMapScene` renders the new locked/future route material only on forward segments whose destination stage is still locked. Completed route legs keep the base cyan route assets, the final/current leg keeps the brighter current route assets, and keyboard-selected WorldMap evidence suppresses all route overlays so the selected marker/tooltip stack stays clean.
+
+`tmp/ui-worldmap-action-hit-target-audit.mjs` now verifies locked route thread/bead counts and placements separately from completed/current route material. The audit passed with default `visibleRouteLockedThreads=7` / `visibleRouteLockedBeads=9`, stage-4 progress `6` / `7`, stage-9 progress `3` / `4`, and keyboard-selected state `0` / `0`.
+
+Verification passed with `npx.cmd tsc --noEmit`, `git diff --check`, `npm.cmd run assets:audit:strict`, `node tmp\ui-worldmap-action-hit-target-audit.mjs`, `node tmp\route-node-raster-hover-state-audit.mjs`, `node tools\ui-worldmap-keyboard-tooltip-audit.mjs`, `node tools\ui-worldmap-locked-tooltip-audit.mjs`, `npm.cmd run check`, and targeted `$env:PHASER_SMOKE_ONLY='checkViewScreenshots,checkClickableControls,checkFullInputCoverage,checkUiSkinStates'; node tmp\run-phaser-smoke-with-vite.mjs` ending in `Phaser smoke OK`.
+
+This remains a 95% candidate rather than final approval. Route-state texture-family separation is stronger now, but full WorldMap node/body recomposition, lower-node silhouette replacement, broader disabled/focus/readability coverage, user acceptance, and final concept-match approval remain unfinished.

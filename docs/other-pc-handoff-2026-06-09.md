@@ -7,7 +7,7 @@ Repository:
 - GitHub: `https://github.com/vivaca86/game.git`
 - Branch: `main`
 - Latest pushed commit: run `git log -1 --oneline` after pulling.
-- Expected latest commit title after the 2026-06-14 mobile portrait framing continuation: `Add mobile portrait framing cue`
+- Expected latest commit title after the 2026-06-14 WorldMap locked future route continuation: `Add WorldMap locked future routes`
 
 ## Start On Another PC
 
@@ -22,7 +22,7 @@ npm install
 Expected first commit title in `git log --oneline -5` after the latest continuation:
 
 ```text
-Add mobile portrait framing cue
+Add WorldMap locked future routes
 ```
 
 Expected status:
@@ -121,6 +121,7 @@ Recommended next work:
    - WorldMap locked/sealed/dormant nodes now expose danger-tone explanation tooltips through tooltip-only disabled hit targets.
    - WorldMap direction-key stage selection now shows the same DOM readability tooltip for the selected stage without adding another hover image.
    - Mobile portrait now has a non-blocking orientation/framing cue in unused letterbox space and suppresses it while readability tooltips are visible.
+   - WorldMap now has muted locked/future route thread/bead material separate from completed/current cyan route material.
    - Continue broader gameplay-critical readable text, broader selected/focus approval, broader disabled-state breadth, final mobile UX review, and user acceptance.
    - Do not put explanatory text directly into the baked concept layers as a shortcut.
 
@@ -908,3 +909,51 @@ Representative evidence:
 - `tmp/ui-quality/mobile-framing/combat-tooltip-suppresses-framing-v1-mobile-390x844.png`
 
 Important limitation: this closes the first deliberate portrait framing/orientation cue, not final mobile UX approval. Full WorldMap node/route recomposition, broader disabled/focus coverage outside the audited paths, broader gameplay-critical readable text, user acceptance, and final concept-match approval remain next.
+
+## 2026-06-14 WorldMap Locked Future Route WIP Continuation
+
+Status remains `Partially complete`.
+
+Current estimate remains about a 95% candidate of the active UI goal, not final, release-ready, or user-accepted 95%.
+
+Additional local continuation work:
+
+- Added `ui_world_map_route_locked_thread_concept` and `ui_world_map_route_locked_bead_concept`.
+- The new source assets are extracted from `assets/concepts/ui/world_map_ui_concept_v001.png` using the same route crop family as the cyan route assets, but processed into a muted gray locked/future material.
+- `WorldMapScene` now renders locked/future route thread/bead overlays only on forward route segments whose destination stage is still locked.
+- Completed route legs keep `ui_world_map_route_progress_thread_concept` / `ui_world_map_route_progress_bead_concept`, the final/current leg keeps the brighter current route assets, and locked future routes use the new muted route assets.
+- Keyboard-selected WorldMap evidence suppresses both progress and locked future route overlays so selected-stage marker/tooltip audits remain clean.
+- Updated `tmp/ui-worldmap-action-hit-target-audit.mjs` to verify locked route thread/bead counts, placement, size, and alpha separately from base/current route material.
+
+Verification for this continuation:
+
+```powershell
+npx.cmd tsc --noEmit
+git diff --check
+npm.cmd run assets:audit:strict
+node tmp\ui-worldmap-action-hit-target-audit.mjs
+node tmp\route-node-raster-hover-state-audit.mjs
+node tools\ui-worldmap-keyboard-tooltip-audit.mjs
+node tools\ui-worldmap-locked-tooltip-audit.mjs
+npm.cmd run check
+$env:PHASER_SMOKE_PROGRESS='1'
+$env:PHASER_SMOKE_PROGRESS_FILE='tmp/phaser-smoke-progress-worldmap-locked-routes-targeted.log'
+$env:PHASER_SMOKE_ONLY='checkViewScreenshots,checkClickableControls,checkFullInputCoverage,checkUiSkinStates'
+node tmp\run-phaser-smoke-with-vite.mjs
+```
+
+All listed checks passed. The WorldMap action audit now reports:
+
+- default state: `visibleRouteLockedThreads=7`, `visibleRouteLockedBeads=9`.
+- stage-4 progress: `visibleRouteLockedThreads=6`, `visibleRouteLockedBeads=7`.
+- stage-9 progress: `visibleRouteLockedThreads=3`, `visibleRouteLockedBeads=4`.
+- keyboard-selected state: `visibleRouteLockedThreads=0`, `visibleRouteLockedBeads=0`.
+
+Representative evidence:
+
+- `tmp/ui-quality/worldmap/worldmap-state-overlays-v1-1920.png`
+- `tmp/ui-quality/worldmap/worldmap-progress-current-stage4-v1-1920.png`
+- `tmp/ui-quality/worldmap/worldmap-progress-current-stage9-v1-1920.png`
+- `tmp/ui-quality/worldmap/worldmap-keyboard-stage-select-v1-1920.png`
+
+Important limitation: this improves route-state texture-family separation, but it is still not full WorldMap recomposition. The map still needs deeper node/body variants, lower-node silhouette recomposition, broader disabled/focus coverage outside the audited paths, user acceptance, and final concept-match approval.

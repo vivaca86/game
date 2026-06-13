@@ -740,6 +740,15 @@ const targets = [
     stateVariant: "currentLeg"
   },
   {
+    key: "ui_world_map_route_locked_thread_concept",
+    kind: "world_map_route_thread",
+    source: path.join(rootDir, "assets", "concepts", "ui", "world_map_ui_concept_v001.png"),
+    output: path.join(rootDir, "assets", "source", "ui", "ui_world_map_route_locked_thread_concept_v001.png"),
+    crop: { x: 710, y: 638, w: 130, h: 42 },
+    nativeSize: { w: 220, h: 56 },
+    stateVariant: "lockedFuture"
+  },
+  {
     key: "ui_world_map_route_progress_bead_concept",
     kind: "world_map_route_bead",
     source: path.join(rootDir, "assets", "concepts", "ui", "world_map_ui_concept_v001.png"),
@@ -755,6 +764,15 @@ const targets = [
     crop: { x: 1048, y: 548, w: 54, h: 74 },
     nativeSize: { w: 80, h: 100 },
     stateVariant: "currentLeg"
+  },
+  {
+    key: "ui_world_map_route_locked_bead_concept",
+    kind: "world_map_route_bead",
+    source: path.join(rootDir, "assets", "concepts", "ui", "world_map_ui_concept_v001.png"),
+    output: path.join(rootDir, "assets", "source", "ui", "ui_world_map_route_locked_bead_concept_v001.png"),
+    crop: { x: 1048, y: 548, w: 54, h: 74 },
+    nativeSize: { w: 80, h: 100 },
+    stateVariant: "lockedFuture"
   },
   {
     key: "ui_current_stage_halo_concept",
@@ -2119,13 +2137,14 @@ try {
         const ctx = canvas.getContext("2d", { willReadFrequently: true });
         if (!ctx) throw new Error("2d canvas context unavailable");
         const currentLeg = stateVariant === "currentLeg";
+        const lockedFuture = stateVariant === "lockedFuture";
 
         const glow = ctx.createLinearGradient(0, nativeSize.h * 0.5, nativeSize.w, nativeSize.h * 0.5);
-        glow.addColorStop(0, "rgba(66, 215, 206, 0)");
-        glow.addColorStop(0.18, currentLeg ? "rgba(94, 248, 238, 0.16)" : "rgba(66, 215, 206, 0.1)");
-        glow.addColorStop(0.5, currentLeg ? "rgba(132, 255, 246, 0.3)" : "rgba(88, 244, 233, 0.18)");
-        glow.addColorStop(0.82, currentLeg ? "rgba(94, 248, 238, 0.16)" : "rgba(66, 215, 206, 0.1)");
-        glow.addColorStop(1, "rgba(66, 215, 206, 0)");
+        glow.addColorStop(0, lockedFuture ? "rgba(117, 115, 104, 0)" : "rgba(66, 215, 206, 0)");
+        glow.addColorStop(0.18, lockedFuture ? "rgba(126, 122, 106, 0.08)" : currentLeg ? "rgba(94, 248, 238, 0.16)" : "rgba(66, 215, 206, 0.1)");
+        glow.addColorStop(0.5, lockedFuture ? "rgba(160, 150, 126, 0.15)" : currentLeg ? "rgba(132, 255, 246, 0.3)" : "rgba(88, 244, 233, 0.18)");
+        glow.addColorStop(0.82, lockedFuture ? "rgba(126, 122, 106, 0.08)" : currentLeg ? "rgba(94, 248, 238, 0.16)" : "rgba(66, 215, 206, 0.1)");
+        glow.addColorStop(1, lockedFuture ? "rgba(117, 115, 104, 0)" : "rgba(66, 215, 206, 0)");
         ctx.fillStyle = glow;
         ctx.fillRect(0, 0, nativeSize.w, nativeSize.h);
         ctx.drawImage(image, crop.x, crop.y, crop.w, crop.h, 0, 0, nativeSize.w, nativeSize.h);
@@ -2151,9 +2170,11 @@ try {
             const blue = smoothstep(12, 92, b - r * 0.5 + (g - r) * 0.12 + saturation * 0.12);
             const whiteHot = smoothstep(176, 246, luminance) * (1 - smoothstep(56, 136, saturation));
             const parchment = r > 128 && g > 104 && b > 78 && saturation < 86;
-            let keep = (currentLeg
-              ? Math.max(cyan * 1.12, blue * 0.96, whiteHot * 0.72)
-              : Math.max(cyan, blue * 0.86)) * lane * cap;
+            let keep = (lockedFuture
+              ? Math.max(cyan * 0.78, blue * 0.68, whiteHot * 0.3)
+              : currentLeg
+                ? Math.max(cyan * 1.12, blue * 0.96, whiteHot * 0.72)
+                : Math.max(cyan, blue * 0.86)) * lane * cap;
             if (parchment && keep < 0.62) keep = 0;
 
             if (keep <= 0.045) {
@@ -2161,11 +2182,18 @@ try {
               continue;
             }
 
-            data[offset] = Math.min(255, Math.round(r * (currentLeg ? 0.86 : 0.82) + luminance * 0.02 + (currentLeg ? whiteHot * 8 : 0)));
-            data[offset + 1] = Math.min(255, Math.round(g * (currentLeg ? 1.14 : 1.08) + cyan * (currentLeg ? 30 : 22) + (currentLeg ? whiteHot * 10 : 0)));
-            data[offset + 2] = Math.min(255, Math.round(b * (currentLeg ? 1.18 : 1.13) + cyan * (currentLeg ? 36 : 28) + (currentLeg ? whiteHot * 12 : 0)));
-            const alphaCap = currentLeg ? 232 : 210;
-            const alphaBase = currentLeg ? 238 : 224;
+            if (lockedFuture) {
+              const gray = Math.max(74, Math.min(178, luminance * 0.72 + 58));
+              data[offset] = Math.min(255, Math.round(gray * 1.02));
+              data[offset + 1] = Math.min(255, Math.round(gray * 0.98 + cyan * 5));
+              data[offset + 2] = Math.min(255, Math.round(gray * 0.9 + blue * 6));
+            } else {
+              data[offset] = Math.min(255, Math.round(r * (currentLeg ? 0.86 : 0.82) + luminance * 0.02 + (currentLeg ? whiteHot * 8 : 0)));
+              data[offset + 1] = Math.min(255, Math.round(g * (currentLeg ? 1.14 : 1.08) + cyan * (currentLeg ? 30 : 22) + (currentLeg ? whiteHot * 10 : 0)));
+              data[offset + 2] = Math.min(255, Math.round(b * (currentLeg ? 1.18 : 1.13) + cyan * (currentLeg ? 36 : 28) + (currentLeg ? whiteHot * 12 : 0)));
+            }
+            const alphaCap = lockedFuture ? 164 : currentLeg ? 232 : 210;
+            const alphaBase = lockedFuture ? 178 : currentLeg ? 238 : 224;
             data[offset + 3] = Math.round(Math.min(alphaCap, alphaBase * keep * (0.42 + lane * 0.58)));
           }
         }
@@ -2198,6 +2226,7 @@ try {
         const ctx = canvas.getContext("2d", { willReadFrequently: true });
         if (!ctx) throw new Error("2d canvas context unavailable");
         const currentLeg = stateVariant === "currentLeg";
+        const lockedFuture = stateVariant === "lockedFuture";
 
         const glow = ctx.createRadialGradient(
           nativeSize.w * 0.5,
@@ -2207,9 +2236,9 @@ try {
           nativeSize.h * 0.5,
           nativeSize.w * 0.56
         );
-        glow.addColorStop(0, currentLeg ? "rgba(142, 255, 248, 0.34)" : "rgba(84, 238, 226, 0.22)");
-        glow.addColorStop(0.48, currentLeg ? "rgba(92, 242, 230, 0.16)" : "rgba(84, 238, 226, 0.1)");
-        glow.addColorStop(1, "rgba(84, 238, 226, 0)");
+        glow.addColorStop(0, lockedFuture ? "rgba(154, 145, 124, 0.2)" : currentLeg ? "rgba(142, 255, 248, 0.34)" : "rgba(84, 238, 226, 0.22)");
+        glow.addColorStop(0.48, lockedFuture ? "rgba(118, 112, 100, 0.1)" : currentLeg ? "rgba(92, 242, 230, 0.16)" : "rgba(84, 238, 226, 0.1)");
+        glow.addColorStop(1, lockedFuture ? "rgba(118, 112, 100, 0)" : "rgba(84, 238, 226, 0)");
         ctx.fillStyle = glow;
         ctx.fillRect(0, 0, nativeSize.w, nativeSize.h);
         ctx.drawImage(image, crop.x, crop.y, crop.w, crop.h, 0, 0, nativeSize.w, nativeSize.h);
@@ -2236,7 +2265,11 @@ try {
             const blue = smoothstep(12, 92, b - r * 0.5 + (g - r) * 0.12 + saturation * 0.12);
             const whiteHot = smoothstep(180, 246, luminance) * (1 - smoothstep(48, 128, saturation));
             const parchment = r > 126 && g > 104 && b > 78 && saturation < 84;
-            let keep = Math.max(cyan * (currentLeg ? 1.1 : 1), blue * (currentLeg ? 0.92 : 0.84), whiteHot * (currentLeg ? 0.92 : 0.72))
+            let keep = Math.max(
+              cyan * (lockedFuture ? 0.7 : currentLeg ? 1.1 : 1),
+              blue * (lockedFuture ? 0.62 : currentLeg ? 0.92 : 0.84),
+              whiteHot * (lockedFuture ? 0.36 : currentLeg ? 0.92 : 0.72)
+            )
               * smoothstep(0, 0.24, radial);
             if (parchment && keep < 0.62) keep = 0;
 
@@ -2245,11 +2278,18 @@ try {
               continue;
             }
 
-            data[offset] = Math.min(255, Math.round(r * (currentLeg ? 0.86 : 0.82) + luminance * 0.03 + (currentLeg ? whiteHot * 6 : 0)));
-            data[offset + 1] = Math.min(255, Math.round(g * (currentLeg ? 1.16 : 1.1) + cyan * (currentLeg ? 32 : 24) + whiteHot * (currentLeg ? 24 : 18)));
-            data[offset + 2] = Math.min(255, Math.round(b * (currentLeg ? 1.2 : 1.14) + cyan * (currentLeg ? 40 : 30) + whiteHot * (currentLeg ? 28 : 20)));
-            const alphaCap = currentLeg ? 240 : 226;
-            const alphaBase = currentLeg ? 246 : 236;
+            if (lockedFuture) {
+              const gray = Math.max(76, Math.min(184, luminance * 0.7 + 62));
+              data[offset] = Math.min(255, Math.round(gray * 1.04 + whiteHot * 3));
+              data[offset + 1] = Math.min(255, Math.round(gray * 0.98 + cyan * 5));
+              data[offset + 2] = Math.min(255, Math.round(gray * 0.9 + blue * 6));
+            } else {
+              data[offset] = Math.min(255, Math.round(r * (currentLeg ? 0.86 : 0.82) + luminance * 0.03 + (currentLeg ? whiteHot * 6 : 0)));
+              data[offset + 1] = Math.min(255, Math.round(g * (currentLeg ? 1.16 : 1.1) + cyan * (currentLeg ? 32 : 24) + whiteHot * (currentLeg ? 24 : 18)));
+              data[offset + 2] = Math.min(255, Math.round(b * (currentLeg ? 1.2 : 1.14) + cyan * (currentLeg ? 40 : 30) + whiteHot * (currentLeg ? 28 : 20)));
+            }
+            const alphaCap = lockedFuture ? 176 : currentLeg ? 240 : 226;
+            const alphaBase = lockedFuture ? 190 : currentLeg ? 246 : 236;
             data[offset + 3] = Math.round(Math.min(alphaCap, alphaBase * keep * (0.5 + radial * 0.5)));
           }
         }
