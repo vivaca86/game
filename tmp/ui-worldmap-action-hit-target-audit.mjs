@@ -431,6 +431,7 @@ async function runKeyboardStageSelectAudit(browser, baseUrl) {
       const sealedFrameImages = visible.filter((child) => child?.type === "Image" && child.texture?.key === "ui_sealed_stage_frame_concept" && (child.alpha ?? 1) > 0.05);
       const dormantBodyImages = visible.filter((child) => child?.type === "Image" && child.texture?.key === "ui_dormant_stage_body_wash_concept" && (child.alpha ?? 1) > 0.05);
       const dormantFrameImages = visible.filter((child) => child?.type === "Image" && child.texture?.key === "ui_dormant_stage_frame_concept" && (child.alpha ?? 1) > 0.05);
+      const routeThreadImages = visible.filter((child) => child?.type === "Image" && child.texture?.key === "ui_world_map_route_progress_thread_concept" && (child.alpha ?? 1) > 0.05);
       const routeBeadImages = visible.filter((child) => child?.type === "Image" && child.texture?.key === "ui_world_map_route_progress_bead_concept" && (child.alpha ?? 1) > 0.05);
       const routeHoverImages = visible.filter((child) => child?.type === "Image" && child.texture?.key === "ui_hover_route_node_concept" && (child.alpha ?? 1) > 0.05);
       const visibleTextCount = visible.filter((child) => child?.type === "Text" && String(child.text ?? "").trim().length > 0).length;
@@ -518,6 +519,7 @@ async function runKeyboardStageSelectAudit(browser, baseUrl) {
           && selectedStageHasNoSealedFrame
           && selectedStageHasNoDormantBody
           && selectedStageHasNoDormantFrame
+          && routeThreadImages.length === 0
           && routeBeadImages.length === 0
           && routeHoverImages.length === 0
           && visibleTextCount === 0
@@ -543,6 +545,7 @@ async function runKeyboardStageSelectAudit(browser, baseUrl) {
         selectedStageHasNoSealedFrame,
         selectedStageHasNoDormantBody,
         selectedStageHasNoDormantFrame,
+        visibleRouteThreads: routeThreadImages.length,
         visibleRouteBeads: routeBeadImages.length,
         visibleRouteHoverImages: routeHoverImages.length,
         visibleTextCount,
@@ -684,6 +687,11 @@ async function runStateOverlayAudit(browser, baseUrl, auditCase) {
         && child.texture?.key === "ui_dormant_stage_frame_concept"
         && (child.alpha ?? 1) > 0.05
       ));
+      const routeThreadImages = visible.filter((child) => (
+        child?.type === "Image"
+        && child.texture?.key === "ui_world_map_route_progress_thread_concept"
+        && (child.alpha ?? 1) > 0.05
+      ));
       const routeBeadImages = visible.filter((child) => (
         child?.type === "Image"
         && child.texture?.key === "ui_world_map_route_progress_bead_concept"
@@ -756,6 +764,26 @@ async function runStateOverlayAudit(browser, baseUrl, auditCase) {
           };
         });
       };
+      const routeThreadPlacement = (fromNode, toNode, finalLeg) => {
+        const dx = toNode.x - fromNode.x;
+        const dy = toNode.y - fromNode.y;
+        const length = Math.hypot(dx, dy);
+        if (length <= 1) return undefined;
+        const fromPad = Math.max(fromNode.width, fromNode.height) * 0.43;
+        const toPad = Math.max(toNode.width, toNode.height) * 0.43;
+        const usableLength = Math.max(0, length - fromPad - toPad);
+        if (usableLength < 28) return undefined;
+        const startProgress = fromPad / length;
+        const endProgress = (fromPad + usableLength) / length;
+        return {
+          x: fromNode.x + dx * ((startProgress + endProgress) * 0.5),
+          y: fromNode.y + dy * ((startProgress + endProgress) * 0.5),
+          width: usableLength + (finalLeg ? 18 : 12),
+          height: finalLeg ? 30 : 24,
+          minAlpha: finalLeg ? 0.4 : 0.28
+        };
+      };
+      const expectedRouteThreads = [];
       const expectedRouteBeads = [];
       for (let routeIndex = 0; routeIndex < currentIndex; routeIndex += 1) {
         const fromStage = stages[routeIndex];
@@ -765,7 +793,10 @@ async function runStateOverlayAudit(browser, baseUrl, auditCase) {
         if (!fromStage || !toStage || !fromNode || !toNode) continue;
         if (!completedStageIds.has(fromStage.id)) continue;
         if (toStage.id !== currentStageId && !completedStageIds.has(toStage.id)) continue;
-        expectedRouteBeads.push(...routeBeadPlacements(fromNode, toNode, routeIndex === currentIndex - 1));
+        const finalLeg = routeIndex === currentIndex - 1;
+        const thread = routeThreadPlacement(fromNode, toNode, finalLeg);
+        if (thread) expectedRouteThreads.push(thread);
+        expectedRouteBeads.push(...routeBeadPlacements(fromNode, toNode, finalLeg));
       }
       const lockedBadgePlacement = (node, stageIndex) => {
         const sourceAlignedLocks = {
@@ -1034,6 +1065,16 @@ async function runStateOverlayAudit(browser, baseUrl, auditCase) {
           && Math.abs(image.displayHeight - placement.size) <= 1
           && (image.alpha ?? 1) >= placement.minAlpha;
       });
+      const routeThreadsAtExpectedSegments = expectedRouteThreads.every((placement) => (
+        hasImageAt(routeThreadImages, placement.x, placement.y)
+      ));
+      const routeThreadStyleAtExpectedSegments = expectedRouteThreads.every((placement) => {
+        const image = imageAt(routeThreadImages, placement.x, placement.y);
+        return image
+          && Math.abs(image.displayWidth - placement.width) <= 1
+          && Math.abs(image.displayHeight - placement.height) <= 1
+          && (image.alpha ?? 1) >= placement.minAlpha;
+      });
       const markerAtCurrentStage = markerImages.length === 1
         && expectedMarker
         && Math.abs(markerImages[0].x - expectedMarker.x) <= 1
@@ -1103,6 +1144,7 @@ async function runStateOverlayAudit(browser, baseUrl, auditCase) {
 
       return {
         ok: completedImages.length === expectedCompleted.length
+          && routeThreadImages.length === expectedRouteThreads.length
           && routeBeadImages.length === expectedRouteBeads.length
           && completedBodyImages.length === expectedCompleted.length
           && completedFrameImages.length === expectedCompleted.length
@@ -1137,6 +1179,8 @@ async function runStateOverlayAudit(browser, baseUrl, auditCase) {
           && dormantBodyStyleAtExpectedNodes
           && dormantFramesAtExpectedNodes
           && dormantFrameStyleAtExpectedNodes
+          && routeThreadsAtExpectedSegments
+          && routeThreadStyleAtExpectedSegments
           && routeBeadsAtExpectedSegments
           && routeBeadStyleAtExpectedSegments
           && markerAtCurrentStage
@@ -1157,6 +1201,10 @@ async function runStateOverlayAudit(browser, baseUrl, auditCase) {
         currentStageId,
         completedStageIds: [...completedStageIds],
         unlockedStageIds: [...unlockedStageIds],
+        visibleRouteThreads: routeThreadImages.length,
+        expectedRouteThreads: expectedRouteThreads.length,
+        routeThreadsAtExpectedSegments,
+        routeThreadStyleAtExpectedSegments,
         visibleRouteBeads: routeBeadImages.length,
         expectedRouteBeads: expectedRouteBeads.length,
         routeBeadsAtExpectedSegments,

@@ -214,6 +214,7 @@ const sharedUiRasterAssetKeys = new Set([
   "ui_sealed_stage_badge_concept",
   "ui_dormant_stage_body_wash_concept",
   "ui_dormant_stage_frame_concept",
+  "ui_world_map_route_progress_thread_concept",
   "ui_world_map_route_progress_bead_concept",
   "combat_raster_underlay_concept",
   "boss_raster_underlay_concept",

@@ -129,6 +129,7 @@ const sourcePassthroughAssets = new Map([
   ["ui_sealed_stage_badge_concept", path.join(rootDir, "assets", "source", "ui", "ui_sealed_stage_badge_concept_v001.png")],
   ["ui_dormant_stage_body_wash_concept", path.join(rootDir, "assets", "source", "ui", "ui_dormant_stage_body_wash_concept_v001.png")],
   ["ui_dormant_stage_frame_concept", path.join(rootDir, "assets", "source", "ui", "ui_dormant_stage_frame_concept_v001.png")],
+  ["ui_world_map_route_progress_thread_concept", path.join(rootDir, "assets", "source", "ui", "ui_world_map_route_progress_thread_concept_v001.png")],
   ["ui_world_map_route_progress_bead_concept", path.join(rootDir, "assets", "source", "ui", "ui_world_map_route_progress_bead_concept_v001.png")],
   ["combat_raster_underlay_concept", path.join(rootDir, "assets", "source", "ui", "combat_raster_underlay_concept_v001.png")],
   ["boss_raster_underlay_concept", path.join(rootDir, "assets", "source", "ui", "boss_raster_underlay_concept_v001.png")],

@@ -136,7 +136,7 @@ Still unfinished:
 
 - Broad disabled coverage across all scenes.
 - Final selected/focus states.
-- Dynamic label/accessibility strategy.
+- Dynamic label/accessibility strategy beyond the first hidden DOM label pass.
 - User acceptance.
 
 ### Town / RuneBench / Result / Settings
@@ -271,7 +271,7 @@ WorldMap still unfinished:
 - The lower 1-3 baked completed-check silhouettes are more neutralized, but some badge silhouette can still be seen in certain selected states and needs later recomposition or stronger source-aware patching.
 - Completed/locked/sealed stage nodes have first-pass runtime badges, but they are not final per-stage recomposition.
 - Keyboard focus state is not concept-quality.
-- Dynamic labels/accessibility-safe tooltips are unresolved.
+- Hidden dynamic accessibility labels now exist, but visible accessibility-safe tooltips/readability zones are unresolved.
 - Mobile/responsive review is not final.
 - No user acceptance yet.
 
@@ -279,7 +279,7 @@ Recommended next WorldMap work:
 
 1. Refine later completed-node variants and remaining baked route/node geometry against the concept.
 2. Refine selected/focus/keyboard state art without reintroducing Phaser vector overlays. The first WorldMap arrow-key selection pass exists, but broader keyboard/focus coverage is still open.
-3. Add accessibility-safe dynamic labels/tooltips outside the baked concept layer.
+3. Continue accessibility-safe dynamic labels/tooltips outside the baked concept layer. The first hidden DOM/canvas-label pass exists; visible safe tooltip/readability zones still need design and audit.
 4. Keep broad Phaser smoke as an ongoing regression gate. The earlier 2026-06-08 timeout has since been root-caused and the full wrapper now passes again.
 5. Capture 1920 screenshots and inspect visually before claiming improvement.
 
@@ -1650,3 +1650,108 @@ Results:
 Remaining related work:
 
 - This is not final WorldMap route recomposition. The route beads are conservative runtime progress material, but baked route/node geometry remains visible and the full current/completed/locked/sealed/dormant state body set is still incomplete. Next work should continue with stronger number-safe state-specific body variants, later node variants, lower-node shape recomposition, complete route-state material, dynamic labels/tooltips, mobile/responsive review, user acceptance, and final concept-match approval.
+
+## 2026-06-13 Continuation: WorldMap Route-Progress Thread Overlay
+
+Status: `Partially complete`.
+
+This follow-up adds a first source-concept-derived route-progress thread overlay under the existing route-progress beads. It makes progressed route segments read less like isolated beads only, but it is still not a full dynamic route recomposition system.
+
+Added/changed:
+
+- `assets/source/ui/ui_world_map_route_progress_thread_concept_v001.png`
+- `public/assets/runtime/ui/ui_world_map_route_progress_thread_concept_v001.png`
+- `tools/extract-ui-state-assets.mjs`
+- `tools/generate-dev-runtime-assets.mjs`
+- `src/data/assetManifest.slice.v1.json`
+- `docs/asset-manifest.slice.v1.json`
+- `src/data/releaseCatalogAdapter.ts`
+- `src/phaser/scenes/WorldMapScene.ts`
+- `tmp/ui-worldmap-action-hit-target-audit.mjs`
+- `tmp/ui-quality/worldmap/worldmap-state-overlays-v1-1920.png`
+- `tmp/ui-quality/worldmap/worldmap-progress-current-stage4-v1-1920.png`
+- `tmp/ui-quality/worldmap/worldmap-progress-current-stage9-v1-1920.png`
+
+Behavior now verified:
+
+- `ui_world_map_route_progress_thread_concept` is cropped/masked from cyan route material in `assets/concepts/ui/world_map_ui_concept_v001.png`, not drawn as a Phaser vector route.
+- `WorldMapScene` renders the thread overlay only on completed/progressed route segments before the current node, below the existing route-progress beads.
+- The WorldMap audit verifies route-thread count, placement, display size, alpha, and texture style in default, stage-4-progress, and stage-9-progress states.
+- The keyboard-selected WorldMap audit verifies `visibleRouteThreads=0` and `visibleRouteBeads=0`, so stage selection does not falsely imply route progress.
+- The checked states still report no Phaser text and no visible rectangle overlays above the raster underlay.
+
+Verification run in this continuation:
+
+```powershell
+node tools\extract-ui-state-assets.mjs
+npm.cmd run assets:generate:dev
+node tmp\ui-worldmap-action-hit-target-audit.mjs
+node tmp\route-node-raster-hover-state-audit.mjs
+npm.cmd run check
+git diff --check
+$env:PHASER_SMOKE_PROGRESS='1'
+$env:PHASER_SMOKE_PROGRESS_FILE='tmp/phaser-smoke-progress-worldmap-route-thread.log'
+node tmp\run-phaser-smoke-with-vite.mjs
+```
+
+Results:
+
+- WorldMap action/state audit passed. Default state reported `visibleRouteThreads=1`, stage-4-progress state reported `visibleRouteThreads=3`, late stage-9 progress state reported `visibleRouteThreads=8`, and keyboard-selected state reported `visibleRouteThreads=0`.
+- Existing route-bead checks still passed: default `visibleRouteBeads=2`, stage-4-progress `visibleRouteBeads=4`, late stage-9 progress `visibleRouteBeads=12`, and keyboard-selected `visibleRouteBeads=0`.
+- Route-node hover audit passed for WorldMap and Dungeon.
+- `npm.cmd run check` passed with `manifestAssets=474`, `existingFiles=474`, `missingFiles=0`, and the existing Vite large JS chunk warning.
+- `git diff --check` passed.
+- Full broad Phaser smoke passed with `Phaser smoke OK`.
+
+Remaining related work:
+
+- This is not final WorldMap route recomposition. The thread overlay is conservative and sits under the existing beads, but baked route/node geometry remains visible and a complete dynamic route-state system is still missing. Next work should continue with stronger number-safe state-specific body variants, later node variants, lower-node shape recomposition, fuller route-state material, visible tooltip/readability zones, mobile/responsive review, user acceptance, and final concept-match approval.
+
+## 2026-06-13 Continuation: Hidden Dynamic Accessibility Labels
+
+Status: `Partially complete`.
+
+This follow-up adds the first dynamic label/accessibility-safe text strategy outside the baked raster concept images. It intentionally does not add visible text to the Phaser canvas or concept screenshots; instead it gives assistive technology a scene-aware DOM summary and synchronizes the canvas `aria-label`.
+
+Added/changed:
+
+- `src/ui/overlays/accessibilityOverlay.ts`
+- `src/ui/overlays/debugOverlay.ts`
+- `src/styles/phaser-shell.css`
+- `tools/ui-accessibility-overlay-audit.mjs`
+
+Behavior now verified:
+
+- Every primary raster scene creates a visually hidden `#game-accessibility-summary` with `role="status"`, `aria-live="polite"`, and `aria-atomic="true"`.
+- The hidden summary includes the current scene title plus dynamic status/control lines derived from `BootContext`, including stage, room, player/combat, reward, event, rune, result, or settings state where relevant.
+- The Phaser canvas receives `role="img"` and a synchronized `aria-label` matching the hidden summary.
+- The accessibility layer is hidden as a 1x1 fixed element and does not add visible text to raster concept screenshots.
+
+Verification run in this continuation:
+
+```powershell
+npx.cmd tsc --noEmit
+node tools\ui-accessibility-overlay-audit.mjs
+node tmp\route-node-raster-hover-state-audit.mjs
+node tmp\ui-worldmap-action-hit-target-audit.mjs
+npm.cmd run check
+git diff --check
+$env:PHASER_SMOKE_PROGRESS='1'
+$env:PHASER_SMOKE_PROGRESS_FILE='tmp/phaser-smoke-progress-accessibility-label.log'
+node tmp\run-phaser-smoke-with-vite.mjs
+```
+
+Results:
+
+- TypeScript passed.
+- The accessibility audit passed for Town, WorldMap, Dungeon, Combat, Reward, Event, RuneBench, Boss, Result, and Settings.
+- Each audited scene reported a synchronized hidden summary/canvas label and `hiddenBox=1x1`.
+- Route-node hover audit passed for WorldMap and Dungeon.
+- WorldMap action/state audit passed, including route-thread/bead counts and keyboard-selected `visibleRouteThreads=0` / `visibleRouteBeads=0`.
+- `npm.cmd run check` passed with `manifestAssets=474`, `existingFiles=474`, `missingFiles=0`, and the existing Vite large JS chunk warning.
+- `git diff --check` passed.
+- Full broad Phaser smoke passed with `Phaser smoke OK`.
+
+Remaining related work:
+
+- This is not final dynamic readability approval. The hidden layer closes the first off-canvas label strategy, but visible tooltip/safe-text zones, mobile/responsive readability review, user acceptance, and final concept-match approval remain unfinished.

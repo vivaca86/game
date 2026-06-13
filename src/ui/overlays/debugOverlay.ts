@@ -1,7 +1,10 @@
 import type { BootContext } from "../../app/bootContext";
 import { createDebugSummary } from "../../debug/debugActions";
+import { renderAccessibilityOverlay } from "./accessibilityOverlay";
 
 export function renderDebugOverlay(context: BootContext, sceneName: string): void {
+  renderAccessibilityOverlay(context, sceneName);
+
   const root = document.getElementById("debug-overlay");
   if (!root) {
     return;

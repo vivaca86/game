@@ -31,6 +31,7 @@ const WORLD_MAP_RASTER_SEALED_FRAME_KEY = "ui_sealed_stage_frame_concept";
 const WORLD_MAP_RASTER_SEALED_BADGE_KEY = "ui_sealed_stage_badge_concept";
 const WORLD_MAP_RASTER_DORMANT_BODY_KEY = "ui_dormant_stage_body_wash_concept";
 const WORLD_MAP_RASTER_DORMANT_FRAME_KEY = "ui_dormant_stage_frame_concept";
+const WORLD_MAP_RASTER_ROUTE_PROGRESS_THREAD_KEY = "ui_world_map_route_progress_thread_concept";
 const WORLD_MAP_RASTER_ROUTE_PROGRESS_BEAD_KEY = "ui_world_map_route_progress_bead_concept";
 const WORLD_MAP_RASTER_STAGE_NODES: Array<{ x: number; y: number; width: number; height: number }> = [
   { x: 586, y: 760, width: 150, height: 150 },
@@ -117,7 +118,9 @@ function renderWorldMapRasterStage(scene: Phaser.Scene, context: BootContext): v
 }
 
 function renderWorldMapRouteProgress(scene: Phaser.Scene, context: BootContext): void {
-  if (!scene.textures.exists(WORLD_MAP_RASTER_ROUTE_PROGRESS_BEAD_KEY)) return;
+  const hasRouteThread = scene.textures.exists(WORLD_MAP_RASTER_ROUTE_PROGRESS_THREAD_KEY);
+  const hasRouteBead = scene.textures.exists(WORLD_MAP_RASTER_ROUTE_PROGRESS_BEAD_KEY);
+  if (!hasRouteThread && !hasRouteBead) return;
 
   const currentStageId = context.run.stageId;
   const currentStageIndex = context.dataBundle.stages.findIndex((stage) => stage.id === currentStageId);
@@ -134,15 +137,56 @@ function renderWorldMapRouteProgress(scene: Phaser.Scene, context: BootContext):
     if (toStage.id !== currentStageId && !completedStageIds.has(toStage.id)) continue;
 
     const finalLeg = index === currentStageIndex - 1;
-    worldMapRouteBeadPlacements(fromNode, toNode, finalLeg).forEach((bead) => {
-      scene.add.image(bead.x, bead.y, WORLD_MAP_RASTER_ROUTE_PROGRESS_BEAD_KEY)
-        .setDisplaySize(bead.size, bead.size)
-        .setRotation(bead.rotation)
-        .setAlpha(bead.alpha)
-        .setBlendMode(Phaser.BlendModes.ADD)
-        .setDepth(3.82);
-    });
+    if (hasRouteThread) {
+      const thread = worldMapRouteThreadPlacement(fromNode, toNode, finalLeg);
+      if (thread) {
+        scene.add.image(thread.x, thread.y, WORLD_MAP_RASTER_ROUTE_PROGRESS_THREAD_KEY)
+          .setDisplaySize(thread.width, thread.height)
+          .setRotation(thread.rotation)
+          .setAlpha(thread.alpha)
+          .setBlendMode(Phaser.BlendModes.ADD)
+          .setDepth(3.64);
+      }
+    }
+
+    if (hasRouteBead) {
+      worldMapRouteBeadPlacements(fromNode, toNode, finalLeg).forEach((bead) => {
+        scene.add.image(bead.x, bead.y, WORLD_MAP_RASTER_ROUTE_PROGRESS_BEAD_KEY)
+          .setDisplaySize(bead.size, bead.size)
+          .setRotation(bead.rotation)
+          .setAlpha(bead.alpha)
+          .setBlendMode(Phaser.BlendModes.ADD)
+          .setDepth(3.82);
+      });
+    }
   }
+}
+
+function worldMapRouteThreadPlacement(
+  fromNode: { x: number; y: number; width: number; height: number },
+  toNode: { x: number; y: number; width: number; height: number },
+  finalLeg: boolean
+): { x: number; y: number; rotation: number; width: number; height: number; alpha: number } | undefined {
+  const dx = toNode.x - fromNode.x;
+  const dy = toNode.y - fromNode.y;
+  const length = Math.hypot(dx, dy);
+  if (length <= 1) return undefined;
+
+  const fromPad = Math.max(fromNode.width, fromNode.height) * 0.43;
+  const toPad = Math.max(toNode.width, toNode.height) * 0.43;
+  const usableLength = Math.max(0, length - fromPad - toPad);
+  if (usableLength < 28) return undefined;
+
+  const startProgress = fromPad / length;
+  const endProgress = (fromPad + usableLength) / length;
+  return {
+    x: fromNode.x + dx * ((startProgress + endProgress) * 0.5),
+    y: fromNode.y + dy * ((startProgress + endProgress) * 0.5),
+    rotation: Math.atan2(dy, dx),
+    width: usableLength + (finalLeg ? 18 : 12),
+    height: finalLeg ? 30 : 24,
+    alpha: finalLeg ? 0.42 : 0.3
+  };
 }
 
 function worldMapRouteBeadPlacements(

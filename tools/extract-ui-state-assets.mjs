@@ -651,6 +651,14 @@ const targets = [
     stateVariant: "dormant"
   },
   {
+    key: "ui_world_map_route_progress_thread_concept",
+    kind: "world_map_route_thread",
+    source: path.join(rootDir, "assets", "concepts", "ui", "world_map_ui_concept_v001.png"),
+    output: path.join(rootDir, "assets", "source", "ui", "ui_world_map_route_progress_thread_concept_v001.png"),
+    crop: { x: 710, y: 638, w: 130, h: 42 },
+    nativeSize: { w: 220, h: 56 }
+  },
+  {
     key: "ui_world_map_route_progress_bead_concept",
     kind: "world_map_route_bead",
     source: path.join(rootDir, "assets", "concepts", "ui", "world_map_ui_concept_v001.png"),
@@ -1904,6 +1912,78 @@ try {
         crop: target.crop,
         nativeSize: target.nativeSize,
         stateVariant: target.stateVariant
+      })
+      : target.kind === "world_map_route_thread"
+      ? await page.evaluate(async ({ base64, crop, nativeSize }) => {
+        const image = await new Promise((resolve, reject) => {
+          const img = new Image();
+          img.onload = () => resolve(img);
+          img.onerror = () => reject(new Error("source concept image failed to load"));
+          img.src = `data:image/png;base64,${base64}`;
+        });
+
+        const canvas = document.createElement("canvas");
+        canvas.width = nativeSize.w;
+        canvas.height = nativeSize.h;
+        const ctx = canvas.getContext("2d", { willReadFrequently: true });
+        if (!ctx) throw new Error("2d canvas context unavailable");
+
+        const glow = ctx.createLinearGradient(0, nativeSize.h * 0.5, nativeSize.w, nativeSize.h * 0.5);
+        glow.addColorStop(0, "rgba(66, 215, 206, 0)");
+        glow.addColorStop(0.18, "rgba(66, 215, 206, 0.1)");
+        glow.addColorStop(0.5, "rgba(88, 244, 233, 0.18)");
+        glow.addColorStop(0.82, "rgba(66, 215, 206, 0.1)");
+        glow.addColorStop(1, "rgba(66, 215, 206, 0)");
+        ctx.fillStyle = glow;
+        ctx.fillRect(0, 0, nativeSize.w, nativeSize.h);
+        ctx.drawImage(image, crop.x, crop.y, crop.w, crop.h, 0, 0, nativeSize.w, nativeSize.h);
+
+        const imageData = ctx.getImageData(0, 0, nativeSize.w, nativeSize.h);
+        const data = imageData.data;
+        const centerY = nativeSize.h * 0.5;
+
+        for (let y = 0; y < nativeSize.h; y += 1) {
+          for (let x = 0; x < nativeSize.w; x += 1) {
+            const offset = (y * nativeSize.w + x) * 4;
+            const r = data[offset];
+            const g = data[offset + 1];
+            const b = data[offset + 2];
+            const max = Math.max(r, g, b);
+            const min = Math.min(r, g, b);
+            const saturation = max - min;
+            const luminance = r * 0.299 + g * 0.587 + b * 0.114;
+            const lane = 1 - smoothstep(0.46, 1.0, Math.abs(y - centerY) / (nativeSize.h * 0.5));
+            const cap = smoothstep(0.02, 0.14, x / nativeSize.w)
+              * (1 - smoothstep(0.86, 0.98, x / nativeSize.w));
+            const cyan = smoothstep(18, 122, Math.min(g, b) - r * 0.68 + saturation * 0.12);
+            const blue = smoothstep(12, 92, b - r * 0.5 + (g - r) * 0.12 + saturation * 0.12);
+            const parchment = r > 128 && g > 104 && b > 78 && saturation < 86;
+            let keep = Math.max(cyan, blue * 0.86) * lane * cap;
+            if (parchment && keep < 0.62) keep = 0;
+
+            if (keep <= 0.045) {
+              data[offset + 3] = 0;
+              continue;
+            }
+
+            data[offset] = Math.min(255, Math.round(r * 0.82 + luminance * 0.02));
+            data[offset + 1] = Math.min(255, Math.round(g * 1.08 + cyan * 22));
+            data[offset + 2] = Math.min(255, Math.round(b * 1.13 + cyan * 28));
+            data[offset + 3] = Math.round(Math.min(210, 224 * keep * (0.42 + lane * 0.58)));
+          }
+        }
+
+        ctx.putImageData(imageData, 0, 0);
+        return canvas.toDataURL("image/png");
+
+        function smoothstep(edge0, edge1, value) {
+          const t = Math.max(0, Math.min(1, (value - edge0) / Math.max(0.0001, edge1 - edge0)));
+          return t * t * (3 - 2 * t);
+        }
+      }, {
+        base64: sourceBuffer.toString("base64"),
+        crop: target.crop,
+        nativeSize: target.nativeSize
       })
       : target.kind === "world_map_route_bead"
       ? await page.evaluate(async ({ base64, crop, nativeSize }) => {
