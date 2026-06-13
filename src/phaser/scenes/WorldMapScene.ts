@@ -35,7 +35,9 @@ const WORLD_MAP_RASTER_SEALED_BADGE_KEY = "ui_sealed_stage_badge_concept";
 const WORLD_MAP_RASTER_DORMANT_BODY_KEY = "ui_dormant_stage_body_wash_concept";
 const WORLD_MAP_RASTER_DORMANT_FRAME_KEY = "ui_dormant_stage_frame_concept";
 const WORLD_MAP_RASTER_ROUTE_PROGRESS_THREAD_KEY = "ui_world_map_route_progress_thread_concept";
+const WORLD_MAP_RASTER_ROUTE_PROGRESS_CURRENT_THREAD_KEY = "ui_world_map_route_progress_current_thread_concept";
 const WORLD_MAP_RASTER_ROUTE_PROGRESS_BEAD_KEY = "ui_world_map_route_progress_bead_concept";
+const WORLD_MAP_RASTER_ROUTE_PROGRESS_CURRENT_BEAD_KEY = "ui_world_map_route_progress_current_bead_concept";
 const WORLD_MAP_RASTER_STAGE_NODES: Array<{ x: number; y: number; width: number; height: number }> = [
   { x: 586, y: 760, width: 150, height: 150 },
   { x: 808, y: 756, width: 150, height: 150 },
@@ -122,8 +124,10 @@ function renderWorldMapRasterStage(scene: Phaser.Scene, context: BootContext): v
 
 function renderWorldMapRouteProgress(scene: Phaser.Scene, context: BootContext): void {
   const hasRouteThread = scene.textures.exists(WORLD_MAP_RASTER_ROUTE_PROGRESS_THREAD_KEY);
+  const hasCurrentRouteThread = scene.textures.exists(WORLD_MAP_RASTER_ROUTE_PROGRESS_CURRENT_THREAD_KEY);
   const hasRouteBead = scene.textures.exists(WORLD_MAP_RASTER_ROUTE_PROGRESS_BEAD_KEY);
-  if (!hasRouteThread && !hasRouteBead) return;
+  const hasCurrentRouteBead = scene.textures.exists(WORLD_MAP_RASTER_ROUTE_PROGRESS_CURRENT_BEAD_KEY);
+  if (!hasRouteThread && !hasCurrentRouteThread && !hasRouteBead && !hasCurrentRouteBead) return;
 
   const currentStageId = context.run.stageId;
   const currentStageIndex = context.dataBundle.stages.findIndex((stage) => stage.id === currentStageId);
@@ -140,10 +144,11 @@ function renderWorldMapRouteProgress(scene: Phaser.Scene, context: BootContext):
     if (toStage.id !== currentStageId && !completedStageIds.has(toStage.id)) continue;
 
     const finalLeg = index === currentStageIndex - 1;
-    if (hasRouteThread) {
+    const routeThreadKey = worldMapRouteThreadKey(scene, finalLeg);
+    if (routeThreadKey) {
       const thread = worldMapRouteThreadPlacement(fromNode, toNode, finalLeg);
       if (thread) {
-        scene.add.image(thread.x, thread.y, WORLD_MAP_RASTER_ROUTE_PROGRESS_THREAD_KEY)
+        scene.add.image(thread.x, thread.y, routeThreadKey)
           .setDisplaySize(thread.width, thread.height)
           .setRotation(thread.rotation)
           .setAlpha(thread.alpha)
@@ -152,9 +157,10 @@ function renderWorldMapRouteProgress(scene: Phaser.Scene, context: BootContext):
       }
     }
 
-    if (hasRouteBead) {
+    const routeBeadKey = worldMapRouteBeadKey(scene, finalLeg);
+    if (routeBeadKey) {
       worldMapRouteBeadPlacements(fromNode, toNode, finalLeg).forEach((bead) => {
-        scene.add.image(bead.x, bead.y, WORLD_MAP_RASTER_ROUTE_PROGRESS_BEAD_KEY)
+        scene.add.image(bead.x, bead.y, routeBeadKey)
           .setDisplaySize(bead.size, bead.size)
           .setRotation(bead.rotation)
           .setAlpha(bead.alpha)
@@ -163,6 +169,26 @@ function renderWorldMapRouteProgress(scene: Phaser.Scene, context: BootContext):
       });
     }
   }
+}
+
+function worldMapRouteThreadKey(scene: Phaser.Scene, finalLeg: boolean): string | undefined {
+  if (finalLeg && scene.textures.exists(WORLD_MAP_RASTER_ROUTE_PROGRESS_CURRENT_THREAD_KEY)) {
+    return WORLD_MAP_RASTER_ROUTE_PROGRESS_CURRENT_THREAD_KEY;
+  }
+  if (scene.textures.exists(WORLD_MAP_RASTER_ROUTE_PROGRESS_THREAD_KEY)) {
+    return WORLD_MAP_RASTER_ROUTE_PROGRESS_THREAD_KEY;
+  }
+  return undefined;
+}
+
+function worldMapRouteBeadKey(scene: Phaser.Scene, finalLeg: boolean): string | undefined {
+  if (finalLeg && scene.textures.exists(WORLD_MAP_RASTER_ROUTE_PROGRESS_CURRENT_BEAD_KEY)) {
+    return WORLD_MAP_RASTER_ROUTE_PROGRESS_CURRENT_BEAD_KEY;
+  }
+  if (scene.textures.exists(WORLD_MAP_RASTER_ROUTE_PROGRESS_BEAD_KEY)) {
+    return WORLD_MAP_RASTER_ROUTE_PROGRESS_BEAD_KEY;
+  }
+  return undefined;
 }
 
 function worldMapRouteThreadPlacement(

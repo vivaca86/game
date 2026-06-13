@@ -677,12 +677,30 @@ const targets = [
     nativeSize: { w: 220, h: 56 }
   },
   {
+    key: "ui_world_map_route_progress_current_thread_concept",
+    kind: "world_map_route_thread",
+    source: path.join(rootDir, "assets", "concepts", "ui", "world_map_ui_concept_v001.png"),
+    output: path.join(rootDir, "assets", "source", "ui", "ui_world_map_route_progress_current_thread_concept_v001.png"),
+    crop: { x: 710, y: 638, w: 130, h: 42 },
+    nativeSize: { w: 220, h: 56 },
+    stateVariant: "currentLeg"
+  },
+  {
     key: "ui_world_map_route_progress_bead_concept",
     kind: "world_map_route_bead",
     source: path.join(rootDir, "assets", "concepts", "ui", "world_map_ui_concept_v001.png"),
     output: path.join(rootDir, "assets", "source", "ui", "ui_world_map_route_progress_bead_concept_v001.png"),
     crop: { x: 1048, y: 548, w: 54, h: 74 },
     nativeSize: { w: 80, h: 100 }
+  },
+  {
+    key: "ui_world_map_route_progress_current_bead_concept",
+    kind: "world_map_route_bead",
+    source: path.join(rootDir, "assets", "concepts", "ui", "world_map_ui_concept_v001.png"),
+    output: path.join(rootDir, "assets", "source", "ui", "ui_world_map_route_progress_current_bead_concept_v001.png"),
+    crop: { x: 1048, y: 548, w: 54, h: 74 },
+    nativeSize: { w: 80, h: 100 },
+    stateVariant: "currentLeg"
   },
   {
     key: "ui_current_stage_halo_concept",
@@ -1971,7 +1989,7 @@ try {
         stateVariant: target.stateVariant
       })
       : target.kind === "world_map_route_thread"
-      ? await page.evaluate(async ({ base64, crop, nativeSize }) => {
+      ? await page.evaluate(async ({ base64, crop, nativeSize, stateVariant }) => {
         const image = await new Promise((resolve, reject) => {
           const img = new Image();
           img.onload = () => resolve(img);
@@ -1984,12 +2002,13 @@ try {
         canvas.height = nativeSize.h;
         const ctx = canvas.getContext("2d", { willReadFrequently: true });
         if (!ctx) throw new Error("2d canvas context unavailable");
+        const currentLeg = stateVariant === "currentLeg";
 
         const glow = ctx.createLinearGradient(0, nativeSize.h * 0.5, nativeSize.w, nativeSize.h * 0.5);
         glow.addColorStop(0, "rgba(66, 215, 206, 0)");
-        glow.addColorStop(0.18, "rgba(66, 215, 206, 0.1)");
-        glow.addColorStop(0.5, "rgba(88, 244, 233, 0.18)");
-        glow.addColorStop(0.82, "rgba(66, 215, 206, 0.1)");
+        glow.addColorStop(0.18, currentLeg ? "rgba(94, 248, 238, 0.16)" : "rgba(66, 215, 206, 0.1)");
+        glow.addColorStop(0.5, currentLeg ? "rgba(132, 255, 246, 0.3)" : "rgba(88, 244, 233, 0.18)");
+        glow.addColorStop(0.82, currentLeg ? "rgba(94, 248, 238, 0.16)" : "rgba(66, 215, 206, 0.1)");
         glow.addColorStop(1, "rgba(66, 215, 206, 0)");
         ctx.fillStyle = glow;
         ctx.fillRect(0, 0, nativeSize.w, nativeSize.h);
@@ -2014,8 +2033,11 @@ try {
               * (1 - smoothstep(0.86, 0.98, x / nativeSize.w));
             const cyan = smoothstep(18, 122, Math.min(g, b) - r * 0.68 + saturation * 0.12);
             const blue = smoothstep(12, 92, b - r * 0.5 + (g - r) * 0.12 + saturation * 0.12);
+            const whiteHot = smoothstep(176, 246, luminance) * (1 - smoothstep(56, 136, saturation));
             const parchment = r > 128 && g > 104 && b > 78 && saturation < 86;
-            let keep = Math.max(cyan, blue * 0.86) * lane * cap;
+            let keep = (currentLeg
+              ? Math.max(cyan * 1.12, blue * 0.96, whiteHot * 0.72)
+              : Math.max(cyan, blue * 0.86)) * lane * cap;
             if (parchment && keep < 0.62) keep = 0;
 
             if (keep <= 0.045) {
@@ -2023,10 +2045,12 @@ try {
               continue;
             }
 
-            data[offset] = Math.min(255, Math.round(r * 0.82 + luminance * 0.02));
-            data[offset + 1] = Math.min(255, Math.round(g * 1.08 + cyan * 22));
-            data[offset + 2] = Math.min(255, Math.round(b * 1.13 + cyan * 28));
-            data[offset + 3] = Math.round(Math.min(210, 224 * keep * (0.42 + lane * 0.58)));
+            data[offset] = Math.min(255, Math.round(r * (currentLeg ? 0.86 : 0.82) + luminance * 0.02 + (currentLeg ? whiteHot * 8 : 0)));
+            data[offset + 1] = Math.min(255, Math.round(g * (currentLeg ? 1.14 : 1.08) + cyan * (currentLeg ? 30 : 22) + (currentLeg ? whiteHot * 10 : 0)));
+            data[offset + 2] = Math.min(255, Math.round(b * (currentLeg ? 1.18 : 1.13) + cyan * (currentLeg ? 36 : 28) + (currentLeg ? whiteHot * 12 : 0)));
+            const alphaCap = currentLeg ? 232 : 210;
+            const alphaBase = currentLeg ? 238 : 224;
+            data[offset + 3] = Math.round(Math.min(alphaCap, alphaBase * keep * (0.42 + lane * 0.58)));
           }
         }
 
@@ -2040,10 +2064,11 @@ try {
       }, {
         base64: sourceBuffer.toString("base64"),
         crop: target.crop,
-        nativeSize: target.nativeSize
+        nativeSize: target.nativeSize,
+        stateVariant: target.stateVariant
       })
       : target.kind === "world_map_route_bead"
-      ? await page.evaluate(async ({ base64, crop, nativeSize }) => {
+      ? await page.evaluate(async ({ base64, crop, nativeSize, stateVariant }) => {
         const image = await new Promise((resolve, reject) => {
           const img = new Image();
           img.onload = () => resolve(img);
@@ -2056,6 +2081,7 @@ try {
         canvas.height = nativeSize.h;
         const ctx = canvas.getContext("2d", { willReadFrequently: true });
         if (!ctx) throw new Error("2d canvas context unavailable");
+        const currentLeg = stateVariant === "currentLeg";
 
         const glow = ctx.createRadialGradient(
           nativeSize.w * 0.5,
@@ -2065,8 +2091,8 @@ try {
           nativeSize.h * 0.5,
           nativeSize.w * 0.56
         );
-        glow.addColorStop(0, "rgba(84, 238, 226, 0.22)");
-        glow.addColorStop(0.48, "rgba(84, 238, 226, 0.1)");
+        glow.addColorStop(0, currentLeg ? "rgba(142, 255, 248, 0.34)" : "rgba(84, 238, 226, 0.22)");
+        glow.addColorStop(0.48, currentLeg ? "rgba(92, 242, 230, 0.16)" : "rgba(84, 238, 226, 0.1)");
         glow.addColorStop(1, "rgba(84, 238, 226, 0)");
         ctx.fillStyle = glow;
         ctx.fillRect(0, 0, nativeSize.w, nativeSize.h);
@@ -2094,7 +2120,8 @@ try {
             const blue = smoothstep(12, 92, b - r * 0.5 + (g - r) * 0.12 + saturation * 0.12);
             const whiteHot = smoothstep(180, 246, luminance) * (1 - smoothstep(48, 128, saturation));
             const parchment = r > 126 && g > 104 && b > 78 && saturation < 84;
-            let keep = Math.max(cyan, blue * 0.84, whiteHot * 0.72) * smoothstep(0, 0.24, radial);
+            let keep = Math.max(cyan * (currentLeg ? 1.1 : 1), blue * (currentLeg ? 0.92 : 0.84), whiteHot * (currentLeg ? 0.92 : 0.72))
+              * smoothstep(0, 0.24, radial);
             if (parchment && keep < 0.62) keep = 0;
 
             if (keep <= 0.05) {
@@ -2102,10 +2129,12 @@ try {
               continue;
             }
 
-            data[offset] = Math.min(255, Math.round(r * 0.82 + luminance * 0.03));
-            data[offset + 1] = Math.min(255, Math.round(g * 1.1 + cyan * 24 + whiteHot * 18));
-            data[offset + 2] = Math.min(255, Math.round(b * 1.14 + cyan * 30 + whiteHot * 20));
-            data[offset + 3] = Math.round(Math.min(226, 236 * keep * (0.5 + radial * 0.5)));
+            data[offset] = Math.min(255, Math.round(r * (currentLeg ? 0.86 : 0.82) + luminance * 0.03 + (currentLeg ? whiteHot * 6 : 0)));
+            data[offset + 1] = Math.min(255, Math.round(g * (currentLeg ? 1.16 : 1.1) + cyan * (currentLeg ? 32 : 24) + whiteHot * (currentLeg ? 24 : 18)));
+            data[offset + 2] = Math.min(255, Math.round(b * (currentLeg ? 1.2 : 1.14) + cyan * (currentLeg ? 40 : 30) + whiteHot * (currentLeg ? 28 : 20)));
+            const alphaCap = currentLeg ? 240 : 226;
+            const alphaBase = currentLeg ? 246 : 236;
+            data[offset + 3] = Math.round(Math.min(alphaCap, alphaBase * keep * (0.5 + radial * 0.5)));
           }
         }
 
@@ -2119,7 +2148,8 @@ try {
       }, {
         base64: sourceBuffer.toString("base64"),
         crop: target.crop,
-        nativeSize: target.nativeSize
+        nativeSize: target.nativeSize,
+        stateVariant: target.stateVariant
       })
       : target.kind === "effect_sheet"
       ? await page.evaluate(async ({ base64, crop, nativeSize, frameSize, effectKind, drawScale, baseAngle, angleRange }) => {

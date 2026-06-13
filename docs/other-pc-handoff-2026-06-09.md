@@ -450,3 +450,40 @@ node tmp\run-phaser-smoke-with-vite.mjs
 All listed checks passed. `npm.cmd run check` reports `manifestAssets=477`, `existingFiles=477`, `missingFiles=0`, and only the existing Vite large JS chunk warning.
 
 Important limitation: this is still not full completed-node recomposition. The late completed stack split improves the mid/late completed-node family, but completed nodes still need stronger stage-family body/frame variants, lower-node silhouette recomposition, complete route-state material, visible tooltip/readability zones, mobile/responsive review, user acceptance, and final concept-match approval next.
+
+## 2026-06-13 Route Current-Leg Variant WIP Continuation
+
+Status remains `Partially complete`.
+
+Current estimate remains about 85% of the active UI goal, not 95%.
+
+Additional local continuation work:
+
+- Added first conservative WorldMap route current-leg material:
+  - `ui_world_map_route_progress_current_thread_concept`
+  - `ui_world_map_route_progress_current_bead_concept`
+- Both assets are extracted from the same cyan route material in `assets/concepts/ui/world_map_ui_concept_v001.png`, but processed as brighter `currentLeg` variants so the final leg into the current stage can read differently from earlier completed legs.
+- `WorldMapScene` now keeps the base route thread/bead textures for earlier completed route legs and uses the current thread/bead textures for the final leg when those textures exist.
+- `src/data/releaseCatalogAdapter.ts`, `src/data/assetManifest.slice.v1.json`, `docs/asset-manifest.slice.v1.json`, and `tools/generate-dev-runtime-assets.mjs` now register the current-leg route assets for dev/runtime and release paths.
+- `tmp/ui-worldmap-action-hit-target-audit.mjs` now splits route thread/bead verification into base and current counts. The default audit reports 0 base / 1 current thread and 0 base / 2 current beads. The stage-4-progress audit reports 2 base / 1 current thread and 3 base / 1 current bead. The stage-9-progress audit reports 7 base / 1 current thread and 11 base / 1 current bead. Keyboard-selected state still reports zero route overlays.
+
+Verification for this continuation:
+
+```powershell
+node tools\extract-ui-state-assets.mjs
+npm.cmd run assets:generate:dev
+node tmp\ui-worldmap-action-hit-target-audit.mjs
+node tmp\route-node-raster-hover-state-audit.mjs
+npm.cmd run check
+git diff --check
+$env:PHASER_SMOKE_PROGRESS='1'
+$env:PHASER_SMOKE_PROGRESS_FILE='tmp/phaser-smoke-progress-worldmap-current-route-leg-targeted.log'
+$env:PHASER_SMOKE_ONLY='checkViewScreenshots,checkReleaseStageRouteBatch'
+node tmp\run-phaser-smoke-with-vite.mjs
+```
+
+All listed checks passed. `npm.cmd run check` reports `manifestAssets=479`, `existingFiles=479`, `missingFiles=0`, and only the existing Vite large JS chunk warning.
+
+Broad smoke note: a full `node tmp\run-phaser-smoke-with-vite.mjs` attempt with progress logging reached `checkBossResultFlow OK`, meaning every logged smoke step reached OK, but the wrapper process did not exit before the 600s command timeout. The targeted route/view smoke above completed with `Phaser smoke OK`. Rerun broad smoke on the next PC if a full wrapper-returning gate is required.
+
+Important limitation: this is still not full WorldMap route recomposition. The current-leg split improves route texture-family evidence, but the route system remains a conservative overlay on top of a neutralized concept underlay. Continue with complete route material, stronger stage-family node variants, lower-node silhouette recomposition, visible tooltip/readability zones, mobile/responsive review, user acceptance, and final concept-match approval next.
