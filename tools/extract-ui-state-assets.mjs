@@ -644,6 +644,15 @@ const targets = [
     nativeSize: { w: 210, h: 220 }
   },
   {
+    key: "ui_locked_stage_far_frame_concept",
+    kind: "locked_stage_frame",
+    source: path.join(rootDir, "assets", "concepts", "ui", "world_map_ui_concept_v001.png"),
+    output: path.join(rootDir, "assets", "source", "ui", "ui_locked_stage_far_frame_concept_v001.png"),
+    crop: { x: 708, y: 222, w: 170, h: 178 },
+    nativeSize: { w: 210, h: 220 },
+    stateVariant: "lockedFar"
+  },
+  {
     key: "ui_locked_stage_body_wash_concept",
     kind: "world_map_stage_body_wash",
     source: path.join(rootDir, "assets", "concepts", "ui", "world_map_ui_concept_v001.png"),
@@ -651,6 +660,15 @@ const targets = [
     crop: { x: 708, y: 222, w: 170, h: 178 },
     nativeSize: { w: 210, h: 220 },
     stateVariant: "locked"
+  },
+  {
+    key: "ui_locked_stage_far_body_wash_concept",
+    kind: "world_map_stage_body_wash",
+    source: path.join(rootDir, "assets", "concepts", "ui", "world_map_ui_concept_v001.png"),
+    output: path.join(rootDir, "assets", "source", "ui", "ui_locked_stage_far_body_wash_concept_v001.png"),
+    crop: { x: 708, y: 222, w: 170, h: 178 },
+    nativeSize: { w: 210, h: 220 },
+    stateVariant: "lockedFar"
   },
   {
     key: "ui_sealed_stage_frame_concept",
@@ -1608,7 +1626,7 @@ try {
         stateVariant: target.stateVariant
       })
       : target.kind === "locked_stage_frame"
-      ? await page.evaluate(async ({ base64, crop, nativeSize }) => {
+      ? await page.evaluate(async ({ base64, crop, nativeSize, stateVariant }) => {
         const image = await new Promise((resolve, reject) => {
           const img = new Image();
           img.onload = () => resolve(img);
@@ -1631,6 +1649,7 @@ try {
         const numberY = nativeSize.h * 0.36;
         const lockX = nativeSize.w * 0.5;
         const lockY = nativeSize.h * 0.67;
+        const lockedFarVariant = stateVariant === "lockedFar";
 
         for (let y = 0; y < nativeSize.h; y += 1) {
           for (let x = 0; x < nativeSize.w; x += 1) {
@@ -1687,7 +1706,10 @@ try {
             const parchment = r > 126 && g > 100 && b > 72 && saturation < 82;
             const brightRoute = r > 168 && g > 158 && b > 136 && saturation < 76;
 
-            let keep = Math.max(red * 1.08, gold * 0.2, darkEdge * 0.28)
+            const colorKeep = lockedFarVariant
+              ? Math.max(red * 0.76, gold * 0.16, darkEdge * 0.2)
+              : Math.max(red * 1.08, gold * 0.2, darkEdge * 0.28);
+            let keep = colorKeep
               * outerMask
               * innerCutout
               * numberCutout
@@ -1700,10 +1722,18 @@ try {
               continue;
             }
 
-            data[offset] = Math.min(255, Math.round(r * 1.05 + red * 22 + gold * 8));
-            data[offset + 1] = Math.min(255, Math.round(g * 0.96 + gold * 10));
-            data[offset + 2] = Math.max(0, Math.round(b * 0.9));
-            data[offset + 3] = Math.round(Math.min(232, 238 * keep * (0.58 + outerFalloff * 0.46)));
+            if (lockedFarVariant) {
+              data[offset] = Math.min(255, Math.round(r * 0.98 + red * 12 + gold * 5));
+              data[offset + 1] = Math.min(255, Math.round(g * 0.94 + gold * 6));
+              data[offset + 2] = Math.max(0, Math.round(b * 0.86));
+            } else {
+              data[offset] = Math.min(255, Math.round(r * 1.05 + red * 22 + gold * 8));
+              data[offset + 1] = Math.min(255, Math.round(g * 0.96 + gold * 10));
+              data[offset + 2] = Math.max(0, Math.round(b * 0.9));
+            }
+            const alphaCap = lockedFarVariant ? 188 : 232;
+            const alphaScale = lockedFarVariant ? 0.78 : 1;
+            data[offset + 3] = Math.round(Math.min(alphaCap, 238 * keep * (0.58 + outerFalloff * 0.46) * alphaScale));
           }
         }
 
@@ -1731,7 +1761,8 @@ try {
       }, {
         base64: sourceBuffer.toString("base64"),
         crop: target.crop,
-        nativeSize: target.nativeSize
+        nativeSize: target.nativeSize,
+        stateVariant: target.stateVariant
       })
       : target.kind === "sealed_stage_frame"
       ? await page.evaluate(async ({ base64, crop, nativeSize, stateVariant }) => {
@@ -1894,6 +1925,8 @@ try {
         const data = imageData.data;
         const centerX = nativeSize.w * 0.49;
         const centerY = nativeSize.h * 0.5;
+        const lockedFarVariant = stateVariant === "lockedFar";
+        const redLockedVariant = stateVariant === "locked" || lockedFarVariant;
         const grayLockedVariant = stateVariant === "sealed" || stateVariant === "dormant" || stateVariant === "dormantMid";
         const completedLateVariant = stateVariant === "completedLate";
         const currentVariant = stateVariant === "current" || stateVariant === "currentLate";
@@ -1901,17 +1934,17 @@ try {
         const dormantMidVariant = stateVariant === "dormantMid";
         const numberY = currentVariant
           ? nativeSize.h * 0.43
-          : stateVariant === "locked"
+          : redLockedVariant
             ? nativeSize.h * 0.32
             : grayLockedVariant
               ? nativeSize.h * 0.35
               : nativeSize.h * 0.36;
-        const numberRx = stateVariant === "locked" ? nativeSize.w * 0.31 : grayLockedVariant ? nativeSize.w * (dormantMidVariant ? 0.29 : 0.27) : completedLateVariant ? nativeSize.w * 0.24 : currentLateVariant ? nativeSize.w * 0.23 : nativeSize.w * 0.21;
-        const numberRy = stateVariant === "locked" ? nativeSize.h * 0.24 : grayLockedVariant ? nativeSize.h * (dormantMidVariant ? 0.23 : 0.22) : completedLateVariant ? nativeSize.h * 0.19 : currentLateVariant ? nativeSize.h * 0.18 : nativeSize.h * 0.17;
-        const lowerIconY = currentVariant ? nativeSize.h * 0.63 : stateVariant === "locked" ? nativeSize.h * 0.67 : grayLockedVariant ? nativeSize.h * 0.72 : nativeSize.h * 0.77;
+        const numberRx = redLockedVariant ? nativeSize.w * (lockedFarVariant ? 0.32 : 0.31) : grayLockedVariant ? nativeSize.w * (dormantMidVariant ? 0.29 : 0.27) : completedLateVariant ? nativeSize.w * 0.24 : currentLateVariant ? nativeSize.w * 0.23 : nativeSize.w * 0.21;
+        const numberRy = redLockedVariant ? nativeSize.h * (lockedFarVariant ? 0.25 : 0.24) : grayLockedVariant ? nativeSize.h * (dormantMidVariant ? 0.23 : 0.22) : completedLateVariant ? nativeSize.h * 0.19 : currentLateVariant ? nativeSize.h * 0.18 : nativeSize.h * 0.17;
+        const lowerIconY = currentVariant ? nativeSize.h * 0.63 : redLockedVariant ? nativeSize.h * 0.67 : grayLockedVariant ? nativeSize.h * 0.72 : nativeSize.h * 0.77;
         const lowerIconX = currentVariant ? nativeSize.w * 0.79 : nativeSize.w * 0.5;
-        const lowerIconRx = currentVariant ? nativeSize.w * 0.18 : stateVariant === "locked" ? nativeSize.w * 0.38 : grayLockedVariant ? nativeSize.w * 0.32 : completedLateVariant ? nativeSize.w * 0.31 : nativeSize.w * 0.28;
-        const lowerIconRy = stateVariant === "locked" ? nativeSize.h * 0.27 : grayLockedVariant ? nativeSize.h * 0.24 : completedLateVariant ? nativeSize.h * 0.22 : nativeSize.h * 0.2;
+        const lowerIconRx = currentVariant ? nativeSize.w * 0.18 : redLockedVariant ? nativeSize.w * 0.38 : grayLockedVariant ? nativeSize.w * 0.32 : completedLateVariant ? nativeSize.w * 0.31 : nativeSize.w * 0.28;
+        const lowerIconRy = redLockedVariant ? nativeSize.h * 0.27 : grayLockedVariant ? nativeSize.h * 0.24 : completedLateVariant ? nativeSize.h * 0.22 : nativeSize.h * 0.2;
 
         for (let y = 0; y < nativeSize.h; y += 1) {
           for (let x = 0; x < nativeSize.w; x += 1) {
@@ -1985,6 +2018,8 @@ try {
               colorKeep = Math.max(silver * 0.82, coolEdge * 0.9, gold * 0.14, darkEdge * 0.16);
             } else if (grayLockedVariant) {
               colorKeep = Math.max(silver * 0.98, coolEdge * 1.04, gold * 0.2, darkEdge * 0.2);
+            } else if (lockedFarVariant) {
+              colorKeep = Math.max(red * 0.8, gold * 0.16, darkEdge * 0.16);
             } else {
               colorKeep = Math.max(red * 1.12, gold * 0.24, darkEdge * 0.2);
             }
@@ -2027,13 +2062,17 @@ try {
               data[offset] = Math.min(255, Math.round(r * 0.98 + gold * 6));
               data[offset + 1] = Math.min(255, Math.round(g * 1.01 + silver * 5));
               data[offset + 2] = Math.min(255, Math.round(b * 1.03 + coolEdge * 9));
+            } else if (lockedFarVariant) {
+              data[offset] = Math.min(255, Math.round(r * 0.98 + red * 12 + gold * 5));
+              data[offset + 1] = Math.min(255, Math.round(g * 0.94 + gold * 6));
+              data[offset + 2] = Math.max(0, Math.round(b * 0.86));
             } else {
               data[offset] = Math.min(255, Math.round(r * 1.05 + red * 20 + gold * 8));
               data[offset + 1] = Math.min(255, Math.round(g * 0.96 + gold * 9));
               data[offset + 2] = Math.max(0, Math.round(b * 0.9));
             }
-            const alphaScale = completedLateVariant || currentLateVariant || dormantMidVariant ? 0.78 : 1;
-            const alphaCap = completedLateVariant ? 178 : currentLateVariant ? 184 : dormantMidVariant ? 176 : 216;
+            const alphaScale = completedLateVariant || currentLateVariant || dormantMidVariant || lockedFarVariant ? 0.78 : 1;
+            const alphaCap = completedLateVariant ? 178 : currentLateVariant ? 184 : dormantMidVariant ? 176 : lockedFarVariant ? 180 : 216;
             data[offset + 3] = Math.round(Math.min(alphaCap, 220 * keep * (0.48 + outerFalloff * 0.36) * alphaScale));
           }
         }

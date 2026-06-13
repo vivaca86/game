@@ -459,7 +459,9 @@ async function runKeyboardStageSelectAudit(browser, baseUrl) {
       const completedBaseFrameImages = visible.filter((child) => child?.type === "Image" && child.texture?.key === "ui_completed_stage_frame_concept" && (child.alpha ?? 1) > 0.05);
       const completedLateFrameImages = visible.filter((child) => child?.type === "Image" && child.texture?.key === "ui_completed_stage_late_frame_concept" && (child.alpha ?? 1) > 0.05);
       const completedFrameImages = [...completedBaseFrameImages, ...completedLateFrameImages];
-      const lockedBodyImages = visible.filter((child) => child?.type === "Image" && child.texture?.key === "ui_locked_stage_body_wash_concept" && (child.alpha ?? 1) > 0.05);
+      const lockedNextBodyImages = visible.filter((child) => child?.type === "Image" && child.texture?.key === "ui_locked_stage_body_wash_concept" && (child.alpha ?? 1) > 0.05);
+      const lockedFarBodyImages = visible.filter((child) => child?.type === "Image" && child.texture?.key === "ui_locked_stage_far_body_wash_concept" && (child.alpha ?? 1) > 0.05);
+      const lockedBodyImages = [...lockedNextBodyImages, ...lockedFarBodyImages];
       const sealedBodyImages = visible.filter((child) => child?.type === "Image" && child.texture?.key === "ui_sealed_stage_body_wash_concept" && (child.alpha ?? 1) > 0.05);
       const sealedFrameImages = visible.filter((child) => child?.type === "Image" && child.texture?.key === "ui_sealed_stage_frame_concept" && (child.alpha ?? 1) > 0.05);
       const dormantBaseBodyImages = visible.filter((child) => child?.type === "Image" && child.texture?.key === "ui_dormant_stage_body_wash_concept" && (child.alpha ?? 1) > 0.05);
@@ -722,16 +724,28 @@ async function runStateOverlayAudit(browser, baseUrl, auditCase) {
         && child.texture?.key === "ui_locked_stage_badge_concept"
         && (child.alpha ?? 1) > 0.05
       ));
-      const lockedBodyImages = visible.filter((child) => (
+      const lockedNextBodyImages = visible.filter((child) => (
         child?.type === "Image"
         && child.texture?.key === "ui_locked_stage_body_wash_concept"
         && (child.alpha ?? 1) > 0.05
       ));
-      const lockedFrameImages = visible.filter((child) => (
+      const lockedFarBodyImages = visible.filter((child) => (
+        child?.type === "Image"
+        && child.texture?.key === "ui_locked_stage_far_body_wash_concept"
+        && (child.alpha ?? 1) > 0.05
+      ));
+      const lockedBodyImages = [...lockedNextBodyImages, ...lockedFarBodyImages];
+      const lockedNextFrameImages = visible.filter((child) => (
         child?.type === "Image"
         && child.texture?.key === "ui_locked_stage_frame_concept"
         && (child.alpha ?? 1) > 0.05
       ));
+      const lockedFarFrameImages = visible.filter((child) => (
+        child?.type === "Image"
+        && child.texture?.key === "ui_locked_stage_far_frame_concept"
+        && (child.alpha ?? 1) > 0.05
+      ));
+      const lockedFrameImages = [...lockedNextFrameImages, ...lockedFarFrameImages];
       const sealedImages = visible.filter((child) => (
         child?.type === "Image"
         && child.texture?.key === "ui_sealed_stage_badge_concept"
@@ -844,6 +858,8 @@ async function runStateOverlayAudit(browser, baseUrl, auditCase) {
       const expectedLocked = stages
         .map((stage, index) => ({ stage, node: stageNodes[index], index }))
         .filter(({ stage, node, index }) => node && !unlockedStageIds.has(stage.id) && index >= 9);
+      const expectedLockedNext = expectedLocked.filter(({ index }) => index === firstLockedIndex);
+      const expectedLockedFar = expectedLocked.filter(({ index }) => index !== firstLockedIndex);
       const expectedSealed = stages
         .map((stage, index) => ({ stage, node: stageNodes[index] }))
         .filter(({ stage, node }, index) => node && !unlockedStageIds.has(stage.id) && index < 9 && index === firstLockedIndex);
@@ -1046,6 +1062,8 @@ async function runStateOverlayAudit(browser, baseUrl, auditCase) {
       };
       const dormantBodyImagesForIndex = (stageIndex) => stageIndex > 4 ? dormantMidBodyImages : dormantBaseBodyImages;
       const dormantFrameImagesForIndex = (stageIndex) => stageIndex > 4 ? dormantMidFrameImages : dormantBaseFrameImages;
+      const lockedBodyImagesForIndex = (stageIndex) => stageIndex === firstLockedIndex ? lockedNextBodyImages : lockedFarBodyImages;
+      const lockedFrameImagesForIndex = (stageIndex) => stageIndex === firstLockedIndex ? lockedNextFrameImages : lockedFarFrameImages;
       const sealedBadgePlacement = (node) => ({
         x: node.x + node.width * 0.01,
         y: node.y + node.height * 0.39
@@ -1087,24 +1105,28 @@ async function runStateOverlayAudit(browser, baseUrl, auditCase) {
           && (image.alpha ?? 1) >= placement.minAlpha;
       });
       const lockedBodiesAtExpectedNodes = expectedLocked.every(({ node, stage }) => {
-        const placement = lockedBodyPlacement(node, stages.findIndex((candidate) => candidate.id === stage.id));
-        return hasImageAt(lockedBodyImages, placement.x, placement.y);
+        const stageIndex = stages.findIndex((candidate) => candidate.id === stage.id);
+        const placement = lockedBodyPlacement(node, stageIndex);
+        return hasImageAt(lockedBodyImagesForIndex(stageIndex), placement.x, placement.y);
       });
       const lockedBodyStyleAtExpectedNodes = expectedLocked.every(({ node, stage }) => {
-        const placement = lockedBodyPlacement(node, stages.findIndex((candidate) => candidate.id === stage.id));
-        const image = imageAt(lockedBodyImages, placement.x, placement.y);
+        const stageIndex = stages.findIndex((candidate) => candidate.id === stage.id);
+        const placement = lockedBodyPlacement(node, stageIndex);
+        const image = imageAt(lockedBodyImagesForIndex(stageIndex), placement.x, placement.y);
         return image
           && Math.abs(image.displayWidth - placement.width) <= 1
           && Math.abs(image.displayHeight - placement.height) <= 1
           && (image.alpha ?? 1) >= placement.minAlpha;
       });
       const lockedFramesAtExpectedNodes = expectedLocked.every(({ node, stage }) => {
-        const placement = lockedFramePlacement(node, stages.findIndex((candidate) => candidate.id === stage.id));
-        return hasImageAt(lockedFrameImages, placement.x, placement.y);
+        const stageIndex = stages.findIndex((candidate) => candidate.id === stage.id);
+        const placement = lockedFramePlacement(node, stageIndex);
+        return hasImageAt(lockedFrameImagesForIndex(stageIndex), placement.x, placement.y);
       });
       const lockedFrameStyleAtExpectedNodes = expectedLocked.every(({ node, stage }) => {
-        const placement = lockedFramePlacement(node, stages.findIndex((candidate) => candidate.id === stage.id));
-        const image = imageAt(lockedFrameImages, placement.x, placement.y);
+        const stageIndex = stages.findIndex((candidate) => candidate.id === stage.id);
+        const placement = lockedFramePlacement(node, stageIndex);
+        const image = imageAt(lockedFrameImagesForIndex(stageIndex), placement.x, placement.y);
         return image
           && Math.abs(image.displayWidth - placement.width) <= 1
           && Math.abs(image.displayHeight - placement.height) <= 1
@@ -1294,7 +1316,11 @@ async function runStateOverlayAudit(browser, baseUrl, auditCase) {
           && currentBaseFrameImages.length === (expectedLateCurrent ? 0 : 1)
           && currentLateFrameImages.length === (expectedLateCurrent ? 1 : 0)
           && lockedBodyImages.length === expectedLocked.length
+          && lockedNextBodyImages.length === expectedLockedNext.length
+          && lockedFarBodyImages.length === expectedLockedFar.length
           && lockedFrameImages.length === expectedLocked.length
+          && lockedNextFrameImages.length === expectedLockedNext.length
+          && lockedFarFrameImages.length === expectedLockedFar.length
           && lockedImages.length === expectedLocked.length
           && sealedBodyImages.length === expectedSealed.length
           && sealedFrameImages.length === expectedSealed.length
@@ -1391,10 +1417,18 @@ async function runStateOverlayAudit(browser, baseUrl, auditCase) {
         completedFrameStyleAtExpectedNodes,
         visibleLockedBodies: lockedBodyImages.length,
         expectedLockedBodies: expectedLocked.length,
+        visibleLockedNextBodies: lockedNextBodyImages.length,
+        expectedLockedNextBodies: expectedLockedNext.length,
+        visibleLockedFarBodies: lockedFarBodyImages.length,
+        expectedLockedFarBodies: expectedLockedFar.length,
         lockedBodiesAtExpectedNodes,
         lockedBodyStyleAtExpectedNodes,
         visibleLockedFrames: lockedFrameImages.length,
         expectedLockedFrames: expectedLocked.length,
+        visibleLockedNextFrames: lockedNextFrameImages.length,
+        expectedLockedNextFrames: expectedLockedNext.length,
+        visibleLockedFarFrames: lockedFarFrameImages.length,
+        expectedLockedFarFrames: expectedLockedFar.length,
         lockedFramesAtExpectedNodes,
         lockedFrameStyleAtExpectedNodes,
         visibleLockedBadges: lockedImages.length,

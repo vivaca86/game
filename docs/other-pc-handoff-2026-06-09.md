@@ -6,8 +6,8 @@ Repository:
 
 - GitHub: `https://github.com/vivaca86/game.git`
 - Branch: `main`
-- Latest pushed commit at handoff time: `76dce417a87e63e9f276d43ed9db618f073dfb10`
-- Commit title: `Add Dungeon keyboard focus feedback`
+- Latest pushed commit: run `git log -1 --oneline` after pulling.
+- Expected latest commit title after the 2026-06-13 far red locked-node continuation: `Add WorldMap far locked node variants`
 
 ## Start On Another PC
 
@@ -19,10 +19,10 @@ git status -sb
 npm install
 ```
 
-Expected first commit in `git log --oneline -5`:
+Expected first commit title in `git log --oneline -5` after the latest continuation:
 
 ```text
-76dce41 Add Dungeon keyboard focus feedback
+Add WorldMap far locked node variants
 ```
 
 Expected status:
@@ -39,7 +39,7 @@ The user rejected procedural/vector-looking UI. Continue with these rules:
 - Do not add Phaser rectangle/stroke/vector overlays as visible UI on concept screens.
 - Keyboard focus must reuse the same bitmap language as pointer hover/down where possible.
 - Do not introduce a new focus ring, tint, generic badge, or new visual style without matching the concept source.
-- Keep completion language conservative. Current estimate is about 75%, not final.
+- Keep completion language conservative. Current estimate is about 88%, not final and not 95%.
 
 Main reference docs:
 
@@ -48,7 +48,7 @@ Main reference docs:
 
 ## Latest Completed Work
 
-Recent commits, newest first:
+Older reference commits from the first handoff period:
 
 - `76dce41` - Dungeon keyboard focus feedback.
 - `87fb0e1` - Combat/Boss keyboard focus feedback.
@@ -557,3 +557,38 @@ node tmp\run-phaser-smoke-with-vite.mjs
 All listed checks passed. `npm.cmd run check` reports `manifestAssets=483`, `existingFiles=483`, `missingFiles=0`, and only the existing Vite large JS chunk warning.
 
 Important limitation: this is still not full WorldMap dormant-node recomposition. The mid dormant split improves one lower/mid locked-node family gap, but dormant nodes still need stronger stage-specific bodies, lower-node silhouette recomposition, complete route material, visible tooltip/readability zones, mobile/responsive review, user acceptance, and final concept-match approval next.
+
+## 2026-06-13 Far Red Locked-Node Stack Variant WIP Continuation
+
+Status remains `Partially complete`.
+
+Current estimate is about 88% of the active UI goal, not 95%.
+
+Additional local continuation work:
+
+- Added first conservative WorldMap far red locked-node material:
+  - `ui_locked_stage_far_body_wash_concept`
+  - `ui_locked_stage_far_frame_concept`
+- Both assets are extracted from the red locked-node crop in `assets/concepts/ui/world_map_ui_concept_v001.png`, but processed as quieter `lockedFar` variants.
+- `WorldMapScene` now keeps the base red locked body/frame textures for the first/next red locked node and uses the far red locked body/frame textures for other upper red locked nodes when those textures exist.
+- `src/data/releaseCatalogAdapter.ts`, `src/data/assetManifest.slice.v1.json`, `docs/asset-manifest.slice.v1.json`, and `tools/generate-dev-runtime-assets.mjs` now register the far locked body/frame assets for dev/runtime and release paths.
+- `tmp/ui-worldmap-action-hit-target-audit.mjs` now splits locked body/frame verification into next and far counts. Default state reports 0 next + 6 far locked bodies/frames. Stage-4-progress reports 0 next + 6 far locked bodies/frames. Stage-9 late-progress reports 1 next + 5 far locked bodies/frames.
+
+Verification for this continuation:
+
+```powershell
+node tools\extract-ui-state-assets.mjs
+npm.cmd run assets:generate:dev
+node tmp\ui-worldmap-action-hit-target-audit.mjs
+node tmp\route-node-raster-hover-state-audit.mjs
+npm.cmd run check
+git diff --check
+$env:PHASER_SMOKE_PROGRESS='1'
+$env:PHASER_SMOKE_PROGRESS_FILE='tmp/phaser-smoke-progress-worldmap-locked-far-stack-targeted.log'
+$env:PHASER_SMOKE_ONLY='checkViewScreenshots,checkReleaseStageRouteBatch'
+node tmp\run-phaser-smoke-with-vite.mjs
+```
+
+All listed checks passed. `npm.cmd run check` reports `manifestAssets=485`, `existingFiles=485`, `missingFiles=0`, and only the existing Vite large JS chunk warning.
+
+Important limitation: this is still not full WorldMap locked-node recomposition. The far red locked split improves one upper locked-node family gap, but locked nodes still need stronger stage-specific bodies, lower-node silhouette recomposition, complete route material, visible tooltip/readability zones, mobile/responsive review, user acceptance, and final concept-match approval next.
