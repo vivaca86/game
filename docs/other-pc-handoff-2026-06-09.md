@@ -7,7 +7,7 @@ Repository:
 - GitHub: `https://github.com/vivaca86/game.git`
 - Branch: `main`
 - Latest pushed commit: run `git log -1 --oneline` after pulling.
-- Expected latest commit title after the 2026-06-14 mobile-landscape readability continuation: `Audit mobile landscape readability`
+- Expected latest commit title after the 2026-06-14 mobile-landscape focus/disabled continuation: `Audit landscape focus disabled states`
 
 ## Start On Another PC
 
@@ -22,7 +22,7 @@ npm install
 Expected first commit title in `git log --oneline -5` after the latest continuation:
 
 ```text
-Audit mobile landscape readability
+Audit landscape focus disabled states
 ```
 
 Expected status:
@@ -1857,3 +1857,39 @@ Representative evidence:
 - `tmp/ui-quality/mobile-framing/worldmap-framing-v1-mobile-landscape-844x390.png`
 
 Important limitation: this strengthens mobile landscape responsive/readability evidence for the current 95% candidate, but it is not final mobile UX approval, final UI approval, user acceptance, or release-ready proof.
+
+## 2026-06-14 Mobile Landscape Focus/Disabled Continuation
+
+Status remains `95% candidate, not final`.
+
+Latest implementation/audit continuation:
+
+- Expanded `tools/ui-keyboard-focus-tooltip-audit.mjs` with `mobile-landscape-844x390`.
+- Expanded `tools/ui-disabled-readability-audit.mjs` with `mobile-landscape-844x390`.
+- Expanded `tools/ui-worldmap-locked-tooltip-audit.mjs` with `mobile-landscape-844x390`.
+- Focus-triggered tooltips, disabled-control explanations, and WorldMap locked-node explanations now use the same four-viewport policy as the latest responsive/readability gate.
+
+Commands:
+
+```powershell
+node tools\ui-keyboard-focus-tooltip-audit.mjs
+node tools\ui-disabled-readability-audit.mjs
+node tools\ui-worldmap-locked-tooltip-audit.mjs
+```
+
+Result:
+
+- `node tools\ui-keyboard-focus-tooltip-audit.mjs` passed 108 focus-tooltip cases: 27 targets across 1920x1080, 1280x720, 390x844 portrait, and 844x390 landscape.
+- `node tools\ui-disabled-readability-audit.mjs` passed 12 disabled-readability cases: Event unaffordable choice, Combat cost-disabled card, and Boss cost-disabled card across the same four viewports.
+- `node tools\ui-worldmap-locked-tooltip-audit.mjs` passed 20 WorldMap locked-node cases: sealed-next, dormant-mid, red-far, red-next, and red-boss across the same four viewports.
+- The first focus audit attempt used a shorter 240-second command timeout and was stopped; the longer rerun passed and is the valid evidence.
+
+Representative evidence:
+
+- `tmp/ui-quality/focus-tooltips/combat-end-turn-focus-tooltip-v1-mobile-landscape-844x390.png`
+- `tmp/ui-quality/focus-tooltips/settings-return-town-focus-tooltip-v1-mobile-landscape-844x390.png`
+- `tmp/ui-quality/disabled-readability/combat-disabled-card-tooltip-v1-mobile-landscape-844x390.png`
+- `tmp/ui-quality/disabled-readability/boss-disabled-card-tooltip-v1-mobile-landscape-844x390.png`
+- `tmp/ui-quality/worldmap-locked-tooltips/red-boss-locked-tooltip-v1-mobile-landscape-844x390.png`
+
+Important limitation: this strengthens mobile landscape focus/disabled/readability evidence for the current 95% candidate, but it is not final full focus approval, full disabled approval, final mobile UX approval, user acceptance, or release-ready proof.
