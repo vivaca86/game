@@ -7,7 +7,7 @@ Repository:
 - GitHub: `https://github.com/vivaca86/game.git`
 - Branch: `main`
 - Latest pushed commit: run `git log -1 --oneline` after pulling.
-- Expected latest commit title after the 2026-06-14 WorldMap open-node tooltip continuation: `Audit WorldMap open node tooltips`
+- Expected latest commit title after the 2026-06-14 WorldMap open-node down continuation: `Audit WorldMap open node down states`
 
 ## Start On Another PC
 
@@ -22,7 +22,7 @@ npm install
 Expected first commit title in `git log --oneline -5` after the latest continuation:
 
 ```text
-Audit WorldMap open node tooltips
+Audit WorldMap open node down states
 ```
 
 Expected status:
@@ -1236,3 +1236,42 @@ Representative evidence:
 - `tmp/ui-quality/worldmap-open-node-tooltips/boss-open-open-node-tooltip-v1-mobile-390x844.png`
 
 Important limitation: this strengthens open stage-node pointer readability evidence, but it is still not full WorldMap node/body recomposition, final selected/focus approval, user acceptance, or release-ready UI.
+
+## 2026-06-14 WorldMap Open Node Down-State Audit Continuation
+
+Status remains `95% candidate, not final`.
+
+Additional local continuation work:
+
+- Added `tools/ui-worldmap-open-node-down-audit.mjs`.
+- The new audit verifies unlocked WorldMap stage-node pointer-down/pressed paths for lower-open, mid-open, and boss-open route families.
+- It checks that the pressed node uses the concept-derived `ui_current_stage_halo_concept` down state at the expected pressed size and alpha, keeps the choice-tone tooltip visible, avoids Phaser text/vector overlay leaks, stays safely placed on desktop/mobile, and selects the pressed stage on pointer up.
+
+Verification for this continuation:
+
+```powershell
+node tools\ui-worldmap-open-node-down-audit.mjs
+node tools\ui-worldmap-open-node-tooltip-audit.mjs
+node tools\ui-worldmap-keyboard-tooltip-audit.mjs
+npx.cmd tsc --noEmit
+git diff --check
+npm.cmd run check
+$env:PHASER_SMOKE_PROGRESS='1'
+$env:PHASER_SMOKE_PROGRESS_FILE='tmp/phaser-smoke-progress-worldmap-open-node-down-targeted.log'
+$env:PHASER_SMOKE_ONLY='checkViewScreenshots,checkClickableControls,checkFullInputCoverage,checkUiSkinStates'
+node tmp\run-phaser-smoke-with-vite.mjs
+```
+
+All listed checks passed. The new open-node down audit passed with 9 cases:
+
+- lower-open to `stage_sunny_gate` at 1920, 1280, and 390x844, pressed halo `288x306`, alpha `0.98`.
+- mid-open to `stage_prism_school` at 1920, 1280, and 390x844, pressed halo `273x290`, alpha `0.98`.
+- boss-open to `stage_dream_arcade` at 1920, 1280, and 390x844, pressed halo `326x347`, alpha `0.98`.
+
+Representative evidence:
+
+- `tmp/ui-quality/worldmap-open-node-down/boss-open-open-node-down-v1-1920.png`
+- `tmp/ui-quality/worldmap-open-node-down/boss-open-open-node-down-v1-desktop-1280.png`
+- `tmp/ui-quality/worldmap-open-node-down/boss-open-open-node-down-v1-mobile-390x844.png`
+
+Important limitation: this strengthens open stage-node pressed/down evidence, but it is still not full WorldMap node/body recomposition, final selected/focus approval, user acceptance, or release-ready UI.

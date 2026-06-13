@@ -1458,3 +1458,10 @@
 - Impact: The project could prove that stage nodes were clickable through broader input smoke, but not that open lower/mid/boss nodes showed the same safe choice-tone tooltip and concept-derived hover halo without Phaser text/vector leakage.
 - Resolution: Added `tools/ui-worldmap-open-node-tooltip-audit.mjs`. It verifies lower-open, mid-open, and boss-open unlocked nodes across 1920x1080, 1280x720, and 390x844, requiring choice-tone tooltip content, exactly two halo images during hover, safe desktop/mobile placement, and successful click selection into the hovered stage.
 - Prevention: Keep pointer hover, keyboard selection, and locked/disabled node audits separate. A WorldMap node family should not be counted as fully readable unless all relevant input paths have evidence.
+
+### Problem: Open WorldMap stage-node pressed state had no route-family audit
+
+- Cause: The open-node pointer audit proved hover tooltip and click selection, but it did not freeze the pointer-down moment. WorldMap nodes use the same concept halo family for hover and down with different pressed sizing/alpha, so hover evidence alone could not prove the pressed state.
+- Impact: The UI could claim broader pointer coverage while still missing proof that lower, mid, and boss stage nodes show an intentional pressed bitmap state without falling back to generic vectors or invisible feedback.
+- Resolution: Added `tools/ui-worldmap-open-node-down-audit.mjs`. It verifies lower-open, mid-open, and boss-open nodes across 1920x1080, 1280x720, and 390x844, requiring the expected pressed halo dimensions, alpha `0.98`, retained choice-tone tooltip, no Phaser text/vector leak, safe placement, and pointer-up stage selection.
+- Prevention: For WorldMap node families, keep hover/click and pressed/down audits separate when the same bitmap family is reused at different size/alpha. A working click path is not enough evidence for pressed-state visual quality.
