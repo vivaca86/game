@@ -1,0 +1,490 @@
+import { mkdir } from "node:fs/promises";
+import { createRequire } from "node:module";
+import Module from "node:module";
+import path from "node:path";
+import { createServer } from "vite";
+
+const require = createRequire(import.meta.url);
+const bundledNodeModules = "C:/Users/i/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules";
+const bundledPnpmModules = `${bundledNodeModules}/.pnpm/node_modules`;
+process.env.NODE_PATH = [process.env.NODE_PATH, bundledNodeModules, bundledPnpmModules].filter(Boolean).join(";");
+Module._initPaths();
+
+const stageNodes = [
+  { x: 586, y: 760, width: 150, height: 150 },
+  { x: 808, y: 756, width: 150, height: 150 },
+  { x: 1000, y: 744, width: 150, height: 150 },
+  { x: 1168, y: 704, width: 164, height: 164 },
+  { x: 1328, y: 574, width: 150, height: 150 },
+  { x: 1168, y: 462, width: 142, height: 142 },
+  { x: 914, y: 486, width: 142, height: 142 },
+  { x: 760, y: 496, width: 142, height: 142 },
+  { x: 606, y: 486, width: 142, height: 142 },
+  { x: 648, y: 264, width: 150, height: 150 },
+  { x: 790, y: 304, width: 142, height: 142 },
+  { x: 960, y: 304, width: 142, height: 142 },
+  { x: 1094, y: 304, width: 142, height: 142 },
+  { x: 1252, y: 166, width: 170, height: 170 },
+  { x: 1378, y: 306, width: 170, height: 170 }
+];
+
+const auditCases = [
+  {
+    key: "lower-open",
+    seed: { completedCount: 2, currentStageIndex: 1 },
+    targetIndex: 0
+  },
+  {
+    key: "mid-open",
+    seed: { completedCount: 9, currentStageIndex: 8 },
+    targetIndex: 7
+  },
+  {
+    key: "boss-open",
+    seed: { completedCount: 14, currentStageIndex: 12 },
+    targetIndex: 13
+  }
+];
+
+const viewports = [
+  { key: "desktop-1920", suffix: "1920", width: 1920, height: 1080 },
+  { key: "desktop-1280", suffix: "desktop-1280", width: 1280, height: 720 },
+  { key: "mobile-390x844", suffix: "mobile-390x844", width: 390, height: 844 }
+];
+
+await mkdir("tmp/ui-quality/worldmap-open-node-selection", { recursive: true });
+
+const { chromium } = loadPlaywright();
+const executableCandidates = [
+  "C:/Users/i/AppData/Local/ms-playwright/chromium-1217/chrome-win64/chrome.exe",
+  "C:/Program Files/Google/Chrome/Application/chrome.exe",
+  "C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe"
+];
+
+let browser;
+let server;
+let baseUrl;
+
+try {
+  ({ server, baseUrl } = await startServer());
+  browser = await launchBrowser();
+  const page = await browser.newPage({ viewport: { width: 1920, height: 1080 }, deviceScaleFactor: 1 });
+  const results = [];
+
+  for (const viewport of viewports) {
+    await page.setViewportSize({ width: viewport.width, height: viewport.height });
+
+    for (const auditCase of auditCases) {
+      const seeded = await seedWorldMapState(page, baseUrl, auditCase);
+      const targetNode = stageNodes[auditCase.targetIndex];
+      if (!targetNode) throw new Error(`${auditCase.key}: missing target node`);
+
+      const canvas = page.locator("canvas");
+      const box = await canvas.boundingBox();
+      if (!box) throw new Error(`${auditCase.key}/${viewport.key}: missing canvas`);
+      const targetX = box.x + (targetNode.x / 1920) * box.width;
+      const targetY = box.y + (targetNode.y / 1080) * box.height;
+
+      await page.mouse.click(targetX, targetY);
+      await page.waitForFunction((expectedStageId) => {
+        const game = window.__paperGame;
+        const scene = game?.scene?.getScenes?.(true)?.find((candidate) => candidate.scene?.key === "WorldMapScene")
+          ?? game?.scene?.getScene?.("WorldMapScene");
+        const context = scene?.registry?.get?.("bootContext");
+        return context?.run?.stageId === expectedStageId;
+      }, seeded.targetStageId, { timeout: 10000 });
+      await page.mouse.move(4, 4);
+      await page.waitForTimeout(140);
+
+      const selectionAudit = await readWorldMapOpenNodeSelectionAudit(page, auditCase);
+      assertWorldMapOpenNodeSelection(`${auditCase.key}/${viewport.key}`, selectionAudit, seeded, auditCase);
+
+      const screenshot = path.join("tmp", "ui-quality", "worldmap-open-node-selection", `${auditCase.key}-open-node-selection-v1-${viewport.suffix}.png`);
+      await page.screenshot({ path: screenshot, fullPage: true });
+
+      results.push({
+        label: auditCase.key,
+        viewport: viewport.key,
+        stageId: selectionAudit.currentStageId,
+        targetIndex: auditCase.targetIndex,
+        lateCurrent: selectionAudit.expectedLateCurrent,
+        currentBody: selectionAudit.visibleCurrentLateBodyImages === 1 ? "late" : "base",
+        screenshot: path.resolve(screenshot)
+      });
+    }
+  }
+
+  console.log(JSON.stringify({ ok: true, baseUrl, results }, null, 2));
+} finally {
+  await browser?.close();
+  await server?.close();
+}
+
+function loadPlaywright() {
+  try {
+    return require("playwright");
+  } catch {
+    return require(`${bundledNodeModules}/playwright`);
+  }
+}
+
+async function startServer() {
+  for (const port of [4265, 4266, 4267, 4268, 4269]) {
+    try {
+      const viteServer = await createServer({
+        root: process.cwd(),
+        logLevel: "silent",
+        server: { host: "127.0.0.1", port, strictPort: true }
+      });
+      await viteServer.listen();
+      return { server: viteServer, baseUrl: `http://127.0.0.1:${port}/` };
+    } catch (error) {
+      if (!String(error?.message ?? error).includes("Port")) throw error;
+    }
+  }
+  throw new Error("No free WorldMap open-node selection audit port found");
+}
+
+async function launchBrowser() {
+  let launchError;
+  for (const executablePath of [null, ...executableCandidates]) {
+    try {
+      return await chromium.launch(executablePath ? { headless: true, executablePath } : { headless: true });
+    } catch (error) {
+      launchError = error;
+    }
+  }
+  throw launchError;
+}
+
+async function seedWorldMapState(page, baseUrl, auditCase) {
+  await page.goto(new URL("/?data=release&entry=world_map&resetSave=1", baseUrl).href, { waitUntil: "networkidle" });
+  await waitForScene(page, "WorldMapScene");
+  const seeded = await page.evaluate(({ completedCount, currentStageIndex, targetIndex }) => {
+    const game = window.__paperGame;
+    const scene = game?.scene?.getScene?.("WorldMapScene");
+    const context = scene?.registry?.get?.("bootContext");
+    if (!context?.save?.currentRun) {
+      return { ok: false, reason: "missing boot context or current run" };
+    }
+    const completedStageIds = context.dataBundle.stages.slice(0, completedCount).map((stage) => stage.id);
+    const currentStageId = context.dataBundle.stages[currentStageIndex]?.id;
+    const targetStageId = context.dataBundle.stages[targetIndex]?.id;
+    if (completedStageIds.length !== completedCount || !currentStageId || !targetStageId) {
+      return { ok: false, reason: "missing release stages" };
+    }
+
+    context.save.profile.completedStages = completedStageIds;
+    context.save.profile.unlockedStages = [...new Set([...completedStageIds, currentStageId])];
+    context.save.currentRun = {
+      ...context.save.currentRun,
+      phase: "world_map",
+      stageId: currentStageId,
+      roomIndex: 0,
+      completedStages: completedStageIds,
+      log: [...new Set([...(context.save.currentRun.log ?? []), "audit:worldmap_open_node_selection"])]
+    };
+    localStorage.setItem("paper_theater_card_crawler_save_v1", JSON.stringify(context.save));
+    return { ok: true, completedStageIds, currentStageId, targetStageId };
+  }, { ...auditCase.seed, targetIndex: auditCase.targetIndex });
+  if (!seeded.ok) {
+    throw new Error(`WorldMap open-node selection seed failed: ${JSON.stringify(seeded)}`);
+  }
+
+  await page.goto(new URL("/?data=release&entry=world_map", baseUrl).href, { waitUntil: "networkidle" });
+  await waitForScene(page, "WorldMapScene");
+  await hideDebugOverlay(page);
+  return seeded;
+}
+
+async function waitForScene(page, sceneName) {
+  await page.waitForSelector("canvas", { timeout: 20000 });
+  await page.waitForFunction((expectedScene) => {
+    const game = window.__paperGame;
+    return Boolean(game?.scene?.getScenes?.(true)?.some((scene) => scene.scene?.key === expectedScene));
+  }, sceneName, { timeout: 20000 });
+}
+
+async function hideDebugOverlay(page) {
+  await page.evaluate(() => {
+    const overlay = document.getElementById("debug-overlay");
+    if (overlay) overlay.style.display = "none";
+  });
+}
+
+async function readWorldMapOpenNodeSelectionAudit(page, auditCase) {
+  return page.evaluate(({ auditCase, stageNodes }) => {
+    const game = window.__paperGame;
+    const scene = game?.scene?.getScenes?.(true)?.find((candidate) => candidate.scene?.key === "WorldMapScene")
+      ?? game?.scene?.getScene?.("WorldMapScene");
+    const context = scene?.registry?.get?.("bootContext");
+    const children = scene?.children?.list ?? [];
+    const visible = children.filter((child) => child?.visible !== false && child.alpha !== 0);
+    const stages = context?.dataBundle?.stages ?? [];
+    const currentStageId = context?.run?.stageId;
+    const currentIndex = stages.findIndex((stage) => stage.id === currentStageId);
+    const currentNode = stageNodes[currentIndex];
+    const targetStage = stages[auditCase.targetIndex];
+    const underlayIndex = children.findIndex((child) => (
+      child?.type === "Image"
+      && child.texture?.key === "world_map_raster_underlay_concept"
+      && child.visible !== false
+      && child.alpha !== 0
+    ));
+    const underlayDepth = children[underlayIndex]?.depth ?? 0;
+    const imageByKey = (key) => visible.filter((child) => (
+      child?.type === "Image"
+      && child.texture?.key === key
+      && Number(child.alpha ?? 1) > 0.05
+    ));
+    const markerImages = imageByKey("ui_current_stage_marker_concept");
+    const currentBaseBodyImages = imageByKey("ui_current_stage_body_wash_concept");
+    const currentLateBodyImages = imageByKey("ui_current_stage_late_body_wash_concept");
+    const currentBodyImages = [...currentBaseBodyImages, ...currentLateBodyImages];
+    const currentBaseFrameImages = imageByKey("ui_current_stage_frame_concept");
+    const currentLateFrameImages = imageByKey("ui_current_stage_late_frame_concept");
+    const currentFrameImages = [...currentBaseFrameImages, ...currentLateFrameImages];
+    const haloImages = imageByKey("ui_current_stage_halo_concept");
+    const statusImages = imageByKey("ui_current_stage_status_badge_concept");
+    const completedImages = [
+      ...imageByKey("ui_completed_stage_badge_concept"),
+      ...imageByKey("ui_completed_stage_late_badge_concept")
+    ];
+    const completedBodyImages = [
+      ...imageByKey("ui_completed_stage_body_wash_concept"),
+      ...imageByKey("ui_completed_stage_late_body_wash_concept")
+    ];
+    const completedFrameImages = [
+      ...imageByKey("ui_completed_stage_frame_concept"),
+      ...imageByKey("ui_completed_stage_late_frame_concept")
+    ];
+    const lockedBadgeImages = imageByKey("ui_locked_stage_badge_concept");
+    const lockedBodyImages = [
+      ...imageByKey("ui_locked_stage_body_wash_concept"),
+      ...imageByKey("ui_locked_stage_far_body_wash_concept"),
+      ...imageByKey("ui_locked_stage_boss_body_wash_concept")
+    ];
+    const lockedFrameImages = [
+      ...imageByKey("ui_locked_stage_frame_concept"),
+      ...imageByKey("ui_locked_stage_far_frame_concept"),
+      ...imageByKey("ui_locked_stage_boss_frame_concept")
+    ];
+    const sealedBadgeImages = imageByKey("ui_sealed_stage_badge_concept");
+    const sealedBodyImages = [
+      ...imageByKey("ui_sealed_stage_body_wash_concept"),
+      ...imageByKey("ui_sealed_stage_mid_body_wash_concept")
+    ];
+    const sealedFrameImages = [
+      ...imageByKey("ui_sealed_stage_frame_concept"),
+      ...imageByKey("ui_sealed_stage_mid_frame_concept")
+    ];
+    const dormantBodyImages = [
+      ...imageByKey("ui_dormant_stage_body_wash_concept"),
+      ...imageByKey("ui_dormant_stage_mid_body_wash_concept")
+    ];
+    const dormantFrameImages = [
+      ...imageByKey("ui_dormant_stage_frame_concept"),
+      ...imageByKey("ui_dormant_stage_mid_frame_concept")
+    ];
+    const visibleTextCount = visible.filter((child) => (
+      child?.type === "Text"
+      && String(child.text ?? "").trim().length > 0
+    )).length;
+    const visibleRectsAboveUnderlay = visible
+      .filter((child) => child?.type === "Rectangle")
+      .filter((child) => child.depth > underlayDepth || children.indexOf(child) > underlayIndex)
+      .filter((child) => {
+        const fillAlpha = Number(child?.fillAlpha ?? child?.alpha ?? 1);
+        const strokeAlpha = Number(child?.strokeAlpha ?? child?.lineAlpha ?? 0);
+        const strokeWidth = Number(child?.lineWidth ?? child?.strokeWidth ?? 0);
+        return (child?.isFilled && fillAlpha > 0.02) || (child?.isStroked && strokeWidth > 0 && strokeAlpha > 0.02);
+      }).length;
+    const expectedLateCurrent = currentIndex > 4;
+    const expectedBodyImages = expectedLateCurrent ? currentLateBodyImages : currentBaseBodyImages;
+    const expectedFrameImages = expectedLateCurrent ? currentLateFrameImages : currentBaseFrameImages;
+    const markerAtCurrentStage = markerImages.length === 1
+      && currentNode
+      && Math.abs(markerImages[0].x - (currentNode.x + 4)) <= 1
+      && Math.abs(markerImages[0].y - (currentNode.y - Math.max(88, currentNode.height * 0.62))) <= 1
+      && Math.abs(markerImages[0].displayWidth - 76) <= 1
+      && Math.abs(markerImages[0].displayHeight - 86) <= 1
+      && Number(markerImages[0].alpha ?? 1) >= 0.96;
+    const haloAtCurrentStage = haloImages.length === 1
+      && currentNode
+      && Math.abs(haloImages[0].x - (currentNode.x + 2)) <= 1
+      && Math.abs(haloImages[0].y - (currentNode.y + 4)) <= 1
+      && Math.abs(haloImages[0].displayWidth - currentNode.width * 1.78) <= 1
+      && Math.abs(haloImages[0].displayHeight - currentNode.height * 1.9) <= 1
+      && Number(haloImages[0].alpha ?? 1) >= 0.72;
+    const bodyAtCurrentStage = currentBodyImages.length === 1
+      && expectedBodyImages.length === 1
+      && (expectedLateCurrent ? currentBaseBodyImages.length === 0 : currentLateBodyImages.length === 0)
+      && currentNode
+      && Math.abs(expectedBodyImages[0].x - (currentNode.x + currentNode.width * 0.02)) <= 1
+      && Math.abs(expectedBodyImages[0].y - (currentNode.y + currentNode.height * 0.04)) <= 1
+      && Math.abs(expectedBodyImages[0].displayWidth - currentNode.width * 1.12) <= 1
+      && Math.abs(expectedBodyImages[0].displayHeight - currentNode.height * 1.16) <= 1
+      && Number(expectedBodyImages[0].alpha ?? 1) >= 0.64;
+    const frameAtCurrentStage = currentFrameImages.length === 1
+      && expectedFrameImages.length === 1
+      && (expectedLateCurrent ? currentBaseFrameImages.length === 0 : currentLateFrameImages.length === 0)
+      && currentNode
+      && Math.abs(expectedFrameImages[0].x - (currentNode.x + currentNode.width * 0.02)) <= 1
+      && Math.abs(expectedFrameImages[0].y - (currentNode.y + currentNode.height * 0.01)) <= 1
+      && Math.abs(expectedFrameImages[0].displayWidth - currentNode.width * 1.34) <= 1
+      && Math.abs(expectedFrameImages[0].displayHeight - currentNode.height * 1.38) <= 1
+      && Number(expectedFrameImages[0].alpha ?? 1) >= 0.88;
+    const statusAtCurrentStage = statusImages.length === 1
+      && currentNode
+      && Math.abs(statusImages[0].x - (currentNode.x + currentNode.width * 0.1)) <= 1
+      && Math.abs(statusImages[0].y - (currentNode.y + currentNode.height * 0.36)) <= 1
+      && Math.abs(statusImages[0].displayWidth - 72) <= 1
+      && Math.abs(statusImages[0].displayHeight - 72) <= 1
+      && Number(statusImages[0].alpha ?? 1) >= 0.96;
+    const notNearCurrentNode = (image, scale) => !currentNode || (
+      Math.abs(image.x - currentNode.x) >= currentNode.width * scale
+      || Math.abs(image.y - currentNode.y) >= currentNode.height * scale
+    );
+    const currentHasNoCompletedBadge = completedImages.every((image) => notNearCurrentNode(image, 0.6));
+    const currentHasNoCompletedBody = completedBodyImages.every((image) => notNearCurrentNode(image, 0.72));
+    const currentHasNoCompletedFrame = completedFrameImages.every((image) => notNearCurrentNode(image, 0.72));
+    const currentHasNoLockedBadge = [...lockedBadgeImages, ...sealedBadgeImages].every((image) => notNearCurrentNode(image, 0.6));
+    const currentHasNoLockedBody = lockedBodyImages.every((image) => notNearCurrentNode(image, 0.72));
+    const currentHasNoLockedFrame = lockedFrameImages.every((image) => notNearCurrentNode(image, 0.72));
+    const currentHasNoSealedBody = sealedBodyImages.every((image) => notNearCurrentNode(image, 0.72));
+    const currentHasNoSealedFrame = sealedFrameImages.every((image) => notNearCurrentNode(image, 0.72));
+    const currentHasNoDormantBody = dormantBodyImages.every((image) => notNearCurrentNode(image, 0.72));
+    const currentHasNoDormantFrame = dormantFrameImages.every((image) => notNearCurrentNode(image, 0.72));
+    const tooltip = document.getElementById("game-readability-tooltip");
+    const log = context?.run?.log ?? [];
+
+    return {
+      activeScene: game?.scene?.getScenes?.(true)?.[0]?.scene?.key ?? "none",
+      currentStageId,
+      currentIndex,
+      targetStageId: targetStage?.id,
+      targetStageName: targetStage?.displayNameKo,
+      expectedLateCurrent,
+      underlayVisible: underlayIndex >= 0,
+      visibleCurrentMarkerImages: markerImages.length,
+      markerAtCurrentStage: Boolean(markerAtCurrentStage),
+      visibleCurrentHaloImages: haloImages.length,
+      haloAtCurrentStage: Boolean(haloAtCurrentStage),
+      visibleCurrentBodyImages: currentBodyImages.length,
+      visibleCurrentBaseBodyImages: currentBaseBodyImages.length,
+      visibleCurrentLateBodyImages: currentLateBodyImages.length,
+      bodyAtCurrentStage: Boolean(bodyAtCurrentStage),
+      visibleCurrentFrameImages: currentFrameImages.length,
+      visibleCurrentBaseFrameImages: currentBaseFrameImages.length,
+      visibleCurrentLateFrameImages: currentLateFrameImages.length,
+      frameAtCurrentStage: Boolean(frameAtCurrentStage),
+      visibleCurrentStatusImages: statusImages.length,
+      statusAtCurrentStage: Boolean(statusAtCurrentStage),
+      currentHasNoCompletedBadge,
+      currentHasNoCompletedBody,
+      currentHasNoCompletedFrame,
+      currentHasNoLockedBadge,
+      currentHasNoLockedBody,
+      currentHasNoLockedFrame,
+      currentHasNoSealedBody,
+      currentHasNoSealedFrame,
+      currentHasNoDormantBody,
+      currentHasNoDormantFrame,
+      visibleTextCount,
+      visibleRectsAboveUnderlay,
+      tooltipVisible: tooltip?.dataset?.visible === "true",
+      hasStageSelectLog: log.includes(`flow:stage_select:${targetStage?.id}`)
+    };
+  }, { auditCase, stageNodes });
+}
+
+function assertWorldMapOpenNodeSelection(label, audit, seeded, auditCase) {
+  if (audit.activeScene !== "WorldMapScene") throw new Error(`${label}: expected WorldMapScene, got ${audit.activeScene}`);
+  if (!audit.underlayVisible) throw new Error(`${label}: missing world map raster underlay`);
+  if (audit.currentStageId !== seeded.targetStageId) {
+    throw new Error(`${label}: expected current stage ${seeded.targetStageId}, got ${audit.currentStageId}`);
+  }
+  if (audit.targetStageId !== seeded.targetStageId) {
+    throw new Error(`${label}: expected target stage ${seeded.targetStageId}, got ${audit.targetStageId}`);
+  }
+  if (audit.currentIndex !== auditCase.targetIndex) {
+    throw new Error(`${label}: expected current index ${auditCase.targetIndex}, got ${audit.currentIndex}`);
+  }
+  if (!audit.markerAtCurrentStage || audit.visibleCurrentMarkerImages !== 1) {
+    throw new Error(`${label}: current marker is not anchored to selected stage ${JSON.stringify({
+      visibleCurrentMarkerImages: audit.visibleCurrentMarkerImages,
+      markerAtCurrentStage: audit.markerAtCurrentStage
+    })}`);
+  }
+  if (!audit.haloAtCurrentStage || audit.visibleCurrentHaloImages !== 1) {
+    throw new Error(`${label}: current halo is not anchored to selected stage ${JSON.stringify({
+      visibleCurrentHaloImages: audit.visibleCurrentHaloImages,
+      haloAtCurrentStage: audit.haloAtCurrentStage
+    })}`);
+  }
+  if (!audit.bodyAtCurrentStage || audit.visibleCurrentBodyImages !== 1) {
+    throw new Error(`${label}: current body is not anchored to selected stage ${JSON.stringify({
+      visibleCurrentBodyImages: audit.visibleCurrentBodyImages,
+      visibleCurrentBaseBodyImages: audit.visibleCurrentBaseBodyImages,
+      visibleCurrentLateBodyImages: audit.visibleCurrentLateBodyImages,
+      bodyAtCurrentStage: audit.bodyAtCurrentStage
+    })}`);
+  }
+  if (!audit.frameAtCurrentStage || audit.visibleCurrentFrameImages !== 1) {
+    throw new Error(`${label}: current frame is not anchored to selected stage ${JSON.stringify({
+      visibleCurrentFrameImages: audit.visibleCurrentFrameImages,
+      visibleCurrentBaseFrameImages: audit.visibleCurrentBaseFrameImages,
+      visibleCurrentLateFrameImages: audit.visibleCurrentLateFrameImages,
+      frameAtCurrentStage: audit.frameAtCurrentStage
+    })}`);
+  }
+  if (!audit.statusAtCurrentStage || audit.visibleCurrentStatusImages !== 1) {
+    throw new Error(`${label}: current status badge is not anchored to selected stage ${JSON.stringify({
+      visibleCurrentStatusImages: audit.visibleCurrentStatusImages,
+      statusAtCurrentStage: audit.statusAtCurrentStage
+    })}`);
+  }
+  if (audit.visibleCurrentBaseBodyImages !== (audit.expectedLateCurrent ? 0 : 1)) {
+    throw new Error(`${label}: wrong base current body count ${audit.visibleCurrentBaseBodyImages}`);
+  }
+  if (audit.visibleCurrentLateBodyImages !== (audit.expectedLateCurrent ? 1 : 0)) {
+    throw new Error(`${label}: wrong late current body count ${audit.visibleCurrentLateBodyImages}`);
+  }
+  if (audit.visibleCurrentBaseFrameImages !== (audit.expectedLateCurrent ? 0 : 1)) {
+    throw new Error(`${label}: wrong base current frame count ${audit.visibleCurrentBaseFrameImages}`);
+  }
+  if (audit.visibleCurrentLateFrameImages !== (audit.expectedLateCurrent ? 1 : 0)) {
+    throw new Error(`${label}: wrong late current frame count ${audit.visibleCurrentLateFrameImages}`);
+  }
+  if (!audit.currentHasNoCompletedBadge
+    || !audit.currentHasNoCompletedBody
+    || !audit.currentHasNoCompletedFrame
+    || !audit.currentHasNoLockedBadge
+    || !audit.currentHasNoLockedBody
+    || !audit.currentHasNoLockedFrame
+    || !audit.currentHasNoSealedBody
+    || !audit.currentHasNoSealedFrame
+    || !audit.currentHasNoDormantBody
+    || !audit.currentHasNoDormantFrame) {
+    throw new Error(`${label}: selected stage has conflicting state overlays ${JSON.stringify({
+      currentHasNoCompletedBadge: audit.currentHasNoCompletedBadge,
+      currentHasNoCompletedBody: audit.currentHasNoCompletedBody,
+      currentHasNoCompletedFrame: audit.currentHasNoCompletedFrame,
+      currentHasNoLockedBadge: audit.currentHasNoLockedBadge,
+      currentHasNoLockedBody: audit.currentHasNoLockedBody,
+      currentHasNoLockedFrame: audit.currentHasNoLockedFrame,
+      currentHasNoSealedBody: audit.currentHasNoSealedBody,
+      currentHasNoSealedFrame: audit.currentHasNoSealedFrame,
+      currentHasNoDormantBody: audit.currentHasNoDormantBody,
+      currentHasNoDormantFrame: audit.currentHasNoDormantFrame
+    })}`);
+  }
+  if (audit.visibleTextCount !== 0 || audit.visibleRectsAboveUnderlay !== 0) {
+    throw new Error(`${label}: unexpected Phaser text/vector leak ${JSON.stringify({
+      visibleTextCount: audit.visibleTextCount,
+      visibleRectsAboveUnderlay: audit.visibleRectsAboveUnderlay
+    })}`);
+  }
+  if (audit.tooltipVisible) throw new Error(`${label}: stale readability tooltip remained visible after selection`);
+  if (!audit.hasStageSelectLog) throw new Error(`${label}: missing flow:stage_select log for ${seeded.targetStageId}`);
+}

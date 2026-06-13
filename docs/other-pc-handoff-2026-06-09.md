@@ -7,7 +7,7 @@ Repository:
 - GitHub: `https://github.com/vivaca86/game.git`
 - Branch: `main`
 - Latest pushed commit: run `git log -1 --oneline` after pulling.
-- Expected latest commit title after the 2026-06-14 WorldMap open-node down continuation: `Audit WorldMap open node down states`
+- Expected latest commit title after the 2026-06-14 WorldMap open-node selection continuation: `Audit WorldMap open node selection states`
 
 ## Start On Another PC
 
@@ -22,7 +22,7 @@ npm install
 Expected first commit title in `git log --oneline -5` after the latest continuation:
 
 ```text
-Audit WorldMap open node down states
+Audit WorldMap open node selection states
 ```
 
 Expected status:
@@ -120,6 +120,7 @@ Recommended next work:
    - Representative keyboard-focus tooltip evidence now exists for Town, Dungeon, Combat, Reward, Event, RuneBench, Boss, Result, and Settings.
    - WorldMap locked/sealed/dormant nodes now expose danger-tone explanation tooltips through tooltip-only disabled hit targets, including the boss-sized red locked-node family.
    - WorldMap direction-key stage selection now shows the same DOM readability tooltip for the selected stage without adding another hover image.
+   - WorldMap open-node pointer click now has lower/mid/boss route-family evidence that the selected/current marker, halo, body, frame, and status stack moves to the clicked node without conflicting completed/locked/sealed/dormant overlays.
    - Mobile portrait now has a non-blocking orientation/framing cue in unused letterbox space and suppresses it while readability tooltips are visible.
    - WorldMap now has muted locked/future route thread/bead material separate from completed/current cyan route material.
    - WorldMap now has neutral lower-node body and frame layers under the first five lower map nodes, separate from current/completed/sealed/dormant state stacks.
@@ -1275,3 +1276,44 @@ Representative evidence:
 - `tmp/ui-quality/worldmap-open-node-down/boss-open-open-node-down-v1-mobile-390x844.png`
 
 Important limitation: this strengthens open stage-node pressed/down evidence, but it is still not full WorldMap node/body recomposition, final selected/focus approval, user acceptance, or release-ready UI.
+
+## 2026-06-14 WorldMap Open Node Selection-State Audit Continuation
+
+Status remains `95% candidate, not final`.
+
+Additional local continuation work:
+
+- Added `tools/ui-worldmap-open-node-selection-audit.mjs`.
+- The new audit verifies unlocked WorldMap stage-node pointer click selection for lower-open, mid-open, and boss-open route families.
+- It clicks the target node, waits for `context.run.stageId` to become the target stage, moves the pointer away, then verifies the selected/current marker, halo, body, frame, and status badge are anchored to the clicked node.
+- It also verifies base current material for the lower node, late current material for mid/boss nodes, no conflicting completed/locked/sealed/dormant overlays on the selected node, no Phaser text/vector overlay leaks, no stale tooltip, and a `flow:stage_select:<stageId>` log entry.
+
+Verification for this continuation:
+
+```powershell
+node tools\ui-worldmap-open-node-selection-audit.mjs
+node tools\ui-worldmap-open-node-tooltip-audit.mjs
+node tools\ui-worldmap-open-node-down-audit.mjs
+node tools\ui-worldmap-keyboard-tooltip-audit.mjs
+npx.cmd tsc --noEmit
+git diff --check
+npm.cmd run check
+$env:PHASER_SMOKE_PROGRESS='1'
+$env:PHASER_SMOKE_PROGRESS_FILE='tmp/phaser-smoke-progress-worldmap-open-node-selection-targeted.log'
+$env:PHASER_SMOKE_ONLY='checkViewScreenshots,checkClickableControls,checkFullInputCoverage,checkUiSkinStates'
+node tmp\run-phaser-smoke-with-vite.mjs
+```
+
+All listed checks passed. The new open-node selection audit passed with 9 cases:
+
+- lower-open to `stage_sunny_gate` at 1920, 1280, and 390x844, using the base current body/frame family.
+- mid-open to `stage_prism_school` at 1920, 1280, and 390x844, using the late current body/frame family.
+- boss-open to `stage_dream_arcade` at 1920, 1280, and 390x844, using the late current body/frame family.
+
+Representative evidence:
+
+- `tmp/ui-quality/worldmap-open-node-selection/boss-open-open-node-selection-v1-1920.png`
+- `tmp/ui-quality/worldmap-open-node-selection/boss-open-open-node-selection-v1-desktop-1280.png`
+- `tmp/ui-quality/worldmap-open-node-selection/boss-open-open-node-selection-v1-mobile-390x844.png`
+
+Important limitation: this strengthens open stage-node selected/current-state evidence, but it is still not full WorldMap node/body recomposition, final selected/focus approval, user acceptance, or release-ready UI.
