@@ -520,6 +520,17 @@ function showRasterTooltip(
   });
 }
 
+export function showRasterReadabilityTooltip(
+  scene: Phaser.Scene,
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  options: RasterTooltipOptions
+): void {
+  showRasterTooltip(scene, x, y, width, height, options);
+}
+
 export function setRasterHitTargetHoverState(
   hitTarget: Phaser.GameObjects.Rectangle | undefined,
   hovered: boolean

@@ -9,7 +9,7 @@ import { sliceRunToSaveRun } from "../../simulation/state/runState";
 import { renderDebugOverlay } from "../../ui/overlays/debugOverlay";
 import { handleSceneAction } from "../bridge/sceneActions";
 import { requireBootContext, storeBootContext } from "../bridge/sceneBridge";
-import { renderActionButton, renderPaperPanel, renderRasterDisabledHitTarget, renderRasterHoverHitTarget, renderSceneShell, renderUiSlot, textStyle } from "../view/sceneShell";
+import { renderActionButton, renderPaperPanel, renderRasterDisabledHitTarget, renderRasterHoverHitTarget, renderSceneShell, renderUiSlot, showRasterReadabilityTooltip, textStyle } from "../view/sceneShell";
 
 const WORLD_MAP_RASTER_UNDERLAY_KEY = "world_map_raster_underlay_concept";
 const WORLD_MAP_RASTER_HOVER_NODE_KEY = "ui_current_stage_halo_concept";
@@ -44,6 +44,7 @@ const WORLD_MAP_RASTER_ROUTE_PROGRESS_THREAD_KEY = "ui_world_map_route_progress_
 const WORLD_MAP_RASTER_ROUTE_PROGRESS_CURRENT_THREAD_KEY = "ui_world_map_route_progress_current_thread_concept";
 const WORLD_MAP_RASTER_ROUTE_PROGRESS_BEAD_KEY = "ui_world_map_route_progress_bead_concept";
 const WORLD_MAP_RASTER_ROUTE_PROGRESS_CURRENT_BEAD_KEY = "ui_world_map_route_progress_current_bead_concept";
+const WORLD_MAP_KEYBOARD_TOOLTIP_STAGE_ID_KEY = "worldMapKeyboardTooltipStageId";
 const WORLD_MAP_RASTER_STAGE_NODES: Array<{ x: number; y: number; width: number; height: number }> = [
   { x: 586, y: 760, width: 150, height: 150 },
   { x: 808, y: 756, width: 150, height: 150 },
@@ -130,6 +131,7 @@ function renderWorldMapRasterStage(scene: Phaser.Scene, context: BootContext): v
   });
   renderWorldMapCurrentStageMarker(scene, context);
   renderWorldMapRasterStageNodes(scene, context);
+  showWorldMapKeyboardSelectionTooltip(scene, context);
 }
 
 function renderWorldMapRouteProgress(scene: Phaser.Scene, context: BootContext): void {
@@ -683,7 +685,8 @@ function renderWorldMapRasterStageNodes(scene: Phaser.Scene, context: BootContex
       node.height,
       0x5eead4,
       () => selectStageAndRestart(scene, context, stage.id),
-      stage
+      stage,
+      context
     );
   });
   renderWorldMapRasterLockedNodeHitTargets(scene, context, unlockedStageIds);
@@ -697,7 +700,8 @@ function renderWorldMapRasterNodeHitTarget(
   height: number,
   _accent: number,
   onClick: () => void,
-  stage: StageData
+  stage: StageData,
+  context: BootContext
 ): void {
   renderRasterHoverHitTarget(scene, x, y, width, height, onClick, {
     hoverKey: WORLD_MAP_RASTER_HOVER_NODE_KEY,
@@ -717,9 +721,19 @@ function renderWorldMapRasterNodeHitTarget(
     hoverBlendMode: Phaser.BlendModes.ADD,
     downBlendMode: Phaser.BlendModes.ADD,
     tooltipTitle: stage.displayNameKo,
-    tooltipBody: stage.descriptionKo,
+    tooltipBody: worldMapUnlockedStageTooltipBody(context, stage),
     tooltipTone: "choice"
   });
+}
+
+function worldMapUnlockedStageTooltipBody(context: BootContext, stage: StageData): string {
+  const completedStageIds = new Set(context.save.profile.completedStages);
+  const status = stage.id === context.run.stageId
+    ? "현재 선택"
+    : completedStageIds.has(stage.id)
+      ? "완료"
+      : "해금됨";
+  return `${stage.descriptionKo} · ${status} · 방 ${stage.route.length}개.`;
 }
 
 function renderWorldMapRasterLockedNodeHitTargets(
@@ -803,6 +817,7 @@ function handleWorldMapAction(scene: Phaser.Scene, context: BootContext, action:
     ? resolveKeyboardStageSelection(context, action)
     : undefined;
   if (nextStageId) {
+    scene.registry.set(WORLD_MAP_KEYBOARD_TOOLTIP_STAGE_ID_KEY, nextStageId);
     selectStageAndRestart(scene, context, nextStageId);
     return;
   }
@@ -846,6 +861,27 @@ function keyboardStageDirection(action: Extract<InputAction, "move_left" | "move
   if (action === "move_right") return { x: 1, y: 0 };
   if (action === "move_up") return { x: 0, y: -1 };
   return { x: 0, y: 1 };
+}
+
+function showWorldMapKeyboardSelectionTooltip(scene: Phaser.Scene, context: BootContext): void {
+  const selectedStageId = scene.registry.get(WORLD_MAP_KEYBOARD_TOOLTIP_STAGE_ID_KEY) as string | undefined;
+  if (!selectedStageId) return;
+
+  scene.registry.set(WORLD_MAP_KEYBOARD_TOOLTIP_STAGE_ID_KEY, undefined);
+  if (selectedStageId !== context.run.stageId) return;
+
+  const stageIndex = context.dataBundle.stages.findIndex((stage) => stage.id === selectedStageId);
+  const stage = context.dataBundle.stages[stageIndex];
+  const node = WORLD_MAP_RASTER_STAGE_NODES[stageIndex];
+  if (!stage || !node) return;
+
+  scene.time.delayedCall(0, () => {
+    showRasterReadabilityTooltip(scene, node.x, node.y, node.width, node.height, {
+      tooltipTitle: stage.displayNameKo,
+      tooltipBody: worldMapUnlockedStageTooltipBody(context, stage),
+      tooltipTone: "choice"
+    });
+  });
 }
 
 function renderWorldMapTheater(scene: Phaser.Scene, context: BootContext): void {

@@ -7,7 +7,7 @@ Repository:
 - GitHub: `https://github.com/vivaca86/game.git`
 - Branch: `main`
 - Latest pushed commit: run `git log -1 --oneline` after pulling.
-- Expected latest commit title after the 2026-06-14 WorldMap locked-node tooltip continuation: `Add WorldMap locked node tooltips`
+- Expected latest commit title after the 2026-06-14 WorldMap keyboard-selection tooltip continuation: `Add WorldMap keyboard selection tooltips`
 
 ## Start On Another PC
 
@@ -22,7 +22,7 @@ npm install
 Expected first commit title in `git log --oneline -5` after the latest continuation:
 
 ```text
-Add WorldMap locked node tooltips
+Add WorldMap keyboard selection tooltips
 ```
 
 Expected status:
@@ -39,7 +39,7 @@ The user rejected procedural/vector-looking UI. Continue with these rules:
 - Do not add Phaser rectangle/stroke/vector overlays as visible UI on concept screens.
 - Keyboard focus must reuse the same bitmap language as pointer hover/down where possible.
 - Do not introduce a new focus ring, tint, generic badge, or new visual style without matching the concept source.
-- Keep completion language conservative. Current estimate is about 93%, not final and not 95%.
+- Keep completion language conservative. Current estimate is about 94%, not final and not 95%.
 
 Main reference docs:
 
@@ -119,6 +119,7 @@ Recommended next work:
    - First hidden accessibility labels and first visible tooltip zones now exist.
    - Representative keyboard-focus tooltip evidence now exists for Town, Dungeon, Combat, Reward, Event, RuneBench, Boss, Result, and Settings.
    - WorldMap locked/sealed/dormant nodes now expose danger-tone explanation tooltips through tooltip-only disabled hit targets.
+   - WorldMap direction-key stage selection now shows the same DOM readability tooltip for the selected stage without adding another hover image.
    - Continue broader gameplay-critical readable text, broader selected/focus approval, broader disabled-state breadth, full mobile framing/orientation review, and user acceptance.
    - Do not put explanatory text directly into the baked concept layers as a shortcut.
 
@@ -818,3 +819,49 @@ Representative evidence:
 - `tmp/ui-quality/worldmap-locked-tooltips/red-next-locked-tooltip-v1-mobile-390x844.png`
 
 Important limitation: this improves WorldMap locked-node readability and disabled-state breadth, but it is still not final WorldMap recomposition or release-ready UI. Continue with full WorldMap node/route recomposition, broader disabled/focus coverage outside the audited paths, mobile framing/orientation review, and user acceptance.
+
+## 2026-06-14 WorldMap Keyboard Selection Tooltip WIP Continuation
+
+Status remains `Partially complete`.
+
+Current estimate is about 94% of the active UI goal, not 95%.
+
+Additional local continuation work:
+
+- Added a small `showRasterReadabilityTooltip` export so scenes can show the existing DOM tooltip without also turning on hover/down bitmap state.
+- WorldMap direction-key stage selection now marks the selected stage before restarting the scene, then shows the selected stage tooltip after the raster scene rebuilds.
+- This reuses the existing selected/current marker stack and keeps exactly one visible current halo, so keyboard tooltip evidence does not add a second hover image or new visual style.
+- Open WorldMap stage tooltip bodies now include status and room count in addition to the stage description, avoiding too-short readable copy on compact stage descriptions.
+- Added `tools/ui-worldmap-keyboard-tooltip-audit.mjs`.
+
+Verification for this continuation:
+
+```powershell
+npx.cmd tsc --noEmit
+git diff --check
+node tools\ui-worldmap-keyboard-tooltip-audit.mjs
+node tmp\ui-worldmap-action-hit-target-audit.mjs
+node tools\ui-worldmap-locked-tooltip-audit.mjs
+node tools\ui-readability-tooltip-audit.mjs
+node tools\ui-keyboard-focus-tooltip-audit.mjs
+node tools\ui-accessibility-overlay-audit.mjs
+npm.cmd run check
+$env:PHASER_SMOKE_PROGRESS='1'
+$env:PHASER_SMOKE_PROGRESS_FILE='tmp/phaser-smoke-progress-worldmap-keyboard-tooltip-targeted.log'
+$env:PHASER_SMOKE_ONLY='checkViewScreenshots,checkClickableControls,checkFullInputCoverage,checkUiSkinStates'
+node tmp\run-phaser-smoke-with-vite.mjs
+```
+
+All listed checks passed. The new WorldMap keyboard tooltip audit reported six passing cases:
+
+- lower-left selection to `stage_sunny_gate` at 1920, 1280, and 390x844.
+- late-right selection to `stage_prism_school` at 1920, 1280, and 390x844.
+
+Representative evidence:
+
+- `tmp/ui-quality/worldmap-keyboard-tooltips/lower-left-keyboard-tooltip-v1-1920.png`
+- `tmp/ui-quality/worldmap-keyboard-tooltips/late-right-keyboard-tooltip-v1-1920.png`
+- `tmp/ui-quality/worldmap-keyboard-tooltips/lower-left-keyboard-tooltip-v1-mobile-390x844.png`
+- `tmp/ui-quality/worldmap-keyboard-tooltips/late-right-keyboard-tooltip-v1-mobile-390x844.png`
+
+Important limitation: this closes the missing WorldMap selected-stage tooltip evidence, not full selected/focus approval. Full WorldMap node/route recomposition, broader disabled/focus coverage outside the audited paths, mobile framing/orientation review, user acceptance, and final 95% concept-match approval remain next.
