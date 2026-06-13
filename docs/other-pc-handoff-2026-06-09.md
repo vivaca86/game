@@ -7,7 +7,7 @@ Repository:
 - GitHub: `https://github.com/vivaca86/game.git`
 - Branch: `main`
 - Latest pushed commit: run `git log -1 --oneline` after pulling.
-- Expected latest commit title after the 2026-06-14 disabled explanation-tooltip continuation: `Add disabled explanation tooltips`
+- Expected latest commit title after the 2026-06-14 keyboard focus tooltip-audit continuation: `Add keyboard focus tooltip audit`
 
 ## Start On Another PC
 
@@ -22,7 +22,7 @@ npm install
 Expected first commit title in `git log --oneline -5` after the latest continuation:
 
 ```text
-Add disabled explanation tooltips
+Add keyboard focus tooltip audit
 ```
 
 Expected status:
@@ -39,7 +39,7 @@ The user rejected procedural/vector-looking UI. Continue with these rules:
 - Do not add Phaser rectangle/stroke/vector overlays as visible UI on concept screens.
 - Keyboard focus must reuse the same bitmap language as pointer hover/down where possible.
 - Do not introduce a new focus ring, tint, generic badge, or new visual style without matching the concept source.
-- Keep completion language conservative. Current estimate is about 91%, not final and not 95%.
+- Keep completion language conservative. Current estimate is about 92%, not final and not 95%.
 
 Main reference docs:
 
@@ -117,7 +117,8 @@ Recommended next work:
 
 4. Dynamic labels/tooltips/accessibility:
    - First hidden accessibility labels and first visible tooltip zones now exist.
-   - Continue broader gameplay-critical readable text, selected/focus tooltip consistency, broader disabled-state breadth, full mobile framing/orientation review, and user acceptance.
+   - Representative keyboard-focus tooltip evidence now exists for Town, Dungeon, Combat, Reward, Event, RuneBench, Boss, Result, and Settings.
+   - Continue broader gameplay-critical readable text, broader selected/focus approval, broader disabled-state breadth, full mobile framing/orientation review, and user acceptance.
    - Do not put explanatory text directly into the baked concept layers as a shortcut.
 
 ## Useful Evidence Paths
@@ -723,4 +724,54 @@ Visual evidence:
 - `tmp/ui-quality/disabled/combat-disabled-card-tooltip-v1-1920.png`
 - `tmp/ui-quality/disabled/boss-disabled-card-tooltip-v1-1920.png`
 
-Important limitation: this is first disabled explanation coverage, not final broad disabled approval. Existing evidence now covers Event unaffordable choices and Combat/Boss cost-disabled cards. Other disabled/locked controls, selected/focus tooltip consistency, full mobile framing/orientation treatment, user acceptance, and final 95% concept-match approval remain next.
+Important limitation: this is first disabled explanation coverage, not final broad disabled approval. Existing evidence now covers Event unaffordable choices and Combat/Boss cost-disabled cards. Other disabled/locked controls, broader selected/focus approval, full mobile framing/orientation treatment, user acceptance, and final 95% concept-match approval remain next.
+
+## 2026-06-14 Keyboard Focus Tooltip Audit WIP Continuation
+
+Status remains `Partially complete`.
+
+Current estimate is about 92% of the active UI goal, not 95%.
+
+Additional local continuation work:
+
+- Added `tools/ui-keyboard-focus-tooltip-audit.mjs`.
+- The audit proves representative keyboard focus paths show the same DOM readability tooltip layer as pointer hover.
+- Covered representative focus paths:
+  - Town: expedition action.
+  - Dungeon: room node.
+  - Combat: first playable card.
+  - Reward: first reward choice.
+  - Event: first affordable event choice in release `stage_sunny_gate`.
+  - RuneBench: action rail.
+  - Boss: first playable card.
+  - Result: action card.
+  - Settings: volume master row after opening Settings from Town.
+- The audit runs those nine focus paths at `1920x1080`, `1280x720`, and `390x844`.
+- It verifies focus registry value, `role="tooltip"`, `aria-live="polite"`, tooltip scene/tone, title/body length, size ratios, viewport/canvas or letterbox-safe placement, `pointer-events: none`, z-index, canvas `role="img"`, and canvas `aria-label`.
+- Screenshots are captured under `tmp/ui-quality/focus-tooltips/`.
+
+Verification for this continuation:
+
+```powershell
+node tools\ui-keyboard-focus-tooltip-audit.mjs
+npx.cmd tsc --noEmit
+git diff --check
+node tools\ui-readability-tooltip-audit.mjs
+node tools\ui-accessibility-overlay-audit.mjs
+npm.cmd run check
+$env:PHASER_SMOKE_PROGRESS='1'
+$env:PHASER_SMOKE_PROGRESS_FILE='tmp/phaser-smoke-progress-focus-tooltip-targeted.log'
+$env:PHASER_SMOKE_ONLY='checkViewScreenshots,checkClickableControls,checkFullInputCoverage,checkUiSkinStates'
+node tmp\run-phaser-smoke-with-vite.mjs
+```
+
+All listed checks passed. `tools/ui-keyboard-focus-tooltip-audit.mjs` reported 27 passing focus-tooltip cases. `npm.cmd run check` reports `manifestAssets=485`, `existingFiles=485`, `missingFiles=0`, and only the existing Vite large JS chunk warning. The targeted smoke ended with `Phaser smoke OK`.
+
+Representative evidence:
+
+- `tmp/ui-quality/focus-tooltips/town-focus-tooltip-v1-1920.png`
+- `tmp/ui-quality/focus-tooltips/combat-focus-tooltip-v1-1920.png`
+- `tmp/ui-quality/focus-tooltips/event-focus-tooltip-v1-desktop-1280.png`
+- `tmp/ui-quality/focus-tooltips/settings-focus-tooltip-v1-mobile-390x844.png`
+
+Important limitation: this closes the representative selected/focus tooltip-consistency gap, not full keyboard/focus approval. WorldMap keyboard stage selection still has its own state-selection evidence rather than a focus tooltip path, broader gameplay-critical readable text is not complete, disabled-state breadth is still limited, mobile portrait framing/orientation is still not final, user acceptance is missing, and the UI is not a 95% or release-ready completion candidate.

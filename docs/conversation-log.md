@@ -2132,3 +2132,15 @@ Codex continued the dynamic readability work by targeting disabled explanations.
 Verification passed with `npx.cmd tsc --noEmit`, `git diff --check`, `node tmp\ui-disabled-raster-audit.mjs`, `node tmp\combat-boss-disabled-raster-state-audit.mjs`, `node tools\ui-readability-tooltip-audit.mjs`, `node tools\ui-accessibility-overlay-audit.mjs`, `npm.cmd run check`, and targeted `$env:PHASER_SMOKE_ONLY='checkViewScreenshots,checkClickableControls,checkFullInputCoverage,checkUiSkinStates'; node tmp\run-phaser-smoke-with-vite.mjs` ending in `Phaser smoke OK`. One readability-tooltip audit attempt failed during Chromium screenshot capture, then the immediate rerun passed all 30 scene/viewport cases.
 
 This remains partial UI progress, roughly about 91% of the active UI goal, not 95%. Disabled explanations now cover the audited Event and Combat/Boss disabled paths, but broader disabled-state breadth, selected/focus tooltip consistency, full mobile framing/orientation treatment, user acceptance, and final concept-match approval remain unfinished.
+
+### Codex
+
+Codex continued after the disabled explanation-tooltip checkpoint by targeting the remaining representative focus-tooltip consistency gap. The earlier keyboard-focus audits proved bitmap hover/down state reuse, and the visible tooltip pass proved pointer hover/readability, but there was no separate durable proof that arrow-key focus exposed the same DOM tooltip layer across desktop and portrait layouts.
+
+Added `tools/ui-keyboard-focus-tooltip-audit.mjs`. It opens Town, Dungeon, Combat, Reward, Event, RuneBench, Boss, Result, and Settings at 1920x1080, 1280x720, and 390x844. For each target it triggers representative keyboard focus, checks the expected focus registry value, then verifies `#game-readability-tooltip` for `role="tooltip"`, `aria-live="polite"`, scene/tone metadata, title/body length, viewport/canvas or letterbox-safe placement, `pointer-events: none`, z-index, canvas `role="img"`, and canvas `aria-label`.
+
+The new audit passed 27 focus-tooltip cases and captured screenshots under `tmp/ui-quality/focus-tooltips/`, including Town, Combat, Event, Boss, and Settings mobile/desktop examples.
+
+Verification passed with `node tools\ui-keyboard-focus-tooltip-audit.mjs`, `npx.cmd tsc --noEmit`, `git diff --check`, `node tools\ui-readability-tooltip-audit.mjs`, `node tools\ui-accessibility-overlay-audit.mjs`, `npm.cmd run check`, and targeted `$env:PHASER_SMOKE_ONLY='checkViewScreenshots,checkClickableControls,checkFullInputCoverage,checkUiSkinStates'; node tmp\run-phaser-smoke-with-vite.mjs` ending in `Phaser smoke OK`.
+
+This remains partial UI progress, roughly about 92% of the active UI goal, not 95%. Representative focus-triggered tooltips are now proven, but broader selected/focus approval across every relevant control, broader disabled-state breadth, full mobile framing/orientation treatment, user acceptance, and final concept-match approval remain unfinished.
