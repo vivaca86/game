@@ -4189,6 +4189,24 @@ It now also verifies that all route overlay families remain suppressed while the
 
 Remaining scope: this improves keyboard selected-state route-policy evidence, but it is still not final selected/focus approval or full WorldMap route recomposition. Broader disabled/focus/readability coverage, user acceptance, and final concept-match approval remain.
 
+## 2026-06-14 Latest Full Broad Smoke Checkpoint
+
+Status: `Regression gate passed`
+
+Completion level: `95% candidate, not final`
+
+Evidence:
+
+- Latest verified code commit before this documentation checkpoint: `586c1fb Audit WorldMap keyboard routes`
+- `tmp/phaser-smoke-progress-latest-586c1fb-full.log`
+- Full `node tmp\run-phaser-smoke-with-vite.mjs`
+- No `PHASER_SMOKE_ONLY` filter
+- Result: `Phaser smoke OK`
+
+The latest full broad smoke passed Town, Combat, and Boss page checks; view screenshots; clickable controls; full input coverage; Settings surface; UI skin states; save/reload; production save reset; combat actions; release catalog mode; release gem/rune effects; release enemy intent batch; release stage route batch; release event batch; release passive batch; core run loop; scene flow plus rune effect; and boss result flow.
+
+Remaining scope: this is strong latest regression evidence for the active 95% candidate, not final UI approval. User acceptance, final concept-match approval, release-readiness, and broader non-audited selected/focus/readability/mobile review remain open.
+
 ## Current Remaining Raster-Quality Scope
 
 Status: `Not complete`
@@ -4210,4 +4228,4 @@ The active goal still remains open. The immediate first-view raster concept-unde
 - Raster hover/down feedback is no longer universally invisible: all 10 primary raster concept screens have extracted bitmap hover-state candidates on representative controls and a pressed/down-state candidate on audited controls. The audited pressed states now avoid the shared fallback stamp, WorldMap open lower/mid/boss stage nodes have pressed-size halo evidence, Event has a first disabled lock candidate, Combat/Boss have first cost-disabled card lock candidates, Settings has first keyboard-cancel plus keyboard-focus feedback on its audited controls, Reward/Event have first keyboard choice-focus evidence, and Town/RuneBench/Result have first utility keyboard-focus evidence. Final matching-quality selected, broad disabled, focus, deeper per-control pressed, and screen-specific state coverage is still missing.
 - The full UI skin is now a 95% candidate for the active concept-art UI goal, but it has no user acceptance yet and is not release-ready.
 - `npm.cmd run check` still reports the existing Vite large JS chunk warning, so performance remains tracked separately as `Needs verification`.
-- Broad Phaser smoke is passing for the earlier 2026-06-13 WorldMap late completed-stack variant, route-progress thread, and hidden accessibility-label checkpoints, and the raster responsive sanity audit is passing at 1920, 1280, and 390x844. The latest route current-leg, route interaction-stack, selection route-stack, keyboard route-suppression, late current-node, mid dormant-node, far red locked-node, mid sealed-node, boss red locked-node, boss keyboard-selected tooltip/current-state, locked-node tooltip/current-stack/target-stack, open-node pointer tooltip/current-stack/target-stack, open-node down-state/current-stack/target-stack, open-node selection-state, visible readability-tooltip, responsive tooltip placement, disabled explanation-tooltip, keyboard focus-tooltip, WorldMap locked-node tooltip, and WorldMap keyboard-selection tooltip passes passed their dedicated audits, `git diff --check`, `npm.cmd run check`, and targeted smoke gates; the previous broad smoke attempt for route/current work reached all logged substeps but timed out during process cleanup. These remain regression/safety gates rather than evidence of final UI approval.
+- Broad Phaser smoke now passes on latest `586c1fb Audit WorldMap keyboard routes` with no `PHASER_SMOKE_ONLY` filter, ending in `Phaser smoke OK` after all logged substeps through `checkBossResultFlow OK`. The raster responsive sanity audit is also passing at 1920, 1280, and 390x844. The latest route current-leg, route interaction-stack, selection route-stack, keyboard route-suppression, late current-node, mid dormant-node, far red locked-node, mid sealed-node, boss red locked-node, boss keyboard-selected tooltip/current-state, locked-node tooltip/current-stack/target-stack, open-node pointer tooltip/current-stack/target-stack, open-node down-state/current-stack/target-stack, open-node selection-state, visible readability-tooltip, responsive tooltip placement, disabled explanation-tooltip, keyboard focus-tooltip, WorldMap locked-node tooltip, and WorldMap keyboard-selection tooltip passes passed their dedicated audits, `git diff --check`, `npm.cmd run check`, and targeted smoke gates. These remain regression/safety gates rather than evidence of final UI approval.

@@ -2370,3 +2370,13 @@ Extended `tools/ui-worldmap-keyboard-tooltip-audit.mjs` so each keyboard-selecte
 Verification passed with `node tools\ui-worldmap-keyboard-tooltip-audit.mjs`, `node tools\ui-worldmap-open-node-selection-audit.mjs`, `node tools\ui-worldmap-route-interaction-audit.mjs`, `npx.cmd tsc --noEmit`, `git diff --check`, `npm.cmd run check`, and targeted `$env:PHASER_SMOKE_ONLY='checkViewScreenshots,checkClickableControls,checkFullInputCoverage,checkUiSkinStates'; node tmp\run-phaser-smoke-with-vite.mjs` ending in `Phaser smoke OK`. The strengthened keyboard audit passed 9 cases and reported route thread/bead counts of 0 for lower-left, late-right, and boss-up at 1920x1080, 1280x720, and 390x844.
 
 This remains a 95% candidate rather than final approval. Keyboard route-policy evidence is stronger now, but full WorldMap node/body/route recomposition approval, broader selected/focus approval, user acceptance, and release-ready UI remain unfinished.
+
+### Codex
+
+Codex continued the 95% candidate UI goal with a latest full broad-smoke verification after `586c1fb Audit WorldMap keyboard routes`. This was a verification-only continuation to prove the newest WorldMap route/keyboard audit work did not break the broader Phaser flow.
+
+Ran `node tmp\run-phaser-smoke-with-vite.mjs` with `PHASER_SMOKE_PROGRESS=1`, progress file `tmp/phaser-smoke-progress-latest-586c1fb-full.log`, and no `PHASER_SMOKE_ONLY` filter. The run ended with `Phaser smoke OK`.
+
+The full run passed Town/Combat/Boss page checks, view screenshots, clickable controls, full input coverage, Settings surface, UI skin states, save/reload, production save reset, combat actions, release catalog mode, release gem/rune effect, release enemy intent batch, release stage route batch, release event batch, release passive batch, core run loop, scene flow plus rune effect, and boss result flow.
+
+This strengthens the current 95% candidate evidence, but it remains a regression gate rather than final UI approval. User acceptance, release-readiness, broader non-audited selected/focus/readability/mobile review, and final concept-match approval remain unfinished.

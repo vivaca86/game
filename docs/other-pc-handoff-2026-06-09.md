@@ -7,7 +7,7 @@ Repository:
 - GitHub: `https://github.com/vivaca86/game.git`
 - Branch: `main`
 - Latest pushed commit: run `git log -1 --oneline` after pulling.
-- Expected latest commit title after the 2026-06-14 WorldMap keyboard route-suppression continuation: `Audit WorldMap keyboard routes`
+- Expected latest commit title after the 2026-06-14 latest broad-smoke continuation: `Document latest broad smoke`
 
 ## Start On Another PC
 
@@ -22,7 +22,7 @@ npm install
 Expected first commit title in `git log --oneline -5` after the latest continuation:
 
 ```text
-Audit WorldMap keyboard routes
+Document latest broad smoke
 ```
 
 Expected status:
@@ -1674,3 +1674,46 @@ Representative evidence:
 - `tmp/ui-quality/worldmap-keyboard-tooltips/boss-up-keyboard-tooltip-v1-1920.png`
 
 Important limitation: this strengthens keyboard selected-route policy evidence, but the project is still `95% candidate, not final`. Full WorldMap node/body/route recomposition approval, broader selected/focus approval, user acceptance, and release-ready UI remain unfinished.
+
+## 2026-06-14 Latest Full Broad Smoke Continuation
+
+Status remains `95% candidate, not final`.
+
+Latest verification-only continuation:
+
+- Latest code commit before this verification was `586c1fb Audit WorldMap keyboard routes`.
+- Ran the full broad Phaser smoke with no `PHASER_SMOKE_ONLY` filter.
+- Progress log path: `tmp/phaser-smoke-progress-latest-586c1fb-full.log`.
+- Result: `Phaser smoke OK`.
+
+Command:
+
+```powershell
+$env:PHASER_SMOKE_PROGRESS='1'
+$env:PHASER_SMOKE_PROGRESS_FILE='tmp/phaser-smoke-progress-latest-586c1fb-full.log'
+Remove-Item Env:PHASER_SMOKE_ONLY -ErrorAction SilentlyContinue
+node tmp\run-phaser-smoke-with-vite.mjs
+```
+
+The full run passed these gates:
+
+- `checkPage TownScene`, `checkPage CombatScene`, `checkPage BossScene`
+- `checkViewScreenshots`
+- `checkClickableControls`
+- `checkFullInputCoverage`
+- `checkSettingsSurface`
+- `checkUiSkinStates`
+- `checkSaveReload`
+- `checkProductionSaveReset`
+- `checkCombatActions`
+- `checkReleaseCatalogMode`
+- `checkReleaseGemRuneEffect`
+- `checkReleaseEnemyIntentBatch`
+- `checkReleaseStageRouteBatch`
+- `checkReleaseEventBatch`
+- `checkReleasePassiveBatch`
+- `checkCoreRunLoop`
+- `checkSceneFlowAndRuneEffect`
+- `checkBossResultFlow`
+
+Important limitation: this is strong latest regression evidence for the current 95% candidate, but it is not final UI approval, user acceptance, or release-ready proof.
