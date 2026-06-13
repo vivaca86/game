@@ -7,7 +7,7 @@ Repository:
 - GitHub: `https://github.com/vivaca86/game.git`
 - Branch: `main`
 - Latest pushed commit: run `git log -1 --oneline` after pulling.
-- Expected latest commit title after the 2026-06-13 far red locked-node continuation: `Add WorldMap far locked node variants`
+- Expected latest commit title after the 2026-06-14 visible readability-tooltip continuation: `Add visible readability tooltips`
 
 ## Start On Another PC
 
@@ -22,7 +22,7 @@ npm install
 Expected first commit title in `git log --oneline -5` after the latest continuation:
 
 ```text
-Add WorldMap far locked node variants
+Add visible readability tooltips
 ```
 
 Expected status:
@@ -39,7 +39,7 @@ The user rejected procedural/vector-looking UI. Continue with these rules:
 - Do not add Phaser rectangle/stroke/vector overlays as visible UI on concept screens.
 - Keyboard focus must reuse the same bitmap language as pointer hover/down where possible.
 - Do not introduce a new focus ring, tint, generic badge, or new visual style without matching the concept source.
-- Keep completion language conservative. Current estimate is about 88%, not final and not 95%.
+- Keep completion language conservative. Current estimate is about 89%, not final and not 95%.
 
 Main reference docs:
 
@@ -116,8 +116,9 @@ Recommended next work:
    - Other controls/screens still need review.
 
 4. Dynamic labels/tooltips/accessibility:
-   - Still unresolved.
-   - Do not put explanatory text on top of baked concept layers as a shortcut.
+   - First hidden accessibility labels and first visible tooltip zones now exist.
+   - Continue broader gameplay-critical readable text, disabled explanations, mobile tooltip placement, and user acceptance.
+   - Do not put explanatory text directly into the baked concept layers as a shortcut.
 
 ## Useful Evidence Paths
 
@@ -592,3 +593,52 @@ node tmp\run-phaser-smoke-with-vite.mjs
 All listed checks passed. `npm.cmd run check` reports `manifestAssets=485`, `existingFiles=485`, `missingFiles=0`, and only the existing Vite large JS chunk warning.
 
 Important limitation: this is still not full WorldMap locked-node recomposition. The far red locked split improves one upper locked-node family gap, but locked nodes still need stronger stage-specific bodies, lower-node silhouette recomposition, complete route material, visible tooltip/readability zones, mobile/responsive review, user acceptance, and final concept-match approval next.
+
+## 2026-06-14 Visible Readability Tooltip WIP Continuation
+
+Status remains `Partially complete`.
+
+Current estimate is about 89% of the active UI goal, not 95%.
+
+Additional local continuation work:
+
+- Added a first visible DOM readability-tooltip layer:
+  - `src/ui/overlays/readabilityOverlay.ts`
+  - `#game-readability-tooltip`
+- `renderRasterHoverHitTarget` now accepts optional tooltip title/body/tone fields and shows the DOM tooltip on pointer hover/down or keyboard focus.
+- The tooltip is positioned relative to the Phaser canvas using the existing 1920x1080 virtual coordinate system, clamps inside the viewport/canvas, uses `role="tooltip"` and `aria-live="polite"`, and stays hidden by default so normal concept screenshots remain textless.
+- Representative visible tooltip content is wired for Town, WorldMap, Dungeon, Combat, Reward, Event, RuneBench, Boss, Result, and Settings.
+- `debugOverlay` hides the readability tooltip during scene transitions so stale text does not remain after scene changes.
+- Added `tools/ui-readability-tooltip-audit.mjs`, which verifies all ten primary raster scenes and captures screenshots under `tmp/ui-quality/readability-tooltips/`.
+
+Verification for this continuation:
+
+```powershell
+node tools\ui-readability-tooltip-audit.mjs
+node tools\ui-accessibility-overlay-audit.mjs
+node tools\ui-responsive-raster-audit.mjs
+node tmp\ui-worldmap-action-hit-target-audit.mjs
+node tmp\route-node-raster-hover-state-audit.mjs
+npx.cmd tsc --noEmit
+git diff --check
+$env:PHASER_SMOKE_PROGRESS='1'
+$env:PHASER_SMOKE_PROGRESS_FILE='tmp/phaser-smoke-progress-readability-tooltip-targeted.log'
+$env:PHASER_SMOKE_ONLY='checkViewScreenshots,checkClickableControls,checkFullInputCoverage,checkUiSkinStates'
+node tmp\run-phaser-smoke-with-vite.mjs
+```
+
+All listed checks passed. The tooltip audit reported these representative titles:
+
+- Town: `탐험 준비`
+- WorldMap: `던전 진입`
+- Dungeon: `방 진입`
+- Combat/Boss card: Korean card title with `비용`
+- Reward: `리본 튕기기`
+- Event: `공격 카드에 불씨 룬`
+- RuneBench: `보석 작업`
+- Result: `결과 확인`
+- Settings: `전체 음량`
+
+Visual inspection of the Combat and Settings screenshots confirmed the tooltip is readable and does not cover the main playfield in the inspected states.
+
+Important limitation: this is still not final readability approval. It proves representative visible tooltip zones after the hidden accessibility-label pass, but the project still needs broader gameplay-critical readable text decisions, disabled-state explanations, mobile tooltip/framing review, user acceptance, and final 95% concept-match approval next.

@@ -112,7 +112,10 @@ function renderRuneBenchRasterStage(scene: Phaser.Scene, context: BootContext): 
     downWidth: 540,
     downHeight: 112,
     hoverAlpha: 0.92,
-    downAlpha: 0.84
+    downAlpha: 0.84,
+    tooltipTitle: "보석 작업",
+    tooltipBody: "선택한 보석 작업을 현재 덱에 반영합니다.",
+    tooltipTone: "confirm"
   });
   addControl("confirmButton", 1660, 984, 250, 102, 0x5eead4, () => handleSceneAction(scene, context, "confirm"), {
     hoverKey: RUNE_BENCH_RASTER_CONFIRM_BUTTON_KEYS.hover,
@@ -126,7 +129,10 @@ function renderRuneBenchRasterStage(scene: Phaser.Scene, context: BootContext): 
     downWidth: 330,
     downHeight: 122,
     hoverAlpha: 0.96,
-    downAlpha: 0.88
+    downAlpha: 0.88,
+    tooltipTitle: "작업 확정",
+    tooltipBody: "보석 변경을 확정하고 다음 흐름으로 돌아갑니다.",
+    tooltipTone: "confirm"
   });
 
   return { controls, confirmHitTarget };
@@ -153,6 +159,9 @@ function renderRuneBenchRasterHitTarget(
     downHeight?: number;
     hoverAlpha?: number;
     downAlpha?: number;
+    tooltipTitle?: string;
+    tooltipBody?: string;
+    tooltipTone?: "default" | "confirm" | "choice" | "danger";
   } = {}
 ): Phaser.GameObjects.Rectangle {
   const hoverSize = Math.min(108, Math.max(80, Math.min(width, height) * 1.12));
@@ -168,7 +177,10 @@ function renderRuneBenchRasterHitTarget(
     downWidth: options.downWidth ?? hoverSize * 1.12,
     downHeight: options.downHeight ?? hoverSize * 1.12,
     hoverAlpha: options.hoverAlpha,
-    downAlpha: options.downAlpha ?? 0.76
+    downAlpha: options.downAlpha ?? 0.76,
+    tooltipTitle: options.tooltipTitle,
+    tooltipBody: options.tooltipBody,
+    tooltipTone: options.tooltipTone
   });
 }
 

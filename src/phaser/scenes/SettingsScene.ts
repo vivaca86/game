@@ -122,25 +122,53 @@ function renderSettingsRasterStage(scene: Phaser.Scene, context: BootContext): S
 
   addControl("volumeMaster", 840, 282, 380, 58, 0xf5c26b, () => updateSettings(scene, context, (next) => {
     next.volumeMaster = stepVolume(next.volumeMaster, 0.1);
-  }), settingsControlStateOptions(SETTINGS_RASTER_CONTROL_STATE_KEYS.volumeMaster, 716, 271, 540, 64));
+  }), {
+    ...settingsControlStateOptions(SETTINGS_RASTER_CONTROL_STATE_KEYS.volumeMaster, 716, 271, 540, 64),
+    tooltipTitle: "전체 음량",
+    tooltipBody: `현재 ${Math.round(context.save.settings.volumeMaster * 100)}%입니다.`
+  });
   addControl("volumeMusic", 840, 372, 380, 58, 0xf5c26b, () => updateSettings(scene, context, (next) => {
     next.volumeMusic = stepVolume(next.volumeMusic, 0.1);
-  }), settingsControlStateOptions(SETTINGS_RASTER_CONTROL_STATE_KEYS.volumeMusic, 716, 363, 540, 64));
+  }), {
+    ...settingsControlStateOptions(SETTINGS_RASTER_CONTROL_STATE_KEYS.volumeMusic, 716, 363, 540, 64),
+    tooltipTitle: "음악 음량",
+    tooltipBody: `현재 ${Math.round(context.save.settings.volumeMusic * 100)}%입니다.`
+  });
   addControl("volumeSfx", 840, 462, 380, 58, 0xf5c26b, () => updateSettings(scene, context, (next) => {
     next.volumeSfx = stepVolume(next.volumeSfx, 0.1);
-  }), settingsControlStateOptions(SETTINGS_RASTER_CONTROL_STATE_KEYS.volumeSfx, 716, 455, 540, 64));
+  }), {
+    ...settingsControlStateOptions(SETTINGS_RASTER_CONTROL_STATE_KEYS.volumeSfx, 716, 455, 540, 64),
+    tooltipTitle: "효과음 음량",
+    tooltipBody: `현재 ${Math.round(context.save.settings.volumeSfx * 100)}%입니다.`
+  });
   addControl("displayMode", 1360, 282, 340, 62, 0x5eead4, () => updateSettings(scene, context, (next) => {
     next.displayMode = next.displayMode === "high_contrast" ? "standard" : "high_contrast";
-  }), settingsControlStateOptions(SETTINGS_RASTER_CONTROL_STATE_KEYS.displayMode, 1311, 271, 492, 64));
+  }), {
+    ...settingsControlStateOptions(SETTINGS_RASTER_CONTROL_STATE_KEYS.displayMode, 1311, 271, 492, 64),
+    tooltipTitle: "표시 모드",
+    tooltipBody: `현재 ${context.save.settings.displayMode === "high_contrast" ? "고대비" : "기본"} 모드입니다.`
+  });
   addControl("largeText", 1360, 372, 300, 62, 0x5eead4, () => updateSettings(scene, context, (next) => {
     next.largeText = !next.largeText;
-  }), settingsControlStateOptions(SETTINGS_RASTER_CONTROL_STATE_KEYS.largeText, 1311, 363, 492, 64));
+  }), {
+    ...settingsControlStateOptions(SETTINGS_RASTER_CONTROL_STATE_KEYS.largeText, 1311, 363, 492, 64),
+    tooltipTitle: "큰 글자",
+    tooltipBody: `현재 ${context.save.settings.largeText ? "켜짐" : "꺼짐"} 상태입니다.`
+  });
   addControl("reducedMotion", 1360, 462, 300, 62, 0x5eead4, () => updateSettings(scene, context, (next) => {
     next.reducedMotion = !next.reducedMotion;
-  }), settingsControlStateOptions(SETTINGS_RASTER_CONTROL_STATE_KEYS.reducedMotion, 1311, 455, 492, 64));
+  }), {
+    ...settingsControlStateOptions(SETTINGS_RASTER_CONTROL_STATE_KEYS.reducedMotion, 1311, 455, 492, 64),
+    tooltipTitle: "모션 줄이기",
+    tooltipBody: `현재 ${context.save.settings.reducedMotion ? "켜짐" : "꺼짐"} 상태입니다.`
+  });
   addControl("spaceConfirm", 1360, 640, 320, 62, 0x5eead4, () => updateSettings(scene, context, (next) => {
     next.spaceConfirm = !next.spaceConfirm;
-  }), settingsControlStateOptions(SETTINGS_RASTER_CONTROL_STATE_KEYS.spaceConfirm, 1311, 639, 492, 64));
+  }), {
+    ...settingsControlStateOptions(SETTINGS_RASTER_CONTROL_STATE_KEYS.spaceConfirm, 1311, 639, 492, 64),
+    tooltipTitle: "Space 확인",
+    tooltipBody: `현재 ${context.save.settings.spaceConfirm ? "Space와 Enter" : "Enter"}로 확인합니다.`
+  });
   addControl("resetDefaults", 1626, 696, 300, 150, 0xf5c26b, () => resetSettings(scene, context), {
     hoverKey: SETTINGS_RASTER_HOVER_RESET_DEFAULTS_KEY,
     downKey: SETTINGS_RASTER_DOWN_RESET_DEFAULTS_KEY,
@@ -149,7 +177,10 @@ function renderSettingsRasterStage(scene: Phaser.Scene, context: BootContext): S
     stampWidth: 330,
     stampHeight: 150,
     hoverAlpha: 0.94,
-    downAlpha: 0.92
+    downAlpha: 0.92,
+    tooltipTitle: "설정 기본값",
+    tooltipBody: "소리와 표시 설정을 기본값으로 되돌립니다.",
+    tooltipTone: "danger"
   });
   addControl("resetSave", 1626, 520, 300, 150, 0xce5869, () => {
     scene.registry.set(SETTINGS_RASTER_FOCUS_ID_KEY, undefined);
@@ -162,7 +193,10 @@ function renderSettingsRasterStage(scene: Phaser.Scene, context: BootContext): S
     stampWidth: 330,
     stampHeight: 150,
     hoverAlpha: 0.94,
-    downAlpha: 0.92
+    downAlpha: 0.92,
+    tooltipTitle: "저장 데이터 초기화",
+    tooltipBody: "현재 저장된 탐험과 진행 데이터를 지웁니다.",
+    tooltipTone: "danger"
   });
   const returnHitTarget = addControl("returnTown", 1688, 958, 330, 170, 0x5eead4, () => {
     scene.registry.set(SETTINGS_RASTER_FOCUS_ID_KEY, undefined);
@@ -175,7 +209,10 @@ function renderSettingsRasterStage(scene: Phaser.Scene, context: BootContext): S
     stampWidth: 330,
     stampHeight: 170,
     hoverAlpha: 0.96,
-    downAlpha: 0.94
+    downAlpha: 0.94,
+    tooltipTitle: "마을로 돌아가기",
+    tooltipBody: "변경한 설정을 유지한 채 마을 화면으로 이동합니다.",
+    tooltipTone: "confirm"
   });
   return { controls, returnHitTarget };
 }
@@ -343,6 +380,9 @@ function renderSettingsRasterHitTarget(
     stampHeight?: number;
     hoverAlpha?: number;
     downAlpha?: number;
+    tooltipTitle?: string;
+    tooltipBody?: string;
+    tooltipTone?: "default" | "confirm" | "choice" | "danger";
   } = {}
 ): Phaser.GameObjects.Rectangle {
   const largeTarget = width >= 180 || height >= 80;
@@ -361,7 +401,10 @@ function renderSettingsRasterHitTarget(
     downWidth: options.stampWidth ?? hoverSize * 1.12,
     downHeight: options.stampHeight ?? hoverSize * 1.12,
     hoverAlpha: options.hoverAlpha,
-    downAlpha: options.downAlpha ?? 0.76
+    downAlpha: options.downAlpha ?? 0.76,
+    tooltipTitle: options.tooltipTitle,
+    tooltipBody: options.tooltipBody,
+    tooltipTone: options.tooltipTone
   });
 }
 

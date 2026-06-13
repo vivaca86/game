@@ -96,7 +96,7 @@ Detailed continuation handoff:
 
 Current best estimate:
 
-- Overall active UI goal: about 88% after the WorldMap late completed-stack split, route-progress current-leg variant, late current-node body/frame split, mid dormant-node split, and far red locked-node split, still reported conservatively as WIP rather than final approval.
+- Overall active UI goal: about 89% after the first visible readability-tooltip pass across ten primary raster scenes, following the WorldMap late completed-stack split, route-progress current-leg variant, late current-node body/frame split, mid dormant-node split, and far red locked-node split. This is still WIP rather than final approval.
 - Static first-view concept matching is ahead of interaction/dynamic-state work.
 - WorldMap state truth is still a visible unfinished area, though it now has first-pass runtime current/completed/locked/sealed/dormant overlays, late current-node, mid dormant-node, and far red locked-node body/frame variants, first concept-derived route-progress bead/thread overlays plus a brighter current-leg route variant, and progressed-save audits for stage 4 current state and stage 9 current / stage 10 first-red-lock state.
 
@@ -162,6 +162,7 @@ Completed progress in this checkpoint:
 - A 2026-06-13 late current-node stack variant pass added `ui_current_stage_late_body_wash_concept` and `ui_current_stage_late_frame_concept`, updated the WorldMap audit to split base/late current body/frame counts, and reran WorldMap audit, route-node hover audit, `npm.cmd run check`, `git diff --check`, and targeted route/view smoke with `Phaser smoke OK`.
 - A 2026-06-13 mid dormant-node stack variant pass added `ui_dormant_stage_mid_body_wash_concept` and `ui_dormant_stage_mid_frame_concept`, updated the WorldMap audit to split base/mid dormant body/frame counts, and reran WorldMap audit, route-node hover audit, `npm.cmd run check`, `git diff --check`, and targeted route/view smoke with `Phaser smoke OK`.
 - A 2026-06-13 far red locked-node stack variant pass added `ui_locked_stage_far_body_wash_concept` and `ui_locked_stage_far_frame_concept`, updated the WorldMap audit to split next/far red locked body/frame counts, and reran WorldMap audit, route-node hover audit, `npm.cmd run check`, `git diff --check`, and targeted route/view smoke with `Phaser smoke OK`.
+- A 2026-06-14 visible readability-tooltip pass added `src/ui/overlays/readabilityOverlay.ts` and `tools/ui-readability-tooltip-audit.mjs`. It wires visible DOM tooltips into representative raster controls for Town, WorldMap, Dungeon, Combat, Reward, Event, RuneBench, Boss, Result, and Settings while keeping the canvas concept layer textless. The audit passed for all ten scenes and screenshot review of Combat/Settings confirmed the tooltips are readable without covering the main playfield.
 
 Next recommended work:
 
@@ -169,7 +170,7 @@ Next recommended work:
 2. Continue neutralizing or replacing baked node/route geometry where it conflicts with runtime state, especially missing/weak later node variants, lower-node shape silhouettes, route-line state marks, and route-progress material that still does not amount to a complete runtime route system.
 3. Refine selected/focus/keyboard state art without falling back to Phaser vector overlays. WorldMap directional keyboard selection, Town/Reward/Event/Dungeon/RuneBench/Result keyboard-confirm feedback, Dungeon directional focus, Reward/Event directional choice focus, Town/RuneBench/Result utility focus, Combat/Boss keyboard card/end-turn feedback plus directional focus, and Settings keyboard-cancel plus keyboard-focus feedback now have first evidence, but this is not final keyboard/focus coverage across screens.
 4. Continue deeper pressed/down, disabled, and focus review beyond the audited representative/current controls. Settings' ten audited controls, Town's lower toolbar controls, RuneBench lower confirm, Result lower return, the Town/RuneBench/Result representative utility targets, and Combat/Boss cost-disabled cards now have first evidence, but selected/focus state art, broader disabled-state breadth, remaining legacy UX decisions, and final keyboard-focus approval are still missing.
-5. Continue dynamic labels/tooltips/accessibility-safe text work beyond the first hidden DOM label pass, especially visible safe tooltip zones and any gameplay-critical readable text that cannot stay baked into concept art.
+5. Continue dynamic labels/tooltips/accessibility-safe text work beyond the first hidden DOM label pass and first visible tooltip pass. Representative safe tooltip zones now exist, but broader gameplay-critical readable text, disabled explanations, mobile tooltip placement, and user acceptance are still unfinished.
 6. Continue mobile/responsive review beyond the first automated sanity pass, especially the portrait letterbox presentation and whether the game needs a deliberate mobile framing/orientation treatment.
 7. Continue WorldMap recomposition beyond neutralized samples, first-pass badges, the first current/completed/locked/sealed/dormant body/frame overlays, the late current/completed, mid dormant, and far red locked splits, and the first route-progress bead/thread/current-leg overlays. The latest stage-5/stage-4 corrections and state body/frame/route passes reduce stale state reads but do not replace full current/completed/locked/sealed/dormant body variants or a complete dynamic route-state system.
 
@@ -179,7 +180,7 @@ Known unfinished scope:
 - Selected/focus/keyboard state art beyond the first WorldMap directional-selection pass, Town/Reward/Event/Dungeon/RuneBench/Result keyboard-confirm feedback pass, Dungeon directional focus pass, Reward/Event directional choice-focus pass, Town/RuneBench/Result utility-focus pass, Combat/Boss keyboard-action plus directional focus pass, and Settings keyboard-cancel/focus feedback pass.
 - Broad disabled-state coverage beyond Event unaffordable choice and Combat/Boss cost-disabled cards.
 - Screen-specific pressed/down art beyond the currently audited controls.
-- Dynamic readability and visible tooltip/safe-text zones beyond the first hidden accessibility-label layer.
+- Dynamic readability and visible tooltip/safe-text zones beyond the first hidden accessibility-label layer and representative visible tooltip pass.
 - Mobile portrait UX/framing beyond the first automated responsive sanity audit. The 390x844 pass proves no clipping but still letterboxes the 16:9 canvas heavily.
 - Broad Phaser smoke is passing for the 2026-06-13 WorldMap late completed-stack variant, route-progress thread, and hidden accessibility-label checkpoints, but it remains a regression gate rather than proof of final UI approval.
 - User acceptance.

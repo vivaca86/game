@@ -123,7 +123,11 @@ function renderWorldMapRasterStage(scene: Phaser.Scene, context: BootContext): v
 
   renderWorldMapRouteProgress(scene, context);
   renderWorldMapStageStateBadges(scene, context);
-  renderWorldMapRasterHitTarget(scene, 1576, 970, 280, 144, 0xf5c26b, () => handleSceneAction(scene, context, "confirm"));
+  renderWorldMapRasterHitTarget(scene, 1576, 970, 280, 144, 0xf5c26b, () => handleSceneAction(scene, context, "confirm"), {
+    tooltipTitle: "던전 진입",
+    tooltipBody: `${currentWorldMapStage(context)?.displayNameKo ?? context.run.stageId}에서 탐험을 시작합니다.`,
+    tooltipTone: "confirm"
+  });
   renderWorldMapCurrentStageMarker(scene, context);
   renderWorldMapRasterStageNodes(scene, context);
 }
@@ -678,7 +682,8 @@ function renderWorldMapRasterStageNodes(scene: Phaser.Scene, context: BootContex
       node.width,
       node.height,
       0x5eead4,
-      () => selectStageAndRestart(scene, context, stage.id)
+      () => selectStageAndRestart(scene, context, stage.id),
+      stage
     );
   });
 }
@@ -690,7 +695,8 @@ function renderWorldMapRasterNodeHitTarget(
   width: number,
   height: number,
   _accent: number,
-  onClick: () => void
+  onClick: () => void,
+  stage: StageData
 ): void {
   renderRasterHoverHitTarget(scene, x, y, width, height, onClick, {
     hoverKey: WORLD_MAP_RASTER_HOVER_NODE_KEY,
@@ -708,7 +714,10 @@ function renderWorldMapRasterNodeHitTarget(
     hoverDepth: 5.75,
     downDepth: 5.75,
     hoverBlendMode: Phaser.BlendModes.ADD,
-    downBlendMode: Phaser.BlendModes.ADD
+    downBlendMode: Phaser.BlendModes.ADD,
+    tooltipTitle: stage.displayNameKo,
+    tooltipBody: stage.descriptionKo,
+    tooltipTone: "choice"
   });
 }
 
@@ -719,7 +728,12 @@ function renderWorldMapRasterHitTarget(
   width: number,
   height: number,
   _accent: number,
-  onClick: () => void
+  onClick: () => void,
+  options: {
+    tooltipTitle?: string;
+    tooltipBody?: string;
+    tooltipTone?: "default" | "confirm" | "choice" | "danger";
+  } = {}
 ): void {
   renderRasterHoverHitTarget(scene, x, y, width, height, onClick, {
     hoverKey: WORLD_MAP_RASTER_HOVER_PLAY_KEY,
@@ -733,8 +747,15 @@ function renderWorldMapRasterHitTarget(
     downWidth: width,
     downHeight: height,
     hoverAlpha: 0.96,
-    downAlpha: 0.94
+    downAlpha: 0.94,
+    tooltipTitle: options.tooltipTitle,
+    tooltipBody: options.tooltipBody,
+    tooltipTone: options.tooltipTone
   });
+}
+
+function currentWorldMapStage(context: BootContext): StageData | undefined {
+  return context.dataBundle.stages.find((stage) => stage.id === context.run.stageId);
 }
 
 function handleWorldMapAction(scene: Phaser.Scene, context: BootContext, action: InputAction): void {

@@ -114,7 +114,10 @@ function renderTownRasterStage(scene: Phaser.Scene, context: BootContext): TownR
     downWidth: 160,
     downHeight: 154,
     hoverAlpha: 0.96,
-    downAlpha: 0.88
+    downAlpha: 0.88,
+    tooltipTitle: "탐험 준비",
+    tooltipBody: `${getStageLabel(context, context.run.stageId)} 경로로 나갑니다.`,
+    tooltipTone: "confirm"
   });
   // These legacy coordinates preserve click behavior but do not map to a clear concept control.
   renderTownRasterHitTarget(scene, 1010, 724, 330, 58, 0xce5869, () => resetStoredSave(scene, context), {
@@ -138,7 +141,9 @@ function renderTownRasterStage(scene: Phaser.Scene, context: BootContext): TownR
     downWidth: 220,
     downHeight: 164,
     hoverAlpha: 0.96,
-    downAlpha: 0.86
+    downAlpha: 0.86,
+    tooltipTitle: "설정 열기",
+    tooltipBody: "소리, 표시, 입력 보조 설정을 조정합니다."
   });
   addControl("toolbarReset", 514, 976, 140, 104, 0xce5869, () => resetStoredSave(scene, context), {
     hoverKey: TOWN_RASTER_TOOLBAR_RESET_KEYS.hover,
@@ -152,7 +157,10 @@ function renderTownRasterStage(scene: Phaser.Scene, context: BootContext): TownR
     downWidth: 230,
     downHeight: 142,
     hoverAlpha: 0.96,
-    downAlpha: 0.86
+    downAlpha: 0.86,
+    tooltipTitle: "저장 초기화",
+    tooltipBody: "현재 저장된 진행을 비우고 처음 상태로 돌아갑니다.",
+    tooltipTone: "danger"
   });
 
   return { controls, confirmHitTarget };
@@ -179,6 +187,9 @@ function renderTownRasterHitTarget(
     downHeight?: number;
     hoverAlpha?: number;
     downAlpha?: number;
+    tooltipTitle?: string;
+    tooltipBody?: string;
+    tooltipTone?: "default" | "confirm" | "choice" | "danger";
   } = {}
 ): Phaser.GameObjects.Rectangle {
   const hoverSize = Math.min(104, Math.max(76, Math.min(width, height) * 1.08));
@@ -194,7 +205,10 @@ function renderTownRasterHitTarget(
     downWidth: options.downWidth ?? hoverSize * 1.12,
     downHeight: options.downHeight ?? hoverSize * 1.12,
     hoverAlpha: options.hoverAlpha,
-    downAlpha: options.downAlpha ?? 0.76
+    downAlpha: options.downAlpha ?? 0.76,
+    tooltipTitle: options.tooltipTitle,
+    tooltipBody: options.tooltipBody,
+    tooltipTone: options.tooltipTone
   });
 }
 

@@ -256,7 +256,8 @@ function renderBossRasterCardTargets(
   const blockedActions: Partial<Record<InputAction, boolean>> = {};
   const controls: BossRasterControl[] = [];
 
-  cards.forEach((_card, index) => {
+  cards.forEach((cardId, index) => {
+    const card = context.dataBundle.cards.find((item) => item.id === cardId);
     const x = cardXs[index] ?? (540 + index * 220);
     const action = `card_${index + 1}` as InputAction;
     const playable = canPlayCardAtIndex(context.run, context.dataBundle, index);
@@ -286,7 +287,10 @@ function renderBossRasterCardTargets(
         downY: cardY - 44,
         downWidth: 134,
         downHeight: 134,
-        downAlpha: 0.92
+        downAlpha: 0.92,
+        tooltipTitle: card ? `${card.displayNameKo} · 비용 ${card.cost}` : action,
+        tooltipBody: card?.descriptionKo ?? "보스 전투에서 이 카드를 사용합니다.",
+        tooltipTone: "choice"
       });
       controls.push({
         id: action,
@@ -318,7 +322,10 @@ function renderBossRasterEndTurnTarget(scene: Phaser.Scene, context: BootContext
     downY: y - 28,
     downWidth: 156,
     downHeight: 156,
-    downAlpha: 0.92
+    downAlpha: 0.92,
+    tooltipTitle: "턴 종료",
+    tooltipBody: "보스의 다음 의도를 처리하고 새 턴을 준비합니다.",
+    tooltipTone: "confirm"
   });
 }
 

@@ -111,7 +111,10 @@ function renderResultRasterStage(scene: Phaser.Scene, context: BootContext): Res
     downWidth: 300,
     downHeight: 128,
     hoverAlpha: 0.94,
-    downAlpha: 0.84
+    downAlpha: 0.84,
+    tooltipTitle: "결과 확인",
+    tooltipBody: "이번 탐험의 보상과 진행 상태를 저장합니다.",
+    tooltipTone: "confirm"
   });
   addControl("returnButton", 960, 944, 440, 120, 0x5eead4, () => handleSceneAction(scene, context, "confirm"), {
     hoverKey: RESULT_RASTER_RETURN_BUTTON_KEYS.hover,
@@ -125,7 +128,10 @@ function renderResultRasterStage(scene: Phaser.Scene, context: BootContext): Res
     downWidth: 440,
     downHeight: 146,
     hoverAlpha: 0.96,
-    downAlpha: 0.88
+    downAlpha: 0.88,
+    tooltipTitle: "마을로 돌아가기",
+    tooltipBody: "결과를 닫고 다음 탐험 준비 화면으로 이동합니다.",
+    tooltipTone: "confirm"
   });
 
   return { controls, confirmHitTarget };
@@ -152,6 +158,9 @@ function renderResultRasterHitTarget(
     downHeight?: number;
     hoverAlpha?: number;
     downAlpha?: number;
+    tooltipTitle?: string;
+    tooltipBody?: string;
+    tooltipTone?: "default" | "confirm" | "choice" | "danger";
   } = {}
 ): Phaser.GameObjects.Rectangle {
   const hoverSize = Math.min(108, Math.max(80, Math.min(width, height) * 1.12));
@@ -167,7 +176,10 @@ function renderResultRasterHitTarget(
     downWidth: options.downWidth ?? hoverSize * 1.12,
     downHeight: options.downHeight ?? hoverSize * 1.12,
     hoverAlpha: options.hoverAlpha,
-    downAlpha: options.downAlpha ?? 0.76
+    downAlpha: options.downAlpha ?? 0.76,
+    tooltipTitle: options.tooltipTitle,
+    tooltipBody: options.tooltipBody,
+    tooltipTone: options.tooltipTone
   });
 }
 

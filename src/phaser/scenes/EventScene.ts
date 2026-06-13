@@ -136,7 +136,10 @@ function renderEventRasterChoice(
     downY: y - 178,
     downWidth: 124,
     downHeight: 88,
-    downAlpha: 0.94
+    downAlpha: 0.94,
+    tooltipTitle: choice.displayNameKo,
+    tooltipBody: choice.descriptionKo,
+    tooltipTone: "choice"
   });
 }
 

@@ -1,5 +1,6 @@
 import Phaser from "phaser";
 import type { BootContext } from "../../app/bootContext";
+import { hideReadabilityTooltip, showReadabilityTooltip, type ReadabilityTooltipTone } from "../../ui/overlays/readabilityOverlay";
 
 interface SceneShellOptions {
   title: string;
@@ -92,6 +93,9 @@ interface RasterHoverHitTargetOptions {
   hoverAlpha?: number;
   downAlpha?: number;
   idleAlpha?: number;
+  tooltipTitle?: string;
+  tooltipBody?: string;
+  tooltipTone?: ReadabilityTooltipTone;
 }
 
 interface RasterDisabledHitTargetOptions {
@@ -453,10 +457,12 @@ export function renderRasterHoverHitTarget(
   const showHover = () => {
     downImage?.setAlpha(idleAlpha);
     hoverImage?.setAlpha(options.hoverAlpha ?? 1);
+    showRasterTooltip(scene, x, y, width, height, options);
   };
   const showIdle = () => {
     hoverImage?.setAlpha(idleAlpha);
     downImage?.setAlpha(idleAlpha);
+    hideReadabilityTooltip();
   };
   const showDown = () => {
     hoverImage?.setAlpha(idleAlpha);
@@ -464,6 +470,7 @@ export function renderRasterHoverHitTarget(
     if (!downImage) {
       hoverImage?.setAlpha(options.downAlpha ?? 0.82);
     }
+    showRasterTooltip(scene, x, y, width, height, options);
   };
   hitTarget.on("pointerover", showHover);
   hitTarget.on("pointerout", showIdle);
@@ -479,6 +486,24 @@ export function renderRasterHoverHitTarget(
   hitTarget.setData("showRasterDown", showDown);
   hitTarget.setData("showRasterIdle", showIdle);
   return hitTarget;
+}
+
+function showRasterTooltip(
+  scene: Phaser.Scene,
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  options: RasterHoverHitTargetOptions
+): void {
+  if (!options.tooltipTitle) return;
+  showReadabilityTooltip({
+    sceneName: scene.scene.key,
+    title: options.tooltipTitle,
+    body: options.tooltipBody,
+    tone: options.tooltipTone,
+    anchor: { x, y, width, height }
+  });
 }
 
 export function setRasterHitTargetHoverState(

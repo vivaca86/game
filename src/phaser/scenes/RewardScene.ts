@@ -126,8 +126,36 @@ function renderRewardRasterChoice(
     downY: y - 268,
     downWidth: 124,
     downHeight: 88,
-    downAlpha: 0.94
+    downAlpha: 0.94,
+    tooltipTitle: rewardTooltipTitle(context, entry),
+    tooltipBody: rewardTooltipBody(context, entry),
+    tooltipTone: "choice"
   });
+}
+
+function rewardTooltipTitle(context: BootContext, entry: RewardEntry): string {
+  const item = rewardContent(context, entry);
+  if (item) return item.displayNameKo;
+  if (entry.type === "currency") return `골드 ${entry.amount ?? 0}`;
+  if (entry.type === "heal") return `체력 회복 ${entry.amount ?? 0}`;
+  return entry.id;
+}
+
+function rewardTooltipBody(context: BootContext, entry: RewardEntry): string {
+  const item = rewardContent(context, entry);
+  if (item) return item.descriptionKo;
+  if (entry.type === "currency") return "다음 상점과 이벤트 선택에 쓸 수 있는 골드를 얻습니다.";
+  if (entry.type === "heal") return "현재 탐험의 체력을 회복합니다.";
+  return "이번 보상을 선택합니다.";
+}
+
+function rewardContent(context: BootContext, entry: RewardEntry): { displayNameKo: string; descriptionKo: string } | undefined {
+  if (!entry.contentId) return undefined;
+  if (entry.type === "card") return context.dataBundle.cards.find((item) => item.id === entry.contentId);
+  if (entry.type === "rune") return context.dataBundle.runes.find((item) => item.id === entry.contentId);
+  if (entry.type === "relic") return context.dataBundle.relics.find((item) => item.id === entry.contentId);
+  if (entry.type === "arcana") return context.dataBundle.arcanas.find((item) => item.id === entry.contentId);
+  return undefined;
 }
 
 function createRewardRasterKeyboardHandler(

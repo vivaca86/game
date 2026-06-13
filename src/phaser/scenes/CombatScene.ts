@@ -266,7 +266,10 @@ function renderCombatRasterEndTurnButton(scene: Phaser.Scene, context: BootConte
     downY: y - 118,
     downWidth: 138,
     downHeight: 138,
-    downAlpha: 0.94
+    downAlpha: 0.94,
+    tooltipTitle: "턴 종료",
+    tooltipBody: "남은 기운을 정리하고 적의 의도를 처리합니다.",
+    tooltipTone: "confirm"
   });
 }
 
@@ -436,7 +439,7 @@ export function renderCombatRasterCardHand(
   const blockedActions: Partial<Record<InputAction, boolean>> = {};
   const controls: CombatRasterControl[] = [];
 
-  cards.forEach((_card, index) => {
+  cards.forEach((card, index) => {
     const x = cardXs[index] ?? (540 + index * 220);
     const action = `card_${index + 1}` as InputAction;
     const playable = canPlayCardAtIndex(context.run, context.dataBundle, index);
@@ -466,7 +469,10 @@ export function renderCombatRasterCardHand(
         downY: cardY - 92,
         downWidth: 94,
         downHeight: 94,
-        downAlpha: 0.94
+        downAlpha: 0.94,
+        tooltipTitle: `${card.displayNameKo} · 비용 ${card.cost}`,
+        tooltipBody: card.descriptionKo,
+        tooltipTone: "choice"
       });
       controls.push({
         id: action,
