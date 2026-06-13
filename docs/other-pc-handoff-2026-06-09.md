@@ -7,7 +7,7 @@ Repository:
 - GitHub: `https://github.com/vivaca86/game.git`
 - Branch: `main`
 - Latest pushed commit: run `git log -1 --oneline` after pulling.
-- Expected latest commit title after the 2026-06-14 disabled-readability continuation: `Add disabled readability audit`
+- Expected latest commit title after the 2026-06-14 mobile-landscape readability continuation: `Audit mobile landscape readability`
 
 ## Start On Another PC
 
@@ -22,7 +22,7 @@ npm install
 Expected first commit title in `git log --oneline -5` after the latest continuation:
 
 ```text
-Add disabled readability audit
+Audit mobile landscape readability
 ```
 
 Expected status:
@@ -1818,3 +1818,42 @@ Representative evidence:
 - `tmp/ui-quality/worldmap-locked-tooltips/red-boss-locked-tooltip-v1-mobile-390x844.png`
 
 Important limitation: this makes disabled/readability evidence more reproducible and broader across desktop/mobile, but it is not full disabled approval across every possible control, final UI approval, user acceptance, or release-ready proof.
+
+## 2026-06-14 Mobile Landscape Readability Continuation
+
+Status remains `95% candidate, not final`.
+
+Latest implementation/audit continuation:
+
+- Expanded `tools/ui-readability-tooltip-audit.mjs` with `mobile-landscape-844x390`.
+- Expanded `tools/ui-responsive-raster-audit.mjs` with `mobile-landscape-844x390`.
+- Re-ran `tools/ui-mobile-framing-audit.mjs`; the framing cue remains portrait-only and stays hidden on desktop and 844x390 landscape.
+- The responsive and readability gates now cover ten primary scenes across four viewports: 1920x1080, 1280x720, 390x844 portrait, and 844x390 landscape.
+
+Commands:
+
+```powershell
+node tools\ui-readability-tooltip-audit.mjs
+node tools\ui-responsive-raster-audit.mjs
+node tools\ui-mobile-framing-audit.mjs
+git diff --check
+npm.cmd run check
+```
+
+Result:
+
+- `node tools\ui-readability-tooltip-audit.mjs` passed 40 scene/viewport cases.
+- `node tools\ui-responsive-raster-audit.mjs` passed 40 scene/viewport cases.
+- `node tools\ui-mobile-framing-audit.mjs` passed portrait, desktop, 1280 desktop, and 844x390 landscape framing checks for all ten primary scenes, plus Combat tooltip suppression.
+- `git diff --check` passed.
+- `npm.cmd run check` passed with only the existing Vite large JS chunk warning.
+
+Representative evidence:
+
+- `tmp/ui-quality/readability-tooltips/worldmap-tooltip-v1-mobile-landscape-844x390.png`
+- `tmp/ui-quality/readability-tooltips/combat-tooltip-v1-mobile-landscape-844x390.png`
+- `tmp/ui-quality/readability-tooltips/settings-tooltip-v1-mobile-landscape-844x390.png`
+- `tmp/ui-quality/responsive/settings-mobile-landscape-844x390.png`
+- `tmp/ui-quality/mobile-framing/worldmap-framing-v1-mobile-landscape-844x390.png`
+
+Important limitation: this strengthens mobile landscape responsive/readability evidence for the current 95% candidate, but it is not final mobile UX approval, final UI approval, user acceptance, or release-ready proof.

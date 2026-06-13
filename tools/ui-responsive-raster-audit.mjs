@@ -38,7 +38,8 @@ async function startServer() {
 const viewports = [
   { label: "desktop-1920", width: 1920, height: 1080 },
   { label: "desktop-1280", width: 1280, height: 720 },
-  { label: "mobile-390x844", width: 390, height: 844 }
+  { label: "mobile-390x844", width: 390, height: 844 },
+  { label: "mobile-landscape-844x390", width: 844, height: 390 }
 ];
 
 const targets = [

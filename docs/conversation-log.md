@@ -2410,3 +2410,15 @@ Added `tools/ui-disabled-readability-audit.mjs`. It verifies Event unaffordable 
 Verification passed with `node tools\ui-disabled-readability-audit.mjs`, `node tools\ui-worldmap-locked-tooltip-audit.mjs`, `git diff --check`, and `npm.cmd run check`. The WorldMap locked audit passed all 15 locked-node cases again across 1920x1080, 1280x720, and 390x844. `npm.cmd run check` still reports only the existing Vite large JS chunk warning.
 
 This remains a 95% candidate rather than final approval. Disabled/readability evidence is broader and easier to rerun now, but full disabled approval across every possible control, final mobile UX approval, user acceptance, and release-ready UI remain unfinished.
+
+### Codex
+
+Codex continued the active 95% candidate UI goal by extending the official responsive/readability coverage into mobile landscape. The prior responsive and visible-tooltip audits covered 1920x1080, 1280x720, and 390x844 portrait, while the mobile framing audit already had a landscape-hidden cue check. The missing reproducible evidence was whether the main raster scenes and DOM readability tooltips also stayed safe at a real small landscape viewport.
+
+Expanded `tools/ui-readability-tooltip-audit.mjs` and `tools/ui-responsive-raster-audit.mjs` with `mobile-landscape-844x390`. Both audits now cover Town, WorldMap, Dungeon, Combat, Reward, Event, RuneBench, Boss, Result, and Settings across four viewports: 1920x1080, 1280x720, 390x844 portrait, and 844x390 landscape.
+
+Verification passed with `node tools\ui-readability-tooltip-audit.mjs`, `node tools\ui-responsive-raster-audit.mjs`, `node tools\ui-mobile-framing-audit.mjs`, `git diff --check`, and `npm.cmd run check`. The readability and responsive audits each passed 40 scene/viewport cases. The mobile framing audit passed portrait, desktop, 1280 desktop, and 844x390 landscape framing checks for all ten primary scenes plus Combat tooltip suppression. `npm.cmd run check` still reports only the existing Vite large JS chunk warning.
+
+Updated `docs/other-pc-handoff-2026-06-09.md`, `docs/current-issues-and-plan.md`, and `docs/ui-visual-quality-rubric.md` so another PC can continue from the latest 95% candidate state. Representative evidence includes `tmp/ui-quality/readability-tooltips/worldmap-tooltip-v1-mobile-landscape-844x390.png`, `tmp/ui-quality/readability-tooltips/combat-tooltip-v1-mobile-landscape-844x390.png`, `tmp/ui-quality/readability-tooltips/settings-tooltip-v1-mobile-landscape-844x390.png`, `tmp/ui-quality/responsive/settings-mobile-landscape-844x390.png`, and `tmp/ui-quality/mobile-framing/worldmap-framing-v1-mobile-landscape-844x390.png`.
+
+This remains a 95% candidate rather than final approval. Mobile landscape responsive/readability evidence is stronger now, but final mobile UX approval, user acceptance, final concept-match approval, and release-ready UI remain unfinished.
