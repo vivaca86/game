@@ -120,6 +120,7 @@ try {
       if (clickAudit.activeScene !== "WorldMapScene" || clickAudit.currentStageId !== seeded.currentStageId) {
         throw new Error(`${auditCase.key}/${viewport.key}: locked node click changed scene/stage ${JSON.stringify(clickAudit)}`);
       }
+      assertWorldMapLockedTooltip(`${auditCase.key}/${viewport.key}/click`, clickAudit, auditCase, viewport, seeded);
 
       const screenshot = path.join("tmp", "ui-quality", "worldmap-locked-tooltips", `${auditCase.key}-locked-tooltip-v1-${viewport.suffix}.png`);
       await page.screenshot({ path: screenshot, fullPage: true });
@@ -130,6 +131,11 @@ try {
         title: hoverAudit.tooltip.title,
         size: `${Math.round(hoverAudit.tooltip.width)}x${Math.round(hoverAudit.tooltip.height)}`,
         currentStageId: hoverAudit.currentStageId,
+        currentMarkerImages: hoverAudit.visibleCurrentMarkerImages,
+        currentHaloImages: hoverAudit.visibleCurrentHaloImages,
+        currentBody: hoverAudit.visibleCurrentLateBodyImages === 1 ? "late" : "base",
+        currentFrame: hoverAudit.visibleCurrentLateFrameImages === 1 ? "late" : "base",
+        currentStatusImages: hoverAudit.visibleCurrentStatusImages,
         firstLockedIndex: hoverAudit.firstLockedIndex,
         screenshot: path.resolve(screenshot)
       });
@@ -236,7 +242,7 @@ async function hideDebugOverlay(page) {
 }
 
 async function readWorldMapTooltipAudit(page, auditCase) {
-  return page.evaluate(({ auditCase }) => {
+  return page.evaluate(({ auditCase, stageNodes }) => {
     const root = document.getElementById("game-readability-tooltip");
     const canvas = document.querySelector("#game-root canvas");
     const game = window.__paperGame;
@@ -245,24 +251,186 @@ async function readWorldMapTooltipAudit(page, auditCase) {
     const context = scene?.registry?.get?.("bootContext");
     const stages = context?.dataBundle?.stages ?? [];
     const currentStageId = context?.run?.stageId;
+    const currentIndex = stages.findIndex((stage) => stage.id === currentStageId);
+    const currentNode = stageNodes[currentIndex];
     const unlockedStageIds = new Set([...(context?.save?.profile?.unlockedStages ?? []), currentStageId]);
     const firstLockedIndex = stages.findIndex((stage) => !unlockedStageIds.has(stage.id));
     const visible = (scene?.children?.list ?? []).filter((child) => child?.visible !== false && child.alpha !== 0);
+    const children = scene?.children?.list ?? [];
+    const underlayIndex = children.findIndex((child) => (
+      child?.type === "Image"
+      && child.texture?.key === "world_map_raster_underlay_concept"
+      && child.visible !== false
+      && child.alpha !== 0
+    ));
+    const underlayDepth = children[underlayIndex]?.depth ?? 0;
+    const imageByKey = (key) => visible.filter((child) => (
+      child?.type === "Image"
+      && child.texture?.key === key
+      && Number(child.alpha ?? 1) > 0.05
+    ));
+    const markerImages = imageByKey("ui_current_stage_marker_concept");
+    const currentBaseBodyImages = imageByKey("ui_current_stage_body_wash_concept");
+    const currentLateBodyImages = imageByKey("ui_current_stage_late_body_wash_concept");
+    const currentBodyImages = [...currentBaseBodyImages, ...currentLateBodyImages];
+    const currentBaseFrameImages = imageByKey("ui_current_stage_frame_concept");
+    const currentLateFrameImages = imageByKey("ui_current_stage_late_frame_concept");
+    const currentFrameImages = [...currentBaseFrameImages, ...currentLateFrameImages];
+    const haloImages = imageByKey("ui_current_stage_halo_concept");
+    const statusImages = imageByKey("ui_current_stage_status_badge_concept");
+    const completedImages = [
+      ...imageByKey("ui_completed_stage_badge_concept"),
+      ...imageByKey("ui_completed_stage_late_badge_concept")
+    ];
+    const completedBodyImages = [
+      ...imageByKey("ui_completed_stage_body_wash_concept"),
+      ...imageByKey("ui_completed_stage_late_body_wash_concept")
+    ];
+    const completedFrameImages = [
+      ...imageByKey("ui_completed_stage_frame_concept"),
+      ...imageByKey("ui_completed_stage_late_frame_concept")
+    ];
+    const lockedBadgeImages = imageByKey("ui_locked_stage_badge_concept");
+    const lockedBodyImages = [
+      ...imageByKey("ui_locked_stage_body_wash_concept"),
+      ...imageByKey("ui_locked_stage_far_body_wash_concept"),
+      ...imageByKey("ui_locked_stage_boss_body_wash_concept")
+    ];
+    const lockedFrameImages = [
+      ...imageByKey("ui_locked_stage_frame_concept"),
+      ...imageByKey("ui_locked_stage_far_frame_concept"),
+      ...imageByKey("ui_locked_stage_boss_frame_concept")
+    ];
+    const sealedBadgeImages = imageByKey("ui_sealed_stage_badge_concept");
+    const sealedBodyImages = [
+      ...imageByKey("ui_sealed_stage_body_wash_concept"),
+      ...imageByKey("ui_sealed_stage_mid_body_wash_concept")
+    ];
+    const sealedFrameImages = [
+      ...imageByKey("ui_sealed_stage_frame_concept"),
+      ...imageByKey("ui_sealed_stage_mid_frame_concept")
+    ];
+    const dormantBodyImages = [
+      ...imageByKey("ui_dormant_stage_body_wash_concept"),
+      ...imageByKey("ui_dormant_stage_mid_body_wash_concept")
+    ];
+    const dormantFrameImages = [
+      ...imageByKey("ui_dormant_stage_frame_concept"),
+      ...imageByKey("ui_dormant_stage_mid_frame_concept")
+    ];
     const defaultDisabledStampCount = visible.filter((child) => (
       child?.type === "Image"
       && child.texture?.key === "ui_disabled_lock_stamp_concept"
       && Number(child.alpha ?? 1) > 0.05
     )).length;
+    const visibleTextCount = visible.filter((child) => (
+      child?.type === "Text"
+      && String(child.text ?? "").trim().length > 0
+    )).length;
+    const visibleRectsAboveUnderlay = visible
+      .filter((child) => child?.type === "Rectangle")
+      .filter((child) => child.depth > underlayDepth || children.indexOf(child) > underlayIndex)
+      .filter((child) => {
+        const fillAlpha = Number(child?.fillAlpha ?? child?.alpha ?? 1);
+        const strokeAlpha = Number(child?.strokeAlpha ?? child?.lineAlpha ?? 0);
+        const strokeWidth = Number(child?.lineWidth ?? child?.strokeWidth ?? 0);
+        return (child?.isFilled && fillAlpha > 0.02) || (child?.isStroked && strokeWidth > 0 && strokeAlpha > 0.02);
+      }).length;
+    const expectedLateCurrent = currentIndex > 4;
+    const expectedBodyImages = expectedLateCurrent ? currentLateBodyImages : currentBaseBodyImages;
+    const expectedFrameImages = expectedLateCurrent ? currentLateFrameImages : currentBaseFrameImages;
+    const markerAtCurrentStage = markerImages.length === 1
+      && currentNode
+      && Math.abs(markerImages[0].x - (currentNode.x + 4)) <= 1
+      && Math.abs(markerImages[0].y - (currentNode.y - Math.max(88, currentNode.height * 0.62))) <= 1
+      && Math.abs(markerImages[0].displayWidth - 76) <= 1
+      && Math.abs(markerImages[0].displayHeight - 86) <= 1
+      && Number(markerImages[0].alpha ?? 1) >= 0.96;
+    const haloAtCurrentStage = haloImages.length === 1
+      && currentNode
+      && Math.abs(haloImages[0].x - (currentNode.x + 2)) <= 1
+      && Math.abs(haloImages[0].y - (currentNode.y + 4)) <= 1
+      && Math.abs(haloImages[0].displayWidth - currentNode.width * 1.78) <= 1
+      && Math.abs(haloImages[0].displayHeight - currentNode.height * 1.9) <= 1
+      && Number(haloImages[0].alpha ?? 1) >= 0.72;
+    const bodyAtCurrentStage = currentBodyImages.length === 1
+      && expectedBodyImages.length === 1
+      && (expectedLateCurrent ? currentBaseBodyImages.length === 0 : currentLateBodyImages.length === 0)
+      && currentNode
+      && Math.abs(expectedBodyImages[0].x - (currentNode.x + currentNode.width * 0.02)) <= 1
+      && Math.abs(expectedBodyImages[0].y - (currentNode.y + currentNode.height * 0.04)) <= 1
+      && Math.abs(expectedBodyImages[0].displayWidth - currentNode.width * 1.12) <= 1
+      && Math.abs(expectedBodyImages[0].displayHeight - currentNode.height * 1.16) <= 1
+      && Number(expectedBodyImages[0].alpha ?? 1) >= 0.64;
+    const frameAtCurrentStage = currentFrameImages.length === 1
+      && expectedFrameImages.length === 1
+      && (expectedLateCurrent ? currentBaseFrameImages.length === 0 : currentLateFrameImages.length === 0)
+      && currentNode
+      && Math.abs(expectedFrameImages[0].x - (currentNode.x + currentNode.width * 0.02)) <= 1
+      && Math.abs(expectedFrameImages[0].y - (currentNode.y + currentNode.height * 0.01)) <= 1
+      && Math.abs(expectedFrameImages[0].displayWidth - currentNode.width * 1.34) <= 1
+      && Math.abs(expectedFrameImages[0].displayHeight - currentNode.height * 1.38) <= 1
+      && Number(expectedFrameImages[0].alpha ?? 1) >= 0.88;
+    const statusAtCurrentStage = statusImages.length === 1
+      && currentNode
+      && Math.abs(statusImages[0].x - (currentNode.x + currentNode.width * 0.1)) <= 1
+      && Math.abs(statusImages[0].y - (currentNode.y + currentNode.height * 0.36)) <= 1
+      && Math.abs(statusImages[0].displayWidth - 72) <= 1
+      && Math.abs(statusImages[0].displayHeight - 72) <= 1
+      && Number(statusImages[0].alpha ?? 1) >= 0.96;
+    const notNearCurrentNode = (image, scale) => !currentNode || (
+      Math.abs(image.x - currentNode.x) >= currentNode.width * scale
+      || Math.abs(image.y - currentNode.y) >= currentNode.height * scale
+    );
+    const currentHasNoCompletedBadge = completedImages.every((image) => notNearCurrentNode(image, 0.6));
+    const currentHasNoCompletedBody = completedBodyImages.every((image) => notNearCurrentNode(image, 0.72));
+    const currentHasNoCompletedFrame = completedFrameImages.every((image) => notNearCurrentNode(image, 0.72));
+    const currentHasNoLockedBadge = [...lockedBadgeImages, ...sealedBadgeImages].every((image) => notNearCurrentNode(image, 0.6));
+    const currentHasNoLockedBody = lockedBodyImages.every((image) => notNearCurrentNode(image, 0.72));
+    const currentHasNoLockedFrame = lockedFrameImages.every((image) => notNearCurrentNode(image, 0.72));
+    const currentHasNoSealedBody = sealedBodyImages.every((image) => notNearCurrentNode(image, 0.72));
+    const currentHasNoSealedFrame = sealedFrameImages.every((image) => notNearCurrentNode(image, 0.72));
+    const currentHasNoDormantBody = dormantBodyImages.every((image) => notNearCurrentNode(image, 0.72));
+    const currentHasNoDormantFrame = dormantFrameImages.every((image) => notNearCurrentNode(image, 0.72));
 
     const tooltip = readTooltip(root, canvas);
     return {
       activeScene: game?.scene?.getScenes?.(true)?.[0]?.scene?.key ?? "none",
       currentStageId,
+      currentIndex,
       targetStageId: stages[auditCase.targetIndex]?.id,
       targetStageName: stages[auditCase.targetIndex]?.displayNameKo,
+      expectedLateCurrent,
+      underlayVisible: underlayIndex >= 0,
+      visibleCurrentMarkerImages: markerImages.length,
+      markerAtCurrentStage: Boolean(markerAtCurrentStage),
+      visibleCurrentHaloImages: haloImages.length,
+      haloAtCurrentStage: Boolean(haloAtCurrentStage),
+      visibleCurrentBodyImages: currentBodyImages.length,
+      visibleCurrentBaseBodyImages: currentBaseBodyImages.length,
+      visibleCurrentLateBodyImages: currentLateBodyImages.length,
+      bodyAtCurrentStage: Boolean(bodyAtCurrentStage),
+      visibleCurrentFrameImages: currentFrameImages.length,
+      visibleCurrentBaseFrameImages: currentBaseFrameImages.length,
+      visibleCurrentLateFrameImages: currentLateFrameImages.length,
+      frameAtCurrentStage: Boolean(frameAtCurrentStage),
+      visibleCurrentStatusImages: statusImages.length,
+      statusAtCurrentStage: Boolean(statusAtCurrentStage),
+      currentHasNoCompletedBadge,
+      currentHasNoCompletedBody,
+      currentHasNoCompletedFrame,
+      currentHasNoLockedBadge,
+      currentHasNoLockedBody,
+      currentHasNoLockedFrame,
+      currentHasNoSealedBody,
+      currentHasNoSealedFrame,
+      currentHasNoDormantBody,
+      currentHasNoDormantFrame,
       firstLockedIndex,
       targetUnlocked: unlockedStageIds.has(stages[auditCase.targetIndex]?.id),
       defaultDisabledStampCount,
+      visibleTextCount,
+      visibleRectsAboveUnderlay,
       tooltip
     };
 
@@ -312,14 +480,84 @@ async function readWorldMapTooltipAudit(page, auditCase) {
         canvasLabelLength: canvasNode.getAttribute("aria-label")?.length ?? 0
       };
     }
-  }, { auditCase });
+  }, { auditCase, stageNodes });
 }
 
 function assertWorldMapLockedTooltip(label, audit, auditCase, viewport, seeded) {
   const tooltip = audit.tooltip;
   if (audit.activeScene !== "WorldMapScene") throw new Error(`${label}: expected WorldMapScene, got ${audit.activeScene}`);
+  if (!audit.underlayVisible) throw new Error(`${label}: missing world map raster underlay`);
   if (audit.currentStageId !== seeded.currentStageId) {
     throw new Error(`${label}: expected current stage ${seeded.currentStageId}, got ${audit.currentStageId}`);
+  }
+  if (!audit.markerAtCurrentStage || audit.visibleCurrentMarkerImages !== 1) {
+    throw new Error(`${label}: current marker changed during locked-node interaction ${JSON.stringify({
+      visibleCurrentMarkerImages: audit.visibleCurrentMarkerImages,
+      markerAtCurrentStage: audit.markerAtCurrentStage
+    })}`);
+  }
+  if (!audit.haloAtCurrentStage || audit.visibleCurrentHaloImages !== 1) {
+    throw new Error(`${label}: current halo changed during locked-node interaction ${JSON.stringify({
+      visibleCurrentHaloImages: audit.visibleCurrentHaloImages,
+      haloAtCurrentStage: audit.haloAtCurrentStage
+    })}`);
+  }
+  if (!audit.bodyAtCurrentStage || audit.visibleCurrentBodyImages !== 1) {
+    throw new Error(`${label}: current body changed during locked-node interaction ${JSON.stringify({
+      visibleCurrentBodyImages: audit.visibleCurrentBodyImages,
+      visibleCurrentBaseBodyImages: audit.visibleCurrentBaseBodyImages,
+      visibleCurrentLateBodyImages: audit.visibleCurrentLateBodyImages,
+      bodyAtCurrentStage: audit.bodyAtCurrentStage
+    })}`);
+  }
+  if (!audit.frameAtCurrentStage || audit.visibleCurrentFrameImages !== 1) {
+    throw new Error(`${label}: current frame changed during locked-node interaction ${JSON.stringify({
+      visibleCurrentFrameImages: audit.visibleCurrentFrameImages,
+      visibleCurrentBaseFrameImages: audit.visibleCurrentBaseFrameImages,
+      visibleCurrentLateFrameImages: audit.visibleCurrentLateFrameImages,
+      frameAtCurrentStage: audit.frameAtCurrentStage
+    })}`);
+  }
+  if (!audit.statusAtCurrentStage || audit.visibleCurrentStatusImages !== 1) {
+    throw new Error(`${label}: current status badge changed during locked-node interaction ${JSON.stringify({
+      visibleCurrentStatusImages: audit.visibleCurrentStatusImages,
+      statusAtCurrentStage: audit.statusAtCurrentStage
+    })}`);
+  }
+  if (audit.visibleCurrentBaseBodyImages !== (audit.expectedLateCurrent ? 0 : 1)) {
+    throw new Error(`${label}: wrong base current body count during locked-node interaction ${audit.visibleCurrentBaseBodyImages}`);
+  }
+  if (audit.visibleCurrentLateBodyImages !== (audit.expectedLateCurrent ? 1 : 0)) {
+    throw new Error(`${label}: wrong late current body count during locked-node interaction ${audit.visibleCurrentLateBodyImages}`);
+  }
+  if (audit.visibleCurrentBaseFrameImages !== (audit.expectedLateCurrent ? 0 : 1)) {
+    throw new Error(`${label}: wrong base current frame count during locked-node interaction ${audit.visibleCurrentBaseFrameImages}`);
+  }
+  if (audit.visibleCurrentLateFrameImages !== (audit.expectedLateCurrent ? 1 : 0)) {
+    throw new Error(`${label}: wrong late current frame count during locked-node interaction ${audit.visibleCurrentLateFrameImages}`);
+  }
+  if (!audit.currentHasNoCompletedBadge
+    || !audit.currentHasNoCompletedBody
+    || !audit.currentHasNoCompletedFrame
+    || !audit.currentHasNoLockedBadge
+    || !audit.currentHasNoLockedBody
+    || !audit.currentHasNoLockedFrame
+    || !audit.currentHasNoSealedBody
+    || !audit.currentHasNoSealedFrame
+    || !audit.currentHasNoDormantBody
+    || !audit.currentHasNoDormantFrame) {
+    throw new Error(`${label}: current stage has conflicting state overlays during locked-node interaction ${JSON.stringify({
+      currentHasNoCompletedBadge: audit.currentHasNoCompletedBadge,
+      currentHasNoCompletedBody: audit.currentHasNoCompletedBody,
+      currentHasNoCompletedFrame: audit.currentHasNoCompletedFrame,
+      currentHasNoLockedBadge: audit.currentHasNoLockedBadge,
+      currentHasNoLockedBody: audit.currentHasNoLockedBody,
+      currentHasNoLockedFrame: audit.currentHasNoLockedFrame,
+      currentHasNoSealedBody: audit.currentHasNoSealedBody,
+      currentHasNoSealedFrame: audit.currentHasNoSealedFrame,
+      currentHasNoDormantBody: audit.currentHasNoDormantBody,
+      currentHasNoDormantFrame: audit.currentHasNoDormantFrame
+    })}`);
   }
   if (audit.firstLockedIndex !== auditCase.expectedFirstLockedIndex) {
     throw new Error(`${label}: expected first locked index ${auditCase.expectedFirstLockedIndex}, got ${audit.firstLockedIndex}`);
@@ -327,6 +565,12 @@ function assertWorldMapLockedTooltip(label, audit, auditCase, viewport, seeded) 
   if (audit.targetUnlocked) throw new Error(`${label}: target stage unexpectedly unlocked`);
   if (audit.defaultDisabledStampCount !== 0) {
     throw new Error(`${label}: unexpected default disabled stamp images on WorldMap (${audit.defaultDisabledStampCount})`);
+  }
+  if (audit.visibleTextCount !== 0 || audit.visibleRectsAboveUnderlay !== 0) {
+    throw new Error(`${label}: unexpected Phaser text/vector leak ${JSON.stringify({
+      visibleTextCount: audit.visibleTextCount,
+      visibleRectsAboveUnderlay: audit.visibleRectsAboveUnderlay
+    })}`);
   }
   if (!tooltip.ok) throw new Error(`${label}: ${tooltip.reason ?? "tooltip audit failed"}`);
   if (tooltip.role !== "tooltip") throw new Error(`${label}: expected role=tooltip, got ${tooltip.role}`);
