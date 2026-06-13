@@ -6,6 +6,11 @@ const VIRTUAL_HEIGHT = 1080;
 
 export type ReadabilityTooltipTone = "default" | "confirm" | "choice" | "danger";
 
+interface ReadabilityPreferences {
+  largeText: boolean;
+  reducedMotion: boolean;
+}
+
 interface ReadabilityTooltipAnchor {
   x: number;
   y: number;
@@ -21,9 +26,21 @@ interface ReadabilityTooltipOptions {
   anchor: ReadabilityTooltipAnchor;
 }
 
+let activePreferences: ReadabilityPreferences = {
+  largeText: false,
+  reducedMotion: false
+};
+
+export function applyReadabilityTooltipPreferences(preferences: ReadabilityPreferences): void {
+  activePreferences = preferences;
+  const root = document.getElementById(READABILITY_ROOT_ID);
+  if (root) applyPreferences(root);
+}
+
 export function showReadabilityTooltip(options: ReadabilityTooltipOptions): void {
   setMobileFramingCueSuppressed(true);
   const root = ensureReadabilityRoot();
+  applyPreferences(root);
   root.dataset.visible = "true";
   root.dataset.scene = options.sceneName;
   root.dataset.title = options.title;
@@ -53,8 +70,14 @@ function ensureReadabilityRoot(): HTMLElement {
   root.dataset.visible = "false";
   root.setAttribute("role", "tooltip");
   root.setAttribute("aria-live", "polite");
+  applyPreferences(root);
   document.body.append(root);
   return root;
+}
+
+function applyPreferences(root: HTMLElement): void {
+  root.dataset.largeText = String(activePreferences.largeText);
+  root.dataset.reducedMotion = String(activePreferences.reducedMotion);
 }
 
 function textElement(tagName: "strong" | "span", text: string): HTMLElement {
@@ -123,12 +146,13 @@ function applyResponsiveTooltipSizing(
   canvasMargin: number
 ): void {
   const compact = canvasWidth < 700;
+  const largeText = root.dataset.largeText === "true";
   const maxWidth = Math.max(180, canvasWidth - canvasMargin * 2);
   const preferredWidth = compact
-    ? Math.min(maxWidth, Math.max(220, canvasWidth * 0.74))
-    : Math.min(maxWidth, 336);
+    ? Math.min(maxWidth, Math.max(largeText ? 244 : 220, canvasWidth * (largeText ? 0.8 : 0.74)))
+    : Math.min(maxWidth, largeText ? 376 : 336);
   root.style.setProperty("--readability-tooltip-width", `${Math.round(preferredWidth)}px`);
-  root.style.setProperty("--readability-tooltip-min-height", compact ? "54px" : "74px");
+  root.style.setProperty("--readability-tooltip-min-height", compact ? (largeText ? "62px" : "54px") : (largeText ? "84px" : "74px"));
   root.style.setProperty("--readability-tooltip-max-height", `${Math.max(48, Math.round(canvasHeight - canvasMargin * 2))}px`);
-  root.style.setProperty("--readability-tooltip-padding", compact ? "9px 11px 10px" : "12px 15px 13px");
+  root.style.setProperty("--readability-tooltip-padding", compact ? (largeText ? "10px 12px 11px" : "9px 11px 10px") : (largeText ? "13px 16px 14px" : "12px 15px 13px"));
 }

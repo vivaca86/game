@@ -217,3 +217,33 @@ Known unfinished scope:
 - Broad Phaser smoke is passing for the latest 2026-06-14 HEAD checkpoint on `5e588d5`, with no `PHASER_SMOKE_ONLY` filter, and the responsive/readability/mobile/accessibility audits are passing on the latest 95% candidate checkpoints, including the 844x390 mobile-landscape responsive/readability/accessibility/focus/disabled/locked/open/route/keyboard-tooltip passes. These remain regression gates rather than proof of final UI approval.
 - User acceptance.
 - Final user-accepted 95% or release-ready UI.
+
+## 2026-06-14 Settings Preferences Overlay Checkpoint
+
+Status: `Settings accessibility preference propagation gate passed`
+
+Completion level: `95% candidate, not final`
+
+What changed:
+
+- `largeText` and `reducedMotion` no longer stop at saved Settings / Phaser text behavior. `renderSceneShell` now pushes those preferences into the visible DOM readability tooltip and mobile portrait framing cue.
+- The readability tooltip now exposes `data-large-text` and `data-reduced-motion`, uses larger responsive dimensions and typography for large text, and disables CSS transitions for reduced motion.
+- The mobile framing cue now exposes the same preference flags, widens/raises cue sizing for large text, and disables transitions for reduced motion.
+- Added `tools/ui-settings-preferences-overlay-audit.mjs` to prove the path through real Settings controls, saved persistence, the Settings keyboard-focus tooltip, and the mobile Town cue.
+
+Evidence:
+
+- `node tools\ui-settings-preferences-overlay-audit.mjs`
+- `node tools\ui-readability-tooltip-audit.mjs`
+- `node tools\ui-mobile-framing-audit.mjs`
+- Full broad smoke: `tmp/phaser-smoke-progress-settings-preferences-overlay-full.log`, ending in `Phaser smoke OK`
+- `git diff --check`
+- `npm.cmd run check`
+- Result: all listed checks passed. `npm.cmd run check` still reports only the existing Vite large JS chunk warning.
+
+Representative evidence:
+
+- `tmp/ui-quality/settings-preferences/settings-large-text-reduced-motion-tooltip-v1-1280.png`
+- `tmp/ui-quality/settings-preferences/mobile-large-text-reduced-motion-cue-v1-390x844.png`
+
+Remaining scope: this is a real accessibility/readability implementation improvement, not just more documentation, but it still does not close final user acceptance, release-readiness, full WorldMap recomposition, full selected/focus approval, broad disabled-state approval, or final mobile UX approval.

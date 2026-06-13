@@ -1,6 +1,7 @@
 import Phaser from "phaser";
 import type { BootContext } from "../../app/bootContext";
-import { hideReadabilityTooltip, showReadabilityTooltip, type ReadabilityTooltipTone } from "../../ui/overlays/readabilityOverlay";
+import { applyMobileFramingCuePreferences } from "../../ui/overlays/mobileFramingOverlay";
+import { applyReadabilityTooltipPreferences, hideReadabilityTooltip, showReadabilityTooltip, type ReadabilityTooltipTone } from "../../ui/overlays/readabilityOverlay";
 
 interface SceneShellOptions {
   title: string;
@@ -124,6 +125,14 @@ export function renderSceneShell(
   const settings = context.save.settings;
   const highContrast = settings.displayMode === "high_contrast";
   const textScale = settings.largeText ? 1.12 : 1;
+  applyReadabilityTooltipPreferences({
+    largeText: settings.largeText,
+    reducedMotion: settings.reducedMotion
+  });
+  applyMobileFramingCuePreferences({
+    largeText: settings.largeText,
+    reducedMotion: settings.reducedMotion
+  });
   scene.sound.volume = settings.volumeMaster;
   scene.cameras.main.setBackgroundColor("#f8efd8");
 

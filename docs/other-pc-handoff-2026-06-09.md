@@ -1993,3 +1993,43 @@ Result:
 - `npm.cmd run check` passed with only the existing Vite large JS chunk warning.
 
 Important limitation: this strengthens latest HEAD regression evidence for the current 95% candidate, but it is not final UI approval, user acceptance, or release-ready proof.
+
+## 2026-06-14 Settings Accessibility Preferences Overlay Continuation
+
+Status remains `95% candidate, not final`.
+
+Latest implementation/audit continuation:
+
+- Wired saved Settings accessibility preferences into the DOM readability layers.
+- `src/phaser/view/sceneShell.ts` now synchronizes `largeText` and `reducedMotion` from `context.save.settings` into both the visible readability tooltip and the mobile framing cue whenever a scene shell renders.
+- `src/ui/overlays/readabilityOverlay.ts` now records `data-large-text` and `data-reduced-motion`, enlarges responsive tooltip width/min-height/padding when large text is on, and keeps reduced-motion state available to CSS.
+- `src/ui/overlays/mobileFramingOverlay.ts` now records the same preferences, widens the portrait cue for large text, and disables cue transitions when reduced motion is on.
+- `src/styles/phaser-shell.css` now applies larger DOM overlay typography for `data-large-text="true"` and removes overlay transitions for `data-reduced-motion="true"`.
+- Added `tools/ui-settings-preferences-overlay-audit.mjs`. The audit opens Settings through the real Town button, toggles large text and reduced motion through the real Settings controls, verifies the keyboard-focus tooltip reflects both preferences, then reloads Town at 390x844 to verify the mobile framing cue also reflects both preferences.
+
+Commands:
+
+```powershell
+node tools\ui-settings-preferences-overlay-audit.mjs
+node tools\ui-readability-tooltip-audit.mjs
+node tools\ui-mobile-framing-audit.mjs
+$env:PHASER_SMOKE_PROGRESS='1'
+$env:PHASER_SMOKE_PROGRESS_FILE='tmp/phaser-smoke-progress-settings-preferences-overlay-full.log'
+Remove-Item Env:PHASER_SMOKE_ONLY -ErrorAction SilentlyContinue
+node tmp\run-phaser-smoke-with-vite.mjs
+git diff --check
+npm.cmd run check
+```
+
+Result:
+
+- `node tools\ui-settings-preferences-overlay-audit.mjs` passed. It captured `tmp/ui-quality/settings-preferences/settings-large-text-reduced-motion-tooltip-v1-1280.png` and `tmp/ui-quality/settings-preferences/mobile-large-text-reduced-motion-cue-v1-390x844.png`.
+- The settings tooltip verified `fontSize=16`, `strongFontSize=17`, `transitionProperty=none`, and size `376x84` after toggling large text and reduced motion.
+- The mobile cue verified `fontSize=15`, `strongFontSize=16`, `transitionProperty=none`, and size `350x90` after the same saved preferences persisted into Town.
+- `node tools\ui-readability-tooltip-audit.mjs` passed all 40 scene/viewport tooltip cases.
+- `node tools\ui-mobile-framing-audit.mjs` passed portrait cue, desktop/landscape hidden cue, and Combat tooltip-suppression coverage.
+- Full broad Phaser smoke passed with `Phaser smoke OK`; progress log: `tmp/phaser-smoke-progress-settings-preferences-overlay-full.log`.
+- `git diff --check` passed.
+- `npm.cmd run check` passed with only the existing Vite large JS chunk warning.
+
+Important limitation: this closes one concrete Settings/accessibility preference propagation gap, but it is not final UI approval, not release readiness, and not user-accepted 95%. Next best work remains WorldMap node/body/route recomposition and broader gameplay-critical readable text, selected/focus, disabled-state, and final mobile UX acceptance.

@@ -4422,3 +4422,27 @@ The active goal still remains open. The immediate first-view raster concept-unde
 - The full UI skin is now a 95% candidate for the active concept-art UI goal, but it has no user acceptance yet and is not release-ready.
 - `npm.cmd run check` still reports the existing Vite large JS chunk warning, so performance remains tracked separately as `Needs verification`.
 - Broad Phaser smoke now passes on latest `5e588d5 Audit landscape accessibility overlay` with no `PHASER_SMOKE_ONLY` filter, ending in `Phaser smoke OK` after all logged substeps through `checkBossResultFlow OK`. The latest responsive/readability/mobile/accessibility rerun also passes on the current 95% candidate checkpoints, including 1920, 1280, 390x844 portrait, and 844x390 landscape responsive screenshots, tooltip placement, mobile framing cue behavior, and hidden accessibility overlays. The latest accessibility overlay audit passes 40 scene/viewport cases across the same four viewport sizes. The latest broadened keyboard-focus tooltip audit passes 108 focus-tooltip cases across 27 targets and four viewports. The latest disabled-readability audit passes Event/Combat/Boss disabled cases across the same four viewport sizes, and the WorldMap locked-node tooltip audit passes 20 locked-tooltip cases across the same four viewport sizes. The latest WorldMap open-node tooltip/down/selection and keyboard-tooltip audits pass 12 cases each across the same four viewport sizes, and the latest WorldMap route-interaction audit passes 64 cases across the same four viewport sizes. The latest route current-leg, route interaction-stack, selection route-stack, keyboard route-suppression, late current-node, mid dormant-node, far red locked-node, mid sealed-node, boss red locked-node, boss keyboard-selected tooltip/current-state, locked-node tooltip/current-stack/target-stack, open-node pointer tooltip/current-stack/target-stack, open-node down-state/current-stack/target-stack, open-node selection-state, visible readability-tooltip, responsive tooltip placement, disabled explanation-tooltip, keyboard focus-tooltip, WorldMap locked-node tooltip, and WorldMap keyboard-selection tooltip passes passed their dedicated audits, `git diff --check`, `npm.cmd run check`, and targeted smoke gates. These remain regression/safety gates rather than evidence of final UI approval.
+
+## 2026-06-14 Settings Preferences Overlay Checkpoint
+
+Status: `Settings accessibility preference propagation gate passed`
+
+Completion level: `95% candidate, not final`
+
+Evidence:
+
+- `src/phaser/view/sceneShell.ts` now synchronizes saved `largeText` / `reducedMotion` values into the DOM readability tooltip and mobile framing cue preferences.
+- `src/ui/overlays/readabilityOverlay.ts` and `src/ui/overlays/mobileFramingOverlay.ts` now expose those preferences as data attributes and adjust sizing/motion behavior.
+- `src/styles/phaser-shell.css` applies larger typography and no-transition states for the DOM tooltip/cue.
+- Added `tools/ui-settings-preferences-overlay-audit.mjs`.
+- `node tools\ui-settings-preferences-overlay-audit.mjs`
+- `node tools\ui-readability-tooltip-audit.mjs`
+- `node tools\ui-mobile-framing-audit.mjs`
+- Full broad smoke with progress log `tmp/phaser-smoke-progress-settings-preferences-overlay-full.log`
+- `git diff --check`
+- `npm.cmd run check`
+- Result: all listed checks passed.
+
+The new audit verifies the actual Settings controls toggle and persist large text plus reduced motion. The Settings keyboard-focus tooltip then reports `data-large-text="true"` and `data-reduced-motion="true"`, larger DOM typography, and `transitionProperty=none`; the persisted Town mobile framing cue verifies the same preferences at 390x844 portrait.
+
+Remaining scope: this improves one previously open accessibility/readability behavior with runtime evidence. It does not replace final visible readability approval, full selected/focus approval, broad disabled approval, final mobile UX approval, user acceptance, or release-readiness.

@@ -58,6 +58,16 @@ body {
   visibility: hidden;
 }
 
+.game-readability-tooltip[data-large-text="true"] {
+  font-size: 16px;
+  line-height: 1.38;
+}
+
+.game-readability-tooltip[data-reduced-motion="true"] {
+  transform: translateY(0);
+  transition: none;
+}
+
 .game-readability-tooltip[data-visible="true"] {
   opacity: 1;
   transform: translateY(0);
@@ -85,6 +95,10 @@ body {
   margin-bottom: 4px;
   color: #25364a;
   font-size: 15px;
+}
+
+.game-readability-tooltip[data-large-text="true"] strong {
+  font-size: 17px;
 }
 
 .game-readability-tooltip span {
@@ -127,6 +141,18 @@ body {
   visibility: hidden;
 }
 
+.game-mobile-framing-cue[data-large-text="true"] {
+  min-height: 66px;
+  padding: 11px 14px 12px 56px;
+  font-size: 15px;
+  line-height: 1.34;
+}
+
+.game-mobile-framing-cue[data-reduced-motion="true"] {
+  transform: translateY(0);
+  transition: none;
+}
+
 .game-mobile-framing-cue::before {
   content: "";
   position: absolute;
@@ -151,6 +177,10 @@ body {
   margin-bottom: 3px;
   color: #25364a;
   font-size: 14px;
+}
+
+.game-mobile-framing-cue[data-large-text="true"] strong {
+  font-size: 16px;
 }
 
 .game-mobile-framing-cue span {

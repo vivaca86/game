@@ -2383,6 +2383,16 @@ This strengthens the current 95% candidate evidence, but it remains a regression
 
 ### Codex
 
+Codex finished the day by closing one concrete Settings/accessibility preference propagation gap instead of only adding more audit breadth. The existing Settings screen persisted `largeText` and `reducedMotion`, and Phaser text already used large text, but the DOM readability tooltip and mobile portrait framing cue did not directly reflect those preferences.
+
+Implemented preference propagation from `renderSceneShell` into `readabilityOverlay` and `mobileFramingOverlay`. The visible DOM tooltip and mobile cue now expose `data-large-text` and `data-reduced-motion`, increase DOM typography/sizing when large text is enabled, and remove CSS transitions when reduced motion is enabled. Added `tools/ui-settings-preferences-overlay-audit.mjs`, which opens Settings through Town, toggles large text and reduced motion through the real controls, verifies the Settings keyboard-focus tooltip, then reloads Town in 390x844 portrait to verify the saved preferences also apply to the mobile framing cue.
+
+Verification passed with `node tools\ui-settings-preferences-overlay-audit.mjs`, `node tools\ui-readability-tooltip-audit.mjs`, `node tools\ui-mobile-framing-audit.mjs`, full broad Phaser smoke using `tmp/phaser-smoke-progress-settings-preferences-overlay-full.log`, `git diff --check`, and `npm.cmd run check`. The full broad smoke ended with `Phaser smoke OK`; `npm.cmd run check` still reports only the existing Vite large JS chunk warning. Evidence screenshots include `tmp/ui-quality/settings-preferences/settings-large-text-reduced-motion-tooltip-v1-1280.png` and `tmp/ui-quality/settings-preferences/mobile-large-text-reduced-motion-cue-v1-390x844.png`.
+
+This is still a 95% candidate, not final user acceptance or release readiness. Next workers should continue from the GitHub state by prioritizing WorldMap node/body/route recomposition, broader gameplay-critical readable text review, deeper selected/focus and disabled-state coverage, final mobile UX review, and user acceptance.
+
+### Codex
+
 Codex answered the active 95% question conservatively: the project is a `95% candidate`, not final or user-accepted 95%. To strengthen that status on latest HEAD after the broad-smoke documentation commit, Codex reran the responsive/readability/mobile/accessibility evidence stack.
 
 Verification passed with `node tools\ui-responsive-raster-audit.mjs`, `node tools\ui-readability-tooltip-audit.mjs`, `node tools\ui-mobile-framing-audit.mjs`, and `node tools\ui-accessibility-overlay-audit.mjs`. The responsive audit passed all ten primary scenes at 1920x1080, 1280x720, and 390x844. The readability tooltip audit passed the same scene/viewport set. The mobile framing audit passed portrait/desktop/1280/landscape cases for all ten scenes plus Combat tooltip suppression. The accessibility audit passed all ten scenes with hidden 1x1 status regions and synchronized canvas labels.

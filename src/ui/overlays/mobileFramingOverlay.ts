@@ -4,10 +4,21 @@ const MIN_LETTERBOX_SPACE = 90;
 
 let resizeBound = false;
 let latestSceneName = "";
+let activePreferences = {
+  largeText: false,
+  reducedMotion: false
+};
+
+export function applyMobileFramingCuePreferences(preferences: { largeText: boolean; reducedMotion: boolean }): void {
+  activePreferences = preferences;
+  const root = document.getElementById(MOBILE_FRAMING_ROOT_ID);
+  if (root) applyPreferences(root);
+}
 
 export function renderMobileFramingCue(sceneName: string): void {
   latestSceneName = sceneName;
   const root = ensureMobileFramingRoot();
+  applyPreferences(root);
   root.dataset.scene = sceneName;
   root.replaceChildren(
     textElement("strong", "가로 화면 권장"),
@@ -21,7 +32,7 @@ export function setMobileFramingCueSuppressed(suppressed: boolean): void {
   const root = document.getElementById(MOBILE_FRAMING_ROOT_ID);
   if (!root) return;
   root.dataset.suppressed = String(suppressed);
-  root.style.transition = suppressed ? "none" : "";
+  root.style.transition = suppressed || root.dataset.reducedMotion === "true" ? "none" : "";
   root.style.opacity = suppressed ? "0" : "";
   root.style.visibility = suppressed ? "hidden" : "";
   root.setAttribute("aria-hidden", suppressed || root.dataset.visible !== "true" ? "true" : "false");
@@ -40,6 +51,7 @@ function ensureMobileFramingRoot(): HTMLElement {
   root.setAttribute("aria-live", "polite");
   root.setAttribute("aria-atomic", "true");
   root.setAttribute("aria-hidden", "true");
+  applyPreferences(root);
   document.body.append(root);
 
   if (!resizeBound) {
@@ -55,6 +67,12 @@ function ensureMobileFramingRoot(): HTMLElement {
   }
 
   return root;
+}
+
+function applyPreferences(root: HTMLElement): void {
+  root.dataset.largeText = String(activePreferences.largeText);
+  root.dataset.reducedMotion = String(activePreferences.reducedMotion);
+  root.style.transition = activePreferences.reducedMotion ? "none" : "";
 }
 
 function scheduleMobileFramingPlacement(root: HTMLElement): void {
@@ -93,7 +111,8 @@ function updateMobileFramingPlacement(root: HTMLElement): void {
     return;
   }
 
-  root.style.setProperty("--mobile-framing-width", `${Math.round(Math.min(canvasBox.width - 28, 330))}px`);
+  const cueWidth = Math.min(canvasBox.width - 28, activePreferences.largeText ? 350 : 330);
+  root.style.setProperty("--mobile-framing-width", `${Math.round(cueWidth)}px`);
   const rootBox = root.getBoundingClientRect();
   const cueHeight = Math.max(58, rootBox.height || 64);
   const useTop = topSpace >= bottomSpace || bottomSpace < cueHeight + 24;
