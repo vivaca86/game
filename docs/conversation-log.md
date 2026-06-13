@@ -2360,3 +2360,13 @@ Extended `tools/ui-worldmap-open-node-selection-audit.mjs` so each clicked lower
 Verification passed with `node tools\ui-worldmap-open-node-selection-audit.mjs`, `node tools\ui-worldmap-route-interaction-audit.mjs`, `node tools\ui-worldmap-open-node-tooltip-audit.mjs`, `node tools\ui-worldmap-open-node-down-audit.mjs`, `node tools\ui-worldmap-keyboard-tooltip-audit.mjs`, `node tools\ui-worldmap-locked-tooltip-audit.mjs`, `npx.cmd tsc --noEmit`, `git diff --check`, `npm.cmd run check`, and targeted `$env:PHASER_SMOKE_ONLY='checkViewScreenshots,checkClickableControls,checkFullInputCoverage,checkUiSkinStates'; node tmp\run-phaser-smoke-with-vite.mjs` ending in `Phaser smoke OK`. The strengthened selection audit passed 9 cases; representative screenshots remain under `tmp/ui-quality/worldmap-open-node-selection/`.
 
 This remains a 95% candidate rather than final approval. Post-click route recomposition evidence is stronger now, but full WorldMap node/body/route recomposition approval, broader selected/focus approval, user acceptance, and release-ready UI remain unfinished.
+
+### Codex
+
+Codex continued the 95% candidate UI goal by strengthening the WorldMap keyboard-selected tooltip audit with route-overlay suppression checks. The previous keyboard audit proved lower-left, late-right, and boss-up selection moved the selected/current marker/body/frame/status stack and showed the selected-stage tooltip, but it did not directly verify the route overlay policy across those same paths.
+
+Extended `tools/ui-worldmap-keyboard-tooltip-audit.mjs` so each keyboard-selected route now verifies base completed route threads/beads, current/final route threads/beads, muted locked/future route threads/beads, and old `ui_hover_route_node_concept` route-hover images are all suppressed while the keyboard-selected tooltip state is active.
+
+Verification passed with `node tools\ui-worldmap-keyboard-tooltip-audit.mjs`, `node tools\ui-worldmap-open-node-selection-audit.mjs`, `node tools\ui-worldmap-route-interaction-audit.mjs`, `npx.cmd tsc --noEmit`, `git diff --check`, `npm.cmd run check`, and targeted `$env:PHASER_SMOKE_ONLY='checkViewScreenshots,checkClickableControls,checkFullInputCoverage,checkUiSkinStates'; node tmp\run-phaser-smoke-with-vite.mjs` ending in `Phaser smoke OK`. The strengthened keyboard audit passed 9 cases and reported route thread/bead counts of 0 for lower-left, late-right, and boss-up at 1920x1080, 1280x720, and 390x844.
+
+This remains a 95% candidate rather than final approval. Keyboard route-policy evidence is stronger now, but full WorldMap node/body/route recomposition approval, broader selected/focus approval, user acceptance, and release-ready UI remain unfinished.

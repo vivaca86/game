@@ -7,7 +7,7 @@ Repository:
 - GitHub: `https://github.com/vivaca86/game.git`
 - Branch: `main`
 - Latest pushed commit: run `git log -1 --oneline` after pulling.
-- Expected latest commit title after the 2026-06-14 WorldMap selection route-stack continuation: `Audit WorldMap selection routes`
+- Expected latest commit title after the 2026-06-14 WorldMap keyboard route-suppression continuation: `Audit WorldMap keyboard routes`
 
 ## Start On Another PC
 
@@ -22,7 +22,7 @@ npm install
 Expected first commit title in `git log --oneline -5` after the latest continuation:
 
 ```text
-Audit WorldMap selection routes
+Audit WorldMap keyboard routes
 ```
 
 Expected status:
@@ -119,7 +119,7 @@ Recommended next work:
    - First hidden accessibility labels and first visible tooltip zones now exist.
    - Representative keyboard-focus tooltip evidence now exists for Town, Dungeon, Combat, Reward, Event, RuneBench, Boss, Result, and Settings.
    - WorldMap locked/sealed/dormant nodes now expose danger-tone explanation tooltips through tooltip-only disabled hit targets, including the boss-sized red locked-node family. The locked-node audit now also verifies the original current marker, halo, body, frame, and status stack stays anchored during locked hover/click, and that the hovered/clicked locked target keeps its own sealed/dormant/red-far/red-next/red-boss body/frame/badge family without conflicting overlays.
-   - WorldMap direction-key stage selection now shows the same DOM readability tooltip for the selected stage without adding another hover image, and now verifies the selected/current marker, halo, body, frame, and status stack across lower, mid, and boss routes.
+   - WorldMap direction-key stage selection now shows the same DOM readability tooltip for the selected stage without adding another hover image, verifies the selected/current marker, halo, body, frame, and status stack across lower, mid, and boss routes, and now also verifies all route thread/bead overlays remain suppressed while the keyboard-selected tooltip state is active.
    - WorldMap open-node hover/down now verifies the existing current marker, halo, body, frame, and status stack stays anchored to the current node while the target node shows hover/pressed halo feedback, and now also verifies the target open node keeps its completed base/late body, frame, and badge stack during hover/down without conflicting current or locked overlays.
    - WorldMap open-node pointer click now has lower/mid/boss route-family evidence that the selected/current marker, halo, body, frame, and status stack moves to the clicked node without conflicting completed/locked/sealed/dormant overlays.
    - Mobile portrait now has a non-blocking orientation/framing cue in unused letterbox space and suppresses it while readability tooltips are visible.
@@ -1630,3 +1630,47 @@ Representative evidence:
 - `tmp/ui-quality/worldmap-open-node-selection/boss-open-open-node-selection-v1-1920.png`
 
 Important limitation: this strengthens post-click route recomposition evidence, but the project is still `95% candidate, not final`. Full WorldMap node/body/route recomposition approval, broader selected/focus approval, user acceptance, and release-ready UI remain unfinished.
+
+## 2026-06-14 WorldMap Keyboard Route-Suppression Audit Continuation
+
+Status remains `95% candidate, not final`.
+
+Additional local continuation work:
+
+- Strengthened `tools/ui-worldmap-keyboard-tooltip-audit.mjs`.
+- The audit still covers lower-left, late-right, and boss-up direction-key selection across 1920x1080, 1280x720, and 390x844.
+- It already verifies the selected/current marker, halo, body, frame, status badge, tooltip placement, no conflicting selected-node state overlays, no Phaser text/vector leak, and `flow:stage_select:<stageId>` logging.
+- It now also verifies that the keyboard-selected tooltip state suppresses all route overlay families:
+  - base completed route threads/beads.
+  - current/final route threads/beads.
+  - muted locked/future route threads/beads.
+  - old `ui_hover_route_node_concept` route-hover images.
+
+Verification for this continuation:
+
+```powershell
+node tools\ui-worldmap-keyboard-tooltip-audit.mjs
+node tools\ui-worldmap-open-node-selection-audit.mjs
+node tools\ui-worldmap-route-interaction-audit.mjs
+npx.cmd tsc --noEmit
+git diff --check
+npm.cmd run check
+$env:PHASER_SMOKE_PROGRESS='1'
+$env:PHASER_SMOKE_PROGRESS_FILE='tmp/phaser-smoke-progress-worldmap-keyboard-route-suppression-targeted.log'
+$env:PHASER_SMOKE_ONLY='checkViewScreenshots,checkClickableControls,checkFullInputCoverage,checkUiSkinStates'
+node tmp\run-phaser-smoke-with-vite.mjs
+```
+
+All listed checks passed. The strengthened keyboard tooltip audit passed 9 cases and now reports route suppression for every keyboard-selected path:
+
+- lower-left: all base/current/locked route thread and bead counts are 0 at 1920, 1280, and 390x844.
+- late-right: all base/current/locked route thread and bead counts are 0 at 1920, 1280, and 390x844.
+- boss-up: all base/current/locked route thread and bead counts are 0 at 1920, 1280, and 390x844.
+
+Representative evidence:
+
+- `tmp/ui-quality/worldmap-keyboard-tooltips/lower-left-keyboard-tooltip-v1-1920.png`
+- `tmp/ui-quality/worldmap-keyboard-tooltips/late-right-keyboard-tooltip-v1-1920.png`
+- `tmp/ui-quality/worldmap-keyboard-tooltips/boss-up-keyboard-tooltip-v1-1920.png`
+
+Important limitation: this strengthens keyboard selected-route policy evidence, but the project is still `95% candidate, not final`. Full WorldMap node/body/route recomposition approval, broader selected/focus approval, user acceptance, and release-ready UI remain unfinished.

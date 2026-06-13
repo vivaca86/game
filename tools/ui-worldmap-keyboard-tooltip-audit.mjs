@@ -110,6 +110,12 @@ try {
         currentBody: audit.visibleCurrentLateBodyImages === 1 ? "late" : "base",
         currentFrame: audit.visibleCurrentLateFrameImages === 1 ? "late" : "base",
         currentStatusImages: audit.visibleCurrentStatusImages,
+        routeBaseThreads: audit.visibleRouteBaseThreads,
+        routeCurrentThreads: audit.visibleRouteCurrentThreads,
+        routeBaseBeads: audit.visibleRouteBaseBeads,
+        routeCurrentBeads: audit.visibleRouteCurrentBeads,
+        lockedRouteThreads: audit.visibleRouteLockedThreads,
+        lockedRouteBeads: audit.visibleRouteLockedBeads,
         screenshot: path.resolve(screenshot)
       });
 
@@ -283,6 +289,13 @@ async function readWorldMapKeyboardTooltipAudit(page, auditCase) {
       ...imageByKey("ui_dormant_stage_frame_concept"),
       ...imageByKey("ui_dormant_stage_mid_frame_concept")
     ];
+    const routeBaseThreadImages = imageByKey("ui_world_map_route_progress_thread_concept");
+    const routeCurrentThreadImages = imageByKey("ui_world_map_route_progress_current_thread_concept");
+    const routeLockedThreadImages = imageByKey("ui_world_map_route_locked_thread_concept");
+    const routeBaseBeadImages = imageByKey("ui_world_map_route_progress_bead_concept");
+    const routeCurrentBeadImages = imageByKey("ui_world_map_route_progress_current_bead_concept");
+    const routeLockedBeadImages = imageByKey("ui_world_map_route_locked_bead_concept");
+    const routeHoverImages = imageByKey("ui_hover_route_node_concept");
     const visibleTextCount = visible.filter((child) => (
       child?.type === "Text"
       && String(child.text ?? "").trim().length > 0
@@ -393,6 +406,13 @@ async function readWorldMapKeyboardTooltipAudit(page, auditCase) {
       currentHasNoSealedFrame,
       currentHasNoDormantBody,
       currentHasNoDormantFrame,
+      visibleRouteBaseThreads: routeBaseThreadImages.length,
+      visibleRouteCurrentThreads: routeCurrentThreadImages.length,
+      visibleRouteLockedThreads: routeLockedThreadImages.length,
+      visibleRouteBaseBeads: routeBaseBeadImages.length,
+      visibleRouteCurrentBeads: routeCurrentBeadImages.length,
+      visibleRouteLockedBeads: routeLockedBeadImages.length,
+      visibleRouteHoverImages: routeHoverImages.length,
       visibleTextCount,
       visibleRectsAboveUnderlay,
       hasStageSelectLog: log.includes(`flow:stage_select:${targetStage?.id}`),
@@ -529,6 +549,18 @@ function assertWorldMapKeyboardTooltip(label, audit, auditCase, viewport, seeded
       currentHasNoDormantBody: audit.currentHasNoDormantBody,
       currentHasNoDormantFrame: audit.currentHasNoDormantFrame
     })}`);
+  }
+  const suppressedRouteFields = [
+    ["route base threads", audit.visibleRouteBaseThreads],
+    ["route current threads", audit.visibleRouteCurrentThreads],
+    ["locked route threads", audit.visibleRouteLockedThreads],
+    ["route base beads", audit.visibleRouteBaseBeads],
+    ["route current beads", audit.visibleRouteCurrentBeads],
+    ["locked route beads", audit.visibleRouteLockedBeads],
+    ["old route hover images", audit.visibleRouteHoverImages]
+  ];
+  for (const [name, count] of suppressedRouteFields) {
+    if (count !== 0) throw new Error(`${label}: expected keyboard-selected ${name} to be suppressed, got ${count}`);
   }
   if (audit.visibleTextCount !== 0 || audit.visibleRectsAboveUnderlay !== 0) {
     throw new Error(`${label}: unexpected Phaser text/vector leak ${JSON.stringify({
