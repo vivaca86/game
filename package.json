@@ -41,6 +41,7 @@
     "assets:audit:strict": "node tools/audit-asset-files.mjs --require-files",
     "assets:audit:release-visuals": "node tools/visual-production-audit.mjs",
     "ui:pc-worldmap:keyboard": "node tools/ui-pc-worldmap-keyboard-audit.mjs",
+    "ui:pc-worldmap:release-state": "node tools/ui-pc-worldmap-release-state-audit.mjs",
     "phaser:smoke": "node tools/phaser-smoke-test.mjs",
     "proof:smoke": "node tools/vertical-slice-proof-smoke.mjs",
     "runtime:smoke": "node tools/runtime-smoke-test.mjs",
@@ -55,6 +56,6 @@
   "devDependencies": {
     "playwright": "^1.60.0",
     "typescript": "^6.0.3",
-    "vite": "^8.0.14"
+    "vite": "^8.0.16"
   }
 }

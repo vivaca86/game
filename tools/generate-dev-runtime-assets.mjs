@@ -114,6 +114,7 @@ const sourcePassthroughAssets = new Map([
   ["ui_hover_result_return_button_concept", path.join(rootDir, "assets", "source", "ui", "ui_hover_result_return_button_concept_v001.png")],
   ["ui_down_result_return_button_concept", path.join(rootDir, "assets", "source", "ui", "ui_down_result_return_button_concept_v001.png")],
   ["ui_current_stage_marker_concept", path.join(rootDir, "assets", "source", "ui", "ui_current_stage_marker_concept_v001.png")],
+  ["ui_current_stage_lock_cover_concept", path.join(rootDir, "assets", "source", "ui", "ui_current_stage_lock_cover_concept_v001.png")],
   ["ui_current_stage_body_wash_concept", path.join(rootDir, "assets", "source", "ui", "ui_current_stage_body_wash_concept_v001.png")],
   ["ui_current_stage_late_body_wash_concept", path.join(rootDir, "assets", "source", "ui", "ui_current_stage_late_body_wash_concept_v001.png")],
   ["ui_current_stage_frame_concept", path.join(rootDir, "assets", "source", "ui", "ui_current_stage_frame_concept_v001.png")],

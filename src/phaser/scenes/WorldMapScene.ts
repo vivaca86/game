@@ -16,6 +16,7 @@ const WORLD_MAP_RASTER_HOVER_NODE_KEY = "ui_current_stage_halo_concept";
 const WORLD_MAP_RASTER_HOVER_PLAY_KEY = "ui_hover_world_map_play_button_concept";
 const WORLD_MAP_RASTER_DOWN_PLAY_KEY = "ui_down_world_map_play_button_concept";
 const WORLD_MAP_RASTER_CURRENT_MARKER_KEY = "ui_current_stage_marker_concept";
+const WORLD_MAP_RASTER_CURRENT_LOCK_COVER_KEY = "ui_current_stage_lock_cover_concept";
 const WORLD_MAP_RASTER_CURRENT_BODY_KEY = "ui_current_stage_body_wash_concept";
 const WORLD_MAP_RASTER_CURRENT_LATE_BODY_KEY = "ui_current_stage_late_body_wash_concept";
 const WORLD_MAP_RASTER_CURRENT_FRAME_KEY = "ui_current_stage_frame_concept";
@@ -703,6 +704,16 @@ function worldMapCompletedBadgePlacement(
   node: { x: number; y: number; width: number; height: number },
   stageIndex: number
 ): { x: number; y: number; size: number; alpha: number } {
+  if (stageIndex >= 9) {
+    const lockedSource = worldMapLockedBadgePlacement(node, stageIndex);
+    return {
+      x: lockedSource.x,
+      y: lockedSource.y,
+      size: Math.max(lockedSource.size, 70),
+      alpha: 0.9
+    };
+  }
+
   if (stageIndex <= 2) {
     return {
       x: node.x + node.width * 0.03,
@@ -810,6 +821,17 @@ function worldMapLockedBadgePlacement(
   return { x: node.x - node.width * 0.06, y: node.y + node.height * 0.36, size: 70 };
 }
 
+function worldMapCurrentStatusPlacement(
+  node: { x: number; y: number; width: number; height: number },
+  _stageIndex: number
+): { x: number; y: number; size: number } {
+  return {
+    x: node.x + node.width * 0.1,
+    y: node.y + node.height * 0.36,
+    size: 72
+  };
+}
+
 function renderWorldMapCurrentStageMarker(scene: Phaser.Scene, context: BootContext): void {
   const currentStageIndex = context.dataBundle.stages.findIndex((stage) => stage.id === context.run.stageId);
   const node = WORLD_MAP_RASTER_STAGE_NODES[currentStageIndex];
@@ -847,10 +869,20 @@ function renderWorldMapCurrentStageMarker(scene: Phaser.Scene, context: BootCont
   }
 
   if (scene.textures.exists(WORLD_MAP_RASTER_CURRENT_STATUS_KEY)) {
-    scene.add.image(node.x + node.width * 0.1, node.y + node.height * 0.36, WORLD_MAP_RASTER_CURRENT_STATUS_KEY)
-      .setDisplaySize(72, 72)
+    const status = worldMapCurrentStatusPlacement(node, currentStageIndex);
+    scene.add.image(status.x, status.y, WORLD_MAP_RASTER_CURRENT_STATUS_KEY)
+      .setDisplaySize(status.size, status.size)
       .setAlpha(0.98)
       .setDepth(8);
+  }
+
+  if (currentStageIndex >= 9 && scene.textures.exists(WORLD_MAP_RASTER_CURRENT_LOCK_COVER_KEY)) {
+    const lockCover = worldMapLockedBadgePlacement(node, currentStageIndex);
+    const width = Math.max(lockCover.size, 78);
+    scene.add.image(lockCover.x, lockCover.y, WORLD_MAP_RASTER_CURRENT_LOCK_COVER_KEY)
+      .setDisplaySize(width, width * 1.12)
+      .setAlpha(0.96)
+      .setDepth(8.2);
   }
 }
 

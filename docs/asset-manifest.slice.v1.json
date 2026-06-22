@@ -611,6 +611,13 @@
       "styleKey": "premium_popup_book"
     },
     {
+      "key": "ui_current_stage_lock_cover_concept",
+      "type": "image",
+      "path": "assets/runtime/ui/ui_current_stage_lock_cover_concept_v001.png",
+      "nativeSize": { "w": 96, "h": 108 },
+      "styleKey": "premium_popup_book"
+    },
+    {
       "key": "ui_current_stage_body_wash_concept",
       "type": "image",
       "path": "assets/runtime/ui/ui_current_stage_body_wash_concept_v001.png",

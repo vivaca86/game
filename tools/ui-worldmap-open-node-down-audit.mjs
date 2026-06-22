@@ -382,6 +382,15 @@ async function readWorldMapOpenNodeDownAudit(page, auditCase) {
       && Math.abs(image.y - targetNode.y) < targetNode.height * scale
     );
     const completedBadgePlacement = (node, stageIndex) => {
+      if (stageIndex >= 9) {
+        const locked = lockedBadgePlacement(node, stageIndex);
+        return {
+          x: locked.x,
+          y: locked.y,
+          size: Math.max(locked.size, 70),
+          minAlpha: 0.88
+        };
+      }
       if (stageIndex <= 2) {
         return {
           x: node.x + node.width * 0.03,
@@ -411,6 +420,20 @@ async function readWorldMapOpenNodeDownAudit(page, auditCase) {
         size: stageIndex >= 9 ? 64 : 60,
         minAlpha: 0.86
       };
+    };
+    const lockedBadgePlacement = (node, stageIndex) => {
+      const sourceAligned = {
+        9: { x: 646, y: 285, size: 70 },
+        10: { x: 787, y: 337, size: 70 },
+        11: { x: 941, y: 358, size: 70 },
+        12: { x: 1068, y: 343, size: 70 },
+        13: { x: 1208, y: 232, size: 76 },
+        14: { x: 1311, y: 378, size: 76 }
+      }[stageIndex];
+      if (sourceAligned) return sourceAligned;
+      if (stageIndex >= 13) return { x: node.x - node.width * 0.34, y: node.y + node.height * 0.36, size: 76 };
+      if (stageIndex >= 11) return { x: node.x - node.width * 0.12, y: node.y + node.height * 0.36, size: 70 };
+      return { x: node.x - node.width * 0.06, y: node.y + node.height * 0.36, size: 70 };
     };
     const completedBodyPlacement = (node, stageIndex) => ({
       x: node.x + node.width * 0.02,

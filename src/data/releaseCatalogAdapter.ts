@@ -199,6 +199,7 @@ const sharedUiRasterAssetKeys = new Set([
   "ui_hover_result_return_button_concept",
   "ui_down_result_return_button_concept",
   "ui_current_stage_marker_concept",
+  "ui_current_stage_lock_cover_concept",
   "ui_current_stage_body_wash_concept",
   "ui_current_stage_late_body_wash_concept",
   "ui_current_stage_frame_concept",
