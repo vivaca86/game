@@ -70,6 +70,7 @@ npm.cmd run assets:generate:dev
 npm.cmd run assets:audit
 npm.cmd run check
 npm.cmd run phaser:smoke
+npm.cmd run ui:pc-release-candidate
 ```
 
 PowerShell 실행 정책 때문에 `npm run ...`이 막히는 환경에서는 아래처럼 실행한다.
@@ -89,6 +90,8 @@ npm.cmd run slice:validate
 `assets:audit`은 docs/runtime asset manifest가 서로 갈라지지 않았는지 확인하고, 실제 `public/assets/runtime` PNG의 크기와 orphan 파일을 검사한다. 에셋 파이프라인이 시작된 뒤에는 `npm.cmd run assets:audit:strict`를 통과해야 한다.
 
 `phaser:smoke`는 실행 중인 Vite dev server에서 기본 진입, `entry=combat`, `entry=boss` debug 화면의 canvas와 콘솔 오류를 확인한다.
+
+`ui:pc-release-candidate`는 현재 PC 전용 WorldMap/UI 릴리즈 후보 게이트다. PC idle/action affordance, PC combat affordance, PC WorldMap keyboard, PC WorldMap release-state recomposition, 핵심 Phaser smoke 단계, `check`를 순서대로 실행한다. 모바일 전용 감사와 보호용 `quality:audit` 콘텐츠 게이트는 의도적으로 포함하지 않는다.
 
 ## 정리된 것
 

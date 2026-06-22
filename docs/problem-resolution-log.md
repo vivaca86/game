@@ -1556,3 +1556,10 @@
 - Impact: A player could read the cards as informational panels instead of click targets, especially after entering choice-heavy screens from combat or events.
 - Resolution: Updated the shared choice-info texture to render `선택하기` for ready choices, kept `조건 부족` for disabled choices, and bumped the choice-info texture version. `tools/ui-pc-action-affordance-audit.mjs` now requires selectable Reward/Event choices to expose action-label metadata in addition to the visible choice-info texture.
 - Prevention: Choice screens should use command language for ready states and audits should distinguish actionable choice labels from passive info panels.
+
+### Problem: PC release-candidate evidence was scattered across separate commands
+
+- Cause: The project had several strong PC/WorldMap/UI audits, but there was no single PC-only command that chained the current release-candidate evidence. This made it too easy to report isolated green checks as broader approval evidence.
+- Impact: A future handoff could skip one of the PC gates, accidentally include mobile-only scope despite the current PC-only target, or forget that `quality:audit` remains a separate protective content gate rather than part of UI release readiness.
+- Resolution: Added `tools/ui-pc-release-candidate-gate.mjs` and `npm.cmd run ui:pc-release-candidate`. The gate runs PC idle/action affordance, PC combat affordance, PC WorldMap keyboard, PC WorldMap release-state recomposition, selected core Phaser smoke steps, and `check`, then prints a per-gate summary.
+- Prevention: Use the PC release-candidate gate as the repeatable baseline before claiming PC UI readiness. Keep user acceptance, final content quality, and mobile-specific validation separate unless the active scope changes.
