@@ -1542,3 +1542,10 @@
 - Impact: The audit could fail with `expected one play down image, got 0` even though the button still transitioned to Dungeon afterward. It also meant the keyboard-confirm visual feedback was briefer than ideal for PC readability.
 - Resolution: Increased the WorldMap keyboard-confirm down feedback duration to 260ms and reran `npm.cmd run ui:pc-worldmap:keyboard`, which passed with `playDown=1` at both 1920x1080 and 1280x720.
 - Prevention: Keyboard-triggered visual feedback should stay visible long enough for both human perception and automated state capture. When an audit checks a transient raster state after a wait condition, keep the visual duration comfortably longer than the readback window.
+
+### Problem: Combat controls still did not clearly read as buttons in idle state
+
+- Cause: Combat cards showed a terse `준비` state and the primary combat/boss end-turn controls relied on large icon art plus hover feedback. Automated click tests could pass, but the idle PC view still did not make every actionable control obvious before interaction.
+- Impact: A player could enter combat, miss that cards were selectable, or fail to identify the end-turn seal as a button. This matched the user report that the biggest issue was not knowing what was clickable.
+- Resolution: Changed the combat card ready label to `사용 가능`, bumped the generated card affordance texture version, and added persistent `턴 종료` button-label affordances to Combat and Boss raster scenes. PC action/combat audits now require the combat card v2 affordances and the visible end-turn label.
+- Prevention: Combat audits should verify both real state changes after card selection and always-visible labels for icon-like primary actions. Do not count hover-only affordances as enough for PC idle readability.

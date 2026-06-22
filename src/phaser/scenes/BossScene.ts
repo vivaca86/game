@@ -9,6 +9,7 @@ import { renderDebugOverlay } from "../../ui/overlays/debugOverlay";
 import { handleSceneAction } from "../bridge/sceneActions";
 import { requireBootContext } from "../bridge/sceneBridge";
 import { bindCombatCardAffordance, renderCombatCardAffordance, renderCombatFeedbackEffect, renderCombatPanel, renderCombatPlayerStandee, renderCombatTheater } from "./CombatScene";
+import { renderButtonLabelAffordance } from "../view/buttonLabelAffordance";
 import { renderActionButton, renderCardHand, renderPaperPanel, renderRasterDisabledHitTarget, renderRasterHoverHitTarget, renderSceneShell, renderTransparentHitTarget, setRasterHitTargetHoverState, textStyle, triggerRasterHitTargetDown } from "../view/sceneShell";
 
 const BOSS_RASTER_UNDERLAY_KEY = "boss_raster_underlay_concept";
@@ -327,6 +328,12 @@ function renderBossRasterEndTurnTarget(scene: Phaser.Scene, context: BootContext
   const y = 960;
   const width = 292;
   const height = 220;
+  renderButtonLabelAffordance(scene, "턴 종료", x, 1040, 120, 34, {
+    tone: "confirm",
+    compact: true,
+    largeText: context.save.settings.largeText,
+    depth: 24.2
+  });
   return renderRasterHoverHitTarget(scene, x, y, width, height, () => handleSceneAction(scene, context, "end_turn"), {
     depth: 22,
     hoverDepth: 24,

@@ -46,7 +46,8 @@ const targets = [
     pathname: "/?debug=1&entry=combat&resetSave=1",
     underlayKey: "combat_raster_underlay_concept",
     minIdleAffordances: 1,
-    minCardAffordances: 5
+    minCardAffordances: 5,
+    minButtonLabelAffordances: 1
   },
   {
     key: "reward",
@@ -78,7 +79,8 @@ const targets = [
     pathname: "/?debug=1&entry=boss&resetSave=1",
     underlayKey: "boss_raster_underlay_concept",
     minIdleAffordances: 1,
-    minCardAffordances: 5
+    minCardAffordances: 5,
+    minButtonLabelAffordances: 1
   },
   {
     key: "result",
@@ -142,7 +144,7 @@ try {
         const idleAffordances = visible.filter((child) => child?.type === "Image" && child.getData?.("rasterIdleAffordance"));
         const cardAffordances = visible.filter((child) => (
           child?.type === "Image"
-          && String(child.texture?.key ?? "").startsWith("combat_card_affordance_v1_")
+          && String(child.texture?.key ?? "").startsWith("combat_card_affordance_v2_")
         ));
         const choiceInfoAffordances = visible.filter((child) => child?.type === "Image" && child.getData?.("choiceInfoAffordance"));
         const buttonLabelAffordances = visible.filter((child) => child?.type === "Image" && child.getData?.("buttonLabelAffordance"));
@@ -253,7 +255,7 @@ async function readActionAffordanceAudit(page, target) {
     const visible = children.filter((child) => child?.visible !== false && Number(child?.alpha ?? 1) > 0.05);
     const images = visible.filter((child) => child?.type === "Image");
     const idleImages = images.filter((child) => child.getData?.("rasterIdleAffordance"));
-    const cardAffordanceImages = images.filter((child) => String(child.texture?.key ?? "").startsWith("combat_card_affordance_v1_"));
+    const cardAffordanceImages = images.filter((child) => String(child.texture?.key ?? "").startsWith("combat_card_affordance_v2_"));
     const choiceInfoImages = images.filter((child) => child.getData?.("choiceInfoAffordance"));
     const buttonLabelImages = images.filter((child) => child.getData?.("buttonLabelAffordance"));
     const rectsAboveUnderlay = visible

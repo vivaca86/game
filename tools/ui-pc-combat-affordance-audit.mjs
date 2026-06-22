@@ -186,7 +186,7 @@ async function forcePlayerEnergy(page, energy) {
     const imageKeys = visible
       .filter((child) => child?.type === "Image")
       .map((child) => String(child.texture?.key ?? ""));
-    const affordanceKeys = imageKeys.filter((key) => key.startsWith("combat_card_affordance_v1_"));
+    const affordanceKeys = imageKeys.filter((key) => key.startsWith("combat_card_affordance_v2_"));
     const blockedAffordances = affordanceKeys.filter((key) => key.includes("_blocked_")).length;
 
     return context?.run?.player?.energy === expectedEnergy && blockedAffordances >= 4;
@@ -204,7 +204,8 @@ async function readCombatAffordanceAudit(page) {
     const visible = children.filter((child) => child?.visible !== false && Number(child?.alpha ?? 1) !== 0);
     const images = visible.filter((child) => child?.type === "Image");
     const imageKeys = images.map((child) => String(child.texture?.key ?? ""));
-    const allAffordanceKeys = imageKeys.filter((key) => key.startsWith("combat_card_affordance_v1_"));
+    const allAffordanceKeys = imageKeys.filter((key) => key.startsWith("combat_card_affordance_v2_"));
+    const buttonLabelImages = images.filter((child) => child.getData?.("buttonLabelAffordance"));
     const rectsAboveUnderlay = visible
       .filter((child) => child?.type === "Rectangle")
       .filter((child) => child.depth > underlayDepth || children.indexOf(child) > underlayIndex)
@@ -230,6 +231,8 @@ async function readCombatAffordanceAudit(page) {
       downFrames: images.filter((child) => child.texture?.key === "combat_card_down_frame_v1" && Number(child.alpha ?? 1) > 0.05).length,
       disabledFrames: images.filter((child) => child.texture?.key === "combat_card_disabled_frame_v1" && Number(child.alpha ?? 1) > 0.05).length,
       goldSeals: images.filter((child) => child.texture?.key === "ui_hover_gold_seal_concept" && Number(child.alpha ?? 1) > 0.05).length,
+      buttonLabelAffordances: buttonLabelImages.length,
+      buttonLabels: buttonLabelImages.map((child) => String(child.getData?.("buttonLabel") ?? "")),
       visibleTextCount: visible.filter((child) => child?.type === "Text" && String(child.text ?? "").trim().length > 0).length,
       visibleRectsAboveUnderlay: rectsAboveUnderlay.length
     };
@@ -238,6 +241,9 @@ async function readCombatAffordanceAudit(page) {
 
 function assertCommon(label, audit) {
   if (!audit.hasScene || !audit.hasUnderlay) throw new Error(`${label}: missing CombatScene underlay ${JSON.stringify(audit)}`);
+  if (audit.buttonLabelAffordances < 1 || !audit.buttonLabels.includes("턴 종료")) {
+    throw new Error(`${label}: combat end-turn button label missing ${JSON.stringify(audit)}`);
+  }
   if (!audit.aria.includes("손패")) throw new Error(`${label}: combat aria summary missing hand count ${JSON.stringify(audit)}`);
   if (audit.visibleTextCount !== 0) throw new Error(`${label}: visible Phaser text leaked over raster underlay ${JSON.stringify(audit)}`);
   if (audit.visibleRectsAboveUnderlay !== 0) throw new Error(`${label}: visible rectangle overlay leaked ${JSON.stringify(audit)}`);
@@ -322,6 +328,7 @@ function summary(state, viewport, audit, screenshot) {
     hoverFrames: audit.hoverFrames,
     downFrames: audit.downFrames,
     disabledFrames: audit.disabledFrames,
+    buttonLabelAffordances: audit.buttonLabelAffordances,
     focusId: audit.focusId,
     combat: `hp=${audit.enemyHp}, energy=${audit.playerEnergy}, hand=${audit.handCount}`,
     leak: `${audit.visibleTextCount} text, ${audit.visibleRectsAboveUnderlay} rects`,

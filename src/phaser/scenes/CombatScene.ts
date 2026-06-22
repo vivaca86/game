@@ -7,12 +7,13 @@ import { resolveCombatFeedbackEffectKey, resolveCombatFeedbackFrame } from "../.
 import { renderDebugOverlay } from "../../ui/overlays/debugOverlay";
 import { handleSceneAction } from "../bridge/sceneActions";
 import { requireBootContext } from "../bridge/sceneBridge";
+import { renderButtonLabelAffordance } from "../view/buttonLabelAffordance";
 import { renderActionButton, renderCardHand, renderPaperPanel, renderRasterDisabledHitTarget, renderRasterHoverHitTarget, renderSceneShell, setRasterHitTargetHoverState, textStyle, triggerRasterHitTargetDown } from "../view/sceneShell";
 
 const COMBAT_RASTER_UNDERLAY_KEY = "combat_raster_underlay_concept";
 const COMBAT_RASTER_HOVER_SEAL_KEY = "ui_hover_gold_seal_concept";
 const COMBAT_RASTER_FOCUS_ID_KEY = "combatRasterFocusId";
-const COMBAT_CARD_AFFORDANCE_VERSION = "v1";
+const COMBAT_CARD_AFFORDANCE_VERSION = "v2";
 const COMBAT_CARD_HOVER_FRAME_KEY = "combat_card_hover_frame_v1";
 const COMBAT_CARD_DOWN_FRAME_KEY = "combat_card_down_frame_v1";
 const COMBAT_CARD_DISABLED_FRAME_KEY = "combat_card_disabled_frame_v1";
@@ -264,6 +265,12 @@ function renderCombatRasterEndTurnButton(scene: Phaser.Scene, context: BootConte
   const y = 910;
   const width = 300;
   const height = 260;
+  renderButtonLabelAffordance(scene, "턴 종료", x, 1028, 120, 34, {
+    tone: "confirm",
+    compact: true,
+    largeText: context.save.settings.largeText,
+    depth: 24.2
+  });
   return renderRasterHoverHitTarget(scene, x, y, width, height, () => handleSceneAction(scene, context, "end_turn"), {
     depth: 22,
     hoverDepth: 24,
@@ -734,7 +741,7 @@ function drawCombatCardAffordance(
   context.fill();
   context.stroke();
   context.fillStyle = "#fff5d7";
-  drawFittedText(context, playable ? "준비" : "기운 부족", width / 2, 298, width - 104, 13, 10, true, "center");
+  drawFittedText(context, playable ? "사용 가능" : "기운 부족", width / 2, 298, width - 104, 13, 10, true, "center");
 
   context.fillStyle = playable ? "rgba(245, 194, 107, 0.86)" : "rgba(143, 129, 121, 0.7)";
   for (const [dotX, dotY] of [[19, 315], [width - 19, 315], [19, 19], [width - 19, 19]]) {
