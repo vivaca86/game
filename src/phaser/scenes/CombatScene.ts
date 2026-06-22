@@ -12,6 +12,10 @@ import { renderActionButton, renderCardHand, renderPaperPanel, renderRasterDisab
 const COMBAT_RASTER_UNDERLAY_KEY = "combat_raster_underlay_concept";
 const COMBAT_RASTER_HOVER_SEAL_KEY = "ui_hover_gold_seal_concept";
 const COMBAT_RASTER_FOCUS_ID_KEY = "combatRasterFocusId";
+const COMBAT_CARD_AFFORDANCE_VERSION = "v1";
+const COMBAT_CARD_HOVER_FRAME_KEY = "combat_card_hover_frame_v1";
+const COMBAT_CARD_DOWN_FRAME_KEY = "combat_card_down_frame_v1";
+const COMBAT_CARD_DISABLED_FRAME_KEY = "combat_card_disabled_frame_v1";
 
 export class CombatScene extends Phaser.Scene {
   constructor() {
@@ -90,6 +94,13 @@ interface CombatRasterControl {
   hitTarget: Phaser.GameObjects.Rectangle;
   activate: () => void;
 }
+
+interface CombatCardAffordanceImages {
+  hover: Phaser.GameObjects.Image;
+  down: Phaser.GameObjects.Image;
+}
+
+type CombatCardData = BootContext["dataBundle"]["cards"][number];
 
 function isCombatRasterBlockedAction(
   controls: CombatRasterControls | undefined,
@@ -443,10 +454,16 @@ export function renderCombatRasterCardHand(
     const x = cardXs[index] ?? (540 + index * 220);
     const action = `card_${index + 1}` as InputAction;
     const playable = canPlayCardAtIndex(context.run, context.dataBundle, index);
+    const adjustedCost = getCombatCardCostAtIndex(context.run, context.dataBundle, index) ?? card.cost;
+    const affordance = renderCombatCardAffordance(scene, card, x, cardY, cardWidth, cardHeight, {
+      index,
+      cost: adjustedCost,
+      playable,
+      largeText: context.save.settings.largeText
+    });
     if (!playable) {
-      const adjustedCost = getCombatCardCostAtIndex(context.run, context.dataBundle, index) ?? card.cost;
       blockedActions[action] = true;
-      renderRasterDisabledHitTarget(scene, x, cardY, cardWidth, cardHeight, {
+      const hitTarget = renderRasterDisabledHitTarget(scene, x, cardY, cardWidth, cardHeight, {
         depth: 22,
         disabledDepth: 24,
         disabledX: x + 12,
@@ -458,6 +475,7 @@ export function renderCombatRasterCardHand(
         tooltipBody: `현재 기운 ${context.run.player.energy}입니다. 이 카드를 사용하려면 기운 ${adjustedCost}가 필요합니다.`,
         tooltipTone: "danger"
       });
+      bindCombatCardAffordance(hitTarget, affordance);
       return;
     }
 
@@ -478,6 +496,7 @@ export function renderCombatRasterCardHand(
         tooltipBody: card.descriptionKo,
         tooltipTone: "choice"
       });
+      bindCombatCardAffordance(hitTarget, affordance);
       controls.push({
         id: action,
         x,
@@ -488,6 +507,384 @@ export function renderCombatRasterCardHand(
     }
   });
   return { blockedActions, controls };
+}
+
+function renderCombatCardAffordance(
+  scene: Phaser.Scene,
+  card: CombatCardData,
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  options: { index: number; cost: number; playable: boolean; largeText: boolean }
+): CombatCardAffordanceImages {
+  const infoKey = ensureCombatCardAffordanceTexture(scene, card, options);
+  scene.add.image(x, y, infoKey)
+    .setDisplaySize(width, height)
+    .setDepth(13)
+    .setData("combatCardAffordance", true);
+
+  const hoverKey = options.playable ? COMBAT_CARD_HOVER_FRAME_KEY : COMBAT_CARD_DISABLED_FRAME_KEY;
+  ensureCombatCardStateFrameTexture(scene, hoverKey, options.playable ? "hover" : "disabled");
+  ensureCombatCardStateFrameTexture(scene, COMBAT_CARD_DOWN_FRAME_KEY, "down");
+
+  const hover = scene.add.image(x, y, hoverKey)
+    .setDisplaySize(width + 28, height + 28)
+    .setAlpha(0)
+    .setDepth(23)
+    .setData("combatCardAffordance", true);
+  const down = scene.add.image(x, y, COMBAT_CARD_DOWN_FRAME_KEY)
+    .setDisplaySize(width + 34, height + 34)
+    .setAlpha(0)
+    .setDepth(23)
+    .setData("combatCardAffordance", true);
+
+  return { hover, down };
+}
+
+function bindCombatCardAffordance(
+  hitTarget: Phaser.GameObjects.Rectangle,
+  affordance: CombatCardAffordanceImages
+): void {
+  const originalHover = hitTarget.getData("showRasterHover") as (() => void) | undefined;
+  const originalDown = hitTarget.getData("showRasterDown") as (() => void) | undefined;
+  const originalIdle = hitTarget.getData("showRasterIdle") as (() => void) | undefined;
+
+  const showHover = () => {
+    affordance.down.setAlpha(0);
+    affordance.hover.setAlpha(1);
+  };
+  const showDown = () => {
+    affordance.hover.setAlpha(0);
+    affordance.down.setAlpha(0.96);
+  };
+  const showIdle = () => {
+    affordance.hover.setAlpha(0);
+    affordance.down.setAlpha(0);
+  };
+
+  hitTarget.on("pointerover", showHover);
+  hitTarget.on("pointerout", showIdle);
+  hitTarget.on("pointerdown", showDown);
+  hitTarget.on("pointerup", showHover);
+  hitTarget.on("pointerupoutside", showIdle);
+  hitTarget.setData("showRasterHover", () => {
+    originalHover?.();
+    showHover();
+  });
+  hitTarget.setData("showRasterDown", () => {
+    originalDown?.();
+    showDown();
+  });
+  hitTarget.setData("showRasterIdle", () => {
+    originalIdle?.();
+    showIdle();
+  });
+}
+
+function ensureCombatCardAffordanceTexture(
+  scene: Phaser.Scene,
+  card: CombatCardData,
+  options: { index: number; cost: number; playable: boolean; largeText: boolean }
+): string {
+  const key = [
+    "combat_card_affordance",
+    COMBAT_CARD_AFFORDANCE_VERSION,
+    safeTextureKeyPart(card.id),
+    options.cost,
+    options.playable ? "ready" : "blocked",
+    options.largeText ? "lg" : "std"
+  ].join("_");
+
+  if (scene.textures.exists(key)) {
+    return key;
+  }
+
+  const scale = 2;
+  const width = 210;
+  const height = 324;
+  const texture = scene.textures.createCanvas(key, width * scale, height * scale);
+  if (!texture) {
+    return key;
+  }
+  const context = texture.getContext();
+  context.save();
+  context.scale(scale, scale);
+  drawCombatCardAffordance(context, card, {
+    ...options,
+    width,
+    height
+  });
+  context.restore();
+  texture.refresh();
+  return key;
+}
+
+function ensureCombatCardStateFrameTexture(scene: Phaser.Scene, key: string, state: "hover" | "down" | "disabled"): string {
+  if (scene.textures.exists(key)) {
+    return key;
+  }
+
+  const scale = 2;
+  const width = 244;
+  const height = 358;
+  const texture = scene.textures.createCanvas(key, width * scale, height * scale);
+  if (!texture) {
+    return key;
+  }
+  const context = texture.getContext();
+  context.save();
+  context.scale(scale, scale);
+  context.clearRect(0, 0, width, height);
+  context.lineJoin = "round";
+  context.shadowColor = state === "disabled" ? "rgba(96, 75, 70, 0.45)" : "rgba(255, 231, 156, 0.75)";
+  context.shadowBlur = state === "down" ? 18 : 12;
+  context.lineWidth = state === "down" ? 8 : 6;
+  context.strokeStyle = state === "disabled" ? "rgba(139, 129, 121, 0.95)" : "rgba(255, 235, 159, 0.98)";
+  context.fillStyle = state === "down" ? "rgba(245, 194, 107, 0.15)" : "rgba(255, 255, 255, 0.02)";
+  drawRoundedRect(context, 12, 12, width - 24, height - 24, 22);
+  context.fill();
+  context.stroke();
+
+  context.shadowBlur = 0;
+  context.lineWidth = 3;
+  context.strokeStyle = state === "disabled" ? "rgba(255, 241, 208, 0.36)" : "rgba(47, 107, 104, 0.92)";
+  drawRoundedRect(context, 22, 22, width - 44, height - 44, 16);
+  context.stroke();
+
+  const accent = state === "disabled" ? "rgba(125, 85, 80, 0.9)" : state === "down" ? "rgba(165, 72, 63, 0.96)" : "rgba(47, 107, 104, 0.96)";
+  context.fillStyle = accent;
+  drawCornerTab(context, 20, 20, 34, "tl");
+  drawCornerTab(context, width - 20, 20, 34, "tr");
+  drawCornerTab(context, 20, height - 20, 34, "bl");
+  drawCornerTab(context, width - 20, height - 20, 34, "br");
+  context.restore();
+  texture.refresh();
+  return key;
+}
+
+function drawCombatCardAffordance(
+  context: CanvasRenderingContext2D,
+  card: CombatCardData,
+  options: { index: number; cost: number; playable: boolean; largeText: boolean; width: number; height: number }
+): void {
+  const { width, height, playable } = options;
+  const accent = cardTypeAccent(card.type);
+  context.clearRect(0, 0, width, height);
+  context.lineJoin = "round";
+
+  context.shadowColor = "rgba(20, 17, 22, 0.38)";
+  context.shadowBlur = 8;
+  context.lineWidth = playable ? 4 : 3;
+  context.strokeStyle = playable ? "rgba(245, 194, 107, 0.92)" : "rgba(143, 129, 121, 0.84)";
+  context.fillStyle = playable ? "rgba(255, 248, 232, 0.05)" : "rgba(48, 42, 43, 0.24)";
+  drawRoundedRect(context, 7, 8, width - 14, height - 16, 16);
+  context.fill();
+  context.stroke();
+
+  context.shadowBlur = 0;
+  context.fillStyle = playable ? "rgba(255, 241, 208, 0.86)" : "rgba(83, 76, 72, 0.74)";
+  context.strokeStyle = playable ? "rgba(198, 166, 94, 0.88)" : "rgba(180, 168, 150, 0.6)";
+  context.lineWidth = 3;
+  drawRoundedRect(context, 14, 220, width - 28, 82, 13);
+  context.fill();
+  context.stroke();
+
+  context.fillStyle = playable ? accent : "rgba(106, 96, 91, 0.9)";
+  drawRoundedRect(context, 22, 226, width - 44, 22, 10);
+  context.fill();
+
+  context.fillStyle = playable ? "rgba(255, 245, 215, 0.98)" : "rgba(225, 216, 202, 0.95)";
+  drawFittedText(context, card.displayNameKo, width / 2, 237, width - 58, options.largeText ? 15 : 14, 10, true, "center");
+
+  const effectText = compactCombatCardDescription(card.descriptionKo);
+  context.fillStyle = playable ? "#2f211a" : "#e1d8ca";
+  context.font = `${options.largeText ? "700" : "600"} ${options.largeText ? 13 : 12}px Arial, sans-serif`;
+  drawWrappedText(context, effectText, 24, 260, width - 48, options.largeText ? 15 : 14, 2);
+
+  context.fillStyle = playable ? "#fff1b8" : "#cabfb0";
+  context.strokeStyle = playable ? "#6d4a20" : "#6a605b";
+  context.lineWidth = 3;
+  context.beginPath();
+  context.arc(30, 31, 21, 0, Math.PI * 2);
+  context.fill();
+  context.stroke();
+  context.fillStyle = "#1e2a3e";
+  drawFittedText(context, String(options.cost), 30, 32, 28, 25, 15, true, "center");
+
+  context.fillStyle = playable ? "#fff8e8" : "#4f4743";
+  context.strokeStyle = playable ? accent : "#8f8179";
+  context.lineWidth = 2;
+  drawRoundedRect(context, width - 45, 15, 30, 30, 9);
+  context.fill();
+  context.stroke();
+  context.fillStyle = playable ? "#1e2a3e" : "#e1d8ca";
+  drawFittedText(context, String(options.index + 1), width - 30, 31, 20, 18, 12, true, "center");
+
+  context.fillStyle = playable ? "rgba(47, 107, 104, 0.96)" : "rgba(125, 85, 80, 0.95)";
+  context.strokeStyle = playable ? "rgba(255, 243, 176, 0.82)" : "rgba(255, 241, 208, 0.42)";
+  context.lineWidth = 2;
+  drawRoundedRect(context, 42, 286, width - 84, 24, 12);
+  context.fill();
+  context.stroke();
+  context.fillStyle = "#fff5d7";
+  drawFittedText(context, playable ? "준비" : "기운 부족", width / 2, 298, width - 104, 13, 10, true, "center");
+
+  context.fillStyle = playable ? "rgba(245, 194, 107, 0.86)" : "rgba(143, 129, 121, 0.7)";
+  for (const [dotX, dotY] of [[19, 315], [width - 19, 315], [19, 19], [width - 19, 19]]) {
+    context.beginPath();
+    context.arc(dotX, dotY, 5, 0, Math.PI * 2);
+    context.fill();
+  }
+}
+
+function compactCombatCardDescription(value: string): string {
+  return value.replace(/\s+/g, " ").trim();
+}
+
+function cardTypeAccent(type: CombatCardData["type"]): string {
+  if (type === "attack") return "#a5483f";
+  if (type === "defense") return "#2f6b68";
+  if (type === "skill") return "#5d73a4";
+  if (type === "curse") return "#6a4b73";
+  return "#8d6a2a";
+}
+
+function drawFittedText(
+  context: CanvasRenderingContext2D,
+  value: string,
+  x: number,
+  y: number,
+  maxWidth: number,
+  maxSize: number,
+  minSize: number,
+  bold: boolean,
+  align: CanvasTextAlign
+): void {
+  context.textAlign = align;
+  context.textBaseline = "middle";
+  let size = maxSize;
+  while (size > minSize) {
+    context.font = `${bold ? "700" : "500"} ${size}px Arial, sans-serif`;
+    if (context.measureText(value).width <= maxWidth) break;
+    size -= 1;
+  }
+  context.font = `${bold ? "700" : "500"} ${size}px Arial, sans-serif`;
+  context.fillText(trimToWidth(context, value, maxWidth), x, y);
+}
+
+function drawWrappedText(
+  context: CanvasRenderingContext2D,
+  value: string,
+  x: number,
+  y: number,
+  maxWidth: number,
+  lineHeight: number,
+  maxLines: number
+): void {
+  context.textAlign = "left";
+  context.textBaseline = "top";
+  const lines = wrapCanvasText(context, value, maxWidth, maxLines);
+  lines.forEach((line, index) => {
+    context.fillText(line, x, y + index * lineHeight);
+  });
+}
+
+function wrapCanvasText(context: CanvasRenderingContext2D, value: string, maxWidth: number, maxLines: number): string[] {
+  const normalized = value.replace(/\s+/g, " ").trim();
+  const units = Array.from(normalized);
+  const lines: string[] = [];
+  let current = "";
+
+  for (const unit of units) {
+    const next = current + unit;
+    if (current && context.measureText(next).width > maxWidth) {
+      lines.push(current.trim());
+      current = unit.trimStart();
+      if (lines.length >= maxLines) {
+        break;
+      }
+    } else {
+      current = next;
+    }
+  }
+
+  if (lines.length < maxLines && current.trim()) {
+    lines.push(current.trim());
+  }
+  if (lines.length > maxLines) {
+    lines.length = maxLines;
+  }
+  if (lines.length === maxLines) {
+    lines[maxLines - 1] = trimToWidth(context, lines[maxLines - 1], maxWidth, "...");
+  }
+  return lines;
+}
+
+function trimToWidth(context: CanvasRenderingContext2D, value: string, maxWidth: number, suffix = ""): string {
+  if (context.measureText(value).width <= maxWidth) {
+    return value;
+  }
+  let next = value;
+  while (next.length > 0 && context.measureText(`${next}${suffix}`).width > maxWidth) {
+    next = next.slice(0, -1);
+  }
+  return `${next}${suffix}`;
+}
+
+function drawRoundedRect(
+  context: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  radius: number
+): void {
+  const r = Math.min(radius, width / 2, height / 2);
+  context.beginPath();
+  context.moveTo(x + r, y);
+  context.lineTo(x + width - r, y);
+  context.quadraticCurveTo(x + width, y, x + width, y + r);
+  context.lineTo(x + width, y + height - r);
+  context.quadraticCurveTo(x + width, y + height, x + width - r, y + height);
+  context.lineTo(x + r, y + height);
+  context.quadraticCurveTo(x, y + height, x, y + height - r);
+  context.lineTo(x, y + r);
+  context.quadraticCurveTo(x, y, x + r, y);
+  context.closePath();
+}
+
+function drawCornerTab(
+  context: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  size: number,
+  corner: "tl" | "tr" | "bl" | "br"
+): void {
+  context.beginPath();
+  if (corner === "tl") {
+    context.moveTo(x, y);
+    context.lineTo(x + size, y);
+    context.lineTo(x, y + size);
+  } else if (corner === "tr") {
+    context.moveTo(x, y);
+    context.lineTo(x - size, y);
+    context.lineTo(x, y + size);
+  } else if (corner === "bl") {
+    context.moveTo(x, y);
+    context.lineTo(x + size, y);
+    context.lineTo(x, y - size);
+  } else {
+    context.moveTo(x, y);
+    context.lineTo(x - size, y);
+    context.lineTo(x, y - size);
+  }
+  context.closePath();
+  context.fill();
+}
+
+function safeTextureKeyPart(value: string): string {
+  return value.replace(/[^a-zA-Z0-9_]/g, "_").slice(0, 80);
 }
 
 function addRasterText(
