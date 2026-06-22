@@ -1549,3 +1549,10 @@
 - Impact: A player could enter combat, miss that cards were selectable, or fail to identify the end-turn seal as a button. This matched the user report that the biggest issue was not knowing what was clickable.
 - Resolution: Changed the combat card ready label to `사용 가능`, bumped the generated card affordance texture version, and added persistent `턴 종료` button-label affordances to Combat and Boss raster scenes. PC action/combat audits now require the combat card v2 affordances and the visible end-turn label.
 - Prevention: Combat audits should verify both real state changes after card selection and always-visible labels for icon-like primary actions. Do not count hover-only affordances as enough for PC idle readability.
+
+### Problem: Reward and Event choices used a passive availability label
+
+- Cause: Reward/Event choice cards already rendered a bottom status pill, but the ready state said `선택 가능`, which described availability rather than giving a clear command. The PC action audit counted choice-info affordances without proving that the idle card carried a direct action label.
+- Impact: A player could read the cards as informational panels instead of click targets, especially after entering choice-heavy screens from combat or events.
+- Resolution: Updated the shared choice-info texture to render `선택하기` for ready choices, kept `조건 부족` for disabled choices, and bumped the choice-info texture version. `tools/ui-pc-action-affordance-audit.mjs` now requires selectable Reward/Event choices to expose action-label metadata in addition to the visible choice-info texture.
+- Prevention: Choice screens should use command language for ready states and audits should distinguish actionable choice labels from passive info panels.

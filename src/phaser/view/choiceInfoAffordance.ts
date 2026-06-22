@@ -2,7 +2,7 @@ import Phaser from "phaser";
 import type { BootContext } from "../../app/bootContext";
 import type { EventChoice, RewardEntry } from "../../data/schema";
 
-const CHOICE_INFO_VERSION = "v2";
+const CHOICE_INFO_VERSION = "v3";
 
 interface ChoiceInfoOptions {
   index: number;
@@ -43,7 +43,9 @@ export function renderRewardChoiceInfo(
     .setDisplaySize(width, height)
     .setDepth(13)
     .setData("choiceInfoAffordance", true)
-    .setData("choiceInfoKind", "reward");
+    .setData("choiceInfoKind", "reward")
+    .setData("choiceInfoState", "ready")
+    .setData("choiceActionLabel", "선택하기");
 }
 
 export function renderEventChoiceInfo(
@@ -68,7 +70,9 @@ export function renderEventChoiceInfo(
     .setDisplaySize(width, height)
     .setDepth(13)
     .setData("choiceInfoAffordance", true)
-    .setData("choiceInfoKind", "event");
+    .setData("choiceInfoKind", "event")
+    .setData("choiceInfoState", options.affordable ? "ready" : "disabled")
+    .setData("choiceActionLabel", options.affordable ? "선택하기" : "조건 부족");
 }
 
 function rewardChoiceInfoModel(context: BootContext, entry: RewardEntry): ChoiceInfoModel {
@@ -189,12 +193,12 @@ function drawChoiceInfoTexture(
   context.fillStyle = disabled ? "rgba(125, 85, 80, 0.95)" : "rgba(47, 107, 104, 0.96)";
   context.strokeStyle = disabled ? "rgba(255, 241, 208, 0.42)" : "rgba(255, 243, 176, 0.82)";
   context.lineWidth = 2;
-  const statusWidth = Math.min(116, width - 78);
+  const statusWidth = Math.min(disabled ? 116 : 132, width - 78);
   drawRoundedRect(context, (width - statusWidth) / 2, height - 34, statusWidth, 24, 12);
   context.fill();
   context.stroke();
   context.fillStyle = "#fff5d7";
-  drawFittedText(context, disabled ? "조건 부족" : "선택 가능", width / 2, height - 22, statusWidth - 16, smallSize + 1, 10, true, "center");
+  drawFittedText(context, disabled ? "조건 부족" : "선택하기", width / 2, height - 22, statusWidth - 16, smallSize + 1, 10, true, "center");
 }
 
 function drawInfoRow(

@@ -55,7 +55,8 @@ const targets = [
     pathname: "/?debug=1&entry=reward&resetSave=1",
     underlayKey: "reward_raster_underlay_concept",
     minIdleAffordances: 1,
-    minChoiceInfoAffordances: 1
+    minChoiceInfoAffordances: 1,
+    requireChoiceActionLabels: true
   },
   {
     key: "event",
@@ -63,7 +64,8 @@ const targets = [
     pathname: "/?debug=1&data=release&entry=event&resetSave=1&stage=stage_sunny_gate",
     underlayKey: "event_raster_underlay_concept",
     minIdleAffordances: 1,
-    minChoiceInfoAffordances: 1
+    minChoiceInfoAffordances: 1,
+    requireChoiceActionLabels: true
   },
   {
     key: "rune-bench",
@@ -147,16 +149,19 @@ try {
           && String(child.texture?.key ?? "").startsWith("combat_card_affordance_v2_")
         ));
         const choiceInfoAffordances = visible.filter((child) => child?.type === "Image" && child.getData?.("choiceInfoAffordance"));
+        const choiceActionLabels = choiceInfoAffordances.filter((child) => child.getData?.("choiceActionLabel"));
         const buttonLabelAffordances = visible.filter((child) => child?.type === "Image" && child.getData?.("buttonLabelAffordance"));
         return idleAffordances.length >= expected.minIdleAffordances
           && cardAffordances.length >= expected.minCardAffordances
           && choiceInfoAffordances.length >= expected.minChoiceInfoAffordances
+          && (!expected.requireChoiceActionLabels || choiceActionLabels.length >= expected.minChoiceInfoAffordances)
           && buttonLabelAffordances.length >= expected.minButtonLabelAffordances;
       }, {
         sceneName: target.sceneName,
         minIdleAffordances: target.minIdleAffordances,
         minCardAffordances: target.minCardAffordances ?? 0,
         minChoiceInfoAffordances: target.minChoiceInfoAffordances ?? 0,
+        requireChoiceActionLabels: Boolean(target.requireChoiceActionLabels),
         minButtonLabelAffordances: target.minButtonLabelAffordances ?? 0
       }, { timeout: 10000 });
 
@@ -257,6 +262,7 @@ async function readActionAffordanceAudit(page, target) {
     const idleImages = images.filter((child) => child.getData?.("rasterIdleAffordance"));
     const cardAffordanceImages = images.filter((child) => String(child.texture?.key ?? "").startsWith("combat_card_affordance_v2_"));
     const choiceInfoImages = images.filter((child) => child.getData?.("choiceInfoAffordance"));
+    const choiceActionLabels = choiceInfoImages.map((child) => String(child.getData?.("choiceActionLabel") ?? ""));
     const buttonLabelImages = images.filter((child) => child.getData?.("buttonLabelAffordance"));
     const rectsAboveUnderlay = visible
       .filter((child) => child?.type === "Rectangle")
@@ -280,6 +286,8 @@ async function readActionAffordanceAudit(page, target) {
       blockedCardAffordances: cardAffordanceImages.filter((child) => String(child.texture?.key ?? "").includes("_blocked_")).length,
       choiceInfoAffordances: choiceInfoImages.length,
       choiceInfoKeys: choiceInfoImages.map((child) => String(child.texture?.key ?? "")),
+      choiceActionLabels,
+      readyChoiceActionLabels: choiceActionLabels.filter((label) => label === "선택하기").length,
       buttonLabelAffordances: buttonLabelImages.length,
       buttonLabels: buttonLabelImages.map((child) => String(child.getData?.("buttonLabel") ?? "")),
       visibleTextCount: visible.filter((child) => child?.type === "Text" && String(child.text ?? "").trim().length > 0).length,
@@ -305,6 +313,9 @@ function assertActionAffordance(label, audit, target) {
   if (audit.choiceInfoAffordances < (target.minChoiceInfoAffordances ?? 0)) {
     throw new Error(`${label}: expected choice info affordances ${JSON.stringify(audit)}`);
   }
+  if (target.requireChoiceActionLabels && audit.readyChoiceActionLabels < (target.minChoiceInfoAffordances ?? 0)) {
+    throw new Error(`${label}: expected selectable choice action labels ${JSON.stringify(audit)}`);
+  }
   if (audit.buttonLabelAffordances < (target.minButtonLabelAffordances ?? 0)) {
     throw new Error(`${label}: expected button label affordances ${JSON.stringify(audit)}`);
   }
@@ -326,6 +337,7 @@ function summary(target, viewport, audit, screenshot) {
     idleAffordances: audit.idleAffordances,
     cardAffordances: `${audit.readyCardAffordances} ready / ${audit.blockedCardAffordances} blocked`,
     choiceInfoAffordances: audit.choiceInfoAffordances,
+    readyChoiceActionLabels: audit.readyChoiceActionLabels,
     buttonLabelAffordances: audit.buttonLabelAffordances,
     leak: `${audit.visibleTextCount} text, ${audit.visibleRectsAboveUnderlay} rects`,
     ariaLength: audit.canvasAriaLength,
