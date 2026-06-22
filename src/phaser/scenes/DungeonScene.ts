@@ -220,6 +220,12 @@ function renderDungeonRasterHitTarget(
     downWidth: hoverSize * 1.1,
     downHeight: hoverSize * 1.1,
     downAlpha: 0.82,
+    idleKey: DUNGEON_RASTER_HOVER_NODE_KEY,
+    idleX: x,
+    idleY: y,
+    idleWidth: hoverSize,
+    idleHeight: hoverSize,
+    idleAlpha: 0.3,
     tooltipTitle: "방 진입",
     tooltipBody: "현재 경로의 다음 방으로 들어갑니다.",
     tooltipTone: "confirm"

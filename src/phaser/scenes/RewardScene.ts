@@ -127,6 +127,12 @@ function renderRewardRasterChoice(
     downWidth: 124,
     downHeight: 88,
     downAlpha: 0.94,
+    idleKey: REWARD_RASTER_HOVER_CHOICE_KEY,
+    idleX: x,
+    idleY: y - 268,
+    idleWidth: 112,
+    idleHeight: 80,
+    idleAlpha: 0.26,
     tooltipTitle: rewardTooltipTitle(context, entry),
     tooltipBody: rewardTooltipBody(context, entry),
     tooltipTone: "choice"

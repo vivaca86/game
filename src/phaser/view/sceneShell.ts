@@ -99,6 +99,13 @@ interface RasterHoverHitTargetOptions extends RasterTooltipOptions {
   downHeight?: number;
   hoverAlpha?: number;
   downAlpha?: number;
+  idleKey?: string | false;
+  idleX?: number;
+  idleY?: number;
+  idleWidth?: number;
+  idleHeight?: number;
+  idleDepth?: number;
+  idleBlendMode?: Phaser.BlendModes;
   idleAlpha?: number;
 }
 
@@ -455,10 +462,23 @@ export function renderRasterHoverHitTarget(
   onClick: () => void,
   options: RasterHoverHitTargetOptions = {}
 ): Phaser.GameObjects.Rectangle {
+  const idleAlpha = options.idleAlpha ?? 0;
+  const idleKey = options.idleKey === undefined ? false : options.idleKey;
+  const idleImage = idleKey && scene.textures.exists(idleKey)
+    ? scene.add.image(options.idleX ?? options.hoverX ?? x, options.idleY ?? options.hoverY ?? y, idleKey)
+      .setDisplaySize(options.idleWidth ?? options.hoverWidth ?? width, options.idleHeight ?? options.hoverHeight ?? height)
+      .setAlpha(idleAlpha)
+      .setDepth(options.idleDepth ?? Math.max(options.depth ?? 21, (options.hoverDepth ?? ((options.depth ?? 21) + 1)) - 0.25))
+      .setData("rasterIdleAffordance", true)
+    : undefined;
+  if (idleImage && options.idleBlendMode !== undefined) {
+    idleImage.setBlendMode(options.idleBlendMode);
+  }
+
   const hoverImage = options.hoverKey && scene.textures.exists(options.hoverKey)
     ? scene.add.image(options.hoverX ?? x, options.hoverY ?? y, options.hoverKey)
       .setDisplaySize(options.hoverWidth ?? width, options.hoverHeight ?? height)
-      .setAlpha(options.idleAlpha ?? 0)
+      .setAlpha(0)
       .setDepth(options.hoverDepth ?? ((options.depth ?? 21) + 1))
     : undefined;
   if (hoverImage && options.hoverBlendMode !== undefined) {
@@ -468,7 +488,7 @@ export function renderRasterHoverHitTarget(
   const downImage = scene.textures.exists(downKey)
     ? scene.add.image(options.downX ?? options.hoverX ?? x, options.downY ?? options.hoverY ?? y, downKey)
       .setDisplaySize(options.downWidth ?? options.hoverWidth ?? width, options.downHeight ?? options.hoverHeight ?? height)
-      .setAlpha(options.idleAlpha ?? 0)
+      .setAlpha(0)
       .setDepth(options.downDepth ?? options.hoverDepth ?? ((options.depth ?? 21) + 1))
     : undefined;
   if (downImage && options.downBlendMode !== undefined) {
@@ -476,19 +496,21 @@ export function renderRasterHoverHitTarget(
   }
   const hitTarget = scene.add.rectangle(x, y, width, height, 0xffffff, 0.001).setDepth(options.depth ?? 21);
   hitTarget.setInteractive({ useHandCursor: options.useHandCursor ?? true });
-  const idleAlpha = options.idleAlpha ?? 0;
   const showHover = () => {
-    downImage?.setAlpha(idleAlpha);
+    idleImage?.setAlpha(0);
+    downImage?.setAlpha(0);
     hoverImage?.setAlpha(options.hoverAlpha ?? 1);
     showRasterTooltip(scene, x, y, width, height, options);
   };
   const showIdle = () => {
-    hoverImage?.setAlpha(idleAlpha);
-    downImage?.setAlpha(idleAlpha);
+    hoverImage?.setAlpha(0);
+    downImage?.setAlpha(0);
+    idleImage?.setAlpha(idleAlpha);
     hideReadabilityTooltip();
   };
   const showDown = () => {
-    hoverImage?.setAlpha(idleAlpha);
+    idleImage?.setAlpha(0);
+    hoverImage?.setAlpha(0);
     downImage?.setAlpha(options.downAlpha ?? 0.86);
     if (!downImage) {
       hoverImage?.setAlpha(options.downAlpha ?? 0.82);

@@ -8,7 +8,7 @@ import { canPlayCardAtIndex, getActiveIntent, getCombatantData, getCombatCardCos
 import { renderDebugOverlay } from "../../ui/overlays/debugOverlay";
 import { handleSceneAction } from "../bridge/sceneActions";
 import { requireBootContext } from "../bridge/sceneBridge";
-import { renderCombatFeedbackEffect, renderCombatPanel, renderCombatPlayerStandee, renderCombatTheater } from "./CombatScene";
+import { bindCombatCardAffordance, renderCombatCardAffordance, renderCombatFeedbackEffect, renderCombatPanel, renderCombatPlayerStandee, renderCombatTheater } from "./CombatScene";
 import { renderActionButton, renderCardHand, renderPaperPanel, renderRasterDisabledHitTarget, renderRasterHoverHitTarget, renderSceneShell, renderTransparentHitTarget, setRasterHitTargetHoverState, textStyle, triggerRasterHitTargetDown } from "../view/sceneShell";
 
 const BOSS_RASTER_UNDERLAY_KEY = "boss_raster_underlay_concept";
@@ -261,10 +261,18 @@ function renderBossRasterCardTargets(
     const x = cardXs[index] ?? (540 + index * 220);
     const action = `card_${index + 1}` as InputAction;
     const playable = canPlayCardAtIndex(context.run, context.dataBundle, index);
+    const adjustedCost = getCombatCardCostAtIndex(context.run, context.dataBundle, index) ?? card?.cost ?? 0;
+    const affordance = card
+      ? renderCombatCardAffordance(scene, card, x, cardY, cardWidth, cardHeight, {
+        index,
+        cost: adjustedCost,
+        playable,
+        largeText: context.save.settings.largeText
+      })
+      : undefined;
     if (!playable) {
-      const adjustedCost = getCombatCardCostAtIndex(context.run, context.dataBundle, index) ?? card?.cost ?? 0;
       blockedActions[action] = true;
-      renderRasterDisabledHitTarget(scene, x, cardY, cardWidth, cardHeight, {
+      const hitTarget = renderRasterDisabledHitTarget(scene, x, cardY, cardWidth, cardHeight, {
         depth: 22,
         disabledDepth: 24,
         disabledX: x - 32,
@@ -276,6 +284,9 @@ function renderBossRasterCardTargets(
         tooltipBody: `현재 기운 ${context.run.player.energy}입니다. 이 카드를 사용하려면 기운 ${adjustedCost}가 필요합니다.`,
         tooltipTone: "danger"
       });
+      if (affordance) {
+        bindCombatCardAffordance(hitTarget, affordance);
+      }
       return;
     }
 
@@ -296,6 +307,9 @@ function renderBossRasterCardTargets(
         tooltipBody: card?.descriptionKo ?? "보스 전투에서 이 카드를 사용합니다.",
         tooltipTone: "choice"
       });
+      if (affordance) {
+        bindCombatCardAffordance(hitTarget, affordance);
+      }
       controls.push({
         id: action,
         x,
@@ -327,6 +341,12 @@ function renderBossRasterEndTurnTarget(scene: Phaser.Scene, context: BootContext
     downWidth: 156,
     downHeight: 156,
     downAlpha: 0.92,
+    idleKey: BOSS_RASTER_HOVER_STAMP_KEY,
+    idleX: x - 16,
+    idleY: y - 28,
+    idleWidth: 144,
+    idleHeight: 144,
+    idleAlpha: 0.3,
     tooltipTitle: "턴 종료",
     tooltipBody: "보스의 다음 의도를 처리하고 새 턴을 준비합니다.",
     tooltipTone: "confirm"

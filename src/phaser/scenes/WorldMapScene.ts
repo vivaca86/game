@@ -1036,6 +1036,12 @@ function renderWorldMapRasterHitTarget(
     downHeight: height,
     hoverAlpha: 0.96,
     downAlpha: 0.94,
+    idleKey: WORLD_MAP_RASTER_HOVER_PLAY_KEY,
+    idleX: x,
+    idleY: y,
+    idleWidth: width,
+    idleHeight: height,
+    idleAlpha: 0.34,
     tooltipTitle: options.tooltipTitle,
     tooltipBody: options.tooltipBody,
     tooltipTone: options.tooltipTone

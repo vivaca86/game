@@ -119,15 +119,9 @@ function renderTownRasterStage(scene: Phaser.Scene, context: BootContext): TownR
     tooltipBody: `${getStageLabel(context, context.run.stageId)} 경로로 나갑니다.`,
     tooltipTone: "confirm"
   });
-  // These legacy coordinates preserve click behavior but do not map to a clear concept control.
-  renderTownRasterHitTarget(scene, 1010, 724, 330, 58, 0xce5869, () => resetStoredSave(scene, context), {
-    hoverKey: "",
-    downKey: ""
-  });
-  renderTownRasterHitTarget(scene, 1010, 806, 330, 58, 0x6c8fd6, () => scene.scene.start("SettingsScene", context), {
-    hoverKey: "",
-    downKey: ""
-  });
+  // These secondary panel coordinates preserve click behavior and use the generic action seal.
+  renderTownRasterHitTarget(scene, 1010, 724, 330, 58, 0xce5869, () => resetStoredSave(scene, context));
+  renderTownRasterHitTarget(scene, 1010, 806, 330, 58, 0x6c8fd6, () => scene.scene.start("SettingsScene", context));
 
   addControl("toolbarSettings", 1340, 976, 140, 104, 0x6c8fd6, () => scene.scene.start("SettingsScene", context), {
     hoverKey: TOWN_RASTER_TOOLBAR_SETTINGS_KEYS.hover,
@@ -187,6 +181,7 @@ function renderTownRasterHitTarget(
     downHeight?: number;
     hoverAlpha?: number;
     downAlpha?: number;
+    idleAlpha?: number;
     tooltipTitle?: string;
     tooltipBody?: string;
     tooltipTone?: "default" | "confirm" | "choice" | "danger";
@@ -206,6 +201,12 @@ function renderTownRasterHitTarget(
     downHeight: options.downHeight ?? hoverSize * 1.12,
     hoverAlpha: options.hoverAlpha,
     downAlpha: options.downAlpha ?? 0.76,
+    idleKey: options.hoverKey ?? TOWN_RASTER_HOVER_ACTION_KEY,
+    idleX: options.hoverX ?? x + width * 0.42,
+    idleY: options.hoverY ?? y - height * 0.28,
+    idleWidth: options.hoverWidth ?? hoverSize,
+    idleHeight: options.hoverHeight ?? hoverSize,
+    idleAlpha: options.idleAlpha ?? 0.3,
     tooltipTitle: options.tooltipTitle,
     tooltipBody: options.tooltipBody,
     tooltipTone: options.tooltipTone

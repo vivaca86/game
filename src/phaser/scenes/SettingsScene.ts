@@ -380,6 +380,7 @@ function renderSettingsRasterHitTarget(
     stampHeight?: number;
     hoverAlpha?: number;
     downAlpha?: number;
+    idleAlpha?: number;
     tooltipTitle?: string;
     tooltipBody?: string;
     tooltipTone?: "default" | "confirm" | "choice" | "danger";
@@ -402,6 +403,12 @@ function renderSettingsRasterHitTarget(
     downHeight: options.stampHeight ?? hoverSize * 1.12,
     hoverAlpha: options.hoverAlpha,
     downAlpha: options.downAlpha ?? 0.76,
+    idleKey: options.hoverKey ?? SETTINGS_RASTER_HOVER_ACTION_KEY,
+    idleX: stampX,
+    idleY: stampY,
+    idleWidth: options.stampWidth ?? hoverSize,
+    idleHeight: options.stampHeight ?? hoverSize,
+    idleAlpha: options.idleAlpha ?? 0.22,
     tooltipTitle: options.tooltipTitle,
     tooltipBody: options.tooltipBody,
     tooltipTone: options.tooltipTone

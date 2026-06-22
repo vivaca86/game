@@ -95,12 +95,12 @@ interface CombatRasterControl {
   activate: () => void;
 }
 
-interface CombatCardAffordanceImages {
+export interface CombatCardAffordanceImages {
   hover: Phaser.GameObjects.Image;
   down: Phaser.GameObjects.Image;
 }
 
-type CombatCardData = BootContext["dataBundle"]["cards"][number];
+export type CombatCardData = BootContext["dataBundle"]["cards"][number];
 
 function isCombatRasterBlockedAction(
   controls: CombatRasterControls | undefined,
@@ -278,6 +278,12 @@ function renderCombatRasterEndTurnButton(scene: Phaser.Scene, context: BootConte
     downWidth: 138,
     downHeight: 138,
     downAlpha: 0.94,
+    idleKey: COMBAT_RASTER_HOVER_SEAL_KEY,
+    idleX: x - 88,
+    idleY: y - 118,
+    idleWidth: 126,
+    idleHeight: 126,
+    idleAlpha: 0.34,
     tooltipTitle: "턴 종료",
     tooltipBody: "남은 기운을 정리하고 적의 의도를 처리합니다.",
     tooltipTone: "confirm"
@@ -509,7 +515,7 @@ export function renderCombatRasterCardHand(
   return { blockedActions, controls };
 }
 
-function renderCombatCardAffordance(
+export function renderCombatCardAffordance(
   scene: Phaser.Scene,
   card: CombatCardData,
   x: number,
@@ -542,7 +548,7 @@ function renderCombatCardAffordance(
   return { hover, down };
 }
 
-function bindCombatCardAffordance(
+export function bindCombatCardAffordance(
   hitTarget: Phaser.GameObjects.Rectangle,
   affordance: CombatCardAffordanceImages
 ): void {

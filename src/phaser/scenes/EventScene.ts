@@ -140,6 +140,12 @@ function renderEventRasterChoice(
     downWidth: 124,
     downHeight: 88,
     downAlpha: 0.94,
+    idleKey: EVENT_RASTER_HOVER_CHOICE_KEY,
+    idleX: badgeX,
+    idleY: y - 178,
+    idleWidth: 112,
+    idleHeight: 80,
+    idleAlpha: 0.26,
     tooltipTitle: choice.displayNameKo,
     tooltipBody: choice.descriptionKo,
     tooltipTone: "choice"

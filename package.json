@@ -43,6 +43,7 @@
     "ui:pc-worldmap:keyboard": "node tools/ui-pc-worldmap-keyboard-audit.mjs",
     "ui:pc-worldmap:release-state": "node tools/ui-pc-worldmap-release-state-audit.mjs",
     "ui:pc-combat:affordance": "node tools/ui-pc-combat-affordance-audit.mjs",
+    "ui:pc-action-affordance": "node tools/ui-pc-action-affordance-audit.mjs",
     "phaser:smoke": "node tools/phaser-smoke-test.mjs",
     "proof:smoke": "node tools/vertical-slice-proof-smoke.mjs",
     "runtime:smoke": "node tools/runtime-smoke-test.mjs",

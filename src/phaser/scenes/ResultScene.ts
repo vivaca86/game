@@ -158,6 +158,7 @@ function renderResultRasterHitTarget(
     downHeight?: number;
     hoverAlpha?: number;
     downAlpha?: number;
+    idleAlpha?: number;
     tooltipTitle?: string;
     tooltipBody?: string;
     tooltipTone?: "default" | "confirm" | "choice" | "danger";
@@ -177,6 +178,12 @@ function renderResultRasterHitTarget(
     downHeight: options.downHeight ?? hoverSize * 1.12,
     hoverAlpha: options.hoverAlpha,
     downAlpha: options.downAlpha ?? 0.76,
+    idleKey: options.hoverKey ?? RESULT_RASTER_HOVER_ACTION_KEY,
+    idleX: options.hoverX ?? x + width * 0.38,
+    idleY: options.hoverY ?? y - height * 0.24,
+    idleWidth: options.hoverWidth ?? hoverSize,
+    idleHeight: options.hoverHeight ?? hoverSize,
+    idleAlpha: options.idleAlpha ?? 0.28,
     tooltipTitle: options.tooltipTitle,
     tooltipBody: options.tooltipBody,
     tooltipTone: options.tooltipTone
