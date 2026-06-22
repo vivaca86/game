@@ -7,6 +7,7 @@ import { canPayEventChoice, getCurrentEvent } from "../../simulation/systems/eve
 import { renderDebugOverlay } from "../../ui/overlays/debugOverlay";
 import { handleSceneAction } from "../bridge/sceneActions";
 import { requireBootContext } from "../bridge/sceneBridge";
+import { renderEventChoiceInfo } from "../view/choiceInfoAffordance";
 import { renderActionButton, renderPaperPanel, renderRasterDisabledHitTarget, renderRasterHoverHitTarget, renderSceneShell, renderUiSlot, setRasterHitTargetHoverState, textStyle, triggerRasterHitTargetDown } from "../view/sceneShell";
 
 const CHOICE_ACTIONS = ["card_1", "card_2", "card_3", "card_4", "card_5"] as const;
@@ -111,6 +112,12 @@ function renderEventRasterChoice(
 ): Phaser.GameObjects.Rectangle | undefined {
   const affordable = canPayEventChoice(context.run, choice);
   const badgeX = x - 32;
+  const choiceIndex = CHOICE_ACTIONS.indexOf(action);
+  renderEventChoiceInfo(scene, context, choice, x, y, 276, 430, {
+    index: choiceIndex,
+    affordable,
+    largeText: context.save.settings.largeText
+  });
 
   if (!affordable) {
     renderRasterDisabledHitTarget(scene, x, y, 276, 430, {

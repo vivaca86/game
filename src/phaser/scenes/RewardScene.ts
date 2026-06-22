@@ -7,6 +7,7 @@ import { findRewardEntryById, selectRewardEntries } from "../../simulation/state
 import { renderDebugOverlay } from "../../ui/overlays/debugOverlay";
 import { handleSceneAction } from "../bridge/sceneActions";
 import { requireBootContext } from "../bridge/sceneBridge";
+import { renderRewardChoiceInfo } from "../view/choiceInfoAffordance";
 import { renderActionButton, renderPaperPanel, renderRasterHoverHitTarget, renderSceneShell, renderTooltip, renderTransparentHitTarget, renderUiSlot, setRasterHitTargetHoverState, textStyle, triggerRasterHitTargetDown } from "../view/sceneShell";
 
 const REWARD_ACTIONS = ["card_1", "card_2", "card_3", "card_4", "card_5"] as const;
@@ -115,6 +116,10 @@ function renderRewardRasterChoice(
   x: number,
   y: number
 ): Phaser.GameObjects.Rectangle {
+  renderRewardChoiceInfo(scene, context, entry, x, y + 20, 240, 486, {
+    index: REWARD_ACTIONS.indexOf(action),
+    largeText: context.save.settings.largeText
+  });
   return renderRasterHoverHitTarget(scene, x, y + 20, 240, 486, () => handleSceneAction(scene, context, action), {
     hoverKey: REWARD_RASTER_HOVER_CHOICE_KEY,
     downKey: REWARD_RASTER_HOVER_CHOICE_KEY,

@@ -50,14 +50,16 @@ const targets = [
     sceneName: "RewardScene",
     pathname: "/?debug=1&entry=reward&resetSave=1",
     underlayKey: "reward_raster_underlay_concept",
-    minIdleAffordances: 1
+    minIdleAffordances: 1,
+    minChoiceInfoAffordances: 1
   },
   {
     key: "event",
     sceneName: "EventScene",
     pathname: "/?debug=1&data=release&entry=event&resetSave=1&stage=stage_sunny_gate",
     underlayKey: "event_raster_underlay_concept",
-    minIdleAffordances: 1
+    minIdleAffordances: 1,
+    minChoiceInfoAffordances: 1
   },
   {
     key: "rune-bench",
@@ -136,12 +138,15 @@ try {
           child?.type === "Image"
           && String(child.texture?.key ?? "").startsWith("combat_card_affordance_v1_")
         ));
+        const choiceInfoAffordances = visible.filter((child) => child?.type === "Image" && child.getData?.("choiceInfoAffordance"));
         return idleAffordances.length >= expected.minIdleAffordances
-          && cardAffordances.length >= expected.minCardAffordances;
+          && cardAffordances.length >= expected.minCardAffordances
+          && choiceInfoAffordances.length >= expected.minChoiceInfoAffordances;
       }, {
         sceneName: target.sceneName,
         minIdleAffordances: target.minIdleAffordances,
-        minCardAffordances: target.minCardAffordances ?? 0
+        minCardAffordances: target.minCardAffordances ?? 0,
+        minChoiceInfoAffordances: target.minChoiceInfoAffordances ?? 0
       }, { timeout: 10000 });
 
       const audit = await readActionAffordanceAudit(page, {
@@ -240,6 +245,7 @@ async function readActionAffordanceAudit(page, target) {
     const images = visible.filter((child) => child?.type === "Image");
     const idleImages = images.filter((child) => child.getData?.("rasterIdleAffordance"));
     const cardAffordanceImages = images.filter((child) => String(child.texture?.key ?? "").startsWith("combat_card_affordance_v1_"));
+    const choiceInfoImages = images.filter((child) => child.getData?.("choiceInfoAffordance"));
     const rectsAboveUnderlay = visible
       .filter((child) => child?.type === "Rectangle")
       .filter((child) => child.depth > underlayDepth || children.indexOf(child) > underlayIndex)
@@ -260,6 +266,8 @@ async function readActionAffordanceAudit(page, target) {
       cardAffordances: cardAffordanceImages.length,
       readyCardAffordances: cardAffordanceImages.filter((child) => String(child.texture?.key ?? "").includes("_ready_")).length,
       blockedCardAffordances: cardAffordanceImages.filter((child) => String(child.texture?.key ?? "").includes("_blocked_")).length,
+      choiceInfoAffordances: choiceInfoImages.length,
+      choiceInfoKeys: choiceInfoImages.map((child) => String(child.texture?.key ?? "")),
       visibleTextCount: visible.filter((child) => child?.type === "Text" && String(child.text ?? "").trim().length > 0).length,
       visibleRectsAboveUnderlay: rectsAboveUnderlay.length,
       canvasAriaLength: document.querySelector("#game-root canvas")?.getAttribute("aria-label")?.length ?? 0
@@ -280,6 +288,9 @@ function assertActionAffordance(label, audit, target) {
   if (audit.cardAffordances < (target.minCardAffordances ?? 0)) {
     throw new Error(`${label}: expected combat card affordances ${JSON.stringify(audit)}`);
   }
+  if (audit.choiceInfoAffordances < (target.minChoiceInfoAffordances ?? 0)) {
+    throw new Error(`${label}: expected choice info affordances ${JSON.stringify(audit)}`);
+  }
   if (audit.visibleTextCount !== 0) {
     throw new Error(`${label}: visible Phaser text leaked over raster underlay ${JSON.stringify(audit)}`);
   }
@@ -297,6 +308,7 @@ function summary(target, viewport, audit, screenshot) {
     viewport: viewport.key,
     idleAffordances: audit.idleAffordances,
     cardAffordances: `${audit.readyCardAffordances} ready / ${audit.blockedCardAffordances} blocked`,
+    choiceInfoAffordances: audit.choiceInfoAffordances,
     leak: `${audit.visibleTextCount} text, ${audit.visibleRectsAboveUnderlay} rects`,
     ariaLength: audit.canvasAriaLength,
     screenshot: path.resolve(screenshot)
