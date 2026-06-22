@@ -1563,3 +1563,31 @@
 - Impact: A future handoff could skip one of the PC gates, accidentally include mobile-only scope despite the current PC-only target, or forget that `quality:audit` remains a separate protective content gate rather than part of UI release readiness.
 - Resolution: Added `tools/ui-pc-release-candidate-gate.mjs` and `npm.cmd run ui:pc-release-candidate`. The gate runs PC idle/action affordance, PC combat affordance, PC WorldMap keyboard, PC WorldMap release-state recomposition, selected core Phaser smoke steps, and `check`, then prints a per-gate summary.
 - Prevention: Use the PC release-candidate gate as the repeatable baseline before claiming PC UI readiness. Keep user acceptance, final content quality, and mobile-specific validation separate unless the active scope changes.
+
+### Problem: PC release-candidate gate still missed focus, disabled, and selected-state evidence
+
+- Cause: The first PC release-candidate gate chained idle/action affordance, combat affordance, WorldMap keyboard, WorldMap release-state recomposition, core smoke, and `check`, but did not include the broader PC-only focus tooltip, disabled readability, selected WorldMap route recomposition, or locked-state explanation audits.
+- Impact: The project could still report one green PC release-candidate command without proving the requested PC focus/keyboard/disabled/selected state coverage in the same repeatable gate.
+- Resolution: Added `tools/auditViewportScope.mjs`, wired `UI_AUDIT_VIEWPORTS=desktop` filtering into focus, disabled, WorldMap selected-node, and WorldMap locked-node audits, and added those audits to `tools/ui-pc-release-candidate-gate.mjs`.
+- Prevention: Keep `ui:pc-release-candidate` aligned with the explicit PC scope. Default audits may still cover all viewports, but the PC release gate should pass `UI_AUDIT_VIEWPORTS=desktop` for PC-only evidence.
+
+### Problem: Combat still looked non-clickable after the first button-affordance pass
+
+- Cause: The earlier combat pass proved card clicks and added visible labels, but the card ready label still read as passive availability, the end-turn label sat small below the large combat seal, and the shared button label texture was visually too quiet for icon-heavy PC screens.
+- Impact: A player could enter combat, miss that cards are the primary actions, and think card selection is broken even though clicking a card changed enemy HP, energy, and hand state. This matched the user report that the biggest issue was not knowing what was a button.
+- Resolution: Bumped combat card affordance textures to `v3`, changed the ready action pill to the direct command `사용`, strengthened the card-wide idle border, added action chevrons, enlarged/repositioned the Combat end-turn label, and increased contrast on shared `buttonLabelAffordance` textures. `tools/ui-pc-combat-affordance-audit.mjs` now verifies ready/disabled card action-label metadata in addition to click, hover, down, focus, disabled, and end-turn evidence.
+- Prevention: Button affordance audits should prove idle command language, not only successful clicks or hover/focus feedback. If a user reports that a working control feels non-clickable, treat that as a UI defect even when automation can activate it.
+
+### Problem: Disabled readability audit counted idle affordance art as hover/down leakage
+
+- Cause: Ready choice cards reuse the `ui_hover_choice_badge_concept` texture family for persistent idle affordance labels. The disabled readability audit counted that texture by key only, so an intentional always-visible idle label could be mistaken for transient hover or down state leakage.
+- Impact: The PC release-candidate gate could fail in disabled-state coverage even when the app correctly kept disabled choices blocked and unchanged. That made the gate less useful for separating real UI defects from audit false positives.
+- Resolution: Updated `tools/ui-disabled-readability-audit.mjs` to exclude images marked with `rasterIdleAffordance` from hover/down leak counts while keeping disabled lock, tooltip, phase, log, and interaction assertions intact.
+- Prevention: Audits that check transient interaction states should distinguish persistent idle affordances from hover/down art, especially when the same concept-derived texture family is reused.
+
+### Problem: Keyboard focus tooltip audit had too little scene-load margin in the chained PC gate
+
+- Cause: The standalone focus tooltip audit passed, but the longer PC release-candidate gate could reach the same audit after several browser/server-heavy steps. The 10 second scene wait was too tight for that chained context, and Settings targets clicked the Town settings control as soon as the canvas existed rather than waiting for TownScene to be active.
+- Impact: The full PC gate could fail with a timeout before reading focus state, creating an inconclusive result even though the focus tooltip behavior itself passed when run alone.
+- Resolution: Increased the focus tooltip audit's canvas and scene wait timeout to 30 seconds, made Settings setup wait for TownScene before clicking, and added target/viewport scene context to setup failures. This keeps the assertions unchanged while reducing timing-only failures in the full gate.
+- Prevention: Long chained gates should give scene bootstrapping more margin than single-purpose audits, then keep the actual UI state assertions strict after the scene is available. Scene-transition setup should wait for the source scene before firing pointer input.

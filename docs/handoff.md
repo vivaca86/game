@@ -1,3 +1,7 @@
+# Active Continuation Notice
+
+For the current PC WorldMap/button-affordance work, read `CURRENT_HANDOFF.md` first. This file is older context and should be read after the current root handoff.
+
 # 프로젝트 인수인계서
 
 작성일: 2026-05-23

@@ -3,6 +3,7 @@ import { createRequire } from "node:module";
 import Module from "node:module";
 import path from "node:path";
 import { createServer } from "vite";
+import { filterAuditViewports } from "./auditViewportScope.mjs";
 
 const require = createRequire(import.meta.url);
 const bundledNodeModules = "C:/Users/i/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules";
@@ -46,12 +47,12 @@ const auditCases = [
   }
 ];
 
-const viewports = [
+const viewports = filterAuditViewports([
   { key: "desktop-1920", suffix: "1920", width: 1920, height: 1080 },
   { key: "desktop-1280", suffix: "desktop-1280", width: 1280, height: 720 },
   { key: "mobile-390x844", suffix: "mobile-390x844", width: 390, height: 844 },
   { key: "mobile-landscape-844x390", suffix: "mobile-landscape-844x390", width: 844, height: 390 }
-];
+]);
 
 await mkdir("tmp/ui-quality/worldmap-open-node-selection", { recursive: true });
 

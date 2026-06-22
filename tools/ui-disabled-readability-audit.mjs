@@ -3,6 +3,7 @@ import { createRequire } from "node:module";
 import Module from "node:module";
 import path from "node:path";
 import { createServer } from "vite";
+import { filterAuditViewports } from "./auditViewportScope.mjs";
 
 const require = createRequire(import.meta.url);
 const bundledNodeModules = "C:/Users/i/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules";
@@ -47,12 +48,12 @@ const targets = [
   }
 ];
 
-const viewports = [
+const viewports = filterAuditViewports([
   { key: "desktop-1920", suffix: "1920", width: 1920, height: 1080, minWidth: 260, minHeight: 60, maxWidthRatio: 0.42, maxHeightRatio: 0.34, allowLetterbox: false },
   { key: "desktop-1280", suffix: "desktop-1280", width: 1280, height: 720, minWidth: 240, minHeight: 58, maxWidthRatio: 0.48, maxHeightRatio: 0.34, allowLetterbox: false },
   { key: "mobile-390x844", suffix: "mobile-390x844", width: 390, height: 844, minWidth: 210, minHeight: 48, maxWidthRatio: 0.82, maxHeightRatio: 0.5, allowLetterbox: true },
   { key: "mobile-landscape-844x390", suffix: "mobile-landscape-844x390", width: 844, height: 390, minWidth: 210, minHeight: 48, maxWidthRatio: 0.78, maxHeightRatio: 0.42, allowLetterbox: false }
-];
+]);
 
 await mkdir("tmp/ui-quality/disabled-readability", { recursive: true });
 
@@ -235,11 +236,14 @@ async function readDisabledState(page, target) {
         displayHeight: Number(image.displayHeight),
         alpha: Number(image.alpha ?? 1)
       }));
-    const hoverImages = visible.filter((child) => child?.type === "Image" && [
-      "ui_hover_choice_badge_concept",
-      "ui_hover_gold_seal_concept",
-      "ui_hover_boss_skull_stamp_concept"
-    ].includes(child.texture?.key) && Number(child.alpha ?? 1) > 0.05);
+    const hoverImages = visible.filter((child) => child?.type === "Image"
+      && !child.getData?.("rasterIdleAffordance")
+      && [
+        "ui_hover_choice_badge_concept",
+        "ui_hover_gold_seal_concept",
+        "ui_hover_boss_skull_stamp_concept"
+      ].includes(child.texture?.key)
+      && Number(child.alpha ?? 1) > 0.05);
     const rectsAbove = visible
       .filter((child) => child?.type === "Rectangle")
       .filter((child) => child.depth > underlayDepth || children.indexOf(child) > underlayIndex)

@@ -13,7 +13,7 @@ import { renderActionButton, renderCardHand, renderPaperPanel, renderRasterDisab
 const COMBAT_RASTER_UNDERLAY_KEY = "combat_raster_underlay_concept";
 const COMBAT_RASTER_HOVER_SEAL_KEY = "ui_hover_gold_seal_concept";
 const COMBAT_RASTER_FOCUS_ID_KEY = "combatRasterFocusId";
-const COMBAT_CARD_AFFORDANCE_VERSION = "v2";
+const COMBAT_CARD_AFFORDANCE_VERSION = "v3";
 const COMBAT_CARD_HOVER_FRAME_KEY = "combat_card_hover_frame_v1";
 const COMBAT_CARD_DOWN_FRAME_KEY = "combat_card_down_frame_v1";
 const COMBAT_CARD_DISABLED_FRAME_KEY = "combat_card_disabled_frame_v1";
@@ -265,9 +265,8 @@ function renderCombatRasterEndTurnButton(scene: Phaser.Scene, context: BootConte
   const y = 910;
   const width = 300;
   const height = 260;
-  renderButtonLabelAffordance(scene, "턴 종료", x, 1028, 120, 34, {
+  renderButtonLabelAffordance(scene, "턴 종료", x, 1008, 178, 48, {
     tone: "confirm",
-    compact: true,
     largeText: context.save.settings.largeText,
     depth: 24.2
   });
@@ -288,9 +287,9 @@ function renderCombatRasterEndTurnButton(scene: Phaser.Scene, context: BootConte
     idleKey: COMBAT_RASTER_HOVER_SEAL_KEY,
     idleX: x - 88,
     idleY: y - 118,
-    idleWidth: 126,
-    idleHeight: 126,
-    idleAlpha: 0.34,
+    idleWidth: 136,
+    idleHeight: 136,
+    idleAlpha: 0.5,
     tooltipTitle: "턴 종료",
     tooltipBody: "남은 기운을 정리하고 적의 의도를 처리합니다.",
     tooltipTone: "confirm"
@@ -535,7 +534,9 @@ export function renderCombatCardAffordance(
   scene.add.image(x, y, infoKey)
     .setDisplaySize(width, height)
     .setDepth(13)
-    .setData("combatCardAffordance", true);
+    .setData("combatCardAffordance", true)
+    .setData("combatCardActionLabel", options.playable ? "사용" : "기운 부족")
+    .setData("combatCardActionState", options.playable ? "ready" : "blocked");
 
   const hoverKey = options.playable ? COMBAT_CARD_HOVER_FRAME_KEY : COMBAT_CARD_DISABLED_FRAME_KEY;
   ensureCombatCardStateFrameTexture(scene, hoverKey, options.playable ? "hover" : "disabled");
@@ -686,34 +687,34 @@ function drawCombatCardAffordance(
   context.clearRect(0, 0, width, height);
   context.lineJoin = "round";
 
-  context.shadowColor = "rgba(20, 17, 22, 0.38)";
-  context.shadowBlur = 8;
-  context.lineWidth = playable ? 4 : 3;
-  context.strokeStyle = playable ? "rgba(245, 194, 107, 0.92)" : "rgba(143, 129, 121, 0.84)";
-  context.fillStyle = playable ? "rgba(255, 248, 232, 0.05)" : "rgba(48, 42, 43, 0.24)";
+  context.shadowColor = "rgba(20, 17, 22, 0.42)";
+  context.shadowBlur = playable ? 12 : 8;
+  context.lineWidth = playable ? 5 : 3;
+  context.strokeStyle = playable ? "rgba(255, 235, 159, 0.98)" : "rgba(143, 129, 121, 0.88)";
+  context.fillStyle = playable ? "rgba(255, 248, 232, 0.1)" : "rgba(48, 42, 43, 0.26)";
   drawRoundedRect(context, 7, 8, width - 14, height - 16, 16);
   context.fill();
   context.stroke();
 
   context.shadowBlur = 0;
-  context.fillStyle = playable ? "rgba(255, 241, 208, 0.86)" : "rgba(83, 76, 72, 0.74)";
+  context.fillStyle = playable ? "rgba(255, 241, 208, 0.9)" : "rgba(83, 76, 72, 0.76)";
   context.strokeStyle = playable ? "rgba(198, 166, 94, 0.88)" : "rgba(180, 168, 150, 0.6)";
   context.lineWidth = 3;
-  drawRoundedRect(context, 14, 220, width - 28, 82, 13);
+  drawRoundedRect(context, 14, 214, width - 28, 94, 13);
   context.fill();
   context.stroke();
 
   context.fillStyle = playable ? accent : "rgba(106, 96, 91, 0.9)";
-  drawRoundedRect(context, 22, 226, width - 44, 22, 10);
+  drawRoundedRect(context, 22, 221, width - 44, 23, 10);
   context.fill();
 
   context.fillStyle = playable ? "rgba(255, 245, 215, 0.98)" : "rgba(225, 216, 202, 0.95)";
-  drawFittedText(context, card.displayNameKo, width / 2, 237, width - 58, options.largeText ? 15 : 14, 10, true, "center");
+  drawFittedText(context, card.displayNameKo, width / 2, 232.5, width - 58, options.largeText ? 15 : 14, 10, true, "center");
 
   const effectText = compactCombatCardDescription(card.descriptionKo);
   context.fillStyle = playable ? "#2f211a" : "#e1d8ca";
   context.font = `${options.largeText ? "700" : "600"} ${options.largeText ? 13 : 12}px Arial, sans-serif`;
-  drawWrappedText(context, effectText, 24, 260, width - 48, options.largeText ? 15 : 14, 2);
+  drawWrappedText(context, effectText, 24, 251, width - 48, options.largeText ? 15 : 14, 2);
 
   context.fillStyle = playable ? "#fff1b8" : "#cabfb0";
   context.strokeStyle = playable ? "#6d4a20" : "#6a605b";
@@ -734,14 +735,19 @@ function drawCombatCardAffordance(
   context.fillStyle = playable ? "#1e2a3e" : "#e1d8ca";
   drawFittedText(context, String(options.index + 1), width - 30, 31, 20, 18, 12, true, "center");
 
-  context.fillStyle = playable ? "rgba(47, 107, 104, 0.96)" : "rgba(125, 85, 80, 0.95)";
-  context.strokeStyle = playable ? "rgba(255, 243, 176, 0.82)" : "rgba(255, 241, 208, 0.42)";
-  context.lineWidth = 2;
-  drawRoundedRect(context, 42, 286, width - 84, 24, 12);
+  const actionFill = playable ? "rgba(47, 107, 104, 0.98)" : "rgba(125, 85, 80, 0.96)";
+  const actionStroke = playable ? "rgba(255, 243, 176, 0.95)" : "rgba(255, 241, 208, 0.5)";
+  context.fillStyle = actionFill;
+  context.strokeStyle = actionStroke;
+  context.lineWidth = 3;
+  drawRoundedRect(context, 30, 276, width - 60, 38, 19);
   context.fill();
   context.stroke();
+  context.fillStyle = playable ? "rgba(255, 243, 176, 0.92)" : "rgba(255, 241, 208, 0.46)";
+  drawActionChevron(context, 48, 295, playable ? "right" : "bar");
+  drawActionChevron(context, width - 48, 295, playable ? "left" : "bar");
   context.fillStyle = "#fff5d7";
-  drawFittedText(context, playable ? "사용 가능" : "기운 부족", width / 2, 298, width - 104, 13, 10, true, "center");
+  drawFittedText(context, playable ? "사용" : "기운 부족", width / 2, 295, width - 96, options.largeText ? 19 : 17, 12, true, "center");
 
   context.fillStyle = playable ? "rgba(245, 194, 107, 0.86)" : "rgba(143, 129, 121, 0.7)";
   for (const [dotX, dotY] of [[19, 315], [width - 19, 315], [19, 19], [width - 19, 19]]) {
@@ -891,6 +897,28 @@ function drawCornerTab(
     context.moveTo(x, y);
     context.lineTo(x - size, y);
     context.lineTo(x, y - size);
+  }
+  context.closePath();
+  context.fill();
+}
+
+function drawActionChevron(
+  context: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  direction: "left" | "right" | "bar"
+): void {
+  context.beginPath();
+  if (direction === "bar") {
+    drawRoundedRect(context, x - 6, y - 10, 12, 20, 5);
+  } else if (direction === "right") {
+    context.moveTo(x - 6, y - 10);
+    context.lineTo(x + 8, y);
+    context.lineTo(x - 6, y + 10);
+  } else {
+    context.moveTo(x + 6, y - 10);
+    context.lineTo(x - 8, y);
+    context.lineTo(x + 6, y + 10);
   }
   context.closePath();
   context.fill();

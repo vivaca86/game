@@ -72,31 +72,61 @@ function drawButtonLabel(
 ): void {
   const tone = options.tone ?? "default";
   const accent = tone === "danger" ? "#a5483f" : tone === "confirm" ? "#2f6b68" : tone === "utility" ? "#4c659d" : "#805845";
-  const fill = tone === "danger" ? "rgba(255, 238, 224, 0.9)" : "rgba(255, 248, 232, 0.9)";
-  const fontSize = options.largeText ? (options.compact ? 17 : 19) : (options.compact ? 15 : 17);
+  const fill = tone === "danger" ? "rgba(255, 238, 224, 0.96)" : "rgba(255, 248, 232, 0.96)";
+  const fontSize = options.largeText ? (options.compact ? 18 : 21) : (options.compact ? 16 : 19);
   const radius = Math.min(12, height / 2);
 
   context.clearRect(0, 0, width, height);
   context.lineJoin = "round";
-  context.shadowColor = "rgba(20, 17, 22, 0.28)";
-  context.shadowBlur = 6;
+  context.shadowColor = "rgba(20, 17, 22, 0.36)";
+  context.shadowBlur = 9;
   context.fillStyle = fill;
   context.strokeStyle = accent;
-  context.lineWidth = 2;
+  context.lineWidth = 3;
   drawRoundedRect(context, 2, 2, width - 4, height - 4, radius);
   context.fill();
   context.stroke();
   context.shadowBlur = 0;
 
+  context.strokeStyle = tone === "confirm" ? "rgba(255, 243, 176, 0.7)" : `${accent}66`;
+  context.lineWidth = 2;
+  drawRoundedRect(context, 7, 7, width - 14, height - 14, Math.max(6, radius - 4));
+  context.stroke();
+
   context.fillStyle = `${accent}24`;
-  drawRoundedRect(context, 7, 7, Math.max(14, Math.min(28, width * 0.14)), height - 14, Math.max(6, radius - 4));
+  drawRoundedRect(context, 9, 9, Math.max(18, Math.min(34, width * 0.16)), height - 18, Math.max(6, radius - 5));
   context.fill();
+
+  context.fillStyle = accent;
+  drawButtonChevron(context, Math.max(18, Math.min(30, width * 0.12)), height / 2, Math.max(7, Math.min(11, height * 0.2)), "right");
+  drawButtonChevron(context, width - Math.max(18, Math.min(30, width * 0.12)), height / 2, Math.max(7, Math.min(11, height * 0.2)), "left");
 
   context.fillStyle = accent;
   context.font = `700 ${fontSize}px Arial, sans-serif`;
   context.textAlign = "center";
   context.textBaseline = "middle";
-  context.fillText(trimToWidth(context, label, width - 24), width / 2, height / 2 + 0.5);
+  context.fillText(trimToWidth(context, label, width - 42), width / 2, height / 2 + 0.5);
+}
+
+function drawButtonChevron(
+  context: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  size: number,
+  direction: "left" | "right"
+): void {
+  context.beginPath();
+  if (direction === "right") {
+    context.moveTo(x - size * 0.5, y - size);
+    context.lineTo(x + size * 0.65, y);
+    context.lineTo(x - size * 0.5, y + size);
+  } else {
+    context.moveTo(x + size * 0.5, y - size);
+    context.lineTo(x - size * 0.65, y);
+    context.lineTo(x + size * 0.5, y + size);
+  }
+  context.closePath();
+  context.fill();
 }
 
 function trimToWidth(context: CanvasRenderingContext2D, value: string, maxWidth: number): string {

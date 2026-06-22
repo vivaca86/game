@@ -146,7 +146,7 @@ try {
         const idleAffordances = visible.filter((child) => child?.type === "Image" && child.getData?.("rasterIdleAffordance"));
         const cardAffordances = visible.filter((child) => (
           child?.type === "Image"
-          && String(child.texture?.key ?? "").startsWith("combat_card_affordance_v2_")
+          && String(child.texture?.key ?? "").startsWith("combat_card_affordance_v3_")
         ));
         const choiceInfoAffordances = visible.filter((child) => child?.type === "Image" && child.getData?.("choiceInfoAffordance"));
         const choiceActionLabels = choiceInfoAffordances.filter((child) => child.getData?.("choiceActionLabel"));
@@ -260,7 +260,7 @@ async function readActionAffordanceAudit(page, target) {
     const visible = children.filter((child) => child?.visible !== false && Number(child?.alpha ?? 1) > 0.05);
     const images = visible.filter((child) => child?.type === "Image");
     const idleImages = images.filter((child) => child.getData?.("rasterIdleAffordance"));
-    const cardAffordanceImages = images.filter((child) => String(child.texture?.key ?? "").startsWith("combat_card_affordance_v2_"));
+    const cardAffordanceImages = images.filter((child) => String(child.texture?.key ?? "").startsWith("combat_card_affordance_v3_"));
     const choiceInfoImages = images.filter((child) => child.getData?.("choiceInfoAffordance"));
     const choiceActionLabels = choiceInfoImages.map((child) => String(child.getData?.("choiceActionLabel") ?? ""));
     const buttonLabelImages = images.filter((child) => child.getData?.("buttonLabelAffordance"));

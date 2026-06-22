@@ -91,7 +91,7 @@ npm.cmd run slice:validate
 
 `phaser:smoke`는 실행 중인 Vite dev server에서 기본 진입, `entry=combat`, `entry=boss` debug 화면의 canvas와 콘솔 오류를 확인한다.
 
-`ui:pc-release-candidate`는 현재 PC 전용 WorldMap/UI 릴리즈 후보 게이트다. PC idle/action affordance, PC combat affordance, PC WorldMap keyboard, PC WorldMap release-state recomposition, 핵심 Phaser smoke 단계, `check`를 순서대로 실행한다. 모바일 전용 감사와 보호용 `quality:audit` 콘텐츠 게이트는 의도적으로 포함하지 않는다.
+`ui:pc-release-candidate`는 현재 PC 전용 WorldMap/UI 릴리즈 후보 게이트다. PC idle/action affordance, PC combat affordance, PC WorldMap keyboard, PC WorldMap release-state recomposition, PC focus tooltip, PC disabled readability, PC WorldMap selected-state route recomposition, PC WorldMap locked-state explanations, 핵심 Phaser smoke 단계, `check`를 순서대로 실행한다. 모바일 전용 감사와 보호용 `quality:audit` 콘텐츠 게이트는 의도적으로 포함하지 않는다.
 
 ## 정리된 것
 

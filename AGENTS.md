@@ -16,16 +16,17 @@ When instructions conflict, follow this order.
 
 1. The user's current instruction in the active conversation
 2. `AGENTS.md`
-3. `PROJECT_RULES.md`
-4. `docs/development-foundation.md`
-5. `docs/data-schema-draft.md`
-6. `docs/reference-role-map-template.md`
-7. `docs/vertical-slice-acceptance.md`
-8. `docs/handoff.md`
-9. `docs/current-issues-and-plan.md`
-10. `docs/recovery-audit.md`
-11. `RESEARCH_CHECKLIST.md`
-12. `README.md` and other files under `research/`
+3. `CURRENT_HANDOFF.md`
+4. `PROJECT_RULES.md`
+5. `docs/development-foundation.md`
+6. `docs/data-schema-draft.md`
+7. `docs/reference-role-map-template.md`
+8. `docs/vertical-slice-acceptance.md`
+9. `docs/handoff.md`
+10. `docs/current-issues-and-plan.md`
+11. `docs/recovery-audit.md`
+12. `RESEARCH_CHECKLIST.md`
+13. `README.md` and other files under `research/`
 
 ### Startup Checklist
 
@@ -33,16 +34,17 @@ Before starting any work in this repository, check the following in order when a
 
 1. The user's current instruction
 2. `AGENTS.md`
-3. `PROJECT_RULES.md`
-4. `docs/development-foundation.md`
-5. `docs/data-schema-draft.md`
-6. `docs/reference-role-map-template.md`
-7. `docs/vertical-slice-acceptance.md`
-8. `docs/handoff.md`
-9. `docs/current-issues-and-plan.md`
-10. `docs/recovery-audit.md`
-11. `RESEARCH_CHECKLIST.md`
-12. `README.md`
+3. `CURRENT_HANDOFF.md`
+4. `PROJECT_RULES.md`
+5. `docs/development-foundation.md`
+6. `docs/data-schema-draft.md`
+7. `docs/reference-role-map-template.md`
+8. `docs/vertical-slice-acceptance.md`
+9. `docs/handoff.md`
+10. `docs/current-issues-and-plan.md`
+11. `docs/recovery-audit.md`
+12. `RESEARCH_CHECKLIST.md`
+13. `README.md`
 
 If a document is missing or the repository is empty, report that fact instead of assuming its contents.
 

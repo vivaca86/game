@@ -3,12 +3,15 @@ import { createRequire } from "node:module";
 import Module from "node:module";
 import path from "node:path";
 import { createServer } from "vite";
+import { filterAuditViewports } from "./auditViewportScope.mjs";
 
 const require = createRequire(import.meta.url);
 const bundledNodeModules = "C:/Users/i/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules";
 const bundledPnpmModules = `${bundledNodeModules}/.pnpm/node_modules`;
 process.env.NODE_PATH = [process.env.NODE_PATH, bundledNodeModules, bundledPnpmModules].filter(Boolean).join(";");
 Module._initPaths();
+
+const SCENE_WAIT_TIMEOUT_MS = 30000;
 
 const targets = [
   {
@@ -151,12 +154,7 @@ const targets = [
     key: "settings-volume-master",
     sceneName: "SettingsScene",
     pathname: "/?entry=town&resetSave=1",
-    setup: async (page) => {
-      const canvas = page.locator("canvas");
-      const box = await canvas.boundingBox();
-      if (!box) throw new Error("settings setup: missing canvas");
-      await page.mouse.click(box.x + (1010 / 1920) * box.width, box.y + (806 / 1080) * box.height);
-    },
+    setup: openSettingsFromTown,
     focusKeys: ["ArrowDown"],
     focusRegistryKey: "settingsRasterFocusId",
     expectedFocusValue: "volumeMaster"
@@ -244,12 +242,12 @@ const targets = [
   }
 ];
 
-const viewports = [
+const viewports = filterAuditViewports([
   { key: "desktop-1920", suffix: "1920", width: 1920, height: 1080, minWidth: 260, minHeight: 60, maxWidthRatio: 0.42, maxHeightRatio: 0.34, allowLetterbox: false },
   { key: "desktop-1280", suffix: "desktop-1280", width: 1280, height: 720, minWidth: 240, minHeight: 58, maxWidthRatio: 0.48, maxHeightRatio: 0.34, allowLetterbox: false },
   { key: "mobile-390x844", suffix: "mobile-390x844", width: 390, height: 844, minWidth: 210, minHeight: 48, maxWidthRatio: 0.82, maxHeightRatio: 0.5, allowLetterbox: true },
   { key: "mobile-landscape-844x390", suffix: "mobile-landscape-844x390", width: 844, height: 390, minWidth: 210, minHeight: 48, maxWidthRatio: 0.78, maxHeightRatio: 0.42, allowLetterbox: false }
-];
+]);
 
 await mkdir("tmp/ui-quality/focus-tooltips", { recursive: true });
 
@@ -276,9 +274,14 @@ try {
 
     for (const target of targets) {
       await page.goto(new URL(target.pathname, baseUrl).href, { waitUntil: "networkidle" });
-      await page.waitForSelector("canvas", { timeout: 10000 });
-      if (target.setup) await target.setup(page);
-      await waitForScene(page, target.sceneName);
+      await page.waitForSelector("canvas", { timeout: SCENE_WAIT_TIMEOUT_MS });
+      try {
+        if (target.setup) await target.setup(page);
+        await waitForScene(page, target.sceneName);
+      } catch (error) {
+        const activeScenes = await readActiveSceneKeys(page);
+        throw new Error(`${target.key}/${viewport.key}: expected ${target.sceneName}; active scenes: ${activeScenes.join(",") || "none"}; ${error?.message ?? error}`);
+      }
       await hideDebugOverlay(page);
 
       const initial = await readTooltip(page);
@@ -359,14 +362,22 @@ async function waitForScene(page, sceneName) {
   await page.waitForFunction((expectedScene) => {
     const game = window.__paperGame;
     return Boolean(game?.scene?.getScenes?.(true)?.some((scene) => scene.scene?.key === expectedScene));
-  }, sceneName, { timeout: 10000 });
+  }, sceneName, { timeout: SCENE_WAIT_TIMEOUT_MS });
 }
 
 async function openSettingsFromTown(page) {
+  await waitForScene(page, "TownScene");
   const canvas = page.locator("canvas");
   const box = await canvas.boundingBox();
   if (!box) throw new Error("settings setup: missing canvas");
   await page.mouse.click(box.x + (1010 / 1920) * box.width, box.y + (806 / 1080) * box.height);
+}
+
+async function readActiveSceneKeys(page) {
+  return page.evaluate(() => {
+    const game = window.__paperGame;
+    return game?.scene?.getScenes?.(true)?.map((scene) => scene.scene?.key).filter(Boolean) ?? [];
+  }).catch(() => []);
 }
 
 async function hideDebugOverlay(page) {

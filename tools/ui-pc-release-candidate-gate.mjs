@@ -37,6 +37,30 @@ const gates = [
     args: [...npmArgPrefix, "run", "ui:pc-worldmap:release-state"]
   },
   {
+    label: "PC keyboard focus tooltips",
+    command: process.execPath,
+    args: ["tools/ui-keyboard-focus-tooltip-audit.mjs"],
+    env: { UI_AUDIT_VIEWPORTS: "desktop" }
+  },
+  {
+    label: "PC disabled readability",
+    command: process.execPath,
+    args: ["tools/ui-disabled-readability-audit.mjs"],
+    env: { UI_AUDIT_VIEWPORTS: "desktop" }
+  },
+  {
+    label: "PC WorldMap selected-state route recomposition",
+    command: process.execPath,
+    args: ["tools/ui-worldmap-open-node-selection-audit.mjs"],
+    env: { UI_AUDIT_VIEWPORTS: "desktop" }
+  },
+  {
+    label: "PC WorldMap locked-state explanations",
+    command: process.execPath,
+    args: ["tools/ui-worldmap-locked-tooltip-audit.mjs"],
+    env: { UI_AUDIT_VIEWPORTS: "desktop" }
+  },
+  {
     label: "PC core interaction smoke",
     command: npmCommand,
     args: [...npmArgPrefix, "run", "phaser:smoke"],

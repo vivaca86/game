@@ -186,7 +186,7 @@ async function forcePlayerEnergy(page, energy) {
     const imageKeys = visible
       .filter((child) => child?.type === "Image")
       .map((child) => String(child.texture?.key ?? ""));
-    const affordanceKeys = imageKeys.filter((key) => key.startsWith("combat_card_affordance_v2_"));
+    const affordanceKeys = imageKeys.filter((key) => key.startsWith("combat_card_affordance_v3_"));
     const blockedAffordances = affordanceKeys.filter((key) => key.includes("_blocked_")).length;
 
     return context?.run?.player?.energy === expectedEnergy && blockedAffordances >= 4;
@@ -204,8 +204,12 @@ async function readCombatAffordanceAudit(page) {
     const visible = children.filter((child) => child?.visible !== false && Number(child?.alpha ?? 1) !== 0);
     const images = visible.filter((child) => child?.type === "Image");
     const imageKeys = images.map((child) => String(child.texture?.key ?? ""));
-    const allAffordanceKeys = imageKeys.filter((key) => key.startsWith("combat_card_affordance_v2_"));
+    const allAffordanceKeys = imageKeys.filter((key) => key.startsWith("combat_card_affordance_v3_"));
     const buttonLabelImages = images.filter((child) => child.getData?.("buttonLabelAffordance"));
+    const cardActionLabels = images
+      .filter((child) => child.getData?.("combatCardAffordance"))
+      .map((child) => String(child.getData?.("combatCardActionLabel") ?? ""))
+      .filter(Boolean);
     const rectsAboveUnderlay = visible
       .filter((child) => child?.type === "Rectangle")
       .filter((child) => child.depth > underlayDepth || children.indexOf(child) > underlayIndex)
@@ -233,6 +237,9 @@ async function readCombatAffordanceAudit(page) {
       goldSeals: images.filter((child) => child.texture?.key === "ui_hover_gold_seal_concept" && Number(child.alpha ?? 1) > 0.05).length,
       buttonLabelAffordances: buttonLabelImages.length,
       buttonLabels: buttonLabelImages.map((child) => String(child.getData?.("buttonLabel") ?? "")),
+      cardActionLabels,
+      readyCardActionLabels: cardActionLabels.filter((label) => label === "사용").length,
+      blockedCardActionLabels: cardActionLabels.filter((label) => label === "기운 부족").length,
       visibleTextCount: visible.filter((child) => child?.type === "Text" && String(child.text ?? "").trim().length > 0).length,
       visibleRectsAboveUnderlay: rectsAboveUnderlay.length
     };
@@ -253,6 +260,9 @@ function assertIdle(label, audit) {
   assertCommon(label, audit);
   if (audit.allAffordances !== 5 || audit.readyAffordances !== 5 || audit.blockedAffordances !== 0) {
     throw new Error(`${label}: expected five ready combat card affordances ${JSON.stringify(audit)}`);
+  }
+  if (audit.readyCardActionLabels !== 5) {
+    throw new Error(`${label}: expected five visible card action labels ${JSON.stringify(audit)}`);
   }
   if (audit.hoverFrames !== 0 || audit.downFrames !== 0 || audit.disabledFrames !== 0) {
     throw new Error(`${label}: idle state should not show transient card frames ${JSON.stringify(audit)}`);
@@ -292,6 +302,9 @@ function assertDisabledIdle(label, audit) {
   if (audit.blockedAffordances < 4 || audit.readyAffordances > 1) {
     throw new Error(`${label}: expected low-energy disabled card affordances ${JSON.stringify(audit)}`);
   }
+  if (audit.blockedCardActionLabels < 4) {
+    throw new Error(`${label}: expected low-energy disabled card action labels ${JSON.stringify(audit)}`);
+  }
 }
 
 function assertDisabledHover(label, audit) {
@@ -329,6 +342,7 @@ function summary(state, viewport, audit, screenshot) {
     downFrames: audit.downFrames,
     disabledFrames: audit.disabledFrames,
     buttonLabelAffordances: audit.buttonLabelAffordances,
+    cardActionLabels: `${audit.readyCardActionLabels} ready / ${audit.blockedCardActionLabels} blocked`,
     focusId: audit.focusId,
     combat: `hp=${audit.enemyHp}, energy=${audit.playerEnergy}, hand=${audit.handCount}`,
     leak: `${audit.visibleTextCount} text, ${audit.visibleRectsAboveUnderlay} rects`,
