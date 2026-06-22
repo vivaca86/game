@@ -7,6 +7,7 @@ import { getStage } from "../../simulation/state/runState";
 import { renderDebugOverlay } from "../../ui/overlays/debugOverlay";
 import { handleSceneAction } from "../bridge/sceneActions";
 import { requireBootContext } from "../bridge/sceneBridge";
+import { renderButtonLabelAffordance } from "../view/buttonLabelAffordance";
 import { renderActionButton, renderPaperPanel, renderRasterHoverHitTarget, renderSceneShell, renderUiSlot, setRasterHitTargetHoverState, textStyle, triggerRasterHitTargetDown } from "../view/sceneShell";
 
 type ResultTone = "clear" | "defeat" | "return";
@@ -82,6 +83,8 @@ function renderResultRasterStage(scene: Phaser.Scene, context: BootContext): Res
   scene.add.image(960, 540, RESULT_RASTER_UNDERLAY_KEY)
     .setDisplaySize(1920, 1080)
     .setDepth(0);
+  renderButtonLabelAffordance(scene, "결과 확인", 1010, 742, 136, 34, { tone: "confirm", largeText: context.save.settings.largeText });
+  renderButtonLabelAffordance(scene, "마을로", 960, 984, 116, 34, { tone: "confirm", compact: true, largeText: context.save.settings.largeText });
 
   const controls: ResultRasterControl[] = [];
   const addControl = (

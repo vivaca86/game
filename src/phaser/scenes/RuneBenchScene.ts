@@ -8,6 +8,7 @@ import { getAttachedRuneModifiedAmount, getAttachedRuneModifiedCost } from "../.
 import { renderDebugOverlay } from "../../ui/overlays/debugOverlay";
 import { handleSceneAction } from "../bridge/sceneActions";
 import { requireBootContext } from "../bridge/sceneBridge";
+import { renderButtonLabelAffordance } from "../view/buttonLabelAffordance";
 import { renderActionButton, renderPaperPanel, renderRasterHoverHitTarget, renderSceneShell, renderUiSlot, setRasterHitTargetHoverState, textStyle, triggerRasterHitTargetDown } from "../view/sceneShell";
 
 const RUNE_BENCH_RASTER_UNDERLAY_KEY = "rune_bench_raster_underlay_concept";
@@ -83,6 +84,8 @@ function renderRuneBenchRasterStage(scene: Phaser.Scene, context: BootContext): 
   scene.add.image(960, 540, RUNE_BENCH_RASTER_UNDERLAY_KEY)
     .setDisplaySize(1920, 1080)
     .setDepth(0);
+  renderButtonLabelAffordance(scene, "룬 장착", 1010, 742, 122, 34, { tone: "confirm", largeText: context.save.settings.largeText });
+  renderButtonLabelAffordance(scene, "확정", 1660, 1018, 96, 32, { tone: "confirm", compact: true, largeText: context.save.settings.largeText });
 
   const controls: RuneBenchRasterControl[] = [];
   const addControl = (

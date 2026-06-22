@@ -1528,3 +1528,17 @@
 - Impact: A regression could show completed/current/locked route overlays underneath the keyboard-selected tooltip state on mid or boss paths while the keyboard tooltip audit still passed. That would make keyboard selected-state evidence weaker than pointer selected-state evidence.
 - Resolution: Strengthened `tools/ui-worldmap-keyboard-tooltip-audit.mjs` to verify base completed route threads/beads, current/final route threads/beads, muted locked/future route threads/beads, and old route-hover images are all suppressed for lower-left, late-right, and boss-up keyboard-selected states across 1920x1080, 1280x720, and 390x844.
 - Prevention: Keyboard selection audits should explicitly verify the route-overlay policy for each audited route family. If keyboard selection suppresses route overlays by design, test the zero counts alongside selected/current stack and tooltip checks.
+
+### Problem: PC idle screens still made some buttons feel like decoration
+
+- Cause: Recent hover/focus/down audits proved many controls after interaction, but several raster scenes still used icon-only or near-hidden idle controls. Town also retained compatibility hit targets at the old central coordinates, which were clickable but not clearly readable as buttons in the idle view.
+- Impact: A player could pass automated input checks while still feeling unsure what can be clicked, matching the user report that the biggest issue was not knowing what was a button.
+- Resolution: Added a shared canvas-texture label affordance (`buttonLabelAffordance`) and rendered persistent PC idle labels on Town, WorldMap, Dungeon, RuneBench, Result, and Settings controls without adding visible Phaser Text or Rectangle objects above the raster underlays. `tools/ui-pc-action-affordance-audit.mjs` now counts required button-label affordances for these scenes.
+- Prevention: Idle affordance audits should verify both interaction-state art and always-visible labels for icon-like controls. Do not rely on hover/focus tooltips alone for primary actions.
+
+### Problem: WorldMap keyboard confirm down-state was too short for stable audit evidence
+
+- Cause: The WorldMap play-button keyboard confirm path showed the down bitmap for 140ms. The PC keyboard audit could observe it in the wait condition, but the subsequent detailed state read sometimes happened after the feedback had already returned to idle.
+- Impact: The audit could fail with `expected one play down image, got 0` even though the button still transitioned to Dungeon afterward. It also meant the keyboard-confirm visual feedback was briefer than ideal for PC readability.
+- Resolution: Increased the WorldMap keyboard-confirm down feedback duration to 260ms and reran `npm.cmd run ui:pc-worldmap:keyboard`, which passed with `playDown=1` at both 1920x1080 and 1280x720.
+- Prevention: Keyboard-triggered visual feedback should stay visible long enough for both human perception and automated state capture. When an audit checks a transient raster state after a wait condition, keep the visual duration comfortably longer than the readback window.

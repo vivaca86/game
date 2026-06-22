@@ -8,6 +8,7 @@ import { getRevealedNextRoomType } from "../../simulation/systems/passives/passi
 import { renderDebugOverlay } from "../../ui/overlays/debugOverlay";
 import { handleSceneAction } from "../bridge/sceneActions";
 import { requireBootContext } from "../bridge/sceneBridge";
+import { renderButtonLabelAffordance } from "../view/buttonLabelAffordance";
 import { renderActionButton, renderPaperPanel, renderRasterHoverHitTarget, renderSceneShell, renderUiSlot, setRasterHitTargetHoverState, textStyle, triggerRasterHitTargetDown } from "../view/sceneShell";
 
 const DUNGEON_RASTER_UNDERLAY_KEY = "dungeon_raster_underlay_concept";
@@ -75,6 +76,8 @@ function renderDungeonRasterStage(
   scene.add.image(960, 540, DUNGEON_RASTER_UNDERLAY_KEY)
     .setDisplaySize(1920, 1080)
     .setDepth(0);
+  renderButtonLabelAffordance(scene, "방 입장", 1010, 616, 120, 34, { tone: "confirm", largeText: context.save.settings.largeText });
+  renderButtonLabelAffordance(scene, "입장", 960, 1002, 94, 32, { tone: "confirm", compact: true, largeText: context.save.settings.largeText });
 
   const roomNodeHitTarget = renderDungeonRasterHitTarget(scene, 1010, 582, 330, 66, 0xf5c26b, () => handleSceneAction(scene, context, "confirm"));
   const bottomConfirmHitTarget = renderDungeonRasterHitTarget(scene, 960, 962, 390, 106, 0xf5c26b, () => handleSceneAction(scene, context, "confirm"));

@@ -21,21 +21,24 @@ const targets = [
     sceneName: "TownScene",
     pathname: "/?debug=1&entry=town&resetSave=1",
     underlayKey: "town_raster_underlay_concept",
-    minIdleAffordances: 5
+    minIdleAffordances: 5,
+    minButtonLabelAffordances: 5
   },
   {
     key: "worldmap",
     sceneName: "WorldMapScene",
     pathname: "/?debug=1&entry=world_map&resetSave=1",
     underlayKey: "world_map_raster_underlay_concept",
-    minIdleAffordances: 1
+    minIdleAffordances: 1,
+    minButtonLabelAffordances: 1
   },
   {
     key: "dungeon",
     sceneName: "DungeonScene",
     pathname: "/?debug=1&entry=dungeon&resetSave=1",
     underlayKey: "dungeon_raster_underlay_concept",
-    minIdleAffordances: 2
+    minIdleAffordances: 2,
+    minButtonLabelAffordances: 2
   },
   {
     key: "combat",
@@ -66,7 +69,8 @@ const targets = [
     sceneName: "RuneBenchScene",
     pathname: "/?debug=1&entry=rune_bench&resetSave=1&grantRune=rune_paper_spark",
     underlayKey: "rune_bench_raster_underlay_concept",
-    minIdleAffordances: 2
+    minIdleAffordances: 2,
+    minButtonLabelAffordances: 2
   },
   {
     key: "boss",
@@ -81,7 +85,8 @@ const targets = [
     sceneName: "ResultScene",
     pathname: "/?debug=1&entry=result&resetSave=1&grantRelic=relic_brass_bookmark",
     underlayKey: "result_raster_underlay_concept",
-    minIdleAffordances: 2
+    minIdleAffordances: 2,
+    minButtonLabelAffordances: 2
   },
   {
     key: "settings",
@@ -89,6 +94,7 @@ const targets = [
     pathname: "/?debug=1&entry=town&resetSave=1",
     underlayKey: "settings_raster_underlay_concept",
     minIdleAffordances: 10,
+    minButtonLabelAffordances: 10,
     setup: async (page) => {
       await waitForScene(page, "TownScene");
       await hideDebugOverlay(page);
@@ -139,14 +145,17 @@ try {
           && String(child.texture?.key ?? "").startsWith("combat_card_affordance_v1_")
         ));
         const choiceInfoAffordances = visible.filter((child) => child?.type === "Image" && child.getData?.("choiceInfoAffordance"));
+        const buttonLabelAffordances = visible.filter((child) => child?.type === "Image" && child.getData?.("buttonLabelAffordance"));
         return idleAffordances.length >= expected.minIdleAffordances
           && cardAffordances.length >= expected.minCardAffordances
-          && choiceInfoAffordances.length >= expected.minChoiceInfoAffordances;
+          && choiceInfoAffordances.length >= expected.minChoiceInfoAffordances
+          && buttonLabelAffordances.length >= expected.minButtonLabelAffordances;
       }, {
         sceneName: target.sceneName,
         minIdleAffordances: target.minIdleAffordances,
         minCardAffordances: target.minCardAffordances ?? 0,
-        minChoiceInfoAffordances: target.minChoiceInfoAffordances ?? 0
+        minChoiceInfoAffordances: target.minChoiceInfoAffordances ?? 0,
+        minButtonLabelAffordances: target.minButtonLabelAffordances ?? 0
       }, { timeout: 10000 });
 
       const audit = await readActionAffordanceAudit(page, {
@@ -246,6 +255,7 @@ async function readActionAffordanceAudit(page, target) {
     const idleImages = images.filter((child) => child.getData?.("rasterIdleAffordance"));
     const cardAffordanceImages = images.filter((child) => String(child.texture?.key ?? "").startsWith("combat_card_affordance_v1_"));
     const choiceInfoImages = images.filter((child) => child.getData?.("choiceInfoAffordance"));
+    const buttonLabelImages = images.filter((child) => child.getData?.("buttonLabelAffordance"));
     const rectsAboveUnderlay = visible
       .filter((child) => child?.type === "Rectangle")
       .filter((child) => child.depth > underlayDepth || children.indexOf(child) > underlayIndex)
@@ -268,6 +278,8 @@ async function readActionAffordanceAudit(page, target) {
       blockedCardAffordances: cardAffordanceImages.filter((child) => String(child.texture?.key ?? "").includes("_blocked_")).length,
       choiceInfoAffordances: choiceInfoImages.length,
       choiceInfoKeys: choiceInfoImages.map((child) => String(child.texture?.key ?? "")),
+      buttonLabelAffordances: buttonLabelImages.length,
+      buttonLabels: buttonLabelImages.map((child) => String(child.getData?.("buttonLabel") ?? "")),
       visibleTextCount: visible.filter((child) => child?.type === "Text" && String(child.text ?? "").trim().length > 0).length,
       visibleRectsAboveUnderlay: rectsAboveUnderlay.length,
       canvasAriaLength: document.querySelector("#game-root canvas")?.getAttribute("aria-label")?.length ?? 0
@@ -291,6 +303,9 @@ function assertActionAffordance(label, audit, target) {
   if (audit.choiceInfoAffordances < (target.minChoiceInfoAffordances ?? 0)) {
     throw new Error(`${label}: expected choice info affordances ${JSON.stringify(audit)}`);
   }
+  if (audit.buttonLabelAffordances < (target.minButtonLabelAffordances ?? 0)) {
+    throw new Error(`${label}: expected button label affordances ${JSON.stringify(audit)}`);
+  }
   if (audit.visibleTextCount !== 0) {
     throw new Error(`${label}: visible Phaser text leaked over raster underlay ${JSON.stringify(audit)}`);
   }
@@ -309,6 +324,7 @@ function summary(target, viewport, audit, screenshot) {
     idleAffordances: audit.idleAffordances,
     cardAffordances: `${audit.readyCardAffordances} ready / ${audit.blockedCardAffordances} blocked`,
     choiceInfoAffordances: audit.choiceInfoAffordances,
+    buttonLabelAffordances: audit.buttonLabelAffordances,
     leak: `${audit.visibleTextCount} text, ${audit.visibleRectsAboveUnderlay} rects`,
     ariaLength: audit.canvasAriaLength,
     screenshot: path.resolve(screenshot)

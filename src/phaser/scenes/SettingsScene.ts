@@ -6,6 +6,7 @@ import { bindKeyboardActions } from "../../input/bindings";
 import { clearStoredSave, createDefaultSettings, persistSave } from "../../save/saveCodec";
 import { renderDebugOverlay } from "../../ui/overlays/debugOverlay";
 import { requireBootContext, storeBootContext } from "../bridge/sceneBridge";
+import { renderButtonLabelAffordance } from "../view/buttonLabelAffordance";
 import { renderActionButton, renderPaperPanel, renderRasterHoverHitTarget, renderSceneShell, renderTooltip, renderUiSlot, setRasterHitTargetHoverState, textStyle, triggerRasterHitTargetDown } from "../view/sceneShell";
 
 type SettingsMutation = (settings: SettingsState) => void;
@@ -99,6 +100,7 @@ function renderSettingsRasterStage(scene: Phaser.Scene, context: BootContext): S
   scene.add.image(960, 540, SETTINGS_RASTER_UNDERLAY_KEY)
     .setDisplaySize(1920, 1080)
     .setDepth(0);
+  renderSettingsRasterLabels(scene, context);
 
   const controls: SettingsRasterControl[] = [];
   const addControl = (
@@ -215,6 +217,20 @@ function renderSettingsRasterStage(scene: Phaser.Scene, context: BootContext): S
     tooltipTone: "confirm"
   });
   return { controls, returnHitTarget };
+}
+
+function renderSettingsRasterLabels(scene: Phaser.Scene, context: BootContext): void {
+  const largeText = context.save.settings.largeText;
+  renderButtonLabelAffordance(scene, "전체 음량", 610, 282, 124, 32, { tone: "utility", compact: true, largeText });
+  renderButtonLabelAffordance(scene, "음악", 610, 372, 90, 32, { tone: "utility", compact: true, largeText });
+  renderButtonLabelAffordance(scene, "효과음", 610, 462, 102, 32, { tone: "utility", compact: true, largeText });
+  renderButtonLabelAffordance(scene, "표시 모드", 1190, 282, 126, 32, { tone: "utility", compact: true, largeText });
+  renderButtonLabelAffordance(scene, "큰 글자", 1190, 372, 112, 32, { tone: "utility", compact: true, largeText });
+  renderButtonLabelAffordance(scene, "모션", 1190, 462, 92, 32, { tone: "utility", compact: true, largeText });
+  renderButtonLabelAffordance(scene, "Space", 1190, 640, 98, 32, { tone: "utility", compact: true, largeText });
+  renderButtonLabelAffordance(scene, "저장 초기화", 1626, 580, 156, 32, { tone: "danger", compact: true, largeText });
+  renderButtonLabelAffordance(scene, "기본값", 1626, 756, 114, 32, { tone: "danger", compact: true, largeText });
+  renderButtonLabelAffordance(scene, "마을로", 1688, 1018, 114, 34, { tone: "confirm", compact: true, largeText });
 }
 
 function createSettingsRasterKeyboardHandler(

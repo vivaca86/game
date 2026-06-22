@@ -7,6 +7,7 @@ import { clearStoredSave } from "../../save/saveCodec";
 import { renderDebugOverlay } from "../../ui/overlays/debugOverlay";
 import { handleSceneAction } from "../bridge/sceneActions";
 import { requireBootContext } from "../bridge/sceneBridge";
+import { renderButtonLabelAffordance } from "../view/buttonLabelAffordance";
 import { renderActionButton, renderPaperPanel, renderRasterHoverHitTarget, renderSceneShell, renderTooltip, renderUiSlot, setRasterHitTargetHoverState, textStyle, triggerRasterHitTargetDown } from "../view/sceneShell";
 
 const TOWN_RASTER_UNDERLAY_KEY = "town_raster_underlay_concept";
@@ -85,6 +86,11 @@ function renderTownRasterStage(scene: Phaser.Scene, context: BootContext): TownR
   scene.add.image(960, 540, TOWN_RASTER_UNDERLAY_KEY)
     .setDisplaySize(1920, 1080)
     .setDepth(0);
+  renderButtonLabelAffordance(scene, "세계 지도", 1010, 654, 136, 34, { tone: "confirm", largeText: context.save.settings.largeText });
+  renderButtonLabelAffordance(scene, "저장 초기화", 1010, 724, 154, 32, { tone: "danger", compact: true, largeText: context.save.settings.largeText });
+  renderButtonLabelAffordance(scene, "설정", 1010, 806, 100, 32, { tone: "utility", compact: true, largeText: context.save.settings.largeText });
+  renderButtonLabelAffordance(scene, "초기화", 514, 1030, 114, 32, { tone: "danger", compact: true, largeText: context.save.settings.largeText });
+  renderButtonLabelAffordance(scene, "설정", 1340, 1030, 96, 32, { tone: "utility", compact: true, largeText: context.save.settings.largeText });
 
   const controls: TownRasterControl[] = [];
   const addControl = (

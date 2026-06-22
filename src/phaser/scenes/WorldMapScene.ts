@@ -9,6 +9,7 @@ import { sliceRunToSaveRun } from "../../simulation/state/runState";
 import { renderDebugOverlay } from "../../ui/overlays/debugOverlay";
 import { handleSceneAction } from "../bridge/sceneActions";
 import { requireBootContext, storeBootContext } from "../bridge/sceneBridge";
+import { renderButtonLabelAffordance } from "../view/buttonLabelAffordance";
 import { renderActionButton, renderPaperPanel, renderRasterDisabledHitTarget, renderRasterHoverHitTarget, renderSceneShell, renderUiSlot, showRasterReadabilityTooltip, textStyle, triggerRasterHitTargetDown } from "../view/sceneShell";
 
 const WORLD_MAP_RASTER_UNDERLAY_KEY = "world_map_raster_underlay_concept";
@@ -149,6 +150,7 @@ function renderWorldMapRasterStage(scene: Phaser.Scene, context: BootContext): v
     tooltipBody: `${currentWorldMapStage(context)?.displayNameKo ?? context.run.stageId}에서 탐험을 시작합니다.`,
     tooltipTone: "confirm"
   });
+  renderButtonLabelAffordance(scene, "던전으로", 1576, 1014, 130, 34, { tone: "confirm", largeText: context.save.settings.largeText });
   worldMapRasterPlayTargets.set(scene, playHitTarget);
   renderWorldMapCurrentStageMarker(scene, context);
   renderWorldMapRasterStageNodes(scene, context);
@@ -1057,7 +1059,7 @@ function handleWorldMapAction(scene: Phaser.Scene, context: BootContext, action:
     if (action === "confirm") {
       scene.registry.set(WORLD_MAP_RASTER_FOCUS_ID_KEY, WORLD_MAP_RASTER_PLAY_FOCUS_ID);
       const playHitTarget = worldMapRasterPlayTargets.get(scene);
-      if (triggerRasterHitTargetDown(scene, playHitTarget, () => handleSceneAction(scene, context, "confirm"), 140)) {
+      if (triggerRasterHitTargetDown(scene, playHitTarget, () => handleSceneAction(scene, context, "confirm"), 260)) {
         return;
       }
     }
