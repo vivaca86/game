@@ -1,0 +1,862 @@
+from __future__ import annotations
+
+import subprocess
+import textwrap
+import zipfile
+from pathlib import Path
+
+
+ROOT = Path(__file__).resolve().parent
+OUT = ROOT / "abyssrium-desk-report-v3"
+OUT.mkdir(exist_ok=True)
+
+CHROME = Path(r"C:\Program Files\Google\Chrome\Application\chrome.exe")
+DECK_HTML = OUT / "slides.html"
+PPTX = ROOT / "Abyssrium_Desk_market_report_v3.pptx"
+
+MVP_DEFAULT = "../abyssrium-desk-mvp-default.png"
+MVP_EXPANDED = "../abyssrium-desk-mvp-expanded.png"
+
+
+def source_note() -> str:
+    return "Data: Steam public APIs / SteamDB / public press, checked 2026-07-04"
+
+
+SLIDES: list[str] = [
+    f"""
+    <section class="slide cover">
+      <div class="copy">
+        <div class="eyebrow">Abyssrium x Desktop Companion</div>
+        <h1>작업표시줄 위에<br>사는 작은 심해</h1>
+        <p>어비스리움 IP를 PC 작업 흐름 안으로 확장하는 시장성 검토</p>
+      </div>
+      <img class="cover-img" src="{MVP_DEFAULT}" alt="">
+      <div class="source">{source_note()}</div>
+    </section>
+    """,
+    """
+    <section class="slide thesis">
+      <div class="eyebrow">Executive Summary</div>
+      <h2>결론</h2>
+      <div class="thesis-line">작게 들어와<br>오래 남는<br>IP</div>
+      <p class="thesis-sub">무료 설치형 데스크톱 companion으로, 어비스리움의 힐링 IP를 작업 흐름 안에 남긴다.</p>
+      <div class="proof proof-a"><b>105K+</b><span>Bongo Cat Steam 리뷰<br>긍정 96.6%</span></div>
+      <div class="proof proof-b"><b>36K+</b><span>TBH Steam 리뷰<br>긍정 51.5%</span></div>
+      <div class="proof proof-c"><b>65M+</b><span>Abyssrium 기존 유저 주장<br>힐링 수족관 문법 보유</span></div>
+    </section>
+    """,
+    """
+    <section class="slide market">
+      <div class="eyebrow">Market Signal</div>
+      <h2>Steam에서 이미 검증된 관심</h2>
+      <div class="bar-chart">
+        <div class="bar-item hero">
+          <div class="value">105K+</div>
+          <div class="bar" style="height: 430px"></div>
+          <div class="label">Bongo Cat<span>Steam 리뷰 긍정 96.6%</span></div>
+        </div>
+        <div class="bar-item">
+          <div class="value">36K+</div>
+          <div class="bar muted" style="height: 151px"></div>
+          <div class="label">TBH<span>Steam 리뷰 긍정 51.5%</span></div>
+        </div>
+        <div class="bar-item">
+          <div class="value">100+</div>
+          <div class="bar muted soft" style="height: 74px"></div>
+          <div class="label one-line">SteamDB Desktop Companion tag</div>
+        </div>
+      </div>
+    </section>
+    """,
+    """
+    <section class="slide category">
+      <div class="eyebrow">Category Size</div>
+      <h2>작은 신흥 장르</h2>
+      <div class="mega-number">28</div>
+      <p class="mega-caption">taskbar 상주형 후보</p>
+      <div class="side-stats">
+        <div><b>153</b><span>Steam taskbar 검색 결과</span></div>
+        <div><b>16</b><span>출시된 후보</span></div>
+        <div><b>12</b><span>출시 예정 후보</span></div>
+      </div>
+    </section>
+    """,
+    """
+    <section class="slide bongo">
+      <div class="eyebrow">Case Study: Bongo Cat</div>
+      <h2>긍정은 감정에서 나온다</h2>
+      <div class="review-score positive">
+        <b>96.6%</b>
+        <span>Steam 리뷰 긍정</span>
+      </div>
+      <div class="reason-cloud">
+        <div>귀여움·밈 언급 <b>36.6K</b></div>
+        <div>무료·힐링 언급 <b>20.3K</b></div>
+        <div>짧은 밈 리뷰 <b>66.2K</b></div>
+        <div>작업 중 상주 <b>7.7K</b></div>
+        <div>모자·스킨 수집 <b>6.1K</b></div>
+      </div>
+      <p class="pair-note positive">Bongo Cat은 “귀엽다”는 감정이 설치와 공유의 이유가 됐다.</p>
+    </section>
+    """,
+    """
+    <section class="slide tbh">
+      <div class="eyebrow">Case Study: TBH</div>
+      <h2>부정은 손실감에서 나온다</h2>
+      <div class="review-score negative">
+        <b>51.5%</b>
+        <span>Steam 리뷰 긍정</span>
+      </div>
+      <div class="reason-cloud negative">
+        <div>장터·아이템 손실 <b>7.3K</b></div>
+        <div>서버·접속·버그 <b>4.8K</b></div>
+        <div>신뢰·정책 불만 <b>2.5K</b></div>
+        <div>DLC·P2W 인식 <b>1.6K</b></div>
+        <div>봇·시장 악용 <b>1.4K</b></div>
+      </div>
+      <p class="pair-note negative">TBH는 관심은 컸지만, 장터 경제가 분노의 중심이 됐다.</p>
+    </section>
+    """,
+    f"""
+    <section class="slide ipfit">
+      <div class="eyebrow">Why Abyssrium</div>
+      <h2>어비스리움은 이미<br>“방치형 힐링 수족관”이다</h2>
+      <div class="ip-number">65M+</div>
+      <p class="ip-copy">모바일에서 검증된 정서: 조용함, 수집, 성장, 나만의 바다.<br>PC에서는 이것이 업무 옆에 오래 머무는 companion 문법으로 바뀐다.</p>
+      <img src="{MVP_EXPANDED}" alt="">
+    </section>
+    """,
+    """
+    <section class="slide positioning">
+      <div class="eyebrow">Positioning</div>
+      <h2>Bongo Cat의 감정 구조를 따르고,<br>TBH의 장터 리스크를 피한다</h2>
+      <div class="matrix-box">
+        <div class="axis x">수익 기대 중심 →</div>
+        <div class="axis y">↑ 감정/애착 중심</div>
+        <div class="dot bongo">Bongo Cat</div>
+        <div class="dot tbh">TBH</div>
+        <div class="dot abyss">Abyssrium Desk</div>
+      </div>
+    </section>
+    """,
+    f"""
+    <section class="slide states">
+      <div class="eyebrow">Product Concept</div>
+      <h2>평소엔 얇게. 필요할 때만 크게.</h2>
+      <div class="state-wrap">
+        <div class="state-pane">
+          <span>기본 상태 · 56px 리프 바</span>
+          <img src="{MVP_DEFAULT}" alt="">
+        </div>
+        <div class="state-pane">
+          <span>확장 상태 · 수집 패널</span>
+          <img src="{MVP_EXPANDED}" alt="">
+        </div>
+      </div>
+    </section>
+    """,
+    """
+    <section class="slide loop">
+      <div class="eyebrow">Core Play</div>
+      <h2>업무 행동이 바다의 반응이 된다</h2>
+      <div class="loop-path">
+        <div><b>1</b><span>키보드 입력</span></div>
+        <i></i>
+        <div><b>2</b><span>버블·빛 반응</span></div>
+        <i></i>
+        <div><b>3</b><span>물고기 방문</span></div>
+        <i></i>
+        <div><b>4</b><span>수집·공유</span></div>
+      </div>
+      <div class="reef-strip">
+        <span class="fish f1"></span><span class="fish f2"></span><span class="fish f3"></span>
+        <span class="coral c1"></span><span class="coral c2"></span><span class="coral c3"></span>
+      </div>
+      <p class="takeaway">플레이는 따로 시간을 빼앗지 않고, 작업 중 자연스럽게 쌓이는 보상으로 만든다.</p>
+    </section>
+    """,
+    """
+    <section class="slide viral">
+      <div class="eyebrow">Viral Hooks</div>
+      <h2>공유되는 것은 기능 설명이 아니라<br>“내 바다의 순간”이다</h2>
+      <div class="viral-stage">
+        <div class="moment large"><b>오늘의 방문자</b><span>희귀 물고기가 잠깐 지나감</span></div>
+        <div class="moment"><b>캡처 버튼</b><span>업무 화면을 가리지 않는 공유 이미지</span></div>
+        <div class="moment"><b>시즌 리프</b><span>테마·물고기 팩으로 반복 방문</span></div>
+      </div>
+    </section>
+    """,
+    """
+    <section class="slide priority">
+      <div class="eyebrow">MVP Scope</div>
+      <h2>작게 만들어 빠르게 검증</h2>
+      <div class="priority-stack">
+        <div class="main-priority"><b>MVP</b><span>56px 리프 바 · 상호작용 · 기본 물고기 · 입력 반응 · 최소화</span></div>
+        <div><b>P1</b><span>도감 · 오늘의 방문자 · 시즌 물고기 · 저사양 모드</span></div>
+        <div><b>P2</b><span>친구 방문 · 스트리머 오버레이 · 유료 테마 팩</span></div>
+      </div>
+    </section>
+    """,
+    """
+    <section class="slide monetize">
+      <div class="eyebrow">Monetization & Validation</div>
+      <h2>무료 진입,<br>애착 기반 코스메틱 수익화</h2>
+      <div class="funnel">
+        <div>무료 설치</div><span>→</span><div>체류·공유</div><span>→</span><div>희귀 방문자</div><span>→</span><div>테마/물고기 DLC</div>
+      </div>
+      <div class="metrics-line">
+        <b>D7 재방문율</b>
+        <b>캡처 공유율</b>
+        <b>DLC 구매 전환율</b>
+      </div>
+      <p class="takeaway">장터 거래가 아니라 애착 기반 꾸미기로 매출을 만든다.</p>
+    </section>
+    """,
+    """
+    <section class="slide sources-slide">
+      <div class="eyebrow">Sources & Assumptions</div>
+      <h2>공개 지표 기반 조사</h2>
+      <ul>
+        <li>Steam Store / Steam Reviews API: Bongo Cat, TBH, taskbar 후보 28종</li>
+        <li>SteamDB: Desktop Companion 태그, app charts, follower/peak player indicators</li>
+        <li>Public press: PC Gamer, GameSpot, Polygon coverage on Bongo Cat viral growth</li>
+        <li>Abyssrium official / App Store / Google Play: IP positioning and existing audience claim</li>
+      </ul>
+      <p>비공개 매출, 위시리스트, 실제 DLC 전환율은 추정 대상이며 확정값으로 사용하지 않았습니다.</p>
+    </section>
+    """,
+]
+
+
+CSS = """
+@page { size: 1920px 1080px; margin: 0; }
+* { box-sizing: border-box; }
+html, body { margin: 0; width: 1920px; height: 1080px; overflow: hidden; }
+body {
+  font-family: "Segoe UI", "Malgun Gothic", Arial, sans-serif;
+  color: #f8fcff;
+  background: #061621;
+}
+.slide {
+  position: absolute;
+  inset: 0;
+  width: 1920px;
+  height: 1080px;
+  padding: 76px 92px;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 78% 18%, rgba(92, 226, 255, .2), transparent 34%),
+    radial-gradient(circle at 16% 88%, rgba(76, 98, 220, .18), transparent 30%),
+    linear-gradient(135deg, #061621 0%, #092333 48%, #0b3446 100%);
+}
+.eyebrow {
+  display: none;
+  color: #83ecff;
+  font-size: 24px;
+  font-weight: 850;
+  padding: 10px 16px;
+  border: 1px solid rgba(131,236,255,.34);
+  border-radius: 999px;
+  background: rgba(7,36,52,.76);
+}
+h1, h2, p { margin: 0; letter-spacing: 0; }
+h1 { margin-top: 30px; font-size: 96px; line-height: .98; font-weight: 930; }
+h2 { margin-top: 30px; font-size: 70px; line-height: 1.08; font-weight: 930; }
+p { color: #ceeffb; font-size: 29px; line-height: 1.38; }
+.takeaway {
+  position: absolute;
+  left: 92px;
+  right: 92px;
+  bottom: 44px;
+  padding: 22px 28px;
+  border-radius: 8px;
+  background: rgba(5,24,35,.86);
+  border: 1px solid rgba(131,236,255,.24);
+  font-size: 31px;
+  font-weight: 780;
+}
+.danger { border-color: rgba(255,138,138,.38); color: #ffe1dd; }
+.source { position: absolute; left: 92px; bottom: 54px; color: rgba(215,239,248,.72); font-size: 19px; }
+.cover .copy { position: relative; z-index: 3; width: 730px; }
+.cover .copy p { margin-top: 28px; font-size: 34px; font-weight: 740; }
+.cover-img {
+  position: absolute;
+  right: 70px;
+  bottom: 110px;
+  width: 1070px;
+  height: 640px;
+  object-fit: cover;
+  border-radius: 8px;
+  box-shadow: 0 44px 130px rgba(0,0,0,.42);
+  border: 1px solid rgba(171,236,255,.24);
+}
+.thesis h2 { font-size: 54px; color: #9cefff; }
+.thesis-line {
+  margin-top: 34px;
+  font-size: 120px;
+  line-height: 1.08;
+  font-weight: 950;
+  letter-spacing: 0;
+}
+.thesis-sub {
+  margin-top: 34px;
+  width: 880px;
+  font-size: 34px;
+  line-height: 1.42;
+  font-weight: 740;
+  color: #cceefa;
+}
+.proof {
+  position: absolute;
+  border-left: 4px solid #7cf2ff;
+  padding-left: 24px;
+}
+.proof b { display: block; color: #7df2ff; font-size: 76px; line-height: .95; }
+.proof span { display: block; margin-top: 12px; color: #d8f5ff; font-size: 24px; line-height: 1.25; font-weight: 720; }
+.proof-a { right: 215px; top: 205px; }
+.proof-b { right: 295px; top: 445px; border-color: #ffb36a; }
+.proof-b b { color: #ffbd79; }
+.proof-c { right: 190px; top: 690px; }
+.bar-chart {
+  position: absolute;
+  left: 170px;
+  right: 170px;
+  bottom: 250px;
+  height: 500px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  align-items: end;
+  gap: 92px;
+  border-bottom: 2px solid rgba(190,241,255,.28);
+  padding: 0 90px;
+}
+.bar-item { text-align: center; position: relative; }
+.bar { width: 100%; max-width: 210px; margin: 0 auto; border-radius: 8px 8px 0 0; background: linear-gradient(180deg,#61edff,#2677ff); box-shadow: 0 0 46px rgba(85,231,255,.45); }
+.bar.muted { background: linear-gradient(180deg,#6b92a7,#314e64); box-shadow: none; opacity: .84; }
+.bar.soft { opacity: .64; }
+.value { font-size: 54px; font-weight: 920; margin-bottom: 18px; }
+.label { margin-top: 20px; color: #f5fcff; font-size: 28px; font-weight: 850; line-height: 1.12; }
+.label span { display: block; margin-top: 8px; color: #a8cfda; font-size: 20px; }
+.label.one-line { font-size: 23px; white-space: nowrap; }
+.category h2 { width: 980px; }
+.mega-number {
+  position: absolute;
+  left: 92px;
+  bottom: 80px;
+  font-size: 470px;
+  line-height: .8;
+  font-weight: 960;
+  color: #7df2ff;
+  text-shadow: 0 0 90px rgba(125,242,255,.32);
+}
+.mega-caption {
+  position: absolute;
+  left: 116px;
+  bottom: 480px;
+  padding: 14px 18px;
+  border-radius: 8px;
+  background: rgba(5,24,35,.84);
+  border: 1px solid rgba(131,236,255,.22);
+  font-size: 42px;
+  font-weight: 840;
+  color: #f5fcff;
+}
+.side-stats {
+  position: absolute;
+  right: 120px;
+  top: 330px;
+  width: 560px;
+}
+.side-stats div { margin-bottom: 40px; border-left: 4px solid rgba(125,242,255,.8); padding-left: 26px; }
+.side-stats b { display: block; color: #f8fcff; font-size: 76px; line-height: .95; }
+.side-stats span { display: block; color: #bde6f2; font-size: 27px; font-weight: 760; margin-top: 10px; }
+.review-score {
+  position: absolute;
+  left: 92px;
+  top: 340px;
+}
+.review-score b { display: block; color: #7df2ff; font-size: 190px; line-height: .86; }
+.review-score span { display: block; margin-top: 20px; font-size: 34px; color: #eaffff; font-weight: 850; }
+.review-score.negative b { color: #ffbd79; }
+.reason-cloud {
+  position: absolute;
+  right: 100px;
+  top: 310px;
+  width: 860px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 22px;
+}
+.reason-cloud div {
+  min-height: 118px;
+  padding: 24px 28px;
+  border-radius: 8px;
+  border: 1px solid rgba(125,242,255,.26);
+  background: rgba(125,242,255,.12);
+  color: #f8fcff;
+  font-size: 29px;
+  line-height: 1.18;
+  font-weight: 840;
+}
+.reason-cloud div:first-child {
+  grid-column: span 2;
+  min-height: 150px;
+  font-size: 42px;
+  background: rgba(125,242,255,.18);
+}
+.reason-cloud b {
+  display: block;
+  margin-top: 10px;
+  color: #7df2ff;
+  font-size: 46px;
+}
+.reason-cloud.negative div {
+  border-color: rgba(255,189,121,.28);
+  background: rgba(255,145,100,.12);
+}
+.reason-cloud.negative div:first-child {
+  background: rgba(255,145,100,.18);
+}
+.reason-cloud.negative b { color: #ffbd79; }
+.pair-note {
+  position: absolute;
+  left: 92px;
+  right: 92px;
+  bottom: 58px;
+  padding: 22px 28px;
+  border-radius: 8px;
+  background: rgba(5,24,35,.78);
+  border: 1px solid rgba(125,242,255,.24);
+  color: #eaffff;
+  font-size: 32px;
+  font-weight: 780;
+}
+.pair-note.negative { border-color: rgba(255,189,121,.3); color: #ffe5d0; }
+.risk-bars { position: absolute; left: 92px; top: 330px; width: 1120px; }
+.risk-bars div { position: relative; height: 72px; margin: 22px 0; background: rgba(255,255,255,.07); border-radius: 8px; border: 1px solid rgba(255,255,255,.11); overflow: hidden; }
+.risk-bars b { position: absolute; left: 0; top: 0; bottom: 0; background: linear-gradient(90deg,#ff6e7a,#ffb86a); opacity: .92; }
+.risk-bars span, .risk-bars em { position: relative; z-index: 2; display: inline-block; font-size: 26px; line-height: 72px; font-style: normal; font-weight: 820; }
+.risk-bars span { margin-left: 24px; }
+.risk-bars em { float: right; margin-right: 24px; color: #fff; }
+.ipfit h2 { width: 900px; }
+.ip-number {
+  position: absolute;
+  left: 96px;
+  bottom: 250px;
+  font-size: 210px;
+  line-height: .88;
+  font-weight: 960;
+  color: #7df2ff;
+}
+.ip-copy {
+  position: absolute;
+  left: 112px;
+  bottom: 98px;
+  width: 880px;
+  font-size: 31px;
+  font-weight: 720;
+}
+.ipfit img {
+  position: absolute;
+  right: 70px;
+  top: 255px;
+  width: 820px;
+  height: 610px;
+  object-fit: cover;
+  border-radius: 8px;
+  opacity: .9;
+  box-shadow: 0 42px 120px rgba(0,0,0,.42);
+  border: 1px solid rgba(171,236,255,.24);
+}
+.matrix-box {
+  position: relative;
+  margin-top: 54px;
+  width: 1240px;
+  height: 620px;
+  border-left: 3px solid rgba(220,247,255,.5);
+  border-bottom: 3px solid rgba(220,247,255,.5);
+  background: rgba(255,255,255,.055);
+  border-radius: 8px;
+}
+.axis { position: absolute; color: #bfe8f3; font-size: 24px; font-weight: 800; }
+.axis.x { right: 28px; bottom: 20px; }
+.axis.y { left: 28px; top: 22px; }
+.dot { position: absolute; padding: 20px 26px; border-radius: 8px; color: #061621; font-size: 28px; font-weight: 900; box-shadow: 0 24px 80px rgba(0,0,0,.35); }
+.dot.bongo { left: 170px; top: 105px; background: #7df0ff; }
+.dot.tbh { right: 150px; bottom: 115px; background: #ffad70; }
+.dot.abyss { left: 430px; top: 220px; background: #ffffff; color: #0e6789; border: 5px solid #7df0ff; }
+.states h2 { font-size: 74px; }
+.state-wrap {
+  position: absolute;
+  left: 86px;
+  right: 86px;
+  bottom: 64px;
+  top: 260px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+}
+.state-pane {
+  position: relative;
+  overflow: hidden;
+  border-radius: 8px;
+  background: rgba(6,26,39,.76);
+  border: 1px solid rgba(171,236,255,.24);
+  box-shadow: 0 38px 110px rgba(0,0,0,.36);
+}
+.state-pane span {
+  position: absolute;
+  z-index: 2;
+  left: 28px;
+  top: 26px;
+  padding: 12px 16px;
+  border-radius: 6px;
+  background: rgba(5,24,35,.88);
+  font-size: 28px;
+  font-weight: 860;
+}
+.state-pane img {
+  position: absolute;
+  inset: 72px 20px 22px;
+  width: calc(100% - 40px);
+  height: calc(100% - 94px);
+  object-fit: contain;
+}
+.loop-path {
+  position: absolute;
+  left: 112px;
+  right: 112px;
+  top: 360px;
+  display: grid;
+  grid-template-columns: 1fr 90px 1fr 90px 1fr 90px 1fr;
+  align-items: center;
+  gap: 0;
+}
+.loop-path div { text-align: center; }
+.loop-path b {
+  display: block;
+  margin: 0 auto 24px;
+  width: 106px;
+  height: 106px;
+  border-radius: 999px;
+  background: #7df2ff;
+  color: #061621;
+  line-height: 106px;
+  font-size: 56px;
+  font-weight: 950;
+}
+.loop-path span { color: #fff; font-size: 34px; font-weight: 880; }
+.loop-path i {
+  width: 90px;
+  height: 4px;
+  background: #7df2ff;
+  box-shadow: 0 0 28px rgba(125,242,255,.55);
+}
+.reef-strip {
+  position: absolute;
+  left: 160px;
+  right: 160px;
+  bottom: 155px;
+  height: 120px;
+  border-bottom: 4px solid rgba(125,242,255,.65);
+  background: linear-gradient(180deg, transparent, rgba(70, 190, 255, .2));
+}
+.fish { position: absolute; width: 54px; height: 28px; border-radius: 70% 45% 45% 70%; background: #ffd552; }
+.fish::after { content: ""; position: absolute; right: -14px; top: 6px; border-left: 18px solid #ffd552; border-top: 8px solid transparent; border-bottom: 8px solid transparent; }
+.f1 { left: 270px; top: 50px; }
+.f2 { left: 760px; top: 24px; background: #7df2ff; }
+.f2::after { border-left-color: #7df2ff; }
+.f3 { right: 290px; top: 58px; background: #ff8f80; }
+.f3::after { border-left-color: #ff8f80; }
+.coral { position: absolute; bottom: 0; width: 16px; height: 82px; background: #9d7dff; border-radius: 12px 12px 0 0; }
+.c1 { left: 430px; }
+.c2 { left: 468px; height: 62px; background: #6ee6cf; }
+.c3 { right: 420px; height: 72px; background: #ffa7c4; }
+.viral-stage {
+  position: absolute;
+  left: 92px;
+  right: 92px;
+  bottom: 94px;
+  height: 520px;
+}
+.moment {
+  position: absolute;
+  padding: 34px;
+  border-radius: 8px;
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(171,236,255,.2);
+}
+.moment b { display: block; font-size: 54px; color: #7df2ff; }
+.moment span { display: block; margin-top: 18px; color: #e8faff; font-size: 28px; font-weight: 740; }
+.moment.large {
+  left: 0;
+  top: 0;
+  width: 760px;
+  height: 430px;
+  background:
+    radial-gradient(circle at 68% 58%, rgba(125,242,255,.28), transparent 25%),
+    rgba(255,255,255,.08);
+}
+.moment.large b { font-size: 72px; }
+.moment:nth-child(2) { right: 330px; top: 58px; width: 560px; height: 220px; }
+.moment:nth-child(3) { right: 0; bottom: 0; width: 660px; height: 250px; }
+.priority-stack {
+  position: absolute;
+  left: 92px;
+  right: 92px;
+  bottom: 86px;
+  top: 310px;
+  display: grid;
+  grid-template-columns: 1.45fr 1fr 1fr;
+  gap: 28px;
+  align-items: stretch;
+}
+.priority-stack div {
+  padding: 42px;
+  border-radius: 8px;
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(171,236,255,.2);
+}
+.priority-stack b { display: block; color: #82f4ff; font-size: 60px; margin-bottom: 34px; }
+.priority-stack span { color: #d8f3fb; font-size: 31px; line-height: 1.35; font-weight: 760; }
+.main-priority { background: linear-gradient(135deg, rgba(125,242,255,.22), rgba(255,255,255,.08)) !important; }
+.main-priority b { font-size: 108px; }
+.main-priority span { font-size: 38px; }
+.funnel {
+  position: absolute;
+  left: 92px;
+  right: 92px;
+  top: 390px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+.funnel div {
+  min-width: 250px;
+  padding: 34px 28px;
+  text-align: center;
+  border-radius: 8px;
+  background: rgba(255,255,255,.09);
+  border: 1px solid rgba(171,236,255,.2);
+  font-size: 32px;
+  font-weight: 880;
+}
+.funnel span { color: #82f4ff; font-size: 56px; font-weight: 930; }
+.metrics-line {
+  position: absolute;
+  left: 92px;
+  right: 92px;
+  top: 620px;
+  display: flex;
+  gap: 30px;
+}
+.metrics-line b {
+  flex: 1;
+  color: #061621;
+  background: #7df2ff;
+  border-radius: 8px;
+  text-align: center;
+  padding: 24px 10px;
+  font-size: 31px;
+}
+.sources-slide ul {
+  margin: 72px 0 0;
+  padding-left: 38px;
+  color: #d8f3fb;
+  font-size: 31px;
+  line-height: 1.58;
+  font-weight: 720;
+}
+.sources-slide p {
+  margin-top: 52px;
+  color: #a9d3df;
+  font-size: 25px;
+}
+"""
+
+
+def write_html() -> None:
+    slide_index = """
+    <script>
+      const params = new URLSearchParams(location.search);
+      const index = Number(params.get("slide") || "1") - 1;
+      document.addEventListener("DOMContentLoaded", () => {
+        const slides = [...document.querySelectorAll(".slide")];
+        slides.forEach((slide, i) => {
+          slide.style.display = i === index ? "block" : "none";
+        });
+      });
+    </script>
+    """
+    body = "\n".join(textwrap.dedent(slide).strip() for slide in SLIDES)
+    html_doc = f"""<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Abyssrium Desk Market Report Deck v2</title>
+  <style>{CSS}</style>
+  {slide_index}
+</head>
+<body>
+{body}
+</body>
+</html>
+"""
+    DECK_HTML.write_text(html_doc, encoding="utf-8")
+
+
+def render_slides() -> list[Path]:
+    if not CHROME.exists():
+        raise SystemExit(f"Chrome not found: {CHROME}")
+    paths: list[Path] = []
+    for i in range(1, len(SLIDES) + 1):
+        out = OUT / f"slide_{i:02d}.png"
+        url = f"{DECK_HTML.as_uri()}?slide={i}"
+        cmd = [
+            str(CHROME),
+            "--headless=new",
+            "--disable-gpu",
+            "--hide-scrollbars",
+            "--window-size=1920,1080",
+            f"--screenshot={out}",
+            url,
+        ]
+        subprocess.run(cmd, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        paths.append(out)
+    return paths
+
+
+def content_types(num_slides: int) -> str:
+    slide_overrides = "\n".join(
+        f'<Override PartName="/ppt/slides/slide{i}.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.slide+xml"/>'
+        for i in range(1, num_slides + 1)
+    )
+    return f'''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+  <Default Extension="xml" ContentType="application/xml"/>
+  <Default Extension="png" ContentType="image/png"/>
+  <Override PartName="/ppt/presentation.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.presentation.main+xml"/>
+  <Override PartName="/ppt/presProps.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.presProps+xml"/>
+  <Override PartName="/ppt/viewProps.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.viewProps+xml"/>
+  <Override PartName="/ppt/tableStyles.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.tableStyles+xml"/>
+  {slide_overrides}
+</Types>'''
+
+
+def rels_root() -> str:
+    return '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="ppt/presentation.xml"/>
+</Relationships>'''
+
+
+def presentation_xml(num_slides: int) -> str:
+    sld_ids = "\n".join(
+        f'<p:sldId id="{255+i}" r:id="rId{i}"/>'
+        for i in range(1, num_slides + 1)
+    )
+    return f'''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<p:presentation xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"
+  xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
+  xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main">
+  <p:sldIdLst>
+    {sld_ids}
+  </p:sldIdLst>
+  <p:sldSz cx="12192000" cy="6858000" type="screen16x9"/>
+  <p:notesSz cx="6858000" cy="9144000"/>
+  <p:defaultTextStyle/>
+</p:presentation>'''
+
+
+def presentation_rels(num_slides: int) -> str:
+    rels = "\n".join(
+        f'<Relationship Id="rId{i}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slide" Target="slides/slide{i}.xml"/>'
+        for i in range(1, num_slides + 1)
+    )
+    return f'''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  {rels}
+</Relationships>'''
+
+
+def slide_xml(idx: int) -> str:
+    return f'''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<p:sld xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"
+  xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
+  xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main">
+  <p:cSld>
+    <p:spTree>
+      <p:nvGrpSpPr>
+        <p:cNvPr id="1" name=""/>
+        <p:cNvGrpSpPr/>
+        <p:nvPr/>
+      </p:nvGrpSpPr>
+      <p:grpSpPr>
+        <a:xfrm>
+          <a:off x="0" y="0"/>
+          <a:ext cx="0" cy="0"/>
+          <a:chOff x="0" y="0"/>
+          <a:chExt cx="0" cy="0"/>
+        </a:xfrm>
+      </p:grpSpPr>
+      <p:pic>
+        <p:nvPicPr>
+          <p:cNvPr id="2" name="slide_{idx:02d}.png"/>
+          <p:cNvPicPr/>
+          <p:nvPr/>
+        </p:nvPicPr>
+        <p:blipFill>
+          <a:blip r:embed="rId1"/>
+          <a:stretch><a:fillRect/></a:stretch>
+        </p:blipFill>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="0" y="0"/>
+            <a:ext cx="12192000" cy="6858000"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect"><a:avLst/></a:prstGeom>
+        </p:spPr>
+      </p:pic>
+    </p:spTree>
+  </p:cSld>
+  <p:clrMapOvr><a:masterClrMapping/></p:clrMapOvr>
+</p:sld>'''
+
+
+def slide_rels(idx: int) -> str:
+    return f'''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="../media/slide_{idx:02d}.png"/>
+</Relationships>'''
+
+
+def build_pptx(slide_pngs: list[Path]) -> None:
+    if PPTX.exists():
+        PPTX.unlink()
+    with zipfile.ZipFile(PPTX, "w", compression=zipfile.ZIP_DEFLATED) as z:
+        z.writestr("[Content_Types].xml", content_types(len(slide_pngs)))
+        z.writestr("_rels/.rels", rels_root())
+        z.writestr("ppt/presentation.xml", presentation_xml(len(slide_pngs)))
+        z.writestr("ppt/_rels/presentation.xml.rels", presentation_rels(len(slide_pngs)))
+        z.writestr("ppt/presProps.xml", '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><p:presentationPr xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"/>')
+        z.writestr("ppt/viewProps.xml", '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><p:viewPr xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"/>')
+        z.writestr("ppt/tableStyles.xml", '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><a:tblStyleLst xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" def="{5C22544A-7EE6-4342-B048-85BDC9FD1C3A}"/>')
+        for idx, png in enumerate(slide_pngs, 1):
+            z.writestr(f"ppt/slides/slide{idx}.xml", slide_xml(idx))
+            z.writestr(f"ppt/slides/_rels/slide{idx}.xml.rels", slide_rels(idx))
+            z.write(png, f"ppt/media/slide_{idx:02d}.png")
+
+
+def main() -> None:
+    write_html()
+    pngs = render_slides()
+    build_pptx(pngs)
+    print(f"slides={len(pngs)}")
+    print(f"html={DECK_HTML}")
+    print(f"pptx={PPTX}")
+
+
+if __name__ == "__main__":
+    main()

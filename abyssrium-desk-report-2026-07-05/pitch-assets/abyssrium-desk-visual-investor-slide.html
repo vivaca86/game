@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Abyssrium Desk Visual Investor Slide</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    html,
+    body {
+      margin: 0;
+      width: 100%;
+      min-height: 100%;
+      background: #061621;
+      color: #f7fcff;
+      font-family: "Segoe UI", "Malgun Gothic", Arial, sans-serif;
+    }
+
+    .slide {
+      position: relative;
+      width: 1920px;
+      height: 1080px;
+      overflow: hidden;
+      padding: 70px 86px 64px;
+      background:
+        radial-gradient(circle at 78% 18%, rgba(79, 215, 255, 0.20), transparent 34%),
+        radial-gradient(circle at 14% 82%, rgba(95, 128, 255, 0.16), transparent 32%),
+        linear-gradient(135deg, #061621 0%, #0a2433 48%, #0b3345 100%);
+    }
+
+    .top {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 40px;
+      margin-bottom: 44px;
+    }
+
+    .label {
+      width: max-content;
+      padding: 10px 16px;
+      border: 1px solid rgba(128, 228, 255, 0.32);
+      border-radius: 999px;
+      color: #8eeaff;
+      background: rgba(11, 45, 63, 0.72);
+      font-size: 21px;
+      font-weight: 800;
+      letter-spacing: 0;
+    }
+
+    h1 {
+      margin: 24px 0 0;
+      font-size: 84px;
+      line-height: 0.98;
+      font-weight: 900;
+      letter-spacing: 0;
+    }
+
+    .tagline {
+      margin: 0 0 8px;
+      max-width: 620px;
+      color: #d7f4ff;
+      font-size: 32px;
+      line-height: 1.3;
+      text-align: right;
+      font-weight: 760;
+    }
+
+    .gallery {
+      position: relative;
+      z-index: 2;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 34px;
+      height: 760px;
+    }
+
+    .shot {
+      position: relative;
+      min-width: 0;
+      overflow: hidden;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(171, 236, 255, 0.24);
+      box-shadow: 0 42px 120px rgba(0, 0, 0, 0.42);
+    }
+
+    .shot img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .shot.default img {
+      object-position: center bottom;
+    }
+
+    .shot.expanded img {
+      object-position: center bottom;
+    }
+
+    .shot::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: linear-gradient(180deg, rgba(4, 18, 28, 0.05), rgba(4, 18, 28, 0.1));
+    }
+
+    .badge {
+      position: absolute;
+      left: 24px;
+      top: 24px;
+      z-index: 3;
+      padding: 14px 18px;
+      border-radius: 8px;
+      background: rgba(5, 22, 34, 0.84);
+      border: 1px solid rgba(135, 232, 255, 0.26);
+      color: #f4fcff;
+      font-size: 24px;
+      line-height: 1.1;
+      font-weight: 850;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.26);
+    }
+
+    .note {
+      position: absolute;
+      right: 24px;
+      bottom: 24px;
+      z-index: 3;
+      padding: 13px 16px;
+      border-radius: 8px;
+      background: rgba(5, 22, 34, 0.78);
+      border: 1px solid rgba(135, 232, 255, 0.2);
+      color: #cfeefa;
+      font-size: 20px;
+      line-height: 1.2;
+      font-weight: 760;
+    }
+
+    .arrow {
+      position: absolute;
+      left: 50%;
+      top: 548px;
+      z-index: 5;
+      width: 92px;
+      height: 92px;
+      transform: translateX(-50%);
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: #7df0ff;
+      color: #052031;
+      font-size: 48px;
+      font-weight: 900;
+      box-shadow: 0 0 46px rgba(125, 240, 255, 0.62);
+      border: 6px solid rgba(6, 22, 33, 0.82);
+    }
+
+  </style>
+</head>
+<body>
+  <main class="slide">
+    <section class="top">
+      <div>
+        <div class="label">Abyssrium x Desktop Companion</div>
+        <h1>작업표시줄 위에<br />사는 작은 심해</h1>
+      </div>
+      <p class="tagline">평소엔 얇게. 필요할 때만 크게.</p>
+    </section>
+
+    <section class="gallery">
+      <article class="shot default">
+        <div class="badge">기본 상태<br />56px 리프 바</div>
+        <img src="abyssrium-desk-mvp-default.png" alt="Default thin reef bar state" />
+        <div class="note">업무 화면을 가리지 않는 상주 상태</div>
+      </article>
+
+      <article class="shot expanded">
+        <div class="badge">확장 상태<br />수집 패널</div>
+        <img src="abyssrium-desk-mvp-expanded.png" alt="Expanded collection drawer state" />
+        <div class="note">클릭했을 때만 도감·수집 패널 확장</div>
+      </article>
+    </section>
+    <div class="arrow">›</div>
+  </main>
+</body>
+</html>

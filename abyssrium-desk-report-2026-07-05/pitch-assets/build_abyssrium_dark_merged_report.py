@@ -1,0 +1,794 @@
+from __future__ import annotations
+
+import subprocess
+from pathlib import Path
+
+
+ROOT = Path(__file__).resolve().parent
+OUT = ROOT / "abyssrium-desk-dark-merged"
+OUT.mkdir(exist_ok=True)
+
+CHROME = Path(r"C:\Program Files\Google\Chrome\Application\chrome.exe")
+HTML = OUT / "slides.html"
+PPTX = Path(r"C:\Users\i\Downloads\Abyssrium_Desk_dark_merged_report.pptx")
+
+MVP_DEFAULT = "../abyssrium-desk-mvp-default.png"
+MVP_EXPANDED = "../abyssrium-desk-mvp-expanded.png"
+
+
+SLIDES = [
+    f"""
+    <section class="slide cover">
+      <div class="eyebrow">Abyssrium Desk · Market + Game Concept</div>
+      <h1>작업표시줄 위에<br>사는 작은 심해</h1>
+      <p>어비스리움 IP를 PC 작업 흐름 안으로 확장하는 데스크톱 companion 시장성 검토.</p>
+      <img class="hero-img" src="{MVP_DEFAULT}" alt="">
+      <div class="source">Steam APIs / SteamDB / public press · checked 2026-07-04</div>
+    </section>
+    """,
+    """
+    <section class="slide thesis">
+      <div class="eyebrow">Executive Summary</div>
+      <h1>작게 들어와<br>오래 남는 IP</h1>
+      <div class="thesis-grid">
+        <div><b>무료 진입</b><span>설치 장벽을 낮추고, 먼저 바이럴을 만든다.</span></div>
+        <div><b>작업 흐름 상주</b><span>게임 실행 시간이 아니라 PC 사용 시간을 점유한다.</span></div>
+        <div><b>코스메틱 수익화</b><span>장터가 아니라 애착과 꾸미기를 판다.</span></div>
+      </div>
+      <div class="proof-strip">
+        <div><span>Bongo Cat 리뷰</span><b>105K+</b><em>96.6% positive</em></div>
+        <div><span>TBH 리뷰</span><b>36K+</b><em>관심은 크지만 리스크도 큼</em></div>
+        <div><span>Abyssrium 기존 유저 주장</span><b>65M+</b><em>힐링 수족관 문법 보유</em></div>
+      </div>
+    </section>
+    """,
+    """
+    <section class="slide signal">
+      <h1>Steam에서 이미<br>검증된 관심</h1>
+      <div class="signal-bars">
+        <div class="bar-item cat"><strong>105K+</strong><i></i><b>Bongo Cat</b><span>Steam 리뷰 긍정 96.6%</span></div>
+        <div class="bar-item tbh"><strong>36K+</strong><i></i><b>TBH</b><span>Steam 리뷰 긍정 51.5%</span></div>
+        <div class="bar-item tag"><strong>100+</strong><i></i><b>Desktop Companion</b><span>SteamDB tag</span></div>
+      </div>
+      <p class="takeaway">리뷰 수는 관심의 크기, 태그는 장르가 형성되는 초기 신호다.</p>
+    </section>
+    """,
+    """
+    <section class="slide category">
+      <div class="eyebrow">Category Size</div>
+      <h1>아직 작지만<br>빠르게 형성되는 장르</h1>
+      <div class="mega-number">28</div>
+      <div class="mega-copy">
+        <b>실제 taskbar / 화면 하단 상주형 후보</b>
+        <p>Steam “taskbar” 검색 153건 중 실제 상주형 후보는 28종. 20~30개 규모라 후보별 디테일 조사와 포지셔닝 설계가 가능하다.</p>
+      </div>
+      <div class="status-row">
+        <div><b>16</b><span>출시된 후보</span></div>
+        <div><b>12</b><span>출시 예정 후보</span></div>
+        <div><b>18%</b><span>검색 결과 대비 실제 후보</span></div>
+      </div>
+    </section>
+    """,
+    """
+    <section class="slide reviews">
+      <div class="eyebrow">Review Split</div>
+      <h1>긍정은 감정에서,<br>부정은 손실감에서 나온다</h1>
+      <div class="review-pair">
+        <div class="review good">
+          <div class="top"><b>Bongo Cat</b><span>105K+ reviews</span></div>
+          <strong>96.6%</strong><em>positive</em>
+          <ul>
+            <li><b>짧은 밈 리뷰</b><span>66.2K</span></li>
+            <li><b>귀여움·밈 언급</b><span>36.6K</span></li>
+            <li><b>무료·힐링 언급</b><span>20.3K</span></li>
+            <li><b>작업 중 상주</b><span>7.7K</span></li>
+          </ul>
+          <p>“귀엽다”가 설치와 공유의 이유가 됐다.</p>
+        </div>
+        <div class="review bad">
+          <div class="top"><b>TBH</b><span>36K+ reviews</span></div>
+          <strong>51.5%</strong><em>positive</em>
+          <ul>
+            <li><b>장터·아이템 손실</b><span>7.3K</span></li>
+            <li><b>서버·접속·버그</b><span>4.8K</span></li>
+            <li><b>신뢰·정책 불만</b><span>2.5K</span></li>
+            <li><b>DLC·P2W 인식</b><span>1.6K</span></li>
+          </ul>
+          <p>관심은 컸지만, 장터 경제가 분노의 중심이 됐다.</p>
+        </div>
+      </div>
+      <p class="takeaway">Abyssrium Desk는 Bongo Cat의 감정 구조를 따르고, TBH의 장터 리스크를 피한다.</p>
+    </section>
+    """,
+    f"""
+    <section class="slide ip">
+      <div class="eyebrow">Why Abyssrium</div>
+      <h1>어비스리움은 이미<br>방치형 힐링 수족관이다</h1>
+      <div class="ip-number">65M+</div>
+      <div class="ip-copy">
+        <p>모바일에서 검증된 정서: 조용함, 수집, 성장, 나만의 바다.</p>
+        <div class="pill-row"><span>조용함</span><span>수집</span><span>성장</span><span>나만의 바다</span></div>
+      </div>
+      <img src="{MVP_EXPANDED}" alt="">
+      <p class="takeaway">같은 정서가 PC에서는 업무 옆에 오래 머무는 companion 문법으로 바뀐다.</p>
+    </section>
+    """,
+    f"""
+    <section class="slide states">
+      <div class="eyebrow">Product Principle</div>
+      <h1>평소엔 얇게,<br>필요할 때만 크게</h1>
+      <div class="state-grid">
+        <div class="state-card">
+          <b>기본 상태 · 56px 리프 바</b>
+          <img src="{MVP_DEFAULT}" alt="">
+          <p>작업표시줄 위를 얇게 차지하고, 키보드 입력에 버블·빛으로 반응한다.</p>
+        </div>
+        <div class="join">클릭 1회</div>
+        <div class="state-card">
+          <b>확장 상태 · 수집 패널</b>
+          <img src="{MVP_EXPANDED}" alt="">
+          <p>도감, 오늘의 방문자, 테마를 확인하고 닫으면 다시 얇은 리프 바로 돌아간다.</p>
+        </div>
+      </div>
+      <p class="takeaway">업무 화면을 가리지 않는 것이 상주형 companion의 첫 번째 조건이다.</p>
+    </section>
+    """,
+    """
+    <section class="slide core">
+      <div class="eyebrow">Game Core</div>
+      <h1>게임의 코어는<br>화면 크기가 아니다</h1>
+      <div class="core-flow">
+        <div><b>PC 행동</b><span>키보드 · 마우스 · 집중 시간</span></div>
+        <i></i>
+        <div><b>바다 반응</b><span>버블 · 빛 · 물고기 움직임</span></div>
+        <i></i>
+        <div><b>수집/공유</b><span>방문자 · 도감 · 캡처 카드</span></div>
+      </div>
+      <div class="reef">
+        <span class="fish f1"></span><span class="fish f2"></span><span class="fish f3"></span>
+        <span class="bubble b1"></span><span class="bubble b2"></span><span class="bubble b3"></span>
+        <span class="coral c1"></span><span class="coral c2"></span><span class="coral c3"></span>
+      </div>
+      <p class="takeaway">플레이어가 일을 하는 동안, 그 행동이 바다의 변화와 발견으로 쌓이는 게임.</p>
+    </section>
+    """,
+    f"""
+    <section class="slide reaction">
+      <div class="eyebrow">Interaction</div>
+      <h1>키보드와 마우스가<br>바다를 움직인다</h1>
+      <img src="{MVP_DEFAULT}" alt="">
+      <div class="reaction-list">
+        <div><b>키보드 입력</b><span>입력 리듬에 맞춰 버블과 빛이 올라온다.</span></div>
+        <div><b>마우스 이동</b><span>물고기가 커서 방향을 따라가거나 피한다.</span></div>
+        <div><b>집중 시간</b><span>오래 작업하면 산호 에너지가 천천히 쌓인다.</span></div>
+      </div>
+    </section>
+    """,
+    f"""
+    <section class="slide visitor">
+      <div class="eyebrow">Retention Hook</div>
+      <h1>오늘이라서<br>만나는 방문자</h1>
+      <div class="visitor-shot">
+        <img src="{MVP_EXPANDED}" alt="">
+        <div class="visitor-card">
+          <span>오늘의 방문자</span>
+          <b>심해 팔레트피쉬</b>
+          <p>18:42 · 집중 30분 후 등장</p>
+        </div>
+      </div>
+      <div class="visitor-rules">
+        <div><b>조건</b><span>시간대 · 집중 시간 · 계절 · 플레이 패턴</span></div>
+        <div><b>발견</b><span>작은 방문자가 업무 옆 바다에 등장</span></div>
+        <div><b>기록</b><span>도감에 남고 캡처 카드로 공유</span></div>
+      </div>
+    </section>
+    """,
+    f"""
+    <section class="slide share">
+      <div class="eyebrow">Share Flow</div>
+      <h1>공유는 이렇게 나간다</h1>
+      <div class="share-grid">
+        <div class="capture">
+          <img src="{MVP_EXPANDED}" alt="">
+          <div>캡처 영역</div>
+        </div>
+        <div class="card">
+          <span>ABYSSRIUM DESK</span>
+          <b>심해 팔레트피쉬 발견</b>
+          <p>오늘 18:42 · 집중 30분 후 등장<br>내 리프: Blue Quiet Reef</p>
+          <i></i>
+        </div>
+        <div class="dest">
+          <div><b>Steam</b><span>스크린샷</span></div>
+          <div><b>Discord</b><span>친구 공유</span></div>
+          <div><b>X / 커뮤니티</b><span>짧은 밈 카드</span></div>
+        </div>
+      </div>
+      <p class="takeaway">전체 업무 화면을 찍는 게 아니라, 게임이 자동으로 공유용 카드 이미지를 만든다.</p>
+    </section>
+    """,
+    """
+    <section class="slide mvp">
+      <div class="eyebrow">MVP Priority</div>
+      <h1>작게 만들고,<br>빠르게 검증한다</h1>
+      <div class="mvp-grid">
+        <div class="p0"><b>P0</b><span>56px 리프 바</span><span>키보드·마우스 반응</span><span>오늘의 방문자</span><span>캡처 카드</span><span>기본 도감</span></div>
+        <div><b>P1</b><span>산호 성장</span><span>시즌 물고기</span><span>테마 팩</span><span>저사양 모드</span></div>
+        <div><b>P2</b><span>친구 방문</span><span>스트리머 오버레이</span><span>고급 공유 카드</span></div>
+      </div>
+      <div class="metric-row">
+        <div><b>D7 재방문</b><span>상주형 리텐션</span></div>
+        <div><b>캡처 공유율</b><span>바이럴 후보성</span></div>
+        <div><b>테마 구매 전환</b><span>코스메틱 수익성</span></div>
+      </div>
+    </section>
+    """,
+]
+
+
+CSS = """
+@page { size: 1920px 1080px; margin: 0; }
+* { box-sizing: border-box; }
+html, body { width: 1920px; height: 1080px; margin: 0; overflow: hidden; }
+body {
+  font-family: "Segoe UI", "Malgun Gothic", "Apple SD Gothic Neo", Arial, sans-serif;
+  color: #f7fbff;
+  background: #071d2a;
+  word-break: keep-all;
+}
+.slide {
+  position: absolute;
+  inset: 0;
+  width: 1920px;
+  height: 1080px;
+  padding: 92px 96px 70px;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 82% 12%, rgba(101, 227, 255, .18), transparent 34%),
+    radial-gradient(circle at 15% 90%, rgba(52, 107, 210, .15), transparent 36%),
+    linear-gradient(135deg, #061620 0%, #092634 48%, #0b3b4e 100%);
+}
+h1, p { margin: 0; letter-spacing: 0; }
+h1 {
+  color: #f7fbff;
+  font-size: 82px;
+  line-height: 1.08;
+  font-weight: 940;
+}
+p {
+  color: #cdeefa;
+  font-size: 31px;
+  line-height: 1.4;
+  font-weight: 720;
+}
+.eyebrow {
+  color: #68efff;
+  font-size: 28px;
+  font-weight: 900;
+  margin-bottom: 30px;
+}
+.source {
+  position: absolute;
+  left: 96px;
+  bottom: 54px;
+  color: #a8dff0;
+  font-size: 20px;
+  font-weight: 650;
+}
+.takeaway {
+  position: absolute;
+  left: 96px;
+  right: 96px;
+  bottom: 62px;
+  padding: 23px 30px;
+  background: rgba(3, 18, 28, .72);
+  border: 1px solid rgba(104, 239, 255, .22);
+  border-radius: 8px;
+  color: #f7fbff;
+  font-size: 34px;
+  font-weight: 850;
+}
+
+.cover h1 { font-size: 102px; line-height: .98; width: 780px; }
+.cover p { margin-top: 36px; width: 620px; font-size: 35px; }
+.hero-img {
+  position: absolute;
+  right: 78px;
+  bottom: 88px;
+  width: 1060px;
+  height: 570px;
+  object-fit: cover;
+  object-position: 50% 100%;
+  border-radius: 8px;
+  border: 1px solid rgba(132, 229, 255, .28);
+  box-shadow: 0 42px 130px rgba(0, 0, 0, .35);
+}
+
+.thesis h1 { font-size: 96px; width: 780px; }
+.thesis-grid {
+  position: absolute;
+  left: 820px;
+  right: 96px;
+  top: 170px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
+}
+.thesis-grid div, .proof-strip div, .review, .mega-copy, .status-row div, .state-card, .core-flow div, .reaction-list div, .visitor-rules div, .dest div, .mvp-grid div, .metric-row div {
+  background: rgba(255, 255, 255, .08);
+  border: 1px solid rgba(165, 229, 255, .22);
+  border-radius: 8px;
+}
+.thesis-grid div { min-height: 208px; padding: 30px; }
+.thesis-grid b { display: block; color: #68efff; font-size: 34px; margin-bottom: 18px; }
+.thesis-grid span { color: #eafaff; font-size: 25px; line-height: 1.35; font-weight: 750; }
+.proof-strip {
+  position: absolute;
+  left: 96px;
+  right: 96px;
+  bottom: 100px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28px;
+}
+.proof-strip div { padding: 32px 36px; }
+.proof-strip span { display: block; color: #a8dff0; font-size: 24px; font-weight: 850; }
+.proof-strip b { display: block; color: #68efff; font-size: 74px; line-height: 1; margin: 18px 0 10px; }
+.proof-strip em { display: block; color: #f7fbff; font-style: normal; font-size: 25px; font-weight: 780; }
+
+.signal h1 { font-size: 78px; }
+.signal-bars {
+  position: absolute;
+  left: 170px;
+  right: 170px;
+  top: 300px;
+  height: 580px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 88px;
+  align-items: end;
+}
+.bar-item { text-align: center; }
+.bar-item strong { display: block; font-size: 58px; line-height: 1; margin-bottom: 28px; }
+.bar-item i {
+  display: block;
+  margin: 0 auto 26px;
+  width: 210px;
+  border-radius: 8px 8px 0 0;
+  background: linear-gradient(180deg, #54e5ff, #2779f5);
+  box-shadow: 0 20px 70px rgba(84, 229, 255, .22);
+}
+.bar-item.cat i { height: 430px; }
+.bar-item.tbh i { height: 156px; opacity: .55; }
+.bar-item.tag i { height: 76px; opacity: .42; }
+.bar-item b { display: block; font-size: 30px; }
+.bar-item span { display: block; color: #bdefff; font-size: 22px; font-weight: 780; margin-top: 8px; }
+
+.category h1 { width: 760px; }
+.mega-number {
+  position: absolute;
+  left: 120px;
+  bottom: 170px;
+  color: #68efff;
+  font-size: 240px;
+  font-weight: 950;
+  line-height: .85;
+}
+.mega-copy {
+  position: absolute;
+  left: 520px;
+  top: 365px;
+  width: 680px;
+  padding: 34px 40px;
+}
+.mega-copy b { display: block; color: #f7fbff; font-size: 38px; margin-bottom: 18px; }
+.mega-copy p { font-size: 27px; }
+.status-row {
+  position: absolute;
+  right: 96px;
+  top: 365px;
+  width: 520px;
+  display: grid;
+  gap: 20px;
+}
+.status-row div { padding: 26px 34px; display: flex; align-items: center; gap: 24px; }
+.status-row b { color: #68efff; font-size: 58px; min-width: 105px; }
+.status-row span { color: #eafaff; font-size: 27px; font-weight: 800; }
+
+.reviews h1 { font-size: 66px; }
+.review-pair {
+  position: absolute;
+  left: 96px;
+  right: 96px;
+  top: 300px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 34px;
+}
+.review { padding: 28px 32px; min-height: 555px; }
+.review .top { display: flex; justify-content: space-between; align-items: center; }
+.review .top b { font-size: 34px; color: #68efff; }
+.review.bad .top b { color: #ffb470; }
+.review .top span { color: #bdefff; font-size: 22px; font-weight: 780; }
+.review strong { display: inline-block; font-size: 74px; line-height: 1; margin-top: 30px; color: #68efff; }
+.review.bad strong { color: #ffb470; }
+.review em { color: #f7fbff; font-size: 26px; font-style: normal; font-weight: 780; margin-left: 18px; }
+.review ul { list-style: none; margin: 28px 0 0; padding: 0; display: grid; gap: 16px; }
+.review li { position: relative; padding-bottom: 12px; border-bottom: 1px solid rgba(255, 255, 255, .12); }
+.review li b { color: #f7fbff; font-size: 25px; }
+.review li span { float: right; color: #f7fbff; font-size: 25px; font-weight: 860; }
+.review p { margin-top: 26px; color: #cdeefa; font-size: 26px; }
+
+.ip h1 { width: 880px; }
+.ip-number {
+  position: absolute;
+  left: 98px;
+  top: 388px;
+  color: #68efff;
+  font-size: 158px;
+  font-weight: 950;
+  line-height: .9;
+}
+.ip-copy { position: absolute; left: 100px; top: 560px; width: 720px; }
+.ip-copy p { font-size: 32px; }
+.pill-row { display: flex; gap: 14px; margin-top: 28px; flex-wrap: wrap; }
+.pill-row span {
+  display: inline-flex;
+  height: 50px;
+  padding: 0 24px;
+  align-items: center;
+  border-radius: 999px;
+  background: rgba(104, 239, 255, .12);
+  border: 1px solid rgba(104, 239, 255, .24);
+  color: #eafaff;
+  font-size: 24px;
+  font-weight: 830;
+}
+.ip img {
+  position: absolute;
+  right: 80px;
+  top: 255px;
+  width: 880px;
+  height: 560px;
+  object-fit: cover;
+  object-position: 40% 100%;
+  border-radius: 8px;
+  border: 1px solid rgba(132, 229, 255, .28);
+  box-shadow: 0 42px 130px rgba(0, 0, 0, .35);
+}
+
+.states h1 { font-size: 72px; }
+.state-grid {
+  position: absolute;
+  left: 96px;
+  right: 96px;
+  top: 350px;
+  display: grid;
+  grid-template-columns: 1fr 90px 1fr;
+  gap: 28px;
+  align-items: center;
+}
+.state-card { padding: 26px; }
+.state-card b { display: block; color: #68efff; font-size: 32px; margin-bottom: 18px; }
+.state-card img {
+  width: 100%;
+  height: 350px;
+  object-fit: cover;
+  object-position: 50% 100%;
+  border-radius: 6px;
+  border: 1px solid rgba(132, 229, 255, .18);
+}
+.state-card p { margin-top: 18px; font-size: 25px; color: #eafaff; }
+.join {
+  width: 90px;
+  height: 90px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background: rgba(104, 239, 255, .14);
+  color: #f7fbff;
+  font-size: 24px;
+  font-weight: 850;
+}
+
+.core h1 { font-size: 82px; }
+.core-flow {
+  position: absolute;
+  left: 96px;
+  right: 96px;
+  top: 440px;
+  display: grid;
+  grid-template-columns: 1fr 80px 1fr 80px 1fr;
+  align-items: center;
+}
+.core-flow div { min-height: 190px; padding: 34px; }
+.core-flow b { display: block; color: #68efff; font-size: 46px; margin-bottom: 20px; }
+.core-flow span { display: block; color: #f7fbff; font-size: 28px; font-weight: 820; }
+.core-flow i { height: 4px; background: #68efff; box-shadow: 0 0 35px rgba(104, 239, 255, .5); }
+.reef {
+  position: absolute;
+  right: 98px;
+  bottom: 168px;
+  width: 780px;
+  height: 210px;
+  border-radius: 12px 12px 0 0;
+  background: linear-gradient(180deg, rgba(104,239,255,.08), rgba(104,239,255,.18));
+  border-bottom: 5px solid #68efff;
+}
+.fish { position: absolute; width: 82px; height: 36px; border-radius: 50%; background: #56d8f4; }
+.fish:after { content: ""; position: absolute; right: -22px; top: 9px; border-left: 26px solid currentColor; border-top: 10px solid transparent; border-bottom: 10px solid transparent; color: inherit; }
+.f1 { left: 110px; top: 112px; background: #ffb24c; color: #ffb24c; }
+.f2 { left: 390px; top: 74px; transform: scale(.8); color: #56d8f4; }
+.f3 { right: 130px; top: 130px; background: #9a78ff; color: #9a78ff; transform: scale(.86); }
+.bubble { position: absolute; border-radius: 999px; border: 3px solid #8defff; opacity: .65; }
+.b1 { width: 34px; height: 34px; left: 240px; top: 70px; }
+.b2 { width: 22px; height: 22px; left: 285px; top: 35px; }
+.b3 { width: 44px; height: 44px; right: 210px; top: 56px; }
+.coral { position: absolute; bottom: 0; width: 42px; height: 92px; border-radius: 999px 999px 0 0; background: #e87799; }
+.c1 { left: 300px; height: 116px; }
+.c2 { left: 340px; height: 86px; background: #6cc78b; }
+.c3 { left: 650px; height: 112px; background: #8f7eea; }
+
+.reaction h1, .visitor h1, .share h1 { width: 760px; }
+.reaction img {
+  position: absolute;
+  right: 72px;
+  top: 250px;
+  width: 980px;
+  height: 590px;
+  object-fit: cover;
+  object-position: 50% 100%;
+  border-radius: 8px;
+  border: 1px solid rgba(132, 229, 255, .28);
+  box-shadow: 0 42px 130px rgba(0, 0, 0, .35);
+}
+.reaction-list {
+  position: absolute;
+  left: 96px;
+  bottom: 118px;
+  width: 700px;
+  display: grid;
+  gap: 18px;
+}
+.reaction-list div, .visitor-rules div { padding: 25px 30px; }
+.reaction-list b, .visitor-rules b { display: block; color: #68efff; font-size: 31px; margin-bottom: 8px; }
+.reaction-list span, .visitor-rules span { color: #f7fbff; font-size: 25px; line-height: 1.3; font-weight: 760; }
+
+.visitor-shot {
+  position: absolute;
+  right: 96px;
+  top: 232px;
+  width: 890px;
+  height: 600px;
+  overflow: hidden;
+  border-radius: 8px;
+  border: 1px solid rgba(132, 229, 255, .28);
+  box-shadow: 0 42px 130px rgba(0, 0, 0, .35);
+}
+.visitor-shot img { width: 100%; height: 100%; object-fit: cover; object-position: 36% 100%; filter: brightness(.9); }
+.visitor-card {
+  position: absolute;
+  left: 34px;
+  bottom: 34px;
+  width: 470px;
+  padding: 28px 32px;
+  border-radius: 8px;
+  background: rgba(3, 18, 28, .86);
+  border: 1px solid rgba(104, 239, 255, .24);
+}
+.visitor-card span { display: block; color: #68efff; font-size: 25px; font-weight: 860; margin-bottom: 10px; }
+.visitor-card b { color: #f7fbff; font-size: 45px; line-height: 1.08; }
+.visitor-card p { margin-top: 18px; font-size: 25px; }
+.visitor-rules {
+  position: absolute;
+  left: 96px;
+  bottom: 110px;
+  width: 700px;
+  display: grid;
+  gap: 18px;
+}
+
+.share-grid {
+  position: absolute;
+  left: 96px;
+  right: 96px;
+  top: 340px;
+  display: grid;
+  grid-template-columns: 1.25fr .9fr .64fr;
+  gap: 34px;
+  align-items: center;
+}
+.capture {
+  position: relative;
+  height: 360px;
+  overflow: hidden;
+  border-radius: 8px;
+  border: 1px solid rgba(132, 229, 255, .28);
+  box-shadow: 0 32px 100px rgba(0, 0, 0, .32);
+}
+.capture img { width: 100%; height: 100%; object-fit: cover; object-position: 36% 100%; filter: brightness(.82); }
+.capture div {
+  position: absolute;
+  left: 58px;
+  bottom: 58px;
+  width: 420px;
+  height: 180px;
+  border: 3px solid #68efff;
+  color: #f7fbff;
+  background: rgba(104, 239, 255, .08);
+  font-size: 30px;
+  font-weight: 900;
+  padding: 18px;
+}
+.card {
+  height: 360px;
+  padding: 36px;
+  border-radius: 8px;
+  background: rgba(3, 18, 28, .82);
+  border: 1px solid rgba(104, 239, 255, .28);
+  box-shadow: 0 32px 100px rgba(0, 0, 0, .28);
+}
+.card span { color: #68efff; font-size: 23px; font-weight: 920; }
+.card b { display: block; margin-top: 24px; color: #f7fbff; font-size: 40px; line-height: 1.12; }
+.card p { margin-top: 18px; font-size: 23px; }
+.card i { display: block; height: 66px; margin-top: 30px; border-bottom: 5px solid #68efff; border-radius: 8px; background: radial-gradient(circle at 48% 50%, rgba(104,239,255,.38), transparent 18%), rgba(104,239,255,.08); }
+.dest { display: grid; gap: 20px; }
+.dest div { padding: 29px 30px; }
+.dest b { display: block; color: #f7fbff; font-size: 32px; }
+.dest span { display: block; color: #cdeefa; font-size: 25px; font-weight: 750; margin-top: 6px; }
+
+.mvp h1 { font-size: 82px; }
+.mvp-grid {
+  position: absolute;
+  left: 96px;
+  right: 96px;
+  top: 372px;
+  display: grid;
+  grid-template-columns: 1.35fr 1fr 1fr;
+  gap: 28px;
+}
+.mvp-grid div { min-height: 252px; padding: 32px 36px; }
+.mvp-grid .p0 { background: rgba(104, 239, 255, .14); border-color: rgba(104, 239, 255, .35); }
+.mvp-grid b { display: block; color: #68efff; font-size: 66px; line-height: 1; margin-bottom: 24px; }
+.mvp-grid span {
+  display: inline-flex;
+  padding: 12px 18px;
+  margin: 0 10px 14px 0;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .1);
+  color: #f7fbff;
+  font-size: 24px;
+  font-weight: 780;
+}
+.metric-row {
+  position: absolute;
+  left: 96px;
+  right: 96px;
+  bottom: 90px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28px;
+}
+.metric-row div { padding: 26px 34px; border-top: 5px solid #68efff; border-radius: 0 0 8px 8px; }
+.metric-row b { display: block; color: #f7fbff; font-size: 31px; margin-bottom: 8px; }
+.metric-row span { color: #cdeefa; font-size: 24px; font-weight: 760; }
+"""
+
+
+def write_html() -> None:
+    script = """
+    <script>
+      const params = new URLSearchParams(location.search);
+      const index = Number(params.get("slide") || "1") - 1;
+      document.addEventListener("DOMContentLoaded", () => {
+        const slides = [...document.querySelectorAll(".slide")];
+        slides.forEach((slide, i) => slide.style.display = i === index ? "block" : "none");
+      });
+    </script>
+    """
+    HTML.write_text(
+        f"""<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <title>Abyssrium Desk Dark Merged Report</title>
+  <style>{CSS}</style>
+  {script}
+</head>
+<body>{"".join(SLIDES)}</body>
+</html>
+""",
+        encoding="utf-8",
+    )
+
+
+def render_slides() -> list[Path]:
+    if not CHROME.exists():
+        raise FileNotFoundError(f"Chrome not found: {CHROME}")
+    slide_paths: list[Path] = []
+    for index in range(1, len(SLIDES) + 1):
+        out = OUT / f"slide_{index:02d}.png"
+        url = HTML.resolve().as_uri() + f"?slide={index}"
+        subprocess.run(
+            [
+                str(CHROME),
+                "--headless=new",
+                "--disable-gpu",
+                "--hide-scrollbars",
+                "--window-size=1920,1080",
+                f"--screenshot={out}",
+                url,
+            ],
+            check=True,
+        )
+        slide_paths.append(out)
+    return slide_paths
+
+
+def ps_quote(path: Path) -> str:
+    return "'" + str(path).replace("'", "''") + "'"
+
+
+def build_pptx(slide_paths: list[Path]) -> int:
+    ps_script = OUT / "build_pptx.ps1"
+    images = ",\n  ".join(ps_quote(path.resolve()) for path in slide_paths)
+    pptx = ps_quote(PPTX)
+    ps_script.write_text(
+        f"""
+$ErrorActionPreference = 'Stop'
+$images = @(
+  {images}
+)
+$out = {pptx}
+if (Test-Path -LiteralPath $out) {{
+  Remove-Item -LiteralPath $out -Force
+}}
+$ppt = New-Object -ComObject PowerPoint.Application
+$ppt.Visible = 1
+$pres = $ppt.Presentations.Add()
+$pres.PageSetup.SlideWidth = 960
+$pres.PageSetup.SlideHeight = 540
+foreach ($img in $images) {{
+  $slide = $pres.Slides.Add($pres.Slides.Count + 1, 12)
+  $slide.Shapes.AddPicture($img, 0, -1, 0, 0, 960, 540) | Out-Null
+}}
+$pres.SaveAs($out, 24)
+$pres.Close()
+$verify = $ppt.Presentations.Open($out, 0, 0, 0)
+$count = $verify.Slides.Count
+$verify.Close()
+$ppt.Quit()
+[GC]::Collect()
+[GC]::WaitForPendingFinalizers()
+Write-Output "SlideCount=$count"
+""",
+        encoding="utf-8-sig",
+    )
+    result = subprocess.run(
+        ["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", str(ps_script)],
+        check=True,
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+    )
+    for line in result.stdout.splitlines():
+        if line.startswith("SlideCount="):
+            return int(line.split("=", 1)[1])
+    raise RuntimeError("PowerPoint verification did not return SlideCount")
+
+
+def main() -> None:
+    write_html()
+    slides = render_slides()
+    verified = build_pptx(slides)
+    print(f"slides_rendered={len(slides)}")
+    print(f"slides_verified={verified}")
+    print(f"html={HTML}")
+    print(f"pptx={PPTX}")
+
+
+if __name__ == "__main__":
+    main()
