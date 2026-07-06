@@ -24,7 +24,7 @@ interface FishEntity {
   scale: number;
   phase: number;
   beatHz: number;
-  tailBend: number;
+  waveStrength: number;
   direction: 1 | -1;
 }
 
@@ -117,10 +117,10 @@ export class TaskbarReefRenderer {
 
   private seedFish(): void {
     this.fish.push(
-      { spriteIndex: 0, x: 0.1, lane: 0.46, speed: 0.02, scale: 0.72, phase: 0, beatHz: 1.9, tailBend: 0.38, direction: 1 },
-      { spriteIndex: 1, x: 0.72, lane: 0.58, speed: 0.017, scale: 0.62, phase: 1.8, beatHz: 2.15, tailBend: 0.42, direction: -1 },
-      { spriteIndex: 2, x: 0.42, lane: 0.38, speed: 0.014, scale: 0.54, phase: 3.2, beatHz: 1.65, tailBend: 0.34, direction: 1 },
-      { spriteIndex: 5, x: 0.84, lane: 0.66, speed: 0.011, scale: 0.86, phase: 4.8, beatHz: 1.25, tailBend: 0.26, direction: -1 }
+      { spriteIndex: 0, x: 0.1, lane: 0.46, speed: 0.02, scale: 0.72, phase: 0, beatHz: 1.7, waveStrength: 0.34, direction: 1 },
+      { spriteIndex: 1, x: 0.72, lane: 0.58, speed: 0.017, scale: 0.62, phase: 1.8, beatHz: 1.95, waveStrength: 0.38, direction: -1 },
+      { spriteIndex: 2, x: 0.42, lane: 0.38, speed: 0.014, scale: 0.54, phase: 3.2, beatHz: 1.45, waveStrength: 0.3, direction: 1 },
+      { spriteIndex: 5, x: 0.84, lane: 0.66, speed: 0.011, scale: 0.86, phase: 4.8, beatHz: 1.12, waveStrength: 0.22, direction: -1 }
     );
   }
 
@@ -132,7 +132,8 @@ export class TaskbarReefRenderer {
       const phaseAdvance =
         deltaSeconds * fish.beatHz * Math.PI * 2 * (0.82 + state.bubblePressure * 0.42);
       fish.phase = (fish.phase + phaseAdvance) % (Math.PI * 2);
-      const strokePush = 0.72 + Math.max(0, Math.sin(fish.phase)) * 0.58;
+      const stroke = (Math.sin(fish.phase) + 1) * 0.5;
+      const strokePush = 0.74 + Math.pow(stroke, 1.7) * 0.54;
       fish.x += fish.speed * speedMultiplier * strokePush * deltaSeconds * fish.direction;
 
       if (fish.direction === 1 && fish.x > 1.14) {
@@ -259,56 +260,59 @@ export class TaskbarReefRenderer {
   ): void {
     const left = -drawWidth / 2;
     const top = -drawHeight / 2;
-    const split = 0.66;
-    const overlap = 0.05;
-    const wave = Math.sin(fish.phase);
-    const counterWave = Math.sin(fish.phase + Math.PI * 0.5);
-    const bodyLean = counterWave * 0.035;
-    const bodyStretch = 1 + Math.abs(wave) * 0.018;
-    const tailAngle = wave * fish.tailBend;
-    const tailPivotX = left + drawWidth * split;
-    const tailSourceX = sourceX + sourceWidth * (split - overlap);
-    const tailSourceWidth = sourceWidth * (1 - split + overlap);
-    const tailDestX = left + drawWidth * (split - overlap);
-    const tailDestWidth = drawWidth * (1 - split + overlap);
-    const bodySourceWidth = sourceWidth * (split + overlap);
-    const bodyDestWidth = drawWidth * (split + overlap);
+    const sliceCount = 18;
+    const sourceStep = sourceWidth / sliceCount;
+    const destStep = drawWidth / sliceCount;
+    const sourceOverlap = sourceStep * 0.22;
+    const destOverlap = Math.max(0.75, destStep * 0.22);
+    const waveTravel = Math.PI * 1.55;
+    const tailAmplitude = drawHeight * fish.waveStrength * 0.18;
+    const bodyLean = Math.sin(fish.phase + Math.PI * 0.42) * 0.022;
+    const bodyBreath = 1 + Math.sin(fish.phase * 2) * 0.006;
 
-    // Unity port note: static concept art is animated here by separating the
-    // caudal area from the body. In Unity this maps cleanly to a two-bone
-    // sprite rig or a simple shader/skeleton tail sway.
+    // Unity port note: static concept art is animated here as a segmented
+    // body-wave. Port this as a sprite mesh/spline deformation, with low
+    // weight at the head and stronger offsets through the caudal area.
     ctx.save();
     ctx.rotate(bodyLean);
-    ctx.scale(bodyStretch, 1 - Math.abs(wave) * 0.012);
+    ctx.scale(bodyBreath, 1);
 
-    ctx.save();
-    ctx.translate(tailPivotX, 0);
-    ctx.rotate(tailAngle);
-    ctx.scale(1 + Math.abs(wave) * 0.035, 1 + Math.abs(wave) * 0.08);
-    ctx.drawImage(
-      this.fishImage,
-      tailSourceX,
-      sourceY,
-      tailSourceWidth,
-      sourceHeight,
-      tailDestX - tailPivotX,
-      top,
-      tailDestWidth,
-      drawHeight
-    );
-    ctx.restore();
+    for (let index = 0; index < sliceCount; index += 1) {
+      const segment = index / (sliceCount - 1);
+      const sourceSliceX = sourceX + Math.max(0, index * sourceStep - sourceOverlap);
+      const sourceSliceRight = sourceX + Math.min(sourceWidth, (index + 1) * sourceStep + sourceOverlap);
+      const sourceSliceWidth = sourceSliceRight - sourceSliceX;
+      const destSliceX = left + index * destStep - destOverlap;
+      const destSliceWidth = destStep + destOverlap * 2;
+      const tailWeight = smoothStep(0.1, 1, segment);
+      const tailTipWeight = smoothStep(0.68, 1, segment);
+      const bodyWeight = smoothStep(0, 0.78, segment);
+      const wave = Math.sin(fish.phase - segment * waveTravel);
+      const tailFlick = Math.sin(fish.phase * 1.85 - segment * Math.PI * 2.35);
+      const crossWave = Math.sin(fish.phase - segment * waveTravel + Math.PI * 0.5);
+      const offsetY = tailAmplitude * (wave * tailWeight + tailFlick * 0.22 * tailTipWeight);
+      const stretchY = 1 + Math.abs(crossWave) * 0.026 * bodyWeight;
+      const squashX = 1 - Math.abs(crossWave) * 0.018 * bodyWeight;
+      const sliceLean = crossWave * 0.032 * bodyWeight;
 
-    ctx.drawImage(
-      this.fishImage,
-      sourceX,
-      sourceY,
-      bodySourceWidth,
-      sourceHeight,
-      left,
-      top,
-      bodyDestWidth,
-      drawHeight
-    );
+      ctx.save();
+      ctx.translate(destSliceX + destSliceWidth / 2, offsetY);
+      ctx.rotate(sliceLean);
+      ctx.scale(squashX, stretchY);
+      ctx.drawImage(
+        this.fishImage,
+        sourceSliceX,
+        sourceY,
+        sourceSliceWidth,
+        sourceHeight,
+        -destSliceWidth / 2,
+        top,
+        destSliceWidth,
+        drawHeight
+      );
+      ctx.restore();
+    }
+
     ctx.restore();
   }
 
@@ -379,6 +383,11 @@ const createBubble = (x: number, y: number, energy: number): BubbleParticle => (
   life: 1.2 + Math.random() * 1.4,
   alpha: 0.45 + Math.random() * 0.42
 });
+
+const smoothStep = (edge0: number, edge1: number, value: number): number => {
+  const t = Math.min(1, Math.max(0, (value - edge0) / (edge1 - edge0)));
+  return t * t * (3 - 2 * t);
+};
 
 const removeDead = <T extends { age: number; life: number }>(items: T[]): void => {
   for (let index = items.length - 1; index >= 0; index -= 1) {
