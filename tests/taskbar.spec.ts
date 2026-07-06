@@ -5,6 +5,7 @@ test("taskbar reef renders and reacts to input", async ({ page }) => {
   const reef = page.locator(".reef-dock");
   await expect(reef).toBeVisible();
   await expect(reef).toHaveAttribute("data-mode", "compact");
+  await expect(reef).toHaveText("");
 
   const compactBox = await reef.boundingBox();
   expect(compactBox?.height).toBeGreaterThanOrEqual(54);

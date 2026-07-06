@@ -178,7 +178,7 @@ export class TaskbarReefRenderer {
       const drawHeight = imageHeight * scale;
       const drift = Math.sin(time * 0.08 + state.tide * Math.PI * 2) * 22;
       const dx = (this.width - drawWidth) * 0.5 + drift;
-      const compactAnchor = this.height - drawHeight + 78;
+      const compactAnchor = this.height - drawHeight + 258;
       const expandedAnchor = this.height - drawHeight * 0.82;
       const dy = state.mode === "compact" ? compactAnchor : expandedAnchor;
       ctx.drawImage(this.reefImage, dx, dy, drawWidth, drawHeight);
