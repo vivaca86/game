@@ -85,3 +85,18 @@ test("input bubbles originate from the lower reef in both modes", async ({ page 
   expect(expandedBoxAfterInput?.width).toBeCloseTo(expandedBox?.width ?? 0, 0);
   expect(expandedBoxAfterInput?.height).toBeCloseTo(expandedBox?.height ?? 0, 0);
 });
+
+test("desktop surface renders only the reef overlay", async ({ page }) => {
+  await page.setViewportSize({ width: 1408, height: 56 });
+  await page.goto("/?surface=desktop");
+
+  const reef = page.locator(".reef-dock");
+  await expect(reef).toBeVisible();
+  await expect(page.locator(".work-window, .windows-taskbar")).toHaveCount(0);
+
+  const box = await reef.boundingBox();
+  expect(box?.x).toBeCloseTo(0, 0);
+  expect(box?.y).toBeCloseTo(0, 0);
+  expect(box?.width).toBeCloseTo(1408, 0);
+  expect(box?.height).toBeCloseTo(56, 0);
+});

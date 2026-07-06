@@ -5,14 +5,19 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host 127.0.0.1",
+    "desktop:dev": "node desktop/launch-dev.cjs",
+    "desktop:electron": "electron desktop/main.cjs",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview --host 127.0.0.1",
     "test:smoke": "playwright test"
   },
-  "dependencies": {},
   "devDependencies": {
     "@playwright/test": "^1.60.0",
+    "electron": "^43.0.0",
     "typescript": "^6.0.3",
     "vite": "^8.0.14"
+  },
+  "dependencies": {
+    "uiohook-napi": "^1.5.5"
   }
 }

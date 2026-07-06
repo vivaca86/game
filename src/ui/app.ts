@@ -10,6 +10,17 @@ import {
 
 declare global {
   interface Window {
+    abyssriumDesktop?: {
+      setMode: (mode: ReefMode) => void;
+      onGlobalInput: (
+        callback: (payload: {
+          kind: "keyboard" | "pointerMove" | "pointerTap";
+          intensity: number;
+          xRatio?: number;
+          keycode?: number;
+        }) => void
+      ) => () => void;
+    };
     __abyssriumDeskDebug?: {
       getMode: () => ReefMode;
       setMode: (mode: ReefMode) => void;
@@ -24,9 +35,10 @@ export const bootAbyssriumDesk = (): void => {
   }
 
   const state = createInitialReefState();
-
-  root.innerHTML = `
-    <main class="desktop" aria-label="Abyssrium Desk prototype">
+  const surface = getSurfaceMode();
+  const browserMockMarkup =
+    surface === "browser"
+      ? `
       <section class="work-window work-window--document" aria-label="work document mock">
         <div class="window-bar">
           <span></span><span></span><span></span>
@@ -43,17 +55,32 @@ export const bootAbyssriumDesk = (): void => {
         <div class="chart-line"></div>
         <div class="chart-bars"><span></span><span></span><span></span><span></span></div>
       </section>
-
-      <section class="reef-dock" data-mode="compact" aria-label="Abyssrium reef taskbar">
-        <canvas class="reef-canvas" aria-hidden="true"></canvas>
-      </section>
-
+      `
+      : "";
+  const taskbarMockMarkup =
+    surface === "browser"
+      ? `
       <nav class="windows-taskbar" aria-label="desktop taskbar mock">
         <span class="start-dot"></span>
         <span class="task-pill"></span>
         <span class="task-pill task-pill--wide"></span>
         <span class="task-clock">18:42</span>
       </nav>
+      `
+      : "";
+
+  document.documentElement.dataset.surface = surface;
+  root.dataset.surface = surface;
+
+  root.innerHTML = `
+    <main class="desktop ${surface === "desktop" ? "desktop--overlay" : ""}" aria-label="Abyssrium Desk prototype">
+      ${browserMockMarkup}
+
+      <section class="reef-dock" data-mode="compact" aria-label="Abyssrium reef taskbar">
+        <canvas class="reef-canvas" aria-hidden="true"></canvas>
+      </section>
+
+      ${taskbarMockMarkup}
     </main>
   `;
 
@@ -74,6 +101,7 @@ export const bootAbyssriumDesk = (): void => {
   const applyMode = (mode: ReefMode): void => {
     setReefMode(state, mode);
     renderState();
+    window.abyssriumDesktop?.setMode(mode);
     requestAnimationFrame(() => renderer.resize());
     window.setTimeout(() => renderer.resize(), 60);
     window.setTimeout(() => renderer.resize(), 220);
@@ -117,4 +145,11 @@ export const bootAbyssriumDesk = (): void => {
 
   renderState();
   renderer.start();
+};
+
+const getSurfaceMode = (): "browser" | "desktop" => {
+  const params = new URLSearchParams(window.location.search);
+  return params.get("surface") === "desktop" || window.abyssriumDesktop
+    ? "desktop"
+    : "browser";
 };

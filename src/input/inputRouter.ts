@@ -24,14 +24,15 @@ export const connectInputRouter = ({
   const dispatch = (
     kind: "keyboard" | "pointerMove" | "pointerTap" | "capture",
     event?: KeyboardEvent | PointerEvent,
-    intensity = 1
+    intensity = 1,
+    xRatio?: number
   ): void => {
     const rect = reefElement.getBoundingClientRect();
     const pointerEvent = event instanceof PointerEvent ? event : undefined;
     const screenX = pointerEvent
       ? clamp(pointerEvent.clientX / Math.max(1, window.innerWidth), 0, 1)
-      : 0.5;
-    const x = pointerEvent ? screenX * rect.width : undefined;
+      : xRatio ?? 0.5;
+    const x = pointerEvent || xRatio !== undefined ? screenX * rect.width : undefined;
     const y = rect.height * getBubbleSourceRatio(state.mode);
     const action = {
       kind,
@@ -84,13 +85,23 @@ export const connectInputRouter = ({
     dispatch("pointerTap", undefined, 0.75);
   };
 
-  window.addEventListener("keydown", handleKeyDown);
+  const removeDesktopInputListener = window.abyssriumDesktop?.onGlobalInput((payload) => {
+    dispatch(payload.kind, undefined, payload.intensity, payload.xRatio);
+  });
+  const shouldUseLocalKeyboard = !window.abyssriumDesktop;
+
+  if (shouldUseLocalKeyboard) {
+    window.addEventListener("keydown", handleKeyDown);
+  }
   window.addEventListener("pointermove", handlePointerMove);
   window.addEventListener("pointerdown", handlePointerDown);
   window.addEventListener("wheel", handleWheel, { passive: true });
 
   return () => {
-    window.removeEventListener("keydown", handleKeyDown);
+    if (shouldUseLocalKeyboard) {
+      window.removeEventListener("keydown", handleKeyDown);
+    }
+    removeDesktopInputListener?.();
     window.removeEventListener("pointermove", handlePointerMove);
     window.removeEventListener("pointerdown", handlePointerDown);
     window.removeEventListener("wheel", handleWheel);
