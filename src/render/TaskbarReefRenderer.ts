@@ -16,14 +16,6 @@ interface BubbleParticle {
   alpha: number;
 }
 
-interface RippleParticle {
-  x: number;
-  y: number;
-  radius: number;
-  age: number;
-  life: number;
-}
-
 interface FishEntity {
   spriteIndex: number;
   x: number;
@@ -47,7 +39,6 @@ export class TaskbarReefRenderer {
   private readonly reefImage = new Image();
   private readonly fishImage = new Image();
   private readonly bubbles: BubbleParticle[] = [];
-  private readonly ripples: RippleParticle[] = [];
   private readonly fish: FishEntity[] = [];
   private animationFrame = 0;
   private lastFrame = performance.now();
@@ -104,13 +95,11 @@ export class TaskbarReefRenderer {
 
     if (action.kind === "pointerMove") {
       this.spawnBubbleStream(x, y, 1 + action.intensity * 2);
-      this.spawnRipple(x, y);
       return;
     }
 
     if (action.kind === "pointerTap" || action.kind === "capture") {
       this.spawnBubbleBurst(x, y, 14 + Math.floor(action.intensity * 10));
-      this.spawnRipple(x, y, 1.35);
       return;
     }
 
@@ -154,13 +143,7 @@ export class TaskbarReefRenderer {
       bubble.x += Math.sin(bubble.age * 8 + bubble.drift) * 9 * deltaSeconds;
     }
 
-    for (const ripple of this.ripples) {
-      ripple.age += deltaSeconds;
-      ripple.radius += 46 * deltaSeconds;
-    }
-
     removeDead(this.bubbles);
-    removeDead(this.ripples);
   }
 
   private draw(time: number): void {
@@ -169,7 +152,6 @@ export class TaskbarReefRenderer {
     ctx.clearRect(0, 0, this.width, this.height);
 
     this.drawBackground(ctx, state);
-    this.drawRipples(ctx);
     this.drawFish(ctx, state, time);
     this.drawBubbles(ctx, state);
     this.drawGlass(ctx, state);
@@ -287,20 +269,6 @@ export class TaskbarReefRenderer {
     }
   }
 
-  private drawRipples(ctx: CanvasRenderingContext2D): void {
-    for (const ripple of this.ripples) {
-      const t = ripple.age / ripple.life;
-      ctx.save();
-      ctx.globalAlpha = 0.5 * (1 - t);
-      ctx.strokeStyle = "rgba(142, 241, 255, 0.8)";
-      ctx.lineWidth = 1.2;
-      ctx.beginPath();
-      ctx.ellipse(ripple.x, ripple.y, ripple.radius * 1.8, ripple.radius * 0.32, 0, 0, Math.PI * 2);
-      ctx.stroke();
-      ctx.restore();
-    }
-  }
-
   private drawGlass(ctx: CanvasRenderingContext2D, state: ReefState): void {
     const sheen = ctx.createLinearGradient(0, 0, 0, this.height);
     sheen.addColorStop(0, `rgba(210, 252, 255, ${0.05 + state.glow * 0.05})`);
@@ -327,16 +295,6 @@ export class TaskbarReefRenderer {
       const spreadY = -Math.random() * upwardSpread;
       this.bubbles.push(createBubble(x + spreadX, y + spreadY, 1.15));
     }
-  }
-
-  private spawnRipple(x: number, y: number, scale = 1): void {
-    this.ripples.push({
-      x,
-      y,
-      radius: 8 * scale,
-      age: 0,
-      life: 0.72
-    });
   }
 }
 
