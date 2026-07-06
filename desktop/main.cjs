@@ -1,4 +1,12 @@
-const { app, BrowserWindow, ipcMain, screen } = require("electron");
+const {
+  app,
+  BrowserWindow,
+  ipcMain,
+  Menu,
+  nativeImage,
+  screen,
+  Tray
+} = require("electron");
 const path = require("node:path");
 
 const WINDOW = {
@@ -12,6 +20,7 @@ let reefWindow;
 let currentMode = "compact";
 let inputHook;
 let lastMouseMoveAt = 0;
+let tray;
 
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
 
@@ -67,6 +76,70 @@ const setMode = (mode) => {
   if (reefWindow && !reefWindow.isDestroyed()) {
     reefWindow.setBounds(getOverlayBounds(mode), true);
   }
+  updateTrayMenu();
+};
+
+const createTrayImage = () => {
+  const size = 16;
+  const bitmap = Buffer.alloc(size * size * 4);
+  const center = (size - 1) / 2;
+
+  for (let y = 0; y < size; y += 1) {
+    for (let x = 0; x < size; x += 1) {
+      const index = (y * size + x) * 4;
+      const dx = x - center;
+      const dy = y - center;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+      const inside = distance <= 7.2;
+      const edge = distance > 6.1;
+
+      bitmap[index] = inside ? 222 : 0;
+      bitmap[index + 1] = inside ? (edge ? 245 : 205) : 0;
+      bitmap[index + 2] = inside ? (edge ? 255 : 79) : 0;
+      bitmap[index + 3] = inside ? 255 : 0;
+    }
+  }
+
+  return nativeImage.createFromBitmap(bitmap, {
+    width: size,
+    height: size,
+    scaleFactor: 1
+  });
+};
+
+const updateTrayMenu = () => {
+  if (!tray) {
+    return;
+  }
+
+  tray.setContextMenu(
+    Menu.buildFromTemplate([
+      { label: "Abyssrium Desk", enabled: false },
+      { type: "separator" },
+      {
+        label: currentMode === "compact" ? "펼치기" : "접기",
+        click: () => setMode(currentMode === "compact" ? "expanded" : "compact")
+      },
+      {
+        label: "위치 다시 맞추기",
+        click: () => setMode(currentMode)
+      },
+      { type: "separator" },
+      {
+        label: "종료",
+        click: () => app.quit()
+      }
+    ])
+  );
+};
+
+const createTray = () => {
+  tray = new Tray(createTrayImage());
+  tray.setToolTip("Abyssrium Desk");
+  tray.on("click", () => {
+    setMode(currentMode === "compact" ? "expanded" : "compact");
+  });
+  updateTrayMenu();
 };
 
 const createWindow = async () => {
@@ -164,6 +237,7 @@ const startGlobalInput = () => {
 
 app.whenReady().then(async () => {
   await createWindow();
+  createTray();
   startGlobalInput();
   console.log("Abyssrium Desk desktop overlay is running.");
 

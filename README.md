@@ -16,6 +16,8 @@ Run as a real Windows desktop overlay:
 npm run desktop:dev
 ```
 
+Quit the desktop overlay from the system tray: right-click the Abyssrium Desk tray icon, then choose `종료`. The same menu also has `펼치기`, `접기`, and `위치 다시 맞추기`.
+
 Run the browser mock:
 
 ```powershell
