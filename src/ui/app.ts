@@ -2,6 +2,7 @@ import { connectInputRouter } from "../input/inputRouter";
 import { TaskbarReefRenderer } from "../render/TaskbarReefRenderer";
 import {
   createInitialReefState,
+  isReefModeToggleZone,
   setReefMode,
   type ReefMode,
   tickReefState
@@ -66,7 +67,16 @@ export const bootAbyssriumDesk = (): void => {
   const renderState = (): void => {
     root.toggleAttribute("data-expanded", state.mode === "expanded");
     reefDock.dataset.mode = state.mode;
+    reefDock.setAttribute("aria-expanded", String(state.mode === "expanded"));
     reefDock.style.setProperty("--reef-glow", state.glow.toFixed(3));
+  };
+
+  const applyMode = (mode: ReefMode): void => {
+    setReefMode(state, mode);
+    renderState();
+    requestAnimationFrame(() => renderer.resize());
+    window.setTimeout(() => renderer.resize(), 60);
+    window.setTimeout(() => renderer.resize(), 220);
   };
 
   const renderer = new TaskbarReefRenderer(canvas, () => state, (now, delta) => {
@@ -88,13 +98,22 @@ export const bootAbyssriumDesk = (): void => {
   if (import.meta.env.DEV) {
     window.__abyssriumDeskDebug = {
       getMode: () => state.mode,
-      setMode: (mode) => {
-        setReefMode(state, mode);
-        renderState();
-        window.setTimeout(() => renderer.resize(), 0);
-      }
+      setMode: applyMode
     };
   }
+
+  reefDock.addEventListener("click", (event) => {
+    const rect = reefDock.getBoundingClientRect();
+    const localY = event.clientY - rect.top;
+    if (!isReefModeToggleZone(state.mode, localY, rect.height)) {
+      return;
+    }
+
+    // Unity port note: compact reef click is the explicit open intent. In
+    // expanded mode only the top glass band closes, so ordinary taps can stay
+    // as reef reactions without fighting window state.
+    applyMode(state.mode === "compact" ? "expanded" : "compact");
+  });
 
   renderState();
   renderer.start();

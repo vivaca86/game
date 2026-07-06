@@ -48,6 +48,7 @@ export const reefTuning = {
   expandedHeightPx: 252,
   compactBubbleSourceRatio: 0.91,
   expandedBubbleSourceRatio: 0.92,
+  expandedCollapseHotZoneRatio: 0.18,
   keyboardBubbleGain: 0.18,
   pointerBubbleGain: 0.08,
   idleDecayPerSecond: 0.055,
@@ -89,6 +90,14 @@ export const getBubbleSourceRatio = (mode: ReefMode): number =>
   mode === "compact"
     ? reefTuning.compactBubbleSourceRatio
     : reefTuning.expandedBubbleSourceRatio;
+
+export const isReefModeToggleZone = (
+  mode: ReefMode,
+  localY: number,
+  height: number
+): boolean =>
+  mode === "compact" ||
+  localY <= height * reefTuning.expandedCollapseHotZoneRatio;
 
 export const applyInputAction = (
   state: ReefState,

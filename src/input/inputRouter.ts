@@ -2,6 +2,7 @@ import type { TaskbarReefRenderer } from "../render/TaskbarReefRenderer";
 import {
   applyInputAction,
   getBubbleSourceRatio,
+  isReefModeToggleZone,
   type ReefState
 } from "../simulation/reefState";
 
@@ -62,6 +63,20 @@ export const connectInputRouter = ({
   };
 
   const handlePointerDown = (event: PointerEvent): void => {
+    const rect = reefElement.getBoundingClientRect();
+    const insideReef =
+      event.clientX >= rect.left &&
+      event.clientX <= rect.right &&
+      event.clientY >= rect.top &&
+      event.clientY <= rect.bottom;
+
+    if (
+      insideReef &&
+      isReefModeToggleZone(state.mode, event.clientY - rect.top, rect.height)
+    ) {
+      return;
+    }
+
     dispatch("pointerTap", event, 1.15);
   };
 

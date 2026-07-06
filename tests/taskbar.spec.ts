@@ -1,5 +1,8 @@
 import { expect, test } from "@playwright/test";
-import { getBubbleSourceRatio } from "../src/simulation/reefState";
+import {
+  getBubbleSourceRatio,
+  reefTuning
+} from "../src/simulation/reefState";
 
 test("taskbar reef renders and reacts to input", async ({ page }) => {
   await page.goto("/");
@@ -35,24 +38,30 @@ test("taskbar reef renders and reacts to input", async ({ page }) => {
   expect(pixelSample).toBeGreaterThan(0);
 
   await reef.click();
+  await expect(reef).toHaveAttribute("data-mode", "expanded");
+  await expect
+    .poll(async () => Math.round((await reef.boundingBox())?.height ?? 0))
+    .toBe(252);
+
+  const expandedBox = await reef.boundingBox();
+  await page.mouse.click(expandedBox!.x + expandedBox!.width * 0.5, expandedBox!.y + expandedBox!.height * 0.72);
+  await expect(reef).toHaveAttribute("data-mode", "expanded");
+
+  await page.mouse.click(expandedBox!.x + expandedBox!.width * 0.5, expandedBox!.y + 10);
   await expect(reef).toHaveAttribute("data-mode", "compact");
-  const afterReefClickBox = await reef.boundingBox();
-  expect(afterReefClickBox?.x).toBeCloseTo(compactBox?.x ?? 0, 0);
-  expect(afterReefClickBox?.y).toBeCloseTo(compactBox?.y ?? 0, 0);
-  expect(afterReefClickBox?.width).toBeCloseTo(compactBox?.width ?? 0, 0);
-  expect(afterReefClickBox?.height).toBeCloseTo(compactBox?.height ?? 0, 0);
 });
 
 test("input bubbles originate from the lower reef in both modes", async ({ page }) => {
   expect(getBubbleSourceRatio("compact")).toBeGreaterThan(0.88);
   expect(getBubbleSourceRatio("expanded")).toBeGreaterThan(0.9);
+  expect(reefTuning.expandedCollapseHotZoneRatio).toBeLessThan(0.25);
 
   await page.goto("/");
   const reef = page.locator(".reef-dock");
   await expect(reef).toHaveAttribute("data-mode", "compact");
 
   await page.keyboard.press("A");
-  await page.mouse.click(720, 820);
+  await page.mouse.click(720, 520);
   const compactBox = await reef.boundingBox();
   await expect(reef).toHaveAttribute("data-mode", "compact");
 
@@ -61,12 +70,12 @@ test("input bubbles originate from the lower reef in both modes", async ({ page 
   });
   await expect(reef).toHaveAttribute("data-mode", "expanded");
   await expect
-    .poll(async () => (await reef.boundingBox())?.height ?? 0)
-    .toBeGreaterThan(180);
+    .poll(async () => Math.round((await reef.boundingBox())?.height ?? 0))
+    .toBe(252);
 
   const expandedBox = await reef.boundingBox();
   await page.keyboard.press("B");
-  await page.mouse.click(720, 620);
+  await page.mouse.click(720, expandedBox!.y + expandedBox!.height * 0.86);
   await expect(reef).toHaveAttribute("data-mode", "expanded");
   const expandedBoxAfterInput = await reef.boundingBox();
 
