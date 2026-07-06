@@ -89,6 +89,8 @@ export class TaskbarReefRenderer {
     this.canvas.width = Math.floor(this.width * dpr);
     this.canvas.height = Math.floor(this.height * dpr);
     this.context.setTransform(dpr, 0, 0, dpr, 0, 0);
+    this.context.imageSmoothingEnabled = true;
+    this.context.imageSmoothingQuality = "high";
   }
 
   pushInput(action: InputAction): void {
@@ -132,8 +134,7 @@ export class TaskbarReefRenderer {
       const phaseAdvance =
         deltaSeconds * fish.beatHz * Math.PI * 2 * (0.82 + state.bubblePressure * 0.42);
       fish.phase = (fish.phase + phaseAdvance) % (Math.PI * 2);
-      const stroke = (Math.sin(fish.phase) + 1) * 0.5;
-      const strokePush = 0.74 + Math.pow(stroke, 1.7) * 0.54;
+      const strokePush = 0.95 + Math.sin(fish.phase + Math.PI * 0.35) * 0.08;
       fish.x += fish.speed * speedMultiplier * strokePush * deltaSeconds * fish.direction;
 
       if (fish.direction === 1 && fish.x > 1.14) {
@@ -221,7 +222,8 @@ export class TaskbarReefRenderer {
     for (const fish of this.fish) {
       const col = fish.spriteIndex % columns;
       const row = Math.floor(fish.spriteIndex / columns);
-      const swimY = fish.lane + Math.sin(time * 1.05 + fish.phase * 0.18) * 0.026;
+      const swimY =
+        fish.lane + Math.sin(time * (0.72 + fish.beatHz * 0.08) + fish.spriteIndex * 1.21) * 0.02;
       const x = fish.x * this.width;
       const y = swimY * this.height;
       const drawHeight = baseSize * fish.scale;
@@ -260,13 +262,13 @@ export class TaskbarReefRenderer {
   ): void {
     const left = -drawWidth / 2;
     const top = -drawHeight / 2;
-    const sliceCount = 18;
+    const sliceCount = 28;
     const sourceStep = sourceWidth / sliceCount;
     const destStep = drawWidth / sliceCount;
-    const sourceOverlap = sourceStep * 0.22;
-    const destOverlap = Math.max(0.75, destStep * 0.22);
+    const sourceOverlap = sourceStep * 0.35;
+    const destOverlap = Math.max(0.85, destStep * 0.35);
     const waveTravel = Math.PI * 1.55;
-    const tailAmplitude = drawHeight * fish.waveStrength * 0.18;
+    const tailAmplitude = drawHeight * fish.waveStrength * 0.15;
     const bodyLean = Math.sin(fish.phase + Math.PI * 0.42) * 0.022;
     const bodyBreath = 1 + Math.sin(fish.phase * 2) * 0.006;
 
@@ -288,12 +290,12 @@ export class TaskbarReefRenderer {
       const tailTipWeight = smoothStep(0.68, 1, segment);
       const bodyWeight = smoothStep(0, 0.78, segment);
       const wave = Math.sin(fish.phase - segment * waveTravel);
-      const tailFlick = Math.sin(fish.phase * 1.85 - segment * Math.PI * 2.35);
+      const tailFlick = Math.sin(fish.phase * 2 - segment * Math.PI * 2.35);
       const crossWave = Math.sin(fish.phase - segment * waveTravel + Math.PI * 0.5);
-      const offsetY = tailAmplitude * (wave * tailWeight + tailFlick * 0.22 * tailTipWeight);
-      const stretchY = 1 + Math.abs(crossWave) * 0.026 * bodyWeight;
-      const squashX = 1 - Math.abs(crossWave) * 0.018 * bodyWeight;
-      const sliceLean = crossWave * 0.032 * bodyWeight;
+      const offsetY = tailAmplitude * (wave * tailWeight + tailFlick * 0.12 * tailTipWeight);
+      const stretchY = 1 + Math.abs(crossWave) * 0.018 * bodyWeight;
+      const squashX = 1 - Math.abs(crossWave) * 0.012 * bodyWeight;
+      const sliceLean = crossWave * 0.02 * bodyWeight;
 
       ctx.save();
       ctx.translate(destSliceX + destSliceWidth / 2, offsetY);
