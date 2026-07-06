@@ -3,10 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "main": "desktop/main.cjs",
   "scripts": {
     "dev": "vite --host 127.0.0.1",
     "desktop:dev": "node desktop/launch-dev.cjs",
     "desktop:electron": "electron desktop/main.cjs",
+    "desktop:pack": "npm run build && node desktop/package-win.cjs",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview --host 127.0.0.1",
     "test:smoke": "playwright test"

@@ -94,11 +94,15 @@ const createWindow = async () => {
   reefWindow.removeMenu();
 
   const url = process.env.ABYSSRIUM_DESK_URL;
-  if (!url) {
-    throw new Error("ABYSSRIUM_DESK_URL is required. Run npm run desktop:dev.");
+  if (url) {
+    await reefWindow.loadURL(url);
+    return;
   }
 
-  await reefWindow.loadURL(url);
+  await reefWindow.loadFile(
+    path.join(__dirname, "..", "dist", "index.html"),
+    { query: { surface: "desktop" } }
+  );
 };
 
 const startGlobalInput = () => {

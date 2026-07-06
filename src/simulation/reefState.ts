@@ -46,6 +46,7 @@ export interface ReefState {
 export const reefTuning = {
   compactHeightPx: 56,
   expandedHeightPx: 252,
+  compactCameraWidthPx: 640,
   compactBubbleSourceRatio: 0.91,
   expandedBubbleSourceRatio: 0.92,
   expandedCollapseHotZoneRatio: 0.18,

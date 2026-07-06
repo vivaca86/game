@@ -1,5 +1,6 @@
 import {
   getBubbleSourceRatio,
+  reefTuning,
   type InputAction,
   type ReefState
 } from "../simulation/reefState";
@@ -175,27 +176,32 @@ export class TaskbarReefRenderer {
     ctx: CanvasRenderingContext2D,
     state: ReefState
   ): void {
+    const fallback = ctx.createLinearGradient(0, 0, 0, this.height);
+    fallback.addColorStop(0, "#0e6f83");
+    fallback.addColorStop(1, "#061f2e");
+    ctx.fillStyle = fallback;
+    ctx.fillRect(0, 0, this.width, this.height);
+
     if (this.reefImage.complete && this.reefImage.naturalWidth > 0) {
       const imageWidth = this.reefImage.naturalWidth;
       const imageHeight = this.reefImage.naturalHeight;
-      const scale = Math.max(this.width / imageWidth, this.height / imageHeight);
+      const cameraWidth =
+        state.mode === "compact"
+          ? Math.min(this.width, reefTuning.compactCameraWidthPx)
+          : this.width;
+      const scale = Math.max(cameraWidth / imageWidth, this.height / imageHeight);
       const drawWidth = imageWidth * scale;
       const drawHeight = imageHeight * scale;
       const dx = (this.width - drawWidth) * 0.5;
       // The corallite face is the IP signal, so both compact and expanded
       // crops anchor to its approximate vertical center instead of the image
-      // top or seabed. Keep this camera anchor input-independent for Unity.
+      // top or seabed. Compact mode also caps the camera width so high-DPI or
+      // ultra-wide desktops do not crop the face differently from laptop widths.
       const coralliteFaceY = drawHeight * 0.4;
       const compactAnchor = this.height * 0.52 - coralliteFaceY;
       const expandedAnchor = this.height * 0.5 - coralliteFaceY;
       const dy = state.mode === "compact" ? compactAnchor : expandedAnchor;
       ctx.drawImage(this.reefImage, dx, dy, drawWidth, drawHeight);
-    } else {
-      const fallback = ctx.createLinearGradient(0, 0, 0, this.height);
-      fallback.addColorStop(0, "#0e6f83");
-      fallback.addColorStop(1, "#061f2e");
-      ctx.fillStyle = fallback;
-      ctx.fillRect(0, 0, this.width, this.height);
     }
 
     const shade = ctx.createLinearGradient(0, 0, 0, this.height);
