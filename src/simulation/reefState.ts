@@ -48,7 +48,7 @@ export const reefTuning = {
   expandedHeightPx: 252,
   compactCameraWidthPx: 640,
   compactBubbleSourceRatio: 0.91,
-  expandedBubbleSourceRatio: 0.92,
+  expandedBubbleSourceRatio: 1.03,
   expandedCollapseHotZoneRatio: 1,
   keyboardBubbleGain: 0.18,
   pointerBubbleGain: 0.08,

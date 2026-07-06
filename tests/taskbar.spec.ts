@@ -60,7 +60,7 @@ test("taskbar reef renders and reacts to input", async ({ page }) => {
 
 test("input bubbles originate from the lower reef in both modes", async ({ page }) => {
   expect(getBubbleSourceRatio("compact")).toBeGreaterThan(0.88);
-  expect(getBubbleSourceRatio("expanded")).toBeGreaterThan(0.9);
+  expect(getBubbleSourceRatio("expanded")).toBeGreaterThan(1);
   expect(reefTuning.compactCameraWidthPx).toBe(640);
   expect(reefTuning.expandedCollapseHotZoneRatio).toBe(1);
 

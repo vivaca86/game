@@ -220,7 +220,9 @@ export class TaskbarReefRenderer {
       const y = swimY * this.height;
       const drawHeight = baseSize * fish.scale;
       const drawWidth = drawHeight * (cellWidth / cellHeight);
-      const flip = fish.direction === -1 ? -1 : 1;
+      // Sprite-sheet fish face left by default; flip only when they swim right
+      // so Unity ports can keep movement direction and sprite facing decoupled.
+      const flip = fish.direction === 1 ? -1 : 1;
 
       ctx.save();
       ctx.translate(x, y);
@@ -289,7 +291,7 @@ export class TaskbarReefRenderer {
   }
 
   private spawnBubbleBurst(x: number, y: number, amount: number): void {
-    const upwardSpread = this.height * (this.getState().mode === "compact" ? 0.12 : 0.08);
+    const upwardSpread = this.height * (this.getState().mode === "compact" ? 0.12 : 0.03);
     for (let index = 0; index < amount; index += 1) {
       const spreadX = (Math.random() - 0.5) * this.width * 0.12;
       const spreadY = -Math.random() * upwardSpread;
