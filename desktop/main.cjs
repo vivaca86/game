@@ -22,8 +22,21 @@ let currentMode = "compact";
 let inputHook;
 let lastMouseMoveAt = 0;
 let tray;
+let manualBounds;
+let dragState;
 
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+
+const clampBoundsToDisplay = (bounds) => {
+  const display = screen.getDisplayMatching(bounds);
+  const { workArea } = display;
+
+  return {
+    ...bounds,
+    x: Math.round(clamp(bounds.x, workArea.x, workArea.x + workArea.width - bounds.width)),
+    y: Math.round(clamp(bounds.y, workArea.y, workArea.y + workArea.height - bounds.height))
+  };
+};
 
 const getOverlayBounds = (mode = currentMode) => {
   const display = screen.getPrimaryDisplay();
@@ -34,13 +47,23 @@ const getOverlayBounds = (mode = currentMode) => {
     mode === "expanded"
       ? fullWidth
       : Math.min(WINDOW.compactWidth, fullWidth);
-  const x =
-    mode === "expanded"
-      ? workArea.x + WINDOW.horizontalMargin
-      : Math.round(workArea.x + (workArea.width - width) * 0.5);
+
+  if (manualBounds) {
+    const centerX = manualBounds.x + manualBounds.width * 0.5;
+    const bottomY = manualBounds.y + manualBounds.height;
+    return clampBoundsToDisplay({
+      x: Math.round(centerX - width * 0.5),
+      y: Math.round(bottomY - height),
+      width,
+      height
+    });
+  }
 
   return {
-    x,
+    x:
+      mode === "expanded"
+        ? workArea.x + WINDOW.horizontalMargin
+        : Math.round(workArea.x + (workArea.width - width) * 0.5),
     y: workArea.y + workArea.height - height - WINDOW.bottomGap,
     width,
     height
@@ -81,9 +104,18 @@ const setMode = (mode) => {
 
   currentMode = mode;
   if (reefWindow && !reefWindow.isDestroyed()) {
-    reefWindow.setBounds(getOverlayBounds(mode), true);
+    const bounds = getOverlayBounds(mode);
+    reefWindow.setBounds(bounds, true);
+    if (manualBounds) {
+      manualBounds = bounds;
+    }
   }
   updateTrayMenu();
+};
+
+const resetPosition = () => {
+  manualBounds = undefined;
+  setMode(currentMode);
 };
 
 const createTrayImage = () => {
@@ -129,7 +161,7 @@ const updateTrayMenu = () => {
       },
       {
         label: "위치 다시 맞추기",
-        click: () => setMode(currentMode)
+        click: resetPosition
       },
       { type: "separator" },
       {
@@ -155,7 +187,7 @@ const createWindow = async () => {
     frame: false,
     transparent: true,
     resizable: false,
-    movable: false,
+    movable: true,
     minimizable: false,
     maximizable: false,
     hasShadow: false,
@@ -252,7 +284,40 @@ app.whenReady().then(async () => {
     setMode(mode);
   });
 
-  screen.on("display-metrics-changed", () => setMode(currentMode));
+  ipcMain.on("reef:drag-start", (_event, point) => {
+    if (!reefWindow || reefWindow.isDestroyed()) {
+      return;
+    }
+
+    dragState = {
+      startX: point.x,
+      startY: point.y,
+      bounds: reefWindow.getBounds()
+    };
+  });
+
+  ipcMain.on("reef:drag-move", (_event, point) => {
+    if (!reefWindow || reefWindow.isDestroyed() || !dragState) {
+      return;
+    }
+
+    const nextBounds = clampBoundsToDisplay({
+      ...dragState.bounds,
+      x: dragState.bounds.x + point.x - dragState.startX,
+      y: dragState.bounds.y + point.y - dragState.startY
+    });
+    reefWindow.setBounds(nextBounds, false);
+    manualBounds = nextBounds;
+  });
+
+  ipcMain.on("reef:drag-end", () => {
+    if (reefWindow && !reefWindow.isDestroyed()) {
+      manualBounds = reefWindow.getBounds();
+    }
+    dragState = undefined;
+  });
+
+  screen.on("display-metrics-changed", resetPosition);
 
   const exitAfterMs = Number(process.env.ABYSSRIUM_DESK_EXIT_AFTER_MS || 0);
   if (exitAfterMs > 0) {

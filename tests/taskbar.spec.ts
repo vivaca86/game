@@ -101,6 +101,7 @@ test("desktop surface renders only the reef overlay", async ({ page }) => {
   const reef = page.locator(".reef-dock");
   await expect(reef).toBeVisible();
   await expect(page.locator(".work-window, .windows-taskbar")).toHaveCount(0);
+  await expect(reef).toHaveCSS("border-radius", "0px");
 
   const box = await reef.boundingBox();
   expect(box?.x).toBeCloseTo(0, 0);

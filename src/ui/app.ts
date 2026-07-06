@@ -12,6 +12,9 @@ declare global {
   interface Window {
     abyssriumDesktop?: {
       setMode: (mode: ReefMode) => void;
+      startDrag: (point: { x: number; y: number }) => void;
+      moveDrag: (point: { x: number; y: number }) => void;
+      endDrag: () => void;
       onGlobalInput: (
         callback: (payload: {
           kind: "keyboard" | "pointerMove" | "pointerTap";
@@ -130,7 +133,84 @@ export const bootAbyssriumDesk = (): void => {
     };
   }
 
+  let dragStart:
+    | {
+        x: number;
+        y: number;
+        screenX: number;
+        screenY: number;
+        active: boolean;
+      }
+    | undefined;
+  let suppressNextClick = false;
+  const dragThresholdPx = 6;
+
+  reefDock.addEventListener("pointerdown", (event) => {
+    if (!window.abyssriumDesktop || event.button !== 0) {
+      return;
+    }
+
+    dragStart = {
+      x: event.clientX,
+      y: event.clientY,
+      screenX: event.screenX,
+      screenY: event.screenY,
+      active: false
+    };
+    reefDock.setPointerCapture(event.pointerId);
+  });
+
+  reefDock.addEventListener("pointermove", (event) => {
+    if (!window.abyssriumDesktop || !dragStart) {
+      return;
+    }
+
+    const dx = event.clientX - dragStart.x;
+    const dy = event.clientY - dragStart.y;
+    if (!dragStart.active && Math.hypot(dx, dy) < dragThresholdPx) {
+      return;
+    }
+
+    if (!dragStart.active) {
+      dragStart.active = true;
+      suppressNextClick = true;
+      window.abyssriumDesktop.startDrag({
+        x: dragStart.screenX,
+        y: dragStart.screenY
+      });
+    }
+
+    window.abyssriumDesktop.moveDrag({
+      x: event.screenX,
+      y: event.screenY
+    });
+  });
+
+  const finishDrag = (event: PointerEvent): void => {
+    if (!window.abyssriumDesktop || !dragStart) {
+      return;
+    }
+
+    if (dragStart.active) {
+      window.abyssriumDesktop.endDrag();
+      suppressNextClick = true;
+    }
+
+    dragStart = undefined;
+    if (reefDock.hasPointerCapture(event.pointerId)) {
+      reefDock.releasePointerCapture(event.pointerId);
+    }
+  };
+
+  reefDock.addEventListener("pointerup", finishDrag);
+  reefDock.addEventListener("pointercancel", finishDrag);
+
   reefDock.addEventListener("click", (event) => {
+    if (suppressNextClick) {
+      suppressNextClick = false;
+      return;
+    }
+
     const rect = reefDock.getBoundingClientRect();
     const localY = event.clientY - rect.top;
     if (!isReefModeToggleZone(state.mode, localY, rect.height)) {

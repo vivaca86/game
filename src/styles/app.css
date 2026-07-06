@@ -245,6 +245,8 @@ button {
   inset: 0;
   width: auto;
   height: 100%;
+  border: 0;
+  border-radius: 0;
   transform: none;
 }
 

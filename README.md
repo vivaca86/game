@@ -18,6 +18,8 @@ npm run desktop:dev
 
 Quit the desktop overlay from the system tray: right-click the Abyssrium Desk tray icon, then choose `종료`. The same menu also has `펼치기`, `접기`, and `위치 다시 맞추기`.
 
+Drag the reef itself to move the desktop overlay. A short click still opens or closes it; moving past a small threshold becomes a drag instead.
+
 Run the browser mock:
 
 ```powershell
