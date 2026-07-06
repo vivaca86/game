@@ -1,0 +1,7 @@
+node_modules/
+dist/
+.vite/
+.codex_scratch/
+test-results/
+playwright-report/
+*.log

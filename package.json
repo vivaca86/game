@@ -1,0 +1,21 @@
+{
+  "name": "abyssrium-desk-taskbar-prototype",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview --host 127.0.0.1",
+    "test:smoke": "playwright test"
+  },
+  "dependencies": {
+    "lucide": "^0.468.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.60.0",
+    "typescript": "^6.0.3",
+    "vite": "^8.0.14"
+  }
+}
+
