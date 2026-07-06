@@ -46,9 +46,15 @@ test("taskbar reef renders and reacts to input", async ({ page }) => {
 
   const expandedBox = await reef.boundingBox();
   await page.mouse.click(expandedBox!.x + expandedBox!.width * 0.5, expandedBox!.y + expandedBox!.height * 0.72);
-  await expect(reef).toHaveAttribute("data-mode", "expanded");
+  await expect(reef).toHaveAttribute("data-mode", "compact");
 
-  await page.mouse.click(expandedBox!.x + expandedBox!.width * 0.5, expandedBox!.y + 10);
+  await reef.click();
+  await expect(reef).toHaveAttribute("data-mode", "expanded");
+  await expect
+    .poll(async () => Math.round((await reef.boundingBox())?.height ?? 0))
+    .toBe(252);
+  const expandedBoxAgain = await reef.boundingBox();
+  await page.mouse.click(expandedBoxAgain!.x + expandedBoxAgain!.width * 0.5, expandedBoxAgain!.y + 10);
   await expect(reef).toHaveAttribute("data-mode", "compact");
 });
 
@@ -56,7 +62,7 @@ test("input bubbles originate from the lower reef in both modes", async ({ page 
   expect(getBubbleSourceRatio("compact")).toBeGreaterThan(0.88);
   expect(getBubbleSourceRatio("expanded")).toBeGreaterThan(0.9);
   expect(reefTuning.compactCameraWidthPx).toBe(640);
-  expect(reefTuning.expandedCollapseHotZoneRatio).toBeLessThan(0.25);
+  expect(reefTuning.expandedCollapseHotZoneRatio).toBe(1);
 
   await page.goto("/");
   const reef = page.locator(".reef-dock");
@@ -77,7 +83,7 @@ test("input bubbles originate from the lower reef in both modes", async ({ page 
 
   const expandedBox = await reef.boundingBox();
   await page.keyboard.press("B");
-  await page.mouse.click(720, expandedBox!.y + expandedBox!.height * 0.86);
+  await page.mouse.click(720, expandedBox!.y - 20);
   await expect(reef).toHaveAttribute("data-mode", "expanded");
   const expandedBoxAfterInput = await reef.boundingBox();
 

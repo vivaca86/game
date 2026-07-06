@@ -137,9 +137,9 @@ export const bootAbyssriumDesk = (): void => {
       return;
     }
 
-    // Unity port note: compact reef click is the explicit open intent. In
-    // expanded mode only the top glass band closes, so ordinary taps can stay
-    // as reef reactions without fighting window state.
+    // Unity port note: compact reef click opens and expanded reef click closes.
+    // Keeping this symmetric makes the desktop overlay usable without visible
+    // chrome while global input still drives ambient reef reactions.
     applyMode(state.mode === "compact" ? "expanded" : "compact");
   });
 
