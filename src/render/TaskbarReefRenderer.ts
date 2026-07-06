@@ -23,6 +23,8 @@ interface FishEntity {
   speed: number;
   scale: number;
   phase: number;
+  beatHz: number;
+  tailBend: number;
   direction: 1 | -1;
 }
 
@@ -115,10 +117,10 @@ export class TaskbarReefRenderer {
 
   private seedFish(): void {
     this.fish.push(
-      { spriteIndex: 0, x: 0.1, lane: 0.46, speed: 0.018, scale: 0.72, phase: 0, direction: 1 },
-      { spriteIndex: 1, x: 0.72, lane: 0.58, speed: 0.014, scale: 0.62, phase: 1.8, direction: -1 },
-      { spriteIndex: 2, x: 0.42, lane: 0.38, speed: 0.012, scale: 0.54, phase: 3.2, direction: 1 },
-      { spriteIndex: 5, x: 0.84, lane: 0.66, speed: 0.01, scale: 0.86, phase: 4.8, direction: -1 }
+      { spriteIndex: 0, x: 0.1, lane: 0.46, speed: 0.02, scale: 0.72, phase: 0, beatHz: 1.9, tailBend: 0.38, direction: 1 },
+      { spriteIndex: 1, x: 0.72, lane: 0.58, speed: 0.017, scale: 0.62, phase: 1.8, beatHz: 2.15, tailBend: 0.42, direction: -1 },
+      { spriteIndex: 2, x: 0.42, lane: 0.38, speed: 0.014, scale: 0.54, phase: 3.2, beatHz: 1.65, tailBend: 0.34, direction: 1 },
+      { spriteIndex: 5, x: 0.84, lane: 0.66, speed: 0.011, scale: 0.86, phase: 4.8, beatHz: 1.25, tailBend: 0.26, direction: -1 }
     );
   }
 
@@ -127,8 +129,11 @@ export class TaskbarReefRenderer {
     const speedMultiplier = 0.8 + state.bubblePressure * 0.9;
 
     for (const fish of this.fish) {
-      fish.x += fish.speed * speedMultiplier * deltaSeconds * fish.direction;
-      fish.phase += deltaSeconds * (0.7 + state.glow * 0.4);
+      const phaseAdvance =
+        deltaSeconds * fish.beatHz * Math.PI * 2 * (0.82 + state.bubblePressure * 0.42);
+      fish.phase = (fish.phase + phaseAdvance) % (Math.PI * 2);
+      const strokePush = 0.72 + Math.max(0, Math.sin(fish.phase)) * 0.58;
+      fish.x += fish.speed * speedMultiplier * strokePush * deltaSeconds * fish.direction;
 
       if (fish.direction === 1 && fish.x > 1.14) {
         fish.x = -0.14;
@@ -215,7 +220,7 @@ export class TaskbarReefRenderer {
     for (const fish of this.fish) {
       const col = fish.spriteIndex % columns;
       const row = Math.floor(fish.spriteIndex / columns);
-      const swimY = fish.lane + Math.sin(time * 1.4 + fish.phase) * 0.035;
+      const swimY = fish.lane + Math.sin(time * 1.05 + fish.phase * 0.18) * 0.026;
       const x = fish.x * this.width;
       const y = swimY * this.height;
       const drawHeight = baseSize * fish.scale;
@@ -228,19 +233,83 @@ export class TaskbarReefRenderer {
       ctx.translate(x, y);
       ctx.scale(flip, 1);
       ctx.globalAlpha = state.mode === "compact" ? 0.94 : 0.98;
-      ctx.drawImage(
-        this.fishImage,
+      this.drawSwimmingFish(
+        ctx,
         col * cellWidth,
         row * cellHeight,
         cellWidth,
         cellHeight,
-        -drawWidth / 2,
-        -drawHeight / 2,
         drawWidth,
-        drawHeight
+        drawHeight,
+        fish
       );
       ctx.restore();
     }
+  }
+
+  private drawSwimmingFish(
+    ctx: CanvasRenderingContext2D,
+    sourceX: number,
+    sourceY: number,
+    sourceWidth: number,
+    sourceHeight: number,
+    drawWidth: number,
+    drawHeight: number,
+    fish: FishEntity
+  ): void {
+    const left = -drawWidth / 2;
+    const top = -drawHeight / 2;
+    const split = 0.66;
+    const overlap = 0.05;
+    const wave = Math.sin(fish.phase);
+    const counterWave = Math.sin(fish.phase + Math.PI * 0.5);
+    const bodyLean = counterWave * 0.035;
+    const bodyStretch = 1 + Math.abs(wave) * 0.018;
+    const tailAngle = wave * fish.tailBend;
+    const tailPivotX = left + drawWidth * split;
+    const tailSourceX = sourceX + sourceWidth * (split - overlap);
+    const tailSourceWidth = sourceWidth * (1 - split + overlap);
+    const tailDestX = left + drawWidth * (split - overlap);
+    const tailDestWidth = drawWidth * (1 - split + overlap);
+    const bodySourceWidth = sourceWidth * (split + overlap);
+    const bodyDestWidth = drawWidth * (split + overlap);
+
+    // Unity port note: static concept art is animated here by separating the
+    // caudal area from the body. In Unity this maps cleanly to a two-bone
+    // sprite rig or a simple shader/skeleton tail sway.
+    ctx.save();
+    ctx.rotate(bodyLean);
+    ctx.scale(bodyStretch, 1 - Math.abs(wave) * 0.012);
+
+    ctx.save();
+    ctx.translate(tailPivotX, 0);
+    ctx.rotate(tailAngle);
+    ctx.scale(1 + Math.abs(wave) * 0.035, 1 + Math.abs(wave) * 0.08);
+    ctx.drawImage(
+      this.fishImage,
+      tailSourceX,
+      sourceY,
+      tailSourceWidth,
+      sourceHeight,
+      tailDestX - tailPivotX,
+      top,
+      tailDestWidth,
+      drawHeight
+    );
+    ctx.restore();
+
+    ctx.drawImage(
+      this.fishImage,
+      sourceX,
+      sourceY,
+      bodySourceWidth,
+      sourceHeight,
+      left,
+      top,
+      bodyDestWidth,
+      drawHeight
+    );
+    ctx.restore();
   }
 
   private drawBubbles(ctx: CanvasRenderingContext2D, state: ReefState): void {
