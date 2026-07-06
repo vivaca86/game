@@ -34,9 +34,12 @@ interface FishEntity {
   direction: 1 | -1;
 }
 
+const assetUrl = (path: string): string =>
+  `${import.meta.env.BASE_URL}${path}`;
+
 const ASSETS = {
-  reef: "/assets/abyssrium-desk/reef-taskbar-bg.png",
-  fish: "/assets/abyssrium-desk/fish-sprites.png"
+  reef: assetUrl("assets/abyssrium-desk/reef-taskbar-bg.png"),
+  fish: assetUrl("assets/abyssrium-desk/fish-sprites.png")
 } as const;
 
 export class TaskbarReefRenderer {
