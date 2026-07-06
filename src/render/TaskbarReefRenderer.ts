@@ -1,4 +1,8 @@
-import type { InputAction, ReefState } from "../simulation/reefState";
+import {
+  getBubbleSourceRatio,
+  type InputAction,
+  type ReefState
+} from "../simulation/reefState";
 
 interface BubbleParticle {
   x: number;
@@ -92,7 +96,7 @@ export class TaskbarReefRenderer {
 
   pushInput(action: InputAction): void {
     const x = action.x ?? this.width * (0.35 + Math.random() * 0.3);
-    const y = action.y ?? this.height * (0.42 + Math.random() * 0.22);
+    const y = action.y ?? this.getBubbleSourceY();
 
     if (action.kind === "pointerMove") {
       this.spawnBubbleStream(x, y, 1 + action.intensity * 2);
@@ -108,8 +112,12 @@ export class TaskbarReefRenderer {
 
     if (action.kind === "keyboard") {
       const origin = this.width * (0.18 + Math.random() * 0.64);
-      this.spawnBubbleBurst(origin, this.height * 0.82, 8);
+      this.spawnBubbleBurst(origin, y, 8);
     }
+  }
+
+  private getBubbleSourceY(): number {
+    return this.height * getBubbleSourceRatio(this.getState().mode);
   }
 
   private seedFish(): void {
@@ -304,9 +312,10 @@ export class TaskbarReefRenderer {
   }
 
   private spawnBubbleBurst(x: number, y: number, amount: number): void {
+    const upwardSpread = this.height * (this.getState().mode === "compact" ? 0.12 : 0.08);
     for (let index = 0; index < amount; index += 1) {
       const spreadX = (Math.random() - 0.5) * this.width * 0.12;
-      const spreadY = (Math.random() - 0.5) * this.height * 0.24;
+      const spreadY = -Math.random() * upwardSpread;
       this.bubbles.push(createBubble(x + spreadX, y + spreadY, 1.15));
     }
   }

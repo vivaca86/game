@@ -1,5 +1,9 @@
 import type { TaskbarReefRenderer } from "../render/TaskbarReefRenderer";
-import { applyInputAction, type ReefState } from "../simulation/reefState";
+import {
+  applyInputAction,
+  getBubbleSourceRatio,
+  type ReefState
+} from "../simulation/reefState";
 
 interface InputRouterOptions {
   reefElement: HTMLElement;
@@ -27,9 +31,7 @@ export const connectInputRouter = ({
       ? clamp(pointerEvent.clientX / Math.max(1, window.innerWidth), 0, 1)
       : 0.5;
     const x = pointerEvent ? screenX * rect.width : undefined;
-    const y = pointerEvent
-      ? rect.height * (kind === "pointerMove" ? 0.46 : 0.58)
-      : undefined;
+    const y = rect.height * getBubbleSourceRatio(state.mode);
     const action = {
       kind,
       at: performance.now(),

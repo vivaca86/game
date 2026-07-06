@@ -2,8 +2,19 @@ import { connectInputRouter } from "../input/inputRouter";
 import { TaskbarReefRenderer } from "../render/TaskbarReefRenderer";
 import {
   createInitialReefState,
+  setReefMode,
+  type ReefMode,
   tickReefState
 } from "../simulation/reefState";
+
+declare global {
+  interface Window {
+    __abyssriumDeskDebug?: {
+      getMode: () => ReefMode;
+      setMode: (mode: ReefMode) => void;
+    };
+  }
+}
 
 export const bootAbyssriumDesk = (): void => {
   const root = document.querySelector<HTMLDivElement>("#app");
@@ -73,6 +84,17 @@ export const bootAbyssriumDesk = (): void => {
     renderer,
     onStateChange: renderState
   });
+
+  if (import.meta.env.DEV) {
+    window.__abyssriumDeskDebug = {
+      getMode: () => state.mode,
+      setMode: (mode) => {
+        setReefMode(state, mode);
+        renderState();
+        window.setTimeout(() => renderer.resize(), 0);
+      }
+    };
+  }
 
   renderState();
   renderer.start();

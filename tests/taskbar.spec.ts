@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { getBubbleSourceRatio } from "../src/simulation/reefState";
 
 test("taskbar reef renders and reacts to input", async ({ page }) => {
   await page.goto("/");
@@ -40,4 +41,38 @@ test("taskbar reef renders and reacts to input", async ({ page }) => {
   expect(afterReefClickBox?.y).toBeCloseTo(compactBox?.y ?? 0, 0);
   expect(afterReefClickBox?.width).toBeCloseTo(compactBox?.width ?? 0, 0);
   expect(afterReefClickBox?.height).toBeCloseTo(compactBox?.height ?? 0, 0);
+});
+
+test("input bubbles originate from the lower reef in both modes", async ({ page }) => {
+  expect(getBubbleSourceRatio("compact")).toBeGreaterThan(0.88);
+  expect(getBubbleSourceRatio("expanded")).toBeGreaterThan(0.9);
+
+  await page.goto("/");
+  const reef = page.locator(".reef-dock");
+  await expect(reef).toHaveAttribute("data-mode", "compact");
+
+  await page.keyboard.press("A");
+  await page.mouse.click(720, 820);
+  const compactBox = await reef.boundingBox();
+  await expect(reef).toHaveAttribute("data-mode", "compact");
+
+  await page.evaluate(() => {
+    window.__abyssriumDeskDebug?.setMode("expanded");
+  });
+  await expect(reef).toHaveAttribute("data-mode", "expanded");
+  await expect
+    .poll(async () => (await reef.boundingBox())?.height ?? 0)
+    .toBeGreaterThan(180);
+
+  const expandedBox = await reef.boundingBox();
+  await page.keyboard.press("B");
+  await page.mouse.click(720, 620);
+  await expect(reef).toHaveAttribute("data-mode", "expanded");
+  const expandedBoxAfterInput = await reef.boundingBox();
+
+  expect(compactBox?.height).toBeGreaterThanOrEqual(54);
+  expect(expandedBoxAfterInput?.x).toBeCloseTo(expandedBox?.x ?? 0, 0);
+  expect(expandedBoxAfterInput?.y).toBeCloseTo(expandedBox?.y ?? 0, 0);
+  expect(expandedBoxAfterInput?.width).toBeCloseTo(expandedBox?.width ?? 0, 0);
+  expect(expandedBoxAfterInput?.height).toBeCloseTo(expandedBox?.height ?? 0, 0);
 });

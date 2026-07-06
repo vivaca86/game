@@ -46,6 +46,8 @@ export interface ReefState {
 export const reefTuning = {
   compactHeightPx: 56,
   expandedHeightPx: 252,
+  compactBubbleSourceRatio: 0.91,
+  expandedBubbleSourceRatio: 0.92,
   keyboardBubbleGain: 0.18,
   pointerBubbleGain: 0.08,
   idleDecayPerSecond: 0.055,
@@ -82,6 +84,11 @@ export const setReefMode = (state: ReefState, mode: ReefMode): void => {
   state.mode = mode;
   state.glow = Math.min(1, state.glow + (mode === "expanded" ? 0.24 : 0.08));
 };
+
+export const getBubbleSourceRatio = (mode: ReefMode): number =>
+  mode === "compact"
+    ? reefTuning.compactBubbleSourceRatio
+    : reefTuning.expandedBubbleSourceRatio;
 
 export const applyInputAction = (
   state: ReefState,
