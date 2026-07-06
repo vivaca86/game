@@ -23,8 +23,13 @@ export const connectInputRouter = ({
   ): void => {
     const rect = reefElement.getBoundingClientRect();
     const pointerEvent = event instanceof PointerEvent ? event : undefined;
-    const x = pointerEvent ? pointerEvent.clientX - rect.left : undefined;
-    const y = pointerEvent ? pointerEvent.clientY - rect.top : undefined;
+    const screenX = pointerEvent
+      ? clamp(pointerEvent.clientX / Math.max(1, window.innerWidth), 0, 1)
+      : 0.5;
+    const x = pointerEvent ? screenX * rect.width : undefined;
+    const y = pointerEvent
+      ? rect.height * (kind === "pointerMove" ? 0.46 : 0.58)
+      : undefined;
     const action = {
       kind,
       at: performance.now(),
@@ -42,10 +47,7 @@ export const connectInputRouter = ({
   };
 
   const handleKeyDown = (event: KeyboardEvent): void => {
-    if (event.repeat) {
-      return;
-    }
-    dispatch("keyboard", event, event.key === " " ? 1.25 : 0.9);
+    dispatch("keyboard", event, event.repeat ? 0.45 : event.key === " " ? 1.25 : 0.9);
   };
 
   const handlePointerMove = (event: PointerEvent): void => {
@@ -61,14 +63,22 @@ export const connectInputRouter = ({
     dispatch("pointerTap", event, 1.15);
   };
 
+  const handleWheel = (): void => {
+    dispatch("pointerTap", undefined, 0.75);
+  };
+
   window.addEventListener("keydown", handleKeyDown);
   window.addEventListener("pointermove", handlePointerMove);
-  reefElement.addEventListener("pointerdown", handlePointerDown);
+  window.addEventListener("pointerdown", handlePointerDown);
+  window.addEventListener("wheel", handleWheel, { passive: true });
 
   return () => {
     window.removeEventListener("keydown", handleKeyDown);
     window.removeEventListener("pointermove", handlePointerMove);
-    reefElement.removeEventListener("pointerdown", handlePointerDown);
+    window.removeEventListener("pointerdown", handlePointerDown);
+    window.removeEventListener("wheel", handleWheel);
   };
 };
 
+const clamp = (value: number, min: number, max: number): number =>
+  Math.min(max, Math.max(min, value));

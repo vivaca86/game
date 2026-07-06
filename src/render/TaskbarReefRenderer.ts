@@ -45,7 +45,6 @@ export class TaskbarReefRenderer {
   private lastFrame = performance.now();
   private width = 1;
   private height = 1;
-  private pointerX = 0.5;
 
   constructor(
     private readonly canvas: HTMLCanvasElement,
@@ -93,8 +92,7 @@ export class TaskbarReefRenderer {
 
   pushInput(action: InputAction): void {
     const x = action.x ?? this.width * (0.35 + Math.random() * 0.3);
-    const y = action.y ?? this.height * 0.72;
-    this.pointerX = clamp(x / this.width, 0, 1);
+    const y = action.y ?? this.height * (0.42 + Math.random() * 0.22);
 
     if (action.kind === "pointerMove") {
       this.spawnBubbleStream(x, y, 1 + action.intensity * 2);
@@ -178,8 +176,12 @@ export class TaskbarReefRenderer {
       const drawHeight = imageHeight * scale;
       const drift = Math.sin(time * 0.08 + state.tide * Math.PI * 2) * 22;
       const dx = (this.width - drawWidth) * 0.5 + drift;
-      const compactAnchor = this.height - drawHeight + 258;
-      const expandedAnchor = this.height - drawHeight * 0.82;
+      // The corallite face is the IP signal, so both compact and expanded
+      // crops anchor to its approximate vertical center instead of the image
+      // top or seabed. This maps cleanly to a Unity camera target later.
+      const coralliteFaceY = drawHeight * 0.4;
+      const compactAnchor = this.height * 0.52 - coralliteFaceY;
+      const expandedAnchor = this.height * 0.5 - coralliteFaceY;
       const dy = state.mode === "compact" ? compactAnchor : expandedAnchor;
       ctx.drawImage(this.reefImage, dx, dy, drawWidth, drawHeight);
     } else {
@@ -216,9 +218,8 @@ export class TaskbarReefRenderer {
     for (const fish of this.fish) {
       const col = fish.spriteIndex % columns;
       const row = Math.floor(fish.spriteIndex / columns);
-      const leanToPointer = (this.pointerX - fish.x) * 0.12;
       const swimY = fish.lane + Math.sin(time * 1.4 + fish.phase) * 0.035;
-      const x = (fish.x + leanToPointer) * this.width;
+      const x = fish.x * this.width;
       const y = swimY * this.height;
       const drawHeight = baseSize * fish.scale;
       const drawWidth = drawHeight * (cellWidth / cellHeight);
@@ -346,6 +347,3 @@ const removeDead = <T extends { age: number; life: number }>(items: T[]): void =
     }
   }
 };
-
-const clamp = (value: number, min: number, max: number): number =>
-  Math.min(max, Math.max(min, value));

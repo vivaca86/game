@@ -6,6 +6,7 @@ test("taskbar reef renders and reacts to input", async ({ page }) => {
   await expect(reef).toBeVisible();
   await expect(reef).toHaveAttribute("data-mode", "compact");
   await expect(reef).toHaveText("");
+  await expect(page.locator(".reef-mark, .reef-meter, .reef-actions, .icon-button")).toHaveCount(0);
 
   const compactBox = await reef.boundingBox();
   expect(compactBox?.height).toBeGreaterThanOrEqual(54);
@@ -25,7 +26,7 @@ test("taskbar reef renders and reacts to input", async ({ page }) => {
   });
   expect(pixelSample).toBeGreaterThan(0);
 
-  await page.locator('[data-action="toggle"]').click();
+  await reef.click();
   await expect(reef).toHaveAttribute("data-mode", "expanded");
   await expect
     .poll(async () => {
