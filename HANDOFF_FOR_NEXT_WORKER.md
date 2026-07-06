@@ -33,6 +33,8 @@ game/
 `code/` contains the source project for continuing development.
 `game/` contains the packaged playable Windows build with `Abyssrium Desk.exe`.
 
+The clean handoff package intentionally excludes unrelated older repository material such as `예전자료/`, `.git/`, `node_modules/`, generated `dist/`, generated `release/`, and test artifacts. It only includes files needed to continue the current Abyssrium Desk prototype.
+
 ## 3. User Direction And Quality Rules
 
 The user explicitly set these working rules:
@@ -51,6 +53,7 @@ The user explicitly set these working rules:
    - The PPT was moved to the repo root.
    - Old surrounding files were moved into `예전자료/`.
    - Final repo root was intended to show the PPT plus `예전자료/`.
+   - For the clean handoff zip, those old surrounding files are excluded because they are not needed for the current Abyssrium Desk implementation.
 
 2. Initial target:
    - The PPT described a taskbar game.
