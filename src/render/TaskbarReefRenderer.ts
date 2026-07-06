@@ -198,7 +198,7 @@ export class TaskbarReefRenderer {
       // top or seabed. Compact mode also caps the camera width so high-DPI or
       // ultra-wide desktops do not crop the face differently from laptop widths.
       const coralliteFaceY = drawHeight * 0.4;
-      const compactAnchor = this.height * 0.52 - coralliteFaceY;
+      const compactAnchor = this.height * 0.78 - coralliteFaceY;
       const expandedAnchor = this.height * 0.5 - coralliteFaceY;
       const dy = state.mode === "compact" ? compactAnchor : expandedAnchor;
       ctx.drawImage(this.reefImage, dx, dy, drawWidth, drawHeight);

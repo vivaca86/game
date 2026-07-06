@@ -10,6 +10,7 @@ const {
 const path = require("node:path");
 
 const WINDOW = {
+  compactWidth: 640,
   compactHeight: 56,
   expandedHeight: 252,
   horizontalMargin: 16,
@@ -28,10 +29,18 @@ const getOverlayBounds = (mode = currentMode) => {
   const display = screen.getPrimaryDisplay();
   const { workArea } = display;
   const height = mode === "expanded" ? WINDOW.expandedHeight : WINDOW.compactHeight;
-  const width = Math.max(320, workArea.width - WINDOW.horizontalMargin * 2);
+  const fullWidth = Math.max(320, workArea.width - WINDOW.horizontalMargin * 2);
+  const width =
+    mode === "expanded"
+      ? fullWidth
+      : Math.min(WINDOW.compactWidth, fullWidth);
+  const x =
+    mode === "expanded"
+      ? workArea.x + WINDOW.horizontalMargin
+      : Math.round(workArea.x + (workArea.width - width) * 0.5);
 
   return {
-    x: workArea.x + WINDOW.horizontalMargin,
+    x,
     y: workArea.y + workArea.height - height - WINDOW.bottomGap,
     width,
     height
@@ -53,10 +62,8 @@ const pointInsideWindow = (x, y) => {
 };
 
 const normalizePointerX = (x, y) => {
-  const display = screen.getDisplayNearestPoint({ x, y });
-  const left = display.workArea.x + WINDOW.horizontalMargin;
-  const width = Math.max(1, display.workArea.width - WINDOW.horizontalMargin * 2);
-  return clamp((x - left) / width, 0, 1);
+  const bounds = getOverlayBounds(currentMode);
+  return clamp((x - bounds.x) / Math.max(1, bounds.width), 0, 1);
 };
 
 const sendInput = (payload) => {

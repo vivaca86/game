@@ -15,6 +15,7 @@ test("taskbar reef renders and reacts to input", async ({ page }) => {
   const compactBox = await reef.boundingBox();
   expect(compactBox?.height).toBeGreaterThanOrEqual(54);
   expect(compactBox?.height).toBeLessThanOrEqual(62);
+  expect(compactBox?.width).toBeLessThanOrEqual(642);
 
   await page.keyboard.press("A");
   await page.mouse.move(400, 680);
