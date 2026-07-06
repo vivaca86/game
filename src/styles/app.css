@@ -201,11 +201,9 @@ button {
     0 16px 54px rgba(1, 16, 30, 0.44),
     0 0 calc(18px + var(--reef-glow) * 38px) rgba(83, 237, 255, 0.28);
   transition:
-    height 220ms ease,
     border-radius 220ms ease,
     box-shadow 220ms ease;
   isolation: isolate;
-  cursor: pointer;
 }
 
 .reef-dock[data-mode="expanded"] {

@@ -17,6 +17,13 @@ test("taskbar reef renders and reacts to input", async ({ page }) => {
   await page.mouse.down();
   await page.mouse.up();
 
+  const afterInputBox = await reef.boundingBox();
+  expect(afterInputBox?.x).toBeCloseTo(compactBox?.x ?? 0, 0);
+  expect(afterInputBox?.y).toBeCloseTo(compactBox?.y ?? 0, 0);
+  expect(afterInputBox?.width).toBeCloseTo(compactBox?.width ?? 0, 0);
+  expect(afterInputBox?.height).toBeCloseTo(compactBox?.height ?? 0, 0);
+  await expect(reef).toHaveAttribute("data-mode", "compact");
+
   const pixelSample = await page.locator(".reef-canvas").evaluate((canvas) => {
     const c = canvas as HTMLCanvasElement;
     const ctx = c.getContext("2d");
@@ -27,11 +34,10 @@ test("taskbar reef renders and reacts to input", async ({ page }) => {
   expect(pixelSample).toBeGreaterThan(0);
 
   await reef.click();
-  await expect(reef).toHaveAttribute("data-mode", "expanded");
-  await expect
-    .poll(async () => {
-      const expandedBox = await reef.boundingBox();
-      return expandedBox?.height ?? 0;
-    })
-    .toBeGreaterThan(180);
+  await expect(reef).toHaveAttribute("data-mode", "compact");
+  const afterReefClickBox = await reef.boundingBox();
+  expect(afterReefClickBox?.x).toBeCloseTo(compactBox?.x ?? 0, 0);
+  expect(afterReefClickBox?.y).toBeCloseTo(compactBox?.y ?? 0, 0);
+  expect(afterReefClickBox?.width).toBeCloseTo(compactBox?.width ?? 0, 0);
+  expect(afterReefClickBox?.height).toBeCloseTo(compactBox?.height ?? 0, 0);
 });

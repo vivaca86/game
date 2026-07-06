@@ -105,7 +105,6 @@ export const applyInputAction = (
     1
   );
   state.glow = clamp(state.glow + gain * 0.72, 0, 1);
-  state.tide = wrap01(state.tide + gain * 0.18);
 
   maybeAddDiscovery(state);
 };
@@ -117,9 +116,9 @@ export const tickReefState = (
 ): void => {
   const active = now - state.lastActivityAt <= reefTuning.focusWindowMs;
 
-  // Unity port note: focus, idle, and tide are renderer-agnostic simulation
-  // values. They should become serializable MonoBehaviour data or ScriptableObject
-  // tuning fields rather than being tied to a canvas animation loop.
+  // Unity port note: focus, idle, and ambient tide are renderer-agnostic
+  // values. Keep direct player input out of camera anchors; input should drive
+  // reaction particles and creature behavior, not scene position.
   if (active) {
     state.focusSeconds += deltaSeconds;
   } else {
@@ -173,4 +172,3 @@ const clamp = (value: number, min: number, max: number): number =>
   Math.min(max, Math.max(min, value));
 
 const wrap01 = (value: number): number => ((value % 1) + 1) % 1;
-

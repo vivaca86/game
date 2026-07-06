@@ -156,17 +156,16 @@ export class TaskbarReefRenderer {
     const state = this.getState();
     ctx.clearRect(0, 0, this.width, this.height);
 
-    this.drawBackground(ctx, state, time);
+    this.drawBackground(ctx, state);
     this.drawRipples(ctx);
     this.drawFish(ctx, state, time);
     this.drawBubbles(ctx, state);
-    this.drawGlass(ctx, state, time);
+    this.drawGlass(ctx, state);
   }
 
   private drawBackground(
     ctx: CanvasRenderingContext2D,
-    state: ReefState,
-    time: number
+    state: ReefState
   ): void {
     if (this.reefImage.complete && this.reefImage.naturalWidth > 0) {
       const imageWidth = this.reefImage.naturalWidth;
@@ -174,11 +173,10 @@ export class TaskbarReefRenderer {
       const scale = Math.max(this.width / imageWidth, this.height / imageHeight);
       const drawWidth = imageWidth * scale;
       const drawHeight = imageHeight * scale;
-      const drift = Math.sin(time * 0.08 + state.tide * Math.PI * 2) * 22;
-      const dx = (this.width - drawWidth) * 0.5 + drift;
+      const dx = (this.width - drawWidth) * 0.5;
       // The corallite face is the IP signal, so both compact and expanded
       // crops anchor to its approximate vertical center instead of the image
-      // top or seabed. This maps cleanly to a Unity camera target later.
+      // top or seabed. Keep this camera anchor input-independent for Unity.
       const coralliteFaceY = drawHeight * 0.4;
       const compactAnchor = this.height * 0.52 - coralliteFaceY;
       const expandedAnchor = this.height * 0.5 - coralliteFaceY;
@@ -286,17 +284,12 @@ export class TaskbarReefRenderer {
     }
   }
 
-  private drawGlass(
-    ctx: CanvasRenderingContext2D,
-    state: ReefState,
-    time: number
-  ): void {
-    const sweepX = ((time * 32 + state.tide * this.width) % (this.width + 240)) - 180;
-    const beam = ctx.createLinearGradient(sweepX, 0, sweepX + 180, 0);
-    beam.addColorStop(0, "rgba(255,255,255,0)");
-    beam.addColorStop(0.5, `rgba(196, 252, 255, ${0.04 + state.glow * 0.06})`);
-    beam.addColorStop(1, "rgba(255,255,255,0)");
-    ctx.fillStyle = beam;
+  private drawGlass(ctx: CanvasRenderingContext2D, state: ReefState): void {
+    const sheen = ctx.createLinearGradient(0, 0, 0, this.height);
+    sheen.addColorStop(0, `rgba(210, 252, 255, ${0.05 + state.glow * 0.05})`);
+    sheen.addColorStop(0.46, "rgba(255,255,255,0)");
+    sheen.addColorStop(1, "rgba(0, 12, 22, 0.16)");
+    ctx.fillStyle = sheen;
     ctx.fillRect(0, 0, this.width, this.height);
 
     ctx.strokeStyle = "rgba(215, 251, 255, 0.26)";

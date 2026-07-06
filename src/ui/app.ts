@@ -2,7 +2,6 @@ import { connectInputRouter } from "../input/inputRouter";
 import { TaskbarReefRenderer } from "../render/TaskbarReefRenderer";
 import {
   createInitialReefState,
-  setReefMode,
   tickReefState
 } from "../simulation/reefState";
 
@@ -73,12 +72,6 @@ export const bootAbyssriumDesk = (): void => {
     state,
     renderer,
     onStateChange: renderState
-  });
-
-  reefDock.addEventListener("click", () => {
-    setReefMode(state, state.mode === "compact" ? "expanded" : "compact");
-    renderState();
-    window.setTimeout(() => renderer.resize(), 180);
   });
 
   renderState();
