@@ -28,6 +28,13 @@ interface FishEntity {
   direction: 1 | -1;
 }
 
+interface ReefImageLayout {
+  dx: number;
+  dy: number;
+  drawWidth: number;
+  drawHeight: number;
+}
+
 const assetUrl = (path: string): string =>
   `${import.meta.env.BASE_URL}${path}`;
 
@@ -158,7 +165,10 @@ export class TaskbarReefRenderer {
     const state = this.getState();
     ctx.clearRect(0, 0, this.width, this.height);
 
-    this.drawBackground(ctx, state);
+    const reefLayout = this.drawBackground(ctx, state);
+    if (reefLayout) {
+      this.drawCoralliteLife(ctx, state, reefLayout, time);
+    }
     this.drawFish(ctx, state, time);
     this.drawBubbles(ctx, state);
     this.drawGlass(ctx, state);
@@ -167,33 +177,24 @@ export class TaskbarReefRenderer {
   private drawBackground(
     ctx: CanvasRenderingContext2D,
     state: ReefState
-  ): void {
+  ): ReefImageLayout | undefined {
     const fallback = ctx.createLinearGradient(0, 0, 0, this.height);
     fallback.addColorStop(0, "#0e6f83");
     fallback.addColorStop(1, "#061f2e");
     ctx.fillStyle = fallback;
     ctx.fillRect(0, 0, this.width, this.height);
 
+    let reefLayout: ReefImageLayout | undefined;
+
     if (this.reefImage.complete && this.reefImage.naturalWidth > 0) {
-      const imageWidth = this.reefImage.naturalWidth;
-      const imageHeight = this.reefImage.naturalHeight;
-      const cameraWidth =
-        state.mode === "compact"
-          ? Math.min(this.width, reefTuning.compactCameraWidthPx)
-          : this.width;
-      const scale = Math.max(cameraWidth / imageWidth, this.height / imageHeight);
-      const drawWidth = imageWidth * scale;
-      const drawHeight = imageHeight * scale;
-      const dx = (this.width - drawWidth) * 0.5;
-      // The corallite face is the IP signal, so both compact and expanded
-      // crops anchor to its approximate vertical center instead of the image
-      // top or seabed. Compact mode also caps the camera width so high-DPI or
-      // ultra-wide desktops do not crop the face differently from laptop widths.
-      const coralliteFaceY = drawHeight * 0.4;
-      const compactAnchor = this.height * 0.78 - coralliteFaceY;
-      const expandedAnchor = this.height * 0.5 - coralliteFaceY;
-      const dy = state.mode === "compact" ? compactAnchor : expandedAnchor;
-      ctx.drawImage(this.reefImage, dx, dy, drawWidth, drawHeight);
+      reefLayout = this.getReefImageLayout(state);
+      ctx.drawImage(
+        this.reefImage,
+        reefLayout.dx,
+        reefLayout.dy,
+        reefLayout.drawWidth,
+        reefLayout.drawHeight
+      );
     }
 
     const shade = ctx.createLinearGradient(0, 0, 0, this.height);
@@ -202,6 +203,241 @@ export class TaskbarReefRenderer {
     shade.addColorStop(1, "rgba(2, 10, 20, 0.5)");
     ctx.fillStyle = shade;
     ctx.fillRect(0, 0, this.width, this.height);
+
+    return reefLayout;
+  }
+
+  private getReefImageLayout(state: ReefState): ReefImageLayout {
+    const imageWidth = this.reefImage.naturalWidth;
+    const imageHeight = this.reefImage.naturalHeight;
+    const cameraWidth =
+      state.mode === "compact"
+        ? Math.min(this.width, reefTuning.compactCameraWidthPx)
+        : this.width;
+    const scale = Math.max(cameraWidth / imageWidth, this.height / imageHeight);
+    const drawWidth = imageWidth * scale;
+    const drawHeight = imageHeight * scale;
+    const dx = (this.width - drawWidth) * 0.5;
+    // The corallite face is the IP signal, so both compact and expanded
+    // crops anchor to its approximate vertical center instead of the image
+    // top or seabed. Compact mode also caps the camera width so high-DPI or
+    // ultra-wide desktops do not crop the face differently from laptop widths.
+    const coralliteFaceY = drawHeight * 0.4;
+    const compactAnchor = this.height * 0.78 - coralliteFaceY;
+    const expandedAnchor = this.height * 0.5 - coralliteFaceY;
+    const dy = state.mode === "compact" ? compactAnchor : expandedAnchor;
+
+    return { dx, dy, drawWidth, drawHeight };
+  }
+
+  private drawCoralliteLife(
+    ctx: CanvasRenderingContext2D,
+    state: ReefState,
+    layout: ReefImageLayout,
+    time: number
+  ): void {
+    const sourceToCanvas = (sourceX: number, sourceY: number): { x: number; y: number } => ({
+      x: layout.dx + (sourceX / this.reefImage.naturalWidth) * layout.drawWidth,
+      y: layout.dy + (sourceY / this.reefImage.naturalHeight) * layout.drawHeight
+    });
+    const sourceScale = layout.drawWidth / this.reefImage.naturalWidth;
+    const vent = sourceToCanvas(994, 184);
+    const face = sourceToCanvas(994, 286);
+    const modeAlpha = state.mode === "compact" ? 0.5 : 1;
+    const pulse = 0.5 + Math.sin(time * 0.82) * 0.5;
+    const slowPulse = 0.5 + Math.sin(time * 0.31 + 1.4) * 0.5;
+    const glowAlpha = (0.14 + pulse * 0.1 + state.glow * 0.06) * modeAlpha;
+
+    ctx.save();
+    ctx.globalCompositeOperation = "screen";
+
+    const aura = ctx.createRadialGradient(
+      vent.x,
+      vent.y + sourceScale * 2,
+      sourceScale * 4,
+      vent.x,
+      vent.y,
+      sourceScale * (86 + slowPulse * 12)
+    );
+    aura.addColorStop(0, `rgba(216, 255, 255, ${0.44 * modeAlpha})`);
+    aura.addColorStop(0.36, `rgba(135, 224, 255, ${glowAlpha})`);
+    aura.addColorStop(1, "rgba(98, 170, 255, 0)");
+    ctx.fillStyle = aura;
+    ctx.beginPath();
+    ctx.ellipse(
+      vent.x,
+      vent.y + sourceScale * 3,
+      sourceScale * 96,
+      sourceScale * 48,
+      0,
+      0,
+      Math.PI * 2
+    );
+    ctx.fill();
+
+    ctx.globalAlpha = (0.26 + pulse * 0.16) * modeAlpha;
+    ctx.strokeStyle = "rgba(225, 255, 255, 0.82)";
+    ctx.lineWidth = Math.max(0.75, sourceScale * 2);
+    ctx.beginPath();
+    ctx.ellipse(
+      vent.x,
+      vent.y,
+      sourceScale * (42 + pulse * 3),
+      sourceScale * (9 + pulse * 1.2),
+      0,
+      0,
+      Math.PI * 2
+    );
+    ctx.stroke();
+
+    ctx.globalAlpha = (0.1 + pulse * 0.09) * modeAlpha;
+    ctx.fillStyle = "rgba(202, 252, 255, 0.72)";
+    ctx.beginPath();
+    ctx.ellipse(
+      vent.x,
+      vent.y + sourceScale * 0.8,
+      sourceScale * (31 + pulse * 2),
+      sourceScale * (5.5 + pulse),
+      0,
+      0,
+      Math.PI * 2
+    );
+    ctx.fill();
+
+    this.drawCraterGlint(ctx, vent.x, vent.y, sourceScale, modeAlpha, time);
+
+    const faceGlow = ctx.createRadialGradient(
+      face.x,
+      face.y,
+      sourceScale * 8,
+      face.x,
+      face.y,
+      sourceScale * 132
+    );
+    faceGlow.addColorStop(0, `rgba(190, 250, 255, ${0.08 * modeAlpha * (0.55 + slowPulse)})`);
+    faceGlow.addColorStop(0.58, `rgba(140, 205, 255, ${0.035 * modeAlpha})`);
+    faceGlow.addColorStop(1, "rgba(140, 205, 255, 0)");
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = faceGlow;
+    ctx.beginPath();
+    ctx.arc(face.x, face.y, sourceScale * 136, 0, Math.PI * 2);
+    ctx.fill();
+
+    this.drawVentCurrent(ctx, vent.x, vent.y, sourceScale, modeAlpha, time);
+    this.drawVentMotes(ctx, vent.x, vent.y, sourceScale, modeAlpha, time);
+
+    ctx.restore();
+  }
+
+  private drawCraterGlint(
+    ctx: CanvasRenderingContext2D,
+    ventX: number,
+    ventY: number,
+    sourceScale: number,
+    modeAlpha: number,
+    time: number
+  ): void {
+    const rx = sourceScale * 43;
+    const ry = sourceScale * 9.5;
+    const angleStart = time * 0.62;
+    const arcLength = Math.PI * 0.42;
+
+    ctx.save();
+    ctx.globalCompositeOperation = "source-over";
+    ctx.globalAlpha = 0.72 * modeAlpha;
+    ctx.strokeStyle = "rgba(158, 250, 255, 0.9)";
+    ctx.lineWidth = Math.max(1.1, sourceScale * 3);
+    ctx.lineCap = "round";
+    ctx.beginPath();
+
+    for (let step = 0; step <= 12; step += 1) {
+      const t = step / 12;
+      const angle = angleStart + t * arcLength;
+      const x = ventX + Math.cos(angle) * rx;
+      const y = ventY + Math.sin(angle) * ry;
+      if (step === 0) {
+        ctx.moveTo(x, y);
+      } else {
+        ctx.lineTo(x, y);
+      }
+    }
+
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  private drawVentCurrent(
+    ctx: CanvasRenderingContext2D,
+    ventX: number,
+    ventY: number,
+    sourceScale: number,
+    modeAlpha: number,
+    time: number
+  ): void {
+    ctx.save();
+    ctx.globalCompositeOperation = "source-over";
+    ctx.lineCap = "round";
+
+    for (let index = 0; index < 3; index += 1) {
+      const progress = fractional(time * 0.16 + index * 0.33);
+      const alpha = Math.sin(progress * Math.PI) * 0.17 * modeAlpha;
+      const height = sourceScale * (46 + index * 18);
+      const side = index - 1;
+      const rootX = ventX + side * sourceScale * 8;
+      const rootY = ventY - sourceScale * 3;
+      const sway = Math.sin(time * 0.7 + index * 1.9) * sourceScale * 10;
+
+      ctx.globalAlpha = alpha;
+      ctx.strokeStyle = "rgba(165, 246, 255, 0.78)";
+      ctx.lineWidth = Math.max(0.6, sourceScale * (1.8 - index * 0.24));
+      ctx.beginPath();
+      ctx.moveTo(rootX, rootY);
+      ctx.bezierCurveTo(
+        rootX + sway * 0.5,
+        rootY - height * 0.32,
+        rootX - sway * 0.4,
+        rootY - height * 0.68,
+        rootX + sway,
+        rootY - height
+      );
+      ctx.stroke();
+    }
+
+    ctx.restore();
+  }
+
+  private drawVentMotes(
+    ctx: CanvasRenderingContext2D,
+    ventX: number,
+    ventY: number,
+    sourceScale: number,
+    modeAlpha: number,
+    time: number
+  ): void {
+    for (let index = 0; index < 5; index += 1) {
+      const period = 4.4 + index * 0.72;
+      const activeWindow = 0.42;
+      const localTime = fractional((time + index * 1.31) / period);
+      if (localTime > activeWindow) {
+        continue;
+      }
+
+      const progress = localTime / activeWindow;
+      const alpha = Math.sin(progress * Math.PI) * 0.28 * modeAlpha;
+      const drift = Math.sin(time * 0.9 + index * 2.4) * sourceScale * (12 + index * 2.2);
+      const x = ventX + drift;
+      const y = ventY - sourceScale * (16 + progress * (62 + index * 9));
+      const radius = sourceScale * (2.4 + (index % 2) * 1.3) * (1 - progress * 0.18);
+      const mote = ctx.createRadialGradient(x, y, 0, x, y, radius * 3.2);
+      mote.addColorStop(0, `rgba(235, 255, 255, ${alpha})`);
+      mote.addColorStop(0.42, `rgba(144, 231, 255, ${alpha * 0.56})`);
+      mote.addColorStop(1, "rgba(144, 231, 255, 0)");
+
+      ctx.fillStyle = mote;
+      ctx.beginPath();
+      ctx.arc(x, y, radius * 3.2, 0, Math.PI * 2);
+      ctx.fill();
+    }
   }
 
   private drawFish(
@@ -390,6 +626,8 @@ const smoothStep = (edge0: number, edge1: number, value: number): number => {
   const t = Math.min(1, Math.max(0, (value - edge0) / (edge1 - edge0)));
   return t * t * (3 - 2 * t);
 };
+
+const fractional = (value: number): number => value - Math.floor(value);
 
 const removeDead = <T extends { age: number; life: number }>(items: T[]): void => {
   for (let index = items.length - 1; index >= 0; index -= 1) {
