@@ -1,0 +1,3065 @@
+:root {
+  --bg: #0a1824;
+  --panel: #fff2d2;
+  --panel-soft: #fff8e8;
+  --line: #b78b4e;
+  --deep: #5d3d24;
+  --wood: #7d5838;
+  --tab: #f6c25f;
+  --mint: #76bd58;
+  --heart: #e96565;
+  --energy: #f2bf45;
+  --blue: #54a8df;
+  --shadow: 0 16px 42px rgba(0, 0, 0, 0.28);
+  --concept-full: url("./assets/concept/full-v9.png");
+  --concept-room: url("./assets/concept/restaurant-scene-v9.png");
+  --concept-cat: url("./assets/concept/chef-cat-v9.png");
+  --concept-widget: url("./assets/concept/tiny-widget-v9.png");
+  --widget-portrait: url("./assets/concept/widget-portrait-v9.png");
+  --widget-action: url("./assets/concept/widget-action-clean-v9.png");
+  --widget-action-cutout: url("./assets/concept/widget-action-cutout-v10.png");
+  --widget-action-sprite: url("./assets/concept/widget-action-sprite-v18.png");
+  --widget-chef-cat-taskbar: url("./assets/concept/widget-chef-cat-taskbar-sprite-v21.png");
+  --widget-chef-cat-hi-sprite: url("./assets/concept/widget-chef-cat-hi-sprite-v21.png");
+  --widget-chef-integrated-sprite: url("./assets/concept/widget-chef-integrated-sprite-v25.png");
+  --widget-chef-integrated-sprite-12: url("./assets/concept/widget-chef-integrated-sprite-v27-12.png");
+  --widget-kitchen-backdrop: url("./assets/concept/widget-kitchen-backdrop-v22.png");
+  --concept-production: url("./assets/concept/production-strip-v9.png");
+  --concept-recipe: url("./assets/concept/recipe-panel-v9.png");
+  --concept-route: url("./assets/concept/route-map-v9.png");
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  overflow: hidden;
+  font-family: "Malgun Gothic", "Segoe UI", system-ui, sans-serif;
+  color: var(--deep);
+  background: var(--bg);
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+.desktop {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  min-width: 1180px;
+  min-height: 720px;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 18% 72%, rgba(83, 143, 164, 0.34), transparent 28%),
+    radial-gradient(circle at 86% 28%, rgba(30, 88, 133, 0.42), transparent 30%),
+    linear-gradient(180deg, #133d60 0%, #0c1e2f 65%, #07121c 100%);
+}
+
+.desktop::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, transparent 0 86px, rgba(255, 255, 255, 0.04) 87px 88px, transparent 89px),
+    linear-gradient(0deg, transparent 0 86px, rgba(255, 255, 255, 0.03) 87px 88px, transparent 89px);
+  background-size: 160px 160px;
+  opacity: 0.18;
+}
+
+.game-panel {
+  position: absolute;
+  left: clamp(24px, 3vw, 76px);
+  right: clamp(24px, 3vw, 76px);
+  top: 34px;
+  height: min(70vh, 760px);
+  min-height: 500px;
+  z-index: 2;
+  display: grid;
+  grid-template-rows: 68px 1fr;
+  padding: 14px;
+  border: 4px solid #3f2c1f;
+  border-radius: 20px;
+  background: linear-gradient(#fff4d8, #f7dfaa);
+  box-shadow: var(--shadow);
+  transition: transform 240ms ease, opacity 180ms ease;
+}
+
+.game-panel.collapsed {
+  transform: translateY(-110%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.topbar,
+.card,
+.tiny-widget {
+  border: 2px solid var(--line);
+  box-shadow: inset 0 1px rgba(255, 255, 255, 0.6);
+}
+
+.topbar {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 16px;
+  align-items: center;
+  min-width: 0;
+  padding: 8px;
+  border-radius: 14px;
+  background: linear-gradient(#ffe3a1, #f5bd5b);
+}
+
+.tabs {
+  display: flex;
+  gap: 8px;
+}
+
+.tab,
+.window-actions button,
+.recipe-tabs button {
+  width: 52px;
+  height: 48px;
+  border: 2px solid #cf9b55;
+  border-radius: 10px;
+  background: #fff4db;
+  font-size: 24px;
+}
+
+.tab.active,
+.recipe-tabs .active {
+  background: #f6b843;
+  box-shadow: inset 0 -4px rgba(130, 80, 26, 0.12);
+}
+
+.resources {
+  display: flex;
+  justify-content: flex-end;
+  gap: clamp(8px, 1.4vw, 24px);
+  font-size: 18px;
+  white-space: nowrap;
+}
+
+.resources span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.window-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.window-actions button {
+  width: 38px;
+  height: 38px;
+  font-size: 18px;
+}
+
+.panel-grid {
+  display: grid;
+  grid-template-columns: minmax(280px, 0.85fr) minmax(420px, 1.35fr) minmax(330px, 0.98fr);
+  grid-template-rows: minmax(330px, 1fr) 128px;
+  gap: 12px;
+  margin-top: 12px;
+  min-height: 0;
+}
+
+.card {
+  border-radius: 16px;
+  background: var(--panel-soft);
+}
+
+.cat-panel {
+  position: relative;
+  display: grid;
+  grid-template-columns: 76px 1fr 76px;
+  grid-template-rows: minmax(220px, 1fr) auto 84px;
+  gap: 10px;
+  padding: 16px;
+  min-width: 0;
+}
+
+.gear-column {
+  display: grid;
+  gap: 12px;
+}
+
+.gear {
+  display: grid;
+  place-items: center;
+  min-height: 62px;
+  border: 3px solid #5b3d25;
+  border-radius: 12px;
+  background: #f7d68e;
+  font-size: 28px;
+}
+
+.gear small {
+  display: block;
+  font-size: 12px;
+}
+
+.gear.selected {
+  outline: 4px solid #b56ee8;
+}
+
+.cat-card {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 220px;
+  border: 2px solid #e0bc7a;
+  border-radius: 14px;
+  background: #fff2d2 var(--concept-cat) center / contain no-repeat;
+  overflow: hidden;
+}
+
+.cat-card .stars,
+.cat-card .big-cat {
+  display: none;
+}
+
+.stars {
+  position: absolute;
+  left: 16px;
+  top: 14px;
+  color: #e1a92d;
+  letter-spacing: 2px;
+}
+
+.big-cat,
+.room-cat,
+.mini-cat,
+.mini-portrait,
+.active-cat {
+  position: relative;
+  display: inline-block;
+  border-radius: 48% 48% 42% 42%;
+  background: #fff7e6;
+  border: 2px solid #c98f70;
+}
+
+.big-cat {
+  width: 112px;
+  height: 148px;
+  animation: breathe 2.8s ease-in-out infinite;
+}
+
+.cat-ear {
+  position: absolute;
+  top: -24px;
+  width: 36px;
+  height: 48px;
+  border: 2px solid #c98f70;
+  background: #fff7e6;
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+}
+
+.cat-ear.left {
+  left: 14px;
+  transform: rotate(-12deg);
+}
+
+.cat-ear.right {
+  right: 14px;
+  transform: rotate(12deg);
+}
+
+.cat-face {
+  position: absolute;
+  left: 23px;
+  right: 23px;
+  top: 45px;
+  height: 48px;
+}
+
+.eye {
+  position: absolute;
+  top: 16px;
+  width: 22px;
+  height: 8px;
+  border-bottom: 3px solid #4b3527;
+  border-radius: 0 0 18px 18px;
+}
+
+.eye.left {
+  left: 4px;
+}
+
+.eye.right {
+  right: 4px;
+}
+
+.mouth {
+  position: absolute;
+  left: 50%;
+  top: 30px;
+  width: 10px;
+  height: 5px;
+  border-bottom: 2px solid #4b3527;
+  transform: translateX(-50%);
+}
+
+.chef-hat {
+  position: absolute;
+  left: 24px;
+  top: -38px;
+  width: 66px;
+  height: 34px;
+  border: 2px solid #c98f70;
+  border-radius: 22px 22px 8px 8px;
+  background: white;
+}
+
+.chef-hat::after {
+  content: "🐾";
+  position: absolute;
+  left: 21px;
+  top: 15px;
+  font-size: 13px;
+}
+
+.scarf {
+  position: absolute;
+  left: 24px;
+  top: 84px;
+  width: 64px;
+  height: 16px;
+  border-radius: 12px;
+  background: #d65b42;
+}
+
+.spatula {
+  position: absolute;
+  left: -35px;
+  top: 72px;
+  width: 62px;
+  height: 10px;
+  border-radius: 8px;
+  background: #7b5132;
+  transform: rotate(-26deg);
+}
+
+.spatula::before {
+  content: "";
+  position: absolute;
+  left: -18px;
+  top: -10px;
+  width: 24px;
+  height: 30px;
+  border: 3px solid #5d3d24;
+  border-radius: 6px;
+  background: #f4e1ba;
+}
+
+.stat-list {
+  grid-column: 1 / 4;
+  display: grid;
+  align-content: center;
+  gap: 10px;
+}
+
+.stat {
+  display: grid;
+  grid-template-columns: 28px 1fr 54px;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+}
+
+.stat div,
+.mini-bars i,
+.production-card .progress,
+.recipe-card .progress {
+  overflow: hidden;
+  height: 16px;
+  border-radius: 20px;
+  background: #ead8b8;
+}
+
+.stat i,
+.production-card .progress i,
+.recipe-card .progress i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--mint);
+}
+
+#affectionBar {
+  background: var(--heart);
+}
+
+#energyBar {
+  background: var(--energy);
+}
+
+#skillBar {
+  background: var(--blue);
+}
+
+.party-list {
+  grid-column: 1 / 4;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+.party-card {
+  position: relative;
+  min-height: 74px;
+  border: 1px solid #d4aa68;
+  border-radius: 12px;
+  background: #ffe8b8;
+}
+
+.party-card::before {
+  content: "";
+  position: absolute;
+  left: 16px;
+  top: 10px;
+  width: 42px;
+  height: 42px;
+  border: 2px solid #c98f70;
+  border-radius: 48%;
+  background: var(--cat-color, #fff7e6);
+}
+
+.party-card b {
+  position: absolute;
+  right: 12px;
+  bottom: 8px;
+}
+
+.restaurant {
+  display: grid;
+  grid-template-rows: 1fr 74px;
+  padding: 12px;
+  min-width: 0;
+  min-height: 0;
+}
+
+.room {
+  position: relative;
+  overflow: hidden;
+  border: 3px solid #8d653d;
+  border-radius: 14px;
+  background: var(--concept-room) center / cover no-repeat;
+}
+
+.room::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(180deg, transparent 58%, rgba(71, 43, 23, 0.15));
+}
+
+.room .floor,
+.room .counter,
+.room .oven,
+.room .shelf,
+.room .table,
+.room .bubble,
+.room .room-cat {
+  display: none;
+}
+
+.counter,
+.oven,
+.shelf,
+.table,
+.bubble,
+.activity-note,
+.room-cat {
+  position: absolute;
+}
+
+.counter.back {
+  left: 38%;
+  top: 15%;
+  width: 48%;
+  height: 18%;
+  border: 3px solid #6d4329;
+  border-radius: 10px;
+  background: linear-gradient(#f1cf8f, #9d6741);
+}
+
+.oven {
+  right: 7%;
+  top: 28%;
+  width: 86px;
+  height: 92px;
+  border: 4px solid #8c4729;
+  border-radius: 46px 46px 12px 12px;
+  background: radial-gradient(circle at 50% 70%, #ffb14a, #61321d 38%, #a96436 39%);
+}
+
+.shelf {
+  top: 8%;
+  width: 160px;
+  height: 54px;
+  border-radius: 8px;
+  background: repeating-linear-gradient(90deg, #b07542 0 18px, #deb06d 19px 30px);
+}
+
+.shelf-a {
+  left: 8%;
+}
+
+.shelf-b {
+  right: 18%;
+}
+
+.table {
+  display: grid;
+  place-items: center;
+  width: 126px;
+  height: 74px;
+  border: 3px solid #7e5734;
+  border-radius: 14px;
+  background: repeating-linear-gradient(45deg, #e9f0c8 0 12px, #b9d588 12px 24px);
+  font-size: 28px;
+  box-shadow: 0 12px 0 rgba(70, 38, 18, 0.2);
+}
+
+.t1 {
+  left: 14%;
+  bottom: 18%;
+}
+
+.t2 {
+  left: 42%;
+  bottom: 12%;
+}
+
+.t3 {
+  right: 14%;
+  bottom: 22%;
+}
+
+.room-cat {
+  width: 38px;
+  height: 54px;
+}
+
+.room-cat::before,
+.room-cat::after,
+.mini-cat::before,
+.mini-cat::after,
+.mini-portrait::before,
+.mini-portrait::after,
+.active-cat::before,
+.active-cat::after {
+  content: "";
+  position: absolute;
+  top: -11px;
+  width: 16px;
+  height: 20px;
+  border: 2px solid #c98f70;
+  background: inherit;
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+}
+
+.room-cat::before,
+.mini-cat::before,
+.mini-portrait::before,
+.active-cat::before {
+  left: 2px;
+}
+
+.room-cat::after,
+.mini-cat::after,
+.mini-portrait::after,
+.active-cat::after {
+  right: 2px;
+}
+
+.c1 {
+  left: 24%;
+  top: 34%;
+  background: #f8b15a;
+}
+
+.c2 {
+  left: 48%;
+  top: 23%;
+  background: #fff7e6;
+}
+
+.c3 {
+  right: 24%;
+  bottom: 16%;
+  background: #383636;
+}
+
+.bubble {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 38px;
+  border-radius: 50%;
+  background: white;
+  color: var(--heart);
+  box-shadow: 0 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+.b1 {
+  left: 51%;
+  top: 9%;
+}
+
+.b2 {
+  left: 62%;
+  bottom: 25%;
+}
+
+.b3 {
+  right: 20%;
+  top: 17%;
+}
+
+.activity-note {
+  left: 22px;
+  bottom: 18px;
+  z-index: 2;
+  padding: 8px 12px;
+  border: 1px solid rgba(112, 74, 38, 0.32);
+  border-radius: 14px;
+  background: rgba(255, 245, 218, 0.9);
+  box-shadow: 0 6px 14px rgba(64, 38, 20, 0.16);
+  font-size: 14px;
+}
+
+.scene-actions {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  align-items: center;
+  padding-top: 12px;
+}
+
+.scene-actions button,
+.upgrade-button {
+  min-height: 44px;
+  border: 2px solid #b37d3c;
+  border-radius: 12px;
+  background: linear-gradient(#fff2c8, #f6bd5a);
+  font-weight: 700;
+  font-size: 18px;
+}
+
+.scene-actions button:active,
+.upgrade-button:active,
+.production-card button:active,
+.tiny-widget:active {
+  transform: translateY(1px);
+}
+
+.recipe-panel {
+  position: relative;
+  display: grid;
+  grid-template-rows: 42px minmax(0, 1fr) 48px 44px;
+  gap: 8px;
+  padding: 12px;
+  min-width: 0;
+  overflow: hidden;
+  background:
+    linear-gradient(rgba(255, 248, 226, 0.76), rgba(255, 239, 195, 0.72)),
+    var(--concept-recipe) center / cover no-repeat;
+}
+
+.recipe-tabs {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+}
+
+.recipe-tabs button {
+  width: auto;
+  height: 42px;
+  background: rgba(255, 245, 220, 0.86);
+}
+
+.recipe-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  min-height: 0;
+  overflow: hidden;
+  grid-auto-rows: minmax(0, 1fr);
+}
+
+.recipe-card {
+  position: relative;
+  display: grid;
+  grid-template-rows: 16px minmax(0, 1fr) 8px;
+  gap: 1px;
+  min-width: 0;
+  min-height: 0;
+  padding: 5px;
+  border: 2px solid #d1a056;
+  border-radius: 12px;
+  background: rgba(255, 241, 191, 0.82);
+  backdrop-filter: blur(0.5px);
+  text-align: center;
+  overflow: hidden;
+}
+
+.recipe-card.selected {
+  outline: 4px solid #7eb5ef;
+}
+
+.recipe-card .icon {
+  display: grid;
+  place-items: center;
+  font-size: clamp(20px, 2vw, 28px);
+  line-height: 1;
+}
+
+.recipe-card small {
+  font-size: 10px;
+  line-height: 1;
+}
+
+.ingredient-row {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 8px;
+  align-items: center;
+}
+
+.ingredient {
+  display: grid;
+  place-items: center;
+  height: 48px;
+  border-radius: 10px;
+  background: rgba(255, 248, 223, 0.82);
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.upgrade-button {
+  justify-self: end;
+  width: 148px;
+  height: 44px;
+  position: relative;
+  z-index: 2;
+  background: linear-gradient(#9ad96d, #6eb34c);
+  color: white;
+}
+
+.production {
+  grid-column: 2 / 4;
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 330px;
+  gap: 12px;
+  padding: 10px;
+  min-width: 0;
+  overflow: hidden;
+  background:
+    linear-gradient(rgba(255, 248, 225, 0.68), rgba(255, 228, 165, 0.58)),
+    var(--concept-production) left center / 72% 100% no-repeat;
+}
+
+.production-list {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(106px, 1fr));
+  gap: 8px;
+}
+
+.production-card {
+  display: grid;
+  grid-template-rows: 1fr 14px 28px;
+  gap: 4px;
+  padding: 8px;
+  border: 2px solid #d0a05f;
+  border-radius: 12px;
+  background-image: var(--concept-production);
+  background-size: 500% 100%;
+  background-repeat: no-repeat;
+  box-shadow: inset 0 0 0 999px rgba(255, 246, 213, 0.12);
+}
+
+.production-card:nth-child(1) { background-position: 0% 50%; }
+.production-card:nth-child(2) { background-position: 25% 50%; }
+.production-card:nth-child(3) { background-position: 50% 50%; }
+.production-card:nth-child(4) { background-position: 75% 50%; }
+.production-card:nth-child(5) { background-position: 100% 50%; }
+
+.production-art {
+  display: grid;
+  place-items: center;
+  min-height: 40px;
+  border-radius: 10px;
+  background: rgba(255, 246, 213, 0.22);
+  text-shadow: 0 2px 4px rgba(55, 34, 16, 0.28);
+  font-size: 30px;
+}
+
+.production-card button {
+  border: 1px solid #a87c3f;
+  border-radius: 8px;
+  background: #f5c35d;
+  font-weight: 700;
+}
+
+.route-map {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  border-radius: 14px;
+  background:
+    linear-gradient(rgba(245, 226, 169, 0.22), rgba(245, 226, 169, 0.22)),
+    var(--concept-route) center / cover no-repeat;
+  overflow: hidden;
+}
+
+.route-map::before {
+  content: "";
+  position: absolute;
+  left: 14%;
+  right: 12%;
+  top: 51%;
+  height: 6px;
+  border-radius: 8px;
+  background: #f7e7ba;
+}
+
+.node {
+  position: relative;
+  z-index: 1;
+  width: 48px;
+  height: 48px;
+  border: 3px solid #af8346;
+  border-radius: 50%;
+  background: #fff3c8;
+  font-size: 23px;
+}
+
+.node.active {
+  background: #f9bd42;
+}
+
+.node.final {
+  background: #ed6d6d;
+}
+
+.node.locked {
+  color: #7d6653;
+}
+
+.tiny-widget {
+  position: absolute;
+  left: 50%;
+  bottom: 76px;
+  z-index: 4;
+  width: 430px;
+  height: 52px;
+  display: grid;
+  grid-template-columns: 42px 90px 136px 62px 30px 28px;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 8px;
+  border: 2px solid #9d6630;
+  border-radius: 11px;
+  background:
+    linear-gradient(180deg, rgba(255, 244, 218, 0.96), rgba(246, 190, 91, 0.72) 56%, rgba(152, 89, 43, 0.92)),
+    linear-gradient(90deg, #fee0a4, #fff4cd 52%, #f3bd6b);
+  transform: translateX(-50%);
+  box-shadow:
+    0 9px 22px rgba(0, 0, 0, 0.34),
+    inset 0 1px rgba(255, 255, 255, 0.95),
+    inset 0 -2px rgba(101, 58, 25, 0.22);
+  overflow: hidden;
+}
+
+.tiny-widget::before {
+  content: "";
+  position: absolute;
+  inset: 3px;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  border-radius: 8px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.22), transparent 42%);
+  pointer-events: none;
+}
+
+.tiny-widget > * {
+  position: relative;
+  z-index: 1;
+}
+
+.mini-portrait {
+  display: block;
+  width: 38px;
+  height: 38px;
+  border: 1px solid #a66f34;
+  border-radius: 7px;
+  background: #fff0ca var(--widget-portrait) center / cover no-repeat;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.62);
+}
+
+.mini-portrait::before,
+.mini-portrait::after {
+  display: none;
+}
+
+.mini-bars {
+  display: grid;
+  justify-items: stretch;
+  gap: 5px;
+}
+
+.mini-bars i {
+  position: relative;
+  display: block;
+  width: 72px;
+  height: 8px;
+  margin-left: 16px;
+  border: 1px solid rgba(80, 48, 28, 0.55);
+  border-radius: 999px;
+  background: rgba(255, 238, 202, 0.76);
+  overflow: visible;
+  box-shadow: inset 0 1px rgba(255, 255, 255, 0.6);
+}
+
+.mini-bars i::before {
+  position: absolute;
+  left: -16px;
+  top: -5px;
+  width: 14px;
+  text-align: center;
+  font-size: 13px;
+  line-height: 16px;
+  text-shadow: 0 1px rgba(255, 255, 255, 0.7);
+}
+
+.mini-bars .heart::before {
+  content: "♥";
+  color: #d94b4b;
+}
+
+.mini-bars .energy::before {
+  content: "⚡";
+  color: #d99b25;
+}
+
+.mini-bars .heart::after,
+.mini-bars .energy::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  border-radius: inherit;
+}
+
+.mini-bars .heart::after {
+  width: var(--mini-heart, 72%);
+  background: var(--heart);
+}
+
+.mini-bars .energy::after {
+  width: var(--mini-energy, 58%);
+  background: var(--energy);
+}
+
+.mini-scene {
+  position: relative;
+  height: 40px;
+  overflow: hidden;
+  border: 1px solid rgba(121, 74, 34, 0.42);
+  border-radius: 8px;
+  background: #f7d39a var(--widget-action) center / cover no-repeat;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.44);
+}
+
+.mini-cat,
+.mini-pot,
+.mini-spark {
+  display: none;
+}
+
+.spark-one {
+  right: 38px;
+  top: 4px;
+}
+
+.spark-two {
+  right: 10px;
+  top: 12px;
+  animation-delay: 0.8s;
+}
+
+.mini-timer {
+  display: grid;
+  place-items: center;
+  width: 58px;
+  height: 36px;
+  border: 2px solid rgba(143, 94, 42, 0.62);
+  border-radius: 18px;
+  background:
+    radial-gradient(circle at 50% 35%, #fff8e4, #f8e2af 72%),
+    #f8e2af;
+  font-size: 13px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  box-shadow:
+    inset 0 1px rgba(255, 255, 255, 0.78),
+    0 1px rgba(92, 55, 25, 0.18);
+}
+
+.mini-reward {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 30px;
+  color: var(--heart);
+  font-size: 18px;
+  text-shadow: 0 1px rgba(255, 255, 255, 0.8);
+}
+
+.mini-expand {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 30px;
+  border: 1px solid rgba(122, 78, 37, 0.48);
+  border-radius: 7px;
+  background: rgba(248, 224, 178, 0.82);
+  font-weight: 900;
+  box-shadow: inset 0 1px rgba(255, 255, 255, 0.6);
+}
+
+/* Focused taskbar action widget */
+.tiny-widget {
+  width: 330px;
+  height: 52px;
+  grid-template-columns: minmax(0, 1fr) 62px 28px;
+  gap: 8px;
+  padding: 5px 7px;
+  border-color: #9d6630;
+  background:
+    linear-gradient(180deg, rgba(255, 244, 218, 0.96), rgba(247, 195, 100, 0.78) 58%, rgba(142, 82, 39, 0.92)),
+    linear-gradient(90deg, #fee0a4, #fff4cd 52%, #f3bd6b);
+}
+
+.mini-scene {
+  min-width: 0;
+  height: 40px;
+  background:
+    linear-gradient(90deg, rgba(255, 240, 201, 0.72), rgba(255, 248, 226, 0.42)),
+    #f7d39a;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.44),
+    inset 0 -8px rgba(119, 70, 36, 0.09);
+}
+
+.mini-action-art {
+  position: absolute;
+  left: 10px;
+  top: 3px;
+  width: 136px;
+  height: 60px;
+  background: var(--widget-action) left top / 136px 60px no-repeat;
+  transform-origin: 70px 34px;
+  animation: widgetCook 1.25s ease-in-out infinite;
+}
+
+.mini-steam {
+  position: absolute;
+  left: 78px;
+  top: 17px;
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.82);
+  filter: blur(0.2px);
+  opacity: 0;
+  animation: widgetSteam 1.6s ease-out infinite;
+}
+
+.steam-two {
+  left: 88px;
+  animation-delay: 0.45s;
+}
+
+.steam-three {
+  left: 96px;
+  animation-delay: 0.9s;
+}
+
+.mini-timer {
+  width: 60px;
+}
+
+.mini-expand {
+  width: 28px;
+}
+
+.mini-action-art {
+  left: 50%;
+  top: -5px;
+  width: 156px;
+  height: 52px;
+  background-position: center center;
+  background-size: contain;
+  transform: translateX(-50%);
+  transform-origin: 50% 72%;
+}
+
+.mini-steam {
+  left: calc(50% + 12px);
+  top: 18px;
+}
+
+.steam-two {
+  left: calc(50% + 22px);
+}
+
+.steam-three {
+  left: calc(50% + 31px);
+}
+
+/* Compact TBH-like diorama: one scene, no side gutters. */
+.tiny-widget {
+  width: 246px;
+  height: 58px;
+  display: block;
+  padding: 0;
+  border-radius: 12px;
+}
+
+.mini-scene {
+  position: absolute;
+  inset: 4px;
+  width: auto;
+  height: auto;
+  border-radius: 9px;
+  background:
+    linear-gradient(90deg, rgba(255, 226, 160, 0.46), rgba(255, 248, 226, 0.16) 50%, rgba(178, 104, 50, 0.18)),
+    #f7d39a;
+}
+
+.mini-scene::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background:
+    linear-gradient(90deg, rgba(87, 48, 22, 0.12), transparent 22%, transparent 72%, rgba(87, 48, 22, 0.15)),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.25), transparent 42%, rgba(106, 62, 28, 0.12));
+  pointer-events: none;
+}
+
+.mini-action-art {
+  left: 50%;
+  top: -8px;
+  width: 216px;
+  height: 64px;
+  background-size: 216px 64px;
+  transform-origin: 50% 78%;
+}
+
+.mini-steam {
+  left: calc(50% + 16px);
+  top: 17px;
+}
+
+.steam-two {
+  left: calc(50% + 26px);
+}
+
+.steam-three {
+  left: calc(50% + 36px);
+}
+
+.mini-timer {
+  position: absolute;
+  right: 38px;
+  top: 9px;
+  width: 54px;
+  height: 30px;
+  z-index: 3;
+  border-width: 1px;
+  font-size: 12px;
+  background: rgba(255, 239, 202, 0.94);
+}
+
+.mini-expand {
+  position: absolute;
+  right: 8px;
+  top: 12px;
+  z-index: 3;
+  width: 26px;
+  height: 28px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mini-action-art,
+  .mini-steam,
+  button.tiny-widget .mini-scene::before {
+    animation: none;
+  }
+}
+
+/* Taskbar-native toy version: no window frame, just a tiny scene on the bar. */
+button.tiny-widget {
+  width: 195px;
+  height: 70px;
+  bottom: 55px;
+  display: block;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  overflow: visible;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+button.tiny-widget:focus,
+button.tiny-widget:focus-visible {
+  outline: none;
+}
+
+button.tiny-widget::before {
+  content: "";
+  position: absolute;
+  left: 14px;
+  right: 36px;
+  bottom: 6px;
+  height: 12px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.34);
+  filter: blur(5px);
+  pointer-events: none;
+}
+
+button.tiny-widget::after {
+  display: none;
+}
+
+button.tiny-widget .mini-scene {
+  position: absolute;
+  inset: 0;
+  width: auto;
+  height: auto;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  overflow: visible;
+}
+
+button.tiny-widget .mini-scene::before {
+  content: "";
+  position: absolute;
+  left: 7px;
+  bottom: 4px;
+  z-index: 4;
+  width: 154px;
+  aspect-ratio: 136 / 60;
+  background-image: var(--widget-action-sprite);
+  background-repeat: no-repeat;
+  background-size: 924px 100%;
+  background-position: 0 0;
+  filter: drop-shadow(0 2px 2px rgba(24, 15, 8, 0.3));
+  pointer-events: none;
+  animation: widgetCookSprite 0.96s steps(6) infinite;
+}
+
+button.tiny-widget .mini-scene::after {
+  display: none;
+}
+
+button.tiny-widget .mini-spoon-actor,
+button.tiny-widget .mini-pot-actor,
+button.tiny-widget .mini-herb-actor {
+  position: absolute;
+  display: none;
+}
+
+.mini-cat-actor {
+  left: 36px;
+  bottom: 19px;
+  width: 52px;
+  height: 52px;
+  z-index: 3;
+  animation: catTaskbarCook 1.5s ease-in-out infinite;
+}
+
+.mini-cat-body {
+  left: 13px;
+  bottom: 0;
+  width: 27px;
+  height: 34px;
+  border: 2px solid #c98f70;
+  border-radius: 45% 45% 40% 40%;
+  background: #fff7e6;
+  box-shadow: inset -5px -3px rgba(235, 211, 177, 0.54);
+}
+
+.mini-cat-head {
+  left: 7px;
+  top: 0;
+  width: 39px;
+  height: 34px;
+  border: 2px solid #c98f70;
+  border-radius: 48% 48% 44% 44%;
+  background: #fff7e6;
+  box-shadow: inset -5px -2px rgba(235, 211, 177, 0.45);
+}
+
+.mini-cat-head::before,
+.mini-cat-head::after {
+  content: "";
+  position: absolute;
+  top: -10px;
+  width: 14px;
+  height: 18px;
+  border: 2px solid #c98f70;
+  background: #fff7e6;
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+}
+
+.mini-cat-head::before {
+  left: 3px;
+  transform: rotate(-12deg);
+}
+
+.mini-cat-head::after {
+  right: 3px;
+  transform: rotate(12deg);
+}
+
+.mini-cat-body::before {
+  content: "";
+  position: absolute;
+  left: 7px;
+  top: -15px;
+  width: 13px;
+  height: 4px;
+  border-radius: 999px;
+  background: #453328;
+  box-shadow: 15px 0 #453328;
+}
+
+.mini-cat-body::after {
+  content: "";
+  position: absolute;
+  left: 12px;
+  top: -5px;
+  width: 14px;
+  height: 4px;
+  border-bottom: 2px solid #c85e4d;
+  border-radius: 50%;
+}
+
+.mini-cat-arm {
+  right: 1px;
+  bottom: 16px;
+  width: 24px;
+  height: 7px;
+  border-radius: 999px;
+  background: #fff7e6;
+  border: 1px solid #c98f70;
+  transform-origin: left center;
+  animation: catStirArm 0.9s ease-in-out infinite;
+}
+
+.mini-spoon-actor {
+  left: 82px;
+  bottom: 41px;
+  z-index: 4;
+  width: 42px;
+  height: 5px;
+  border-radius: 999px;
+  background: #6d4b31;
+  transform-origin: left center;
+  animation: spoonTaskbarStir 0.9s ease-in-out infinite;
+}
+
+.mini-spoon-actor::after {
+  content: "";
+  position: absolute;
+  right: -8px;
+  top: -5px;
+  width: 13px;
+  height: 13px;
+  border: 2px solid #6d4b31;
+  border-radius: 50%;
+  background: #d3c5b0;
+}
+
+.mini-pot-actor {
+  left: 109px;
+  bottom: 22px;
+  z-index: 3;
+  width: 43px;
+  height: 24px;
+  border: 2px solid #5b4a3e;
+  border-radius: 8px 8px 14px 14px;
+  background: linear-gradient(#d6dee0, #87959a);
+  box-shadow:
+    inset 0 3px rgba(255, 255, 255, 0.45),
+    0 3px rgba(59, 40, 25, 0.22);
+}
+
+.mini-pot-actor::before,
+.mini-pot-actor::after {
+  content: "";
+  position: absolute;
+  top: 7px;
+  width: 10px;
+  height: 8px;
+  border: 2px solid #5b4a3e;
+  border-radius: 50%;
+}
+
+.mini-pot-actor::before {
+  left: -10px;
+}
+
+.mini-pot-actor::after {
+  right: -10px;
+}
+
+.mini-herb-actor {
+  right: 43px;
+  bottom: 19px;
+  z-index: 2;
+  width: 28px;
+  height: 22px;
+  border-radius: 5px 5px 10px 10px;
+  background: linear-gradient(#bf7b39, #7f4a28);
+  box-shadow: inset 0 2px rgba(255, 216, 141, 0.35);
+}
+
+.mini-herb-actor::before {
+  content: "";
+  position: absolute;
+  left: 6px;
+  top: -17px;
+  width: 8px;
+  height: 18px;
+  border-radius: 100% 0 100% 0;
+  background: #5cad48;
+  box-shadow:
+    8px -4px 0 #70bf55,
+    14px 1px 0 #4f9e3f;
+  transform: rotate(-14deg);
+}
+
+button.tiny-widget .mini-steam {
+  z-index: 6;
+  left: 86px;
+  top: 23px;
+}
+
+button.tiny-widget .steam-two {
+  left: 94px;
+}
+
+button.tiny-widget .steam-three {
+  left: 102px;
+}
+
+button.tiny-widget .mini-timer {
+  position: absolute;
+  right: 4px;
+  top: 5px;
+  z-index: 6;
+  width: 45px;
+  height: 22px;
+  border: 1px solid rgba(143, 94, 42, 0.6);
+  border-radius: 999px;
+  background: rgba(255, 239, 202, 0.92);
+  font-size: 10px;
+  box-shadow: 0 2px 4px rgba(54, 35, 18, 0.18);
+}
+
+button.tiny-widget .mini-expand {
+  position: absolute;
+  right: 8px;
+  bottom: 14px;
+  z-index: 6;
+  width: 21px;
+  height: 21px;
+  border-radius: 50%;
+  background: rgba(248, 224, 178, 0.88);
+  font-size: 11px;
+}
+
+button.tiny-widget .mini-cat-actor {
+  position: absolute;
+  left: 7px;
+  bottom: 4px;
+  z-index: 5;
+  display: none;
+  width: 154px;
+  aspect-ratio: 136 / 60;
+  background: none;
+  pointer-events: none;
+  transform: none;
+  animation: none;
+}
+
+button.tiny-widget .mini-cat-head {
+  position: absolute;
+  left: 23px;
+  top: 25px;
+  z-index: 8;
+  display: block;
+  width: 47px;
+  height: 15px;
+  border: 0;
+  border-radius: 0;
+  background:
+    radial-gradient(ellipse 13px 7px at 8px 6px, #fff2dd 0 72%, transparent 76%),
+    radial-gradient(ellipse 13px 7px at 37px 6px, #fff2dd 0 72%, transparent 76%);
+  box-shadow: none;
+  display: none;
+}
+
+button.tiny-widget .mini-cat-head::before,
+button.tiny-widget .mini-cat-head::after {
+  content: "";
+  position: absolute;
+  top: 6px;
+  width: 13px;
+  height: 3px;
+  border: 0;
+  border-radius: 999px;
+  background: #3d2a20;
+  clip-path: none;
+  transform-origin: center;
+  animation: catWidgetBlink 4.4s steps(1, end) infinite;
+}
+
+button.tiny-widget .mini-cat-head::before {
+  left: 2px;
+  transform: rotate(-1deg);
+}
+
+button.tiny-widget .mini-cat-head::after {
+  left: 31px;
+  transform: rotate(1deg);
+  animation-delay: 0.04s;
+}
+
+button.tiny-widget .mini-cat-body {
+  position: absolute;
+  left: 58px;
+  top: 37px;
+  z-index: 9;
+  display: none;
+  width: 14px;
+  height: 12px;
+  border: 1px solid rgba(191, 135, 100, 0.9);
+  border-radius: 48% 52% 45% 55%;
+  background: #fff3df;
+  box-shadow: inset -2px -1px rgba(231, 202, 168, 0.7);
+  transform-origin: 25% 35%;
+  will-change: left, top, transform;
+  animation: catWidgetPaw 0.92s ease-in-out infinite;
+}
+
+button.tiny-widget .mini-cat-body::before,
+button.tiny-widget .mini-cat-body::after {
+  content: none;
+}
+
+button.tiny-widget .mini-cat-arm {
+  position: absolute;
+  left: 66px;
+  top: 34px;
+  z-index: 8;
+  display: none;
+  width: 28px;
+  height: 4px;
+  border: 0;
+  border-radius: 999px;
+  background: #8a542c;
+  box-shadow: 0 1px 0 rgba(65, 39, 22, 0.25);
+  transform-origin: 3px 2px;
+  will-change: left, top, transform;
+  animation: catWidgetSpoon 0.92s ease-in-out infinite;
+}
+
+@keyframes widgetCookSprite {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: -924px 0;
+  }
+}
+
+@keyframes catWidgetBlink {
+  0%, 86%, 93%, 100% {
+    opacity: 1;
+  }
+  89%, 91% {
+    opacity: 0;
+  }
+}
+
+@keyframes catWidgetPaw {
+  0%, 100% {
+    left: 58px;
+    top: 37px;
+    transform: rotate(-8deg);
+  }
+  50% {
+    left: 61px;
+    top: 34px;
+    transform: rotate(12deg);
+  }
+}
+
+@keyframes catWidgetSpoon {
+  0%, 100% {
+    left: 66px;
+    top: 34px;
+    transform: rotate(-54deg);
+  }
+  50% {
+    left: 68px;
+    top: 31px;
+    transform: rotate(-34deg);
+  }
+}
+
+@keyframes widgetSpriteCook {
+  0%, 100% {
+    transform: translateY(0) rotate(-0.6deg);
+  }
+  50% {
+    transform: translateY(-2px) rotate(0.8deg);
+  }
+}
+
+@keyframes catTaskbarCook {
+  0%, 100% {
+    transform: translateY(0) rotate(-1deg);
+  }
+  50% {
+    transform: translateY(-2px) rotate(1deg);
+  }
+}
+
+@keyframes catStirArm {
+  0%, 100% {
+    transform: rotate(-18deg);
+  }
+  50% {
+    transform: rotate(8deg);
+  }
+}
+
+@keyframes spoonTaskbarStir {
+  0%, 100% {
+    transform: rotate(-28deg) translateY(0);
+  }
+  50% {
+    transform: rotate(-10deg) translateY(3px);
+  }
+}
+
+.os-taskbar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 3;
+  height: 66px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 0 38px;
+  background: rgba(8, 17, 26, 0.96);
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.os-icon,
+.os-search,
+.app-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+  background: #263545;
+}
+
+.os-icon {
+  background: linear-gradient(90deg, #35b9f0 0 46%, transparent 47% 53%, #35b9f0 54%), linear-gradient(#35b9f0 0 46%, transparent 47% 53%, #35b9f0 54%);
+}
+
+.os-search {
+  border: 4px solid #e8eef4;
+  border-radius: 50%;
+  background: transparent;
+}
+
+.folder {
+  background: #f1c34e;
+}
+
+.browser {
+  border-radius: 50%;
+  background: conic-gradient(#33a3dc, #44c96e, #f1c34e, #33a3dc);
+}
+
+.mail {
+  background: #4ab0e6;
+}
+
+.active-cat {
+  width: 50px;
+  height: 50px;
+  background: #fff7e6;
+  box-shadow: inset 0 -4px #293d54;
+}
+
+.tray {
+  margin-left: auto;
+  color: #eef6fb;
+  font-size: 18px;
+  letter-spacing: 10px;
+}
+
+.toast {
+  position: absolute;
+  left: 50%;
+  bottom: 150px;
+  z-index: 20;
+  padding: 10px 16px;
+  border: 2px solid var(--line);
+  border-radius: 14px;
+  background: #fff8e6;
+  color: var(--deep);
+  font-weight: 800;
+  box-shadow: var(--shadow);
+  transform: translateX(-50%);
+  animation: toast 1.6s ease forwards;
+}
+
+@keyframes breathe {
+  50% {
+    transform: translateY(3px);
+  }
+}
+
+@keyframes stir {
+  50% {
+    transform: translateX(5px) rotate(-3deg);
+  }
+}
+
+@keyframes pop {
+  0%, 100% {
+    opacity: 0;
+    transform: translateY(6px) scale(0.85);
+  }
+  35%, 70% {
+    opacity: 1;
+    transform: translateY(-1px) scale(1);
+  }
+}
+
+@keyframes widgetCook {
+  0%, 100% {
+    transform: translateX(-50%) translateY(0) rotate(-0.6deg);
+  }
+  35% {
+    transform: translateX(-50%) translateY(-1px) rotate(0.8deg);
+  }
+  62% {
+    transform: translateX(-50%) translateY(1px) rotate(-0.4deg);
+  }
+}
+
+@keyframes widgetSteam {
+  0% {
+    opacity: 0;
+    transform: translateY(7px) scale(0.7);
+  }
+  25% {
+    opacity: 0.8;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-13px) scale(1.35);
+  }
+}
+
+@keyframes toast {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, 10px);
+  }
+  15%, 80% {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -8px);
+  }
+}
+
+@media (max-width: 1200px) {
+  .desktop {
+    min-width: 0;
+    overflow-x: auto;
+  }
+
+  .game-panel {
+    width: 1120px;
+    left: 24px;
+    right: auto;
+  }
+}
+
+/* v19: polished taskbar micro-scene. The widget is animated as separated SVG parts,
+   not as a cropped bitmap or a whole-image sprite. */
+button.tiny-widget {
+  width: 218px;
+  height: 76px;
+}
+
+button.tiny-widget::before {
+  left: 10px;
+  right: 38px;
+  bottom: 7px;
+  height: 13px;
+  background: rgba(0, 0, 0, 0.36);
+}
+
+button.tiny-widget .mini-scene {
+  inset: 0;
+  overflow: visible;
+}
+
+button.tiny-widget .mini-scene::before,
+button.tiny-widget .mini-scene::after {
+  display: none;
+  animation: none;
+}
+
+.widget-stage {
+  position: absolute;
+  left: -1px;
+  bottom: -1px;
+  z-index: 4;
+  width: 176px;
+  height: 77px;
+  overflow: visible;
+  filter: drop-shadow(0 2px 2px rgba(21, 13, 8, 0.28));
+}
+
+.widget-stage * {
+  vector-effect: non-scaling-stroke;
+}
+
+.widget-ground {
+  fill: rgba(0, 0, 0, 0.24);
+}
+
+.widget-shelf path {
+  fill: #9e6335;
+  stroke: #4d321f;
+  stroke-width: 1.2;
+  stroke-linejoin: round;
+}
+
+.widget-shelf rect {
+  fill: #d89b55;
+  stroke: #5b3821;
+  stroke-width: 1.1;
+}
+
+.widget-base rect,
+.widget-base path {
+  fill: url("#widgetWood");
+  stroke: #4c2e1e;
+  stroke-width: 1.2;
+  stroke-linejoin: round;
+}
+
+.widget-stage .widget-cat {
+  animation: widgetCatBreathe 2.6s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: 46px 64px;
+}
+
+.widget-stage .cat-tail {
+  fill: none;
+  stroke: #fff3df;
+  stroke-width: 9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  paint-order: stroke;
+  filter: drop-shadow(0 0 0 #b98062);
+}
+
+.widget-stage .cat-body,
+.widget-stage .cat-head,
+.widget-stage .cat-ear,
+.widget-stage .cat-hat {
+  fill: url("#widgetFur");
+  stroke: #8f573d;
+  stroke-width: 1.7;
+  clip-path: none;
+}
+
+.widget-stage .cat-ear {
+  fill: #fff4e1;
+  stroke-linejoin: round;
+}
+
+.widget-stage .cat-apron {
+  fill: #fff9ec;
+  stroke: #c08a61;
+  stroke-width: 1.2;
+}
+
+.widget-stage .cat-scarf {
+  fill: #db5f3f;
+  stroke: #9f3727;
+  stroke-width: 1.1;
+}
+
+.widget-stage .cat-hat {
+  fill: #fffdf4;
+}
+
+.widget-stage .cat-hat-band {
+  fill: #fff8e9;
+  stroke: #b77c53;
+  stroke-width: 1.1;
+}
+
+.widget-stage .cat-face {
+  stroke: #4a2e22;
+  stroke-width: 2.25;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: none;
+}
+
+.widget-stage .cat-eye {
+  stroke-width: 2.7;
+  animation: widgetCatBlink 4.2s steps(1, end) infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.widget-stage .cat-mouth {
+  stroke-width: 1.7;
+}
+
+.widget-stage .cat-blush {
+  fill: #f1a184;
+  stroke: none;
+  opacity: 0.72;
+}
+
+.widget-stage .cat-whisker {
+  stroke: #e9a487;
+  stroke-width: 1.45;
+  opacity: 0.9;
+}
+
+.widget-stage .cat-stir {
+  animation: widgetCatStir 0.86s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: 66px 49px;
+}
+
+.widget-stage .cat-paw {
+  fill: #fff4df;
+  stroke: #b98062;
+  stroke-width: 1.2;
+}
+
+.widget-stage .cat-spoon {
+  fill: none;
+  stroke: #89532e;
+  stroke-width: 4;
+  stroke-linecap: round;
+}
+
+.widget-stage .cat-spoon-tip {
+  fill: #b8793c;
+  stroke: #704326;
+  stroke-width: 1;
+}
+
+.widget-pot {
+  transform-box: fill-box;
+  transform-origin: 91px 60px;
+}
+
+.pot-body {
+  fill: url("#widgetPot");
+  stroke: #3e4549;
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+}
+
+.pot-rim {
+  fill: #d9e0df;
+  stroke: #3e4549;
+  stroke-width: 1.6;
+}
+
+.pot-handle {
+  fill: none;
+  stroke: #3e4549;
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+
+.soup {
+  fill: #efc661;
+  stroke: #9e6b33;
+  stroke-width: 1;
+  animation: widgetSoupPulse 1.2s ease-in-out infinite;
+}
+
+.soup-bubble {
+  fill: #fff2a7;
+  animation: widgetSoupBubble 1.15s ease-in-out infinite;
+}
+
+.soup-bubble.b2 {
+  animation-delay: 0.36s;
+}
+
+.widget-steam {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.86);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.steam {
+  animation: widgetSteamDrift 1.7s ease-out infinite;
+}
+
+.steam.s2 {
+  animation-delay: 0.34s;
+}
+
+.steam.s3 {
+  animation-delay: 0.68s;
+}
+
+.herb-pot {
+  fill: #a86432;
+  stroke: #59351f;
+  stroke-width: 1.4;
+  stroke-linejoin: round;
+}
+
+.leaf {
+  fill: url("#widgetLeaf");
+  stroke: #306e2f;
+  stroke-width: 1;
+  transform-box: fill-box;
+  transform-origin: bottom center;
+  animation: widgetLeafSway 2.2s ease-in-out infinite;
+}
+
+.leaf.l2,
+.leaf.l4 {
+  animation-delay: 0.42s;
+}
+
+.leaf.l3,
+.leaf.l5 {
+  animation-delay: 0.76s;
+}
+
+button.tiny-widget .mini-timer {
+  right: 7px;
+  top: 5px;
+  z-index: 7;
+  width: 43px;
+  height: 22px;
+}
+
+button.tiny-widget .mini-expand {
+  right: 10px;
+  bottom: 14px;
+  z-index: 7;
+  width: 21px;
+  height: 21px;
+}
+
+@keyframes widgetCatBreathe {
+  0%, 100% {
+    transform: translate(-4px, -2px) scale(1.08);
+  }
+  50% {
+    transform: translate(-4px, -0.8px) scale(1.08);
+  }
+}
+
+@keyframes widgetCatBlink {
+  0%, 86%, 93%, 100% {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+  89%, 91% {
+    transform: scaleY(0.18);
+    opacity: 0.85;
+  }
+}
+
+@keyframes widgetCatStir {
+  0%, 100% {
+    transform: translate(0, 0) rotate(-8deg);
+  }
+  45% {
+    transform: translate(2px, -2px) rotate(12deg);
+  }
+  72% {
+    transform: translate(1px, 1px) rotate(-3deg);
+  }
+}
+
+@keyframes widgetSoupPulse {
+  0%, 100% {
+    transform: scaleX(1);
+  }
+  50% {
+    transform: scaleX(0.94);
+  }
+}
+
+@keyframes widgetSoupBubble {
+  0%, 100% {
+    opacity: 0.5;
+    transform: translateY(0) scale(0.85);
+  }
+  45% {
+    opacity: 1;
+    transform: translateY(-1px) scale(1.05);
+  }
+}
+
+@keyframes widgetSteamDrift {
+  0% {
+    opacity: 0;
+    transform: translateY(6px) scale(0.88);
+  }
+  28% {
+    opacity: 0.88;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-9px) scale(1.12);
+  }
+}
+
+@keyframes widgetLeafSway {
+  0%, 100% {
+    transform: rotate(-2deg);
+  }
+  50% {
+    transform: rotate(4deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .widget-cat,
+  .cat-eye,
+  .cat-stir,
+  .soup,
+  .soup-bubble,
+  .steam,
+  .leaf {
+    animation: none;
+  }
+}
+
+/* v21: high-detail raster sprite pass for the taskbar widget. */
+button.tiny-widget {
+  width: 224px;
+  height: 84px;
+  padding: 0;
+  border-radius: 11px;
+}
+
+button.tiny-widget::before {
+  inset: 4px 7px 5px 7px;
+  border-color: rgba(255, 248, 222, 0.78);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.26), rgba(255, 244, 202, 0.04) 48%, rgba(112, 61, 23, 0.2)),
+    linear-gradient(90deg, rgba(255, 215, 132, 0.88), rgba(255, 239, 184, 0.9) 54%, rgba(232, 171, 82, 0.86));
+}
+
+button.tiny-widget .mini-scene {
+  inset: 0;
+  overflow: visible;
+}
+
+button.tiny-widget .widget-stage {
+  display: none;
+}
+
+button.tiny-widget .mini-scene::before {
+  content: "";
+  display: block;
+  position: absolute;
+  left: 4px;
+  bottom: 4px;
+  z-index: 5;
+  width: 184px;
+  height: 76px;
+  background-image: var(--widget-chef-cat-taskbar);
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  background-size: 1104px 76px;
+  filter:
+    drop-shadow(0 2px 1px rgba(82, 41, 18, 0.36))
+    drop-shadow(0 0 1px rgba(255, 247, 216, 0.9));
+  image-rendering: auto;
+  animation: widgetTaskbarChefCook 1.02s steps(6, end) infinite;
+}
+
+button.tiny-widget .mini-timer {
+  right: 8px;
+  top: 5px;
+  z-index: 8;
+  width: 42px;
+  height: 22px;
+  border-color: rgba(128, 78, 38, 0.62);
+  background: rgba(255, 247, 218, 0.94);
+  font-size: 11px;
+  box-shadow:
+    0 1px 3px rgba(73, 39, 18, 0.22),
+    inset 0 1px rgba(255, 255, 255, 0.9);
+}
+
+button.tiny-widget .mini-expand {
+  right: 12px;
+  bottom: 11px;
+  z-index: 8;
+  width: 22px;
+  height: 22px;
+  border-color: rgba(130, 81, 42, 0.66);
+  background: rgba(255, 237, 190, 0.9);
+}
+
+@keyframes widgetTaskbarChefCook {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: -1104px 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  button.tiny-widget .mini-scene::before {
+    animation: none;
+  }
+}
+
+/* v28 final: fixed scene, part animation only. No full-frame sprite shake. */
+button.tiny-widget {
+  width: 188px !important;
+  height: 86px !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  overflow: visible !important;
+}
+
+button.tiny-widget::before {
+  display: block !important;
+  content: "";
+  position: absolute !important;
+  left: 16px !important;
+  right: 48px !important;
+  bottom: 11px !important;
+  height: 21px !important;
+  border: 0 !important;
+  border-radius: 999px !important;
+  background: radial-gradient(ellipse at center, rgba(30, 17, 8, 0.34), rgba(30, 17, 8, 0.08) 58%, rgba(30, 17, 8, 0) 78%) !important;
+  filter: blur(1.8px) !important;
+  box-shadow: none !important;
+  pointer-events: none !important;
+}
+
+button.tiny-widget .mini-scene {
+  position: absolute !important;
+  inset: 0 !important;
+  overflow: visible !important;
+}
+
+button.tiny-widget .mini-scene::before,
+button.tiny-widget .mini-scene::after {
+  display: none !important;
+  animation: none !important;
+  background-image: none !important;
+}
+
+button.tiny-widget .widget-stage {
+  display: block !important;
+  position: absolute !important;
+  left: 8px !important;
+  bottom: 2px !important;
+  z-index: 5 !important;
+  width: 154px !important;
+  height: 78px !important;
+  overflow: visible !important;
+  filter:
+    drop-shadow(0 2px 2px rgba(42, 22, 10, 0.32))
+    drop-shadow(0 0 2px rgba(255, 238, 178, 0.55)) !important;
+}
+
+button.tiny-widget .widget-shelf {
+  display: none !important;
+}
+
+button.tiny-widget .widget-base,
+button.tiny-widget .widget-pot,
+button.tiny-widget .herb-pot {
+  transform: none !important;
+  animation: none !important;
+}
+
+button.tiny-widget .widget-cat {
+  transform: translate(-4px, -2px) scale(1.06) !important;
+  transform-box: fill-box !important;
+  transform-origin: 48px 64px !important;
+  animation: none !important;
+}
+
+button.tiny-widget .cat-body,
+button.tiny-widget .cat-apron,
+button.tiny-widget .cat-scarf {
+  transform-box: fill-box !important;
+  transform-origin: center bottom !important;
+  animation: widgetCatSmallBreathV28 3.8s ease-in-out infinite !important;
+}
+
+button.tiny-widget .cat-head,
+button.tiny-widget .cat-ear,
+button.tiny-widget .cat-hat,
+button.tiny-widget .cat-hat-band,
+button.tiny-widget .cat-face {
+  transform-box: fill-box !important;
+  transform-origin: center bottom !important;
+  animation: widgetCatHeadCalmV28 4.6s ease-in-out infinite !important;
+}
+
+button.tiny-widget .cat-tail {
+  transform-box: fill-box !important;
+  transform-origin: 35px 48px !important;
+  animation: widgetTailSwayV28 2.8s ease-in-out infinite !important;
+}
+
+button.tiny-widget .cat-eye {
+  animation: widgetCatBlinkV28 5.2s steps(1, end) infinite !important;
+  transform-box: fill-box !important;
+  transform-origin: center !important;
+}
+
+button.tiny-widget .cat-stir {
+  animation: widgetStirV28 1.9s ease-in-out infinite !important;
+  transform-box: fill-box !important;
+  transform-origin: 66px 50px !important;
+}
+
+button.tiny-widget .soup {
+  transform-box: fill-box !important;
+  transform-origin: center !important;
+  animation: widgetSoupSloshV28 1.9s ease-in-out infinite !important;
+}
+
+button.tiny-widget .soup-bubble {
+  transform-box: fill-box !important;
+  transform-origin: center !important;
+  animation: widgetSoupBubbleV28 2.45s ease-in-out infinite !important;
+}
+
+button.tiny-widget .soup-bubble.b2 {
+  animation-delay: 0.9s !important;
+}
+
+button.tiny-widget .steam {
+  animation: widgetSteamSlowV28 3.2s ease-out infinite !important;
+}
+
+button.tiny-widget .steam.s2 {
+  animation-delay: 1.05s !important;
+}
+
+button.tiny-widget .steam.s3 {
+  animation-delay: 2.1s !important;
+}
+
+button.tiny-widget .leaf {
+  transform-box: fill-box !important;
+  transform-origin: bottom center !important;
+  animation: widgetLeafTinyV28 4.2s ease-in-out infinite !important;
+}
+
+button.tiny-widget .mini-timer {
+  right: 8px !important;
+  top: 15px !important;
+  z-index: 8 !important;
+  width: 38px !important;
+  height: 20px !important;
+  border-color: rgba(129, 82, 43, 0.62) !important;
+  background: rgba(255, 247, 218, 0.95) !important;
+  font-size: 10.5px !important;
+}
+
+button.tiny-widget .mini-expand {
+  right: 11px !important;
+  bottom: 15px !important;
+  z-index: 8 !important;
+  width: 20px !important;
+  height: 20px !important;
+  border-color: rgba(129, 82, 43, 0.62) !important;
+  background: rgba(255, 234, 184, 0.92) !important;
+}
+
+@keyframes widgetCatSmallBreathV28 {
+  0%, 100% {
+    transform: translateY(0) scaleY(1);
+  }
+  50% {
+    transform: translateY(0.5px) scaleY(1.012);
+  }
+}
+
+@keyframes widgetCatHeadCalmV28 {
+  0%, 100% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(0.35px, 0.2px);
+  }
+}
+
+@keyframes widgetTailSwayV28 {
+  0%, 100% {
+    transform: rotate(-2deg) translateX(0);
+  }
+  50% {
+    transform: rotate(7deg) translateX(1px);
+  }
+}
+
+@keyframes widgetCatBlinkV28 {
+  0%, 84%, 91%, 100% {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+  87%, 89% {
+    transform: scaleY(0.16);
+    opacity: 0.86;
+  }
+}
+
+@keyframes widgetStirV28 {
+  0%, 100% {
+    transform: translate(0, 0) rotate(-8deg);
+  }
+  38% {
+    transform: translate(1.7px, -1.5px) rotate(9deg);
+  }
+  70% {
+    transform: translate(0.7px, 0.8px) rotate(-2deg);
+  }
+}
+
+@keyframes widgetSoupSloshV28 {
+  0%, 100% {
+    transform: translateX(0) scaleX(1);
+  }
+  38% {
+    transform: translateX(0.8px) scaleX(0.96);
+  }
+  70% {
+    transform: translateX(-0.6px) scaleX(1.02);
+  }
+}
+
+@keyframes widgetSoupBubbleV28 {
+  0%, 100% {
+    opacity: 0.3;
+    transform: translateY(0) scale(0.72);
+  }
+  45% {
+    opacity: 0.95;
+    transform: translateY(-1.4px) scale(1.05);
+  }
+}
+
+@keyframes widgetSteamSlowV28 {
+  0% {
+    opacity: 0;
+    transform: translateY(7px) scale(0.78);
+  }
+  35% {
+    opacity: 0.74;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-9px) scale(1.12);
+  }
+}
+
+@keyframes widgetLeafTinyV28 {
+  0%, 100% {
+    transform: rotate(-1.2deg);
+  }
+  50% {
+    transform: rotate(2.2deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  button.tiny-widget .widget-stage *,
+  button.tiny-widget .mini-scene::before {
+    animation: none !important;
+  }
+}
+
+/* v27 final: high-quality integrated 12-frame sprite, not the old v18 fallback. */
+button.tiny-widget {
+  width: 180px !important;
+  height: 92px !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  overflow: visible !important;
+}
+
+button.tiny-widget::before {
+  display: block !important;
+  content: "";
+  position: absolute !important;
+  left: 8px !important;
+  right: 44px !important;
+  bottom: 10px !important;
+  height: 46px !important;
+  border: 0 !important;
+  border-radius: 13px !important;
+  background:
+    radial-gradient(ellipse at center, rgba(255, 226, 145, 0.44), rgba(255, 226, 145, 0.15) 50%, rgba(255, 226, 145, 0) 78%) !important;
+  filter: blur(2px) !important;
+  box-shadow: none !important;
+  pointer-events: none !important;
+}
+
+button.tiny-widget .mini-scene {
+  position: absolute !important;
+  inset: 0 !important;
+  overflow: visible !important;
+}
+
+button.tiny-widget .mini-scene::before {
+  content: "";
+  display: block !important;
+  position: absolute !important;
+  left: 7px !important;
+  bottom: -2px !important;
+  z-index: 5 !important;
+  width: 112px !important;
+  height: 113px !important;
+  background-image: var(--widget-chef-integrated-sprite-12) !important;
+  background-repeat: no-repeat !important;
+  background-position: 0 0;
+  background-size: 1344px 113px !important;
+  image-rendering: auto !important;
+  filter:
+    drop-shadow(0 2px 2px rgba(40, 20, 10, 0.36))
+    drop-shadow(0 0 2px rgba(255, 238, 178, 0.78)) !important;
+  animation: widgetChefIntegratedV27 1.28s steps(12, end) infinite !important;
+}
+
+button.tiny-widget .mini-scene::after,
+button.tiny-widget .widget-stage {
+  display: none !important;
+}
+
+button.tiny-widget .mini-timer {
+  right: 7px !important;
+  top: 17px !important;
+  z-index: 8 !important;
+  width: 38px !important;
+  height: 20px !important;
+  border-color: rgba(129, 82, 43, 0.62) !important;
+  background: rgba(255, 247, 218, 0.95) !important;
+  font-size: 10.5px !important;
+}
+
+button.tiny-widget .mini-expand {
+  right: 10px !important;
+  bottom: 15px !important;
+  z-index: 8 !important;
+  width: 20px !important;
+  height: 20px !important;
+  border-color: rgba(129, 82, 43, 0.62) !important;
+  background: rgba(255, 234, 184, 0.92) !important;
+}
+
+@keyframes widgetChefIntegratedV27 {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: -1344px 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  button.tiny-widget .mini-scene::before {
+    animation: none;
+  }
+}
+
+/* v23 final override: integrated scene, appended after v22. */
+button.tiny-widget {
+  width: 204px;
+  height: 78px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  overflow: visible;
+}
+
+button.tiny-widget::before {
+  display: block;
+  content: "";
+  position: absolute;
+  left: 5px;
+  right: 32px;
+  bottom: 9px;
+  height: 52px;
+  border: 0;
+  border-radius: 12px;
+  background:
+    radial-gradient(ellipse at center, rgba(255, 232, 154, 0.48), rgba(255, 232, 154, 0.16) 48%, rgba(255, 232, 154, 0) 76%);
+  filter: blur(2px);
+  box-shadow: none;
+  pointer-events: none;
+}
+
+button.tiny-widget .mini-scene {
+  position: absolute;
+  inset: 0;
+  overflow: visible;
+}
+
+button.tiny-widget .mini-scene::before {
+  content: "";
+  display: block;
+  position: absolute;
+  left: 5px;
+  bottom: 6px;
+  z-index: 5;
+  width: 166px;
+  height: 73px;
+  background-image: var(--widget-action-sprite);
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  background-size: 996px 73px;
+  image-rendering: auto;
+  filter:
+    drop-shadow(0 2px 2px rgba(40, 20, 10, 0.35))
+    drop-shadow(0 0 2px rgba(255, 238, 178, 0.74));
+  animation: widgetIntegratedSceneCook 1.06s steps(6, end) infinite;
+}
+
+button.tiny-widget .mini-scene::after,
+button.tiny-widget .widget-stage {
+  display: none;
+}
+
+button.tiny-widget .mini-timer {
+  right: 7px;
+  top: 10px;
+  z-index: 8;
+  width: 40px;
+  height: 21px;
+  border-color: rgba(129, 82, 43, 0.62);
+  background: rgba(255, 247, 218, 0.95);
+  font-size: 11px;
+}
+
+button.tiny-widget .mini-expand {
+  right: 10px;
+  bottom: 14px;
+  z-index: 8;
+  width: 21px;
+  height: 21px;
+  border-color: rgba(129, 82, 43, 0.62);
+  background: rgba(255, 234, 184, 0.92);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  button.tiny-widget .mini-scene::before {
+    animation: none;
+  }
+}
+
+/* v23 final override: must stay after v22 rules. */
+button.tiny-widget {
+  width: 204px;
+  height: 78px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  overflow: visible;
+}
+
+button.tiny-widget::before {
+  display: block;
+  content: "";
+  position: absolute;
+  left: 5px;
+  right: 32px;
+  bottom: 9px;
+  height: 52px;
+  border: 0;
+  border-radius: 12px;
+  background:
+    radial-gradient(ellipse at center, rgba(255, 232, 154, 0.48), rgba(255, 232, 154, 0.16) 48%, rgba(255, 232, 154, 0) 76%);
+  filter: blur(2px);
+  box-shadow: none;
+  pointer-events: none;
+}
+
+button.tiny-widget .mini-scene {
+  position: absolute;
+  inset: 0;
+  overflow: visible;
+}
+
+button.tiny-widget .mini-scene::before {
+  content: "";
+  display: block;
+  position: absolute;
+  left: 5px;
+  bottom: 6px;
+  z-index: 5;
+  width: 166px;
+  height: 73px;
+  background-image: var(--widget-action-sprite);
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  background-size: 996px 73px;
+  image-rendering: auto;
+  filter:
+    drop-shadow(0 2px 2px rgba(40, 20, 10, 0.35))
+    drop-shadow(0 0 2px rgba(255, 238, 178, 0.74));
+  animation: widgetIntegratedSceneCook 1.06s steps(6, end) infinite;
+}
+
+button.tiny-widget .mini-scene::after,
+button.tiny-widget .widget-stage {
+  display: none;
+}
+
+button.tiny-widget .mini-timer {
+  right: 7px;
+  top: 10px;
+  z-index: 8;
+  width: 40px;
+  height: 21px;
+  border-color: rgba(129, 82, 43, 0.62);
+  background: rgba(255, 247, 218, 0.95);
+  font-size: 11px;
+}
+
+button.tiny-widget .mini-expand {
+  right: 10px;
+  bottom: 14px;
+  z-index: 8;
+  width: 21px;
+  height: 21px;
+  border-color: rgba(129, 82, 43, 0.62);
+  background: rgba(255, 234, 184, 0.92);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  button.tiny-widget .mini-scene::before {
+    animation: none;
+  }
+}
+
+/* v23: integrated TBH-sized scene. Background and action stay in one sprite strip. */
+button.tiny-widget {
+  width: 204px;
+  height: 78px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  overflow: visible;
+}
+
+button.tiny-widget::before {
+  display: block;
+  content: "";
+  position: absolute;
+  left: 5px;
+  right: 32px;
+  bottom: 9px;
+  height: 52px;
+  border: 0;
+  border-radius: 12px;
+  background:
+    radial-gradient(ellipse at center, rgba(255, 232, 154, 0.48), rgba(255, 232, 154, 0.16) 48%, rgba(255, 232, 154, 0) 76%);
+  filter: blur(2px);
+  box-shadow: none;
+  pointer-events: none;
+}
+
+button.tiny-widget .mini-scene {
+  position: absolute;
+  inset: 0;
+  overflow: visible;
+}
+
+button.tiny-widget .mini-scene::before {
+  content: "";
+  display: block;
+  position: absolute;
+  left: 5px;
+  bottom: 6px;
+  z-index: 5;
+  width: 166px;
+  height: 73px;
+  background-image: var(--widget-action-sprite);
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  background-size: 996px 73px;
+  image-rendering: auto;
+  filter:
+    drop-shadow(0 2px 2px rgba(40, 20, 10, 0.35))
+    drop-shadow(0 0 2px rgba(255, 238, 178, 0.74));
+  animation: widgetIntegratedSceneCook 1.06s steps(6, end) infinite;
+}
+
+button.tiny-widget .mini-scene::after,
+button.tiny-widget .widget-stage {
+  display: none;
+}
+
+button.tiny-widget .mini-timer {
+  right: 7px;
+  top: 10px;
+  z-index: 8;
+  width: 40px;
+  height: 21px;
+  border-color: rgba(129, 82, 43, 0.62);
+  background: rgba(255, 247, 218, 0.95);
+  font-size: 11px;
+}
+
+button.tiny-widget .mini-expand {
+  right: 10px;
+  bottom: 14px;
+  z-index: 8;
+  width: 21px;
+  height: 21px;
+  border-color: rgba(129, 82, 43, 0.62);
+  background: rgba(255, 234, 184, 0.92);
+}
+
+@keyframes widgetIntegratedSceneCook {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: -996px 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  button.tiny-widget .mini-scene::before {
+    animation: none;
+  }
+}
+
+/* v22: keep the cat sprite's original aspect ratio and restore a kitchen backdrop. */
+button.tiny-widget {
+  width: 236px;
+  height: 110px;
+}
+
+button.tiny-widget::before {
+  inset: 30px 6px 5px 6px;
+  border-radius: 13px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.18), rgba(118, 66, 28, 0.12)),
+    linear-gradient(90deg, rgba(255, 220, 145, 0.78), rgba(255, 240, 192, 0.82) 52%, rgba(219, 155, 74, 0.78));
+  box-shadow:
+    0 6px 18px rgba(47, 26, 12, 0.3),
+    inset 0 1px rgba(255, 255, 255, 0.76),
+    inset 0 -2px rgba(98, 55, 24, 0.18);
+}
+
+button.tiny-widget .mini-scene::after {
+  content: "";
+  display: block;
+  position: absolute;
+  left: 11px;
+  bottom: 10px;
+  z-index: 3;
+  width: 206px;
+  height: 78px;
+  background: var(--widget-kitchen-backdrop) center / 100% 100% no-repeat;
+  filter:
+    drop-shadow(0 3px 2px rgba(45, 25, 12, 0.34))
+    drop-shadow(0 0 4px rgba(255, 221, 134, 0.5));
+}
+
+button.tiny-widget .mini-scene::before {
+  left: 49px;
+  bottom: -1px;
+  width: 134px;
+  height: 148px;
+  background-image: var(--widget-chef-cat-hi-sprite);
+  background-size: 804px 148px;
+  z-index: 5;
+  filter:
+    drop-shadow(0 3px 2px rgba(64, 33, 15, 0.4))
+    drop-shadow(0 0 2px rgba(255, 249, 222, 0.92));
+  animation: widgetTaskbarChefNaturalCook 1.02s steps(6, end) infinite;
+}
+
+button.tiny-widget .mini-timer {
+  right: 12px;
+  top: 34px;
+}
+
+button.tiny-widget .mini-expand {
+  right: 15px;
+  bottom: 15px;
+}
+
+@keyframes widgetTaskbarChefNaturalCook {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: -804px 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  button.tiny-widget .mini-scene::before {
+    animation: none;
+  }
+}
+
+/* v23 final override: integrated scene, appended after v22. */
+button.tiny-widget {
+  width: 204px;
+  height: 78px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  overflow: visible;
+}
+
+button.tiny-widget::before {
+  display: block;
+  content: "";
+  position: absolute;
+  left: 5px;
+  right: 32px;
+  bottom: 9px;
+  height: 52px;
+  border: 0;
+  border-radius: 12px;
+  background:
+    radial-gradient(ellipse at center, rgba(255, 232, 154, 0.48), rgba(255, 232, 154, 0.16) 48%, rgba(255, 232, 154, 0) 76%);
+  filter: blur(2px);
+  box-shadow: none;
+  pointer-events: none;
+}
+
+button.tiny-widget .mini-scene {
+  position: absolute;
+  inset: 0;
+  overflow: visible;
+}
+
+button.tiny-widget .mini-scene::before {
+  content: "";
+  display: block;
+  position: absolute;
+  left: 5px;
+  bottom: 6px;
+  z-index: 5;
+  width: 166px;
+  height: 73px;
+  background-image: var(--widget-action-sprite);
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  background-size: 996px 73px;
+  image-rendering: auto;
+  filter:
+    drop-shadow(0 2px 2px rgba(40, 20, 10, 0.35))
+    drop-shadow(0 0 2px rgba(255, 238, 178, 0.74));
+  animation: widgetIntegratedSceneCook 1.06s steps(6, end) infinite;
+}
+
+button.tiny-widget .mini-scene::after,
+button.tiny-widget .widget-stage {
+  display: none;
+}
+
+button.tiny-widget .mini-timer {
+  right: 7px;
+  top: 10px;
+  z-index: 8;
+  width: 40px;
+  height: 21px;
+  border-color: rgba(129, 82, 43, 0.62);
+  background: rgba(255, 247, 218, 0.95);
+  font-size: 11px;
+}
+
+button.tiny-widget .mini-expand {
+  right: 10px;
+  bottom: 14px;
+  z-index: 8;
+  width: 21px;
+  height: 21px;
+  border-color: rgba(129, 82, 43, 0.62);
+  background: rgba(255, 234, 184, 0.92);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  button.tiny-widget .mini-scene::before {
+    animation: none;
+  }
+}

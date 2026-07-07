@@ -1,0 +1,285 @@
+/* Taskbar widget final override: fixed frame, animated parts only. */
+button.tiny-widget {
+  width: 184px !important;
+  height: 78px !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  overflow: visible !important;
+}
+
+button.tiny-widget::before {
+  display: block !important;
+  content: "" !important;
+  position: absolute !important;
+  left: 15px !important;
+  right: 47px !important;
+  bottom: 10px !important;
+  height: 18px !important;
+  border: 0 !important;
+  border-radius: 999px !important;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(26, 15, 8, 0.3),
+    rgba(26, 15, 8, 0.08) 58%,
+    rgba(26, 15, 8, 0) 79%
+  ) !important;
+  filter: blur(1.7px) !important;
+  box-shadow: none !important;
+  pointer-events: none !important;
+}
+
+button.tiny-widget .mini-scene {
+  position: absolute !important;
+  inset: 0 !important;
+  overflow: visible !important;
+}
+
+button.tiny-widget .mini-scene::before,
+button.tiny-widget .mini-scene::after {
+  display: none !important;
+  content: none !important;
+  animation: none !important;
+  background-image: none !important;
+  filter: none !important;
+}
+
+button.tiny-widget .widget-stage {
+  display: block !important;
+  position: absolute !important;
+  left: 7px !important;
+  bottom: 2px !important;
+  z-index: 5 !important;
+  width: 150px !important;
+  height: 72px !important;
+  overflow: visible !important;
+  filter:
+    drop-shadow(0 2px 2px rgba(42, 22, 10, 0.32))
+    drop-shadow(0 0 2px rgba(255, 238, 178, 0.5)) !important;
+  animation: none !important;
+}
+
+button.tiny-widget .widget-stage * {
+  transform-box: fill-box !important;
+}
+
+button.tiny-widget .widget-shelf {
+  display: none !important;
+}
+
+button.tiny-widget .widget-base,
+button.tiny-widget .widget-pot,
+button.tiny-widget .pot-body,
+button.tiny-widget .pot-rim,
+button.tiny-widget .pot-handle,
+button.tiny-widget .herb-pot {
+  transform: none !important;
+  animation: none !important;
+}
+
+button.tiny-widget .widget-cat {
+  transform: translate(-4px, -2px) scale(1.04) !important;
+  transform-origin: 48px 64px !important;
+  animation: none !important;
+}
+
+button.tiny-widget .cat-body,
+button.tiny-widget .cat-apron,
+button.tiny-widget .cat-scarf {
+  transform-origin: center bottom !important;
+  animation: widgetCatSmallBreathV28 4.2s ease-in-out infinite !important;
+}
+
+button.tiny-widget .cat-head,
+button.tiny-widget .cat-ear,
+button.tiny-widget .cat-hat,
+button.tiny-widget .cat-hat-band,
+button.tiny-widget .cat-face,
+button.tiny-widget .cat-blush,
+button.tiny-widget .cat-whisker,
+button.tiny-widget .cat-mouth {
+  transform-origin: center bottom !important;
+  animation: widgetCatHeadCalmV28 4.8s ease-in-out infinite !important;
+}
+
+button.tiny-widget .cat-tail {
+  transform-origin: 35px 48px !important;
+  animation: widgetTailSwayV28 3.2s ease-in-out infinite !important;
+}
+
+button.tiny-widget .cat-eye {
+  transform-origin: center !important;
+  animation: widgetCatBlinkV28 5.4s steps(1, end) infinite !important;
+}
+
+button.tiny-widget .cat-stir {
+  transform-origin: 66px 50px !important;
+  animation: widgetStirV28 2.05s ease-in-out infinite !important;
+}
+
+button.tiny-widget .cat-stir-hidden {
+  display: none !important;
+  animation: none !important;
+}
+
+button.tiny-widget .cat-stir-front {
+  transform-origin: 66px 50px !important;
+  animation: widgetStirV28 2.05s ease-in-out infinite !important;
+}
+
+button.tiny-widget .soup {
+  transform-origin: center !important;
+  animation: widgetSoupSloshV28 2.05s ease-in-out infinite !important;
+}
+
+button.tiny-widget .soup-bubble {
+  transform-origin: center !important;
+  animation: widgetSoupBubbleV28 3.1s ease-in-out infinite !important;
+}
+
+button.tiny-widget .soup-bubble.b2 {
+  animation-delay: 1.28s !important;
+}
+
+button.tiny-widget .steam {
+  animation: widgetSteamSlowV28 3.8s ease-out infinite !important;
+}
+
+button.tiny-widget .steam.s2 {
+  animation-delay: 1.25s !important;
+}
+
+button.tiny-widget .steam.s3 {
+  animation-delay: 2.5s !important;
+}
+
+button.tiny-widget .leaf {
+  transform-origin: bottom center !important;
+  animation: widgetLeafTinyV28 4.6s ease-in-out infinite !important;
+}
+
+button.tiny-widget .mini-timer {
+  right: 7px !important;
+  top: 12px !important;
+  z-index: 8 !important;
+  width: 38px !important;
+  height: 20px !important;
+  border-color: rgba(129, 82, 43, 0.62) !important;
+  background: rgba(255, 247, 218, 0.95) !important;
+  font-size: 10.5px !important;
+}
+
+button.tiny-widget .mini-expand {
+  right: 10px !important;
+  bottom: 13px !important;
+  z-index: 8 !important;
+  width: 20px !important;
+  height: 20px !important;
+  border-color: rgba(129, 82, 43, 0.62) !important;
+  background: rgba(255, 234, 184, 0.92) !important;
+}
+
+@keyframes widgetCatSmallBreathV28 {
+  0%, 100% {
+    transform: translateY(0) scaleY(1);
+  }
+  50% {
+    transform: translateY(0.35px) scaleY(1.008);
+  }
+}
+
+@keyframes widgetCatHeadCalmV28 {
+  0%, 100% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(0.25px, 0.2px);
+  }
+}
+
+@keyframes widgetTailSwayV28 {
+  0%, 100% {
+    transform: rotate(-2deg) translateX(0);
+  }
+  50% {
+    transform: rotate(7deg) translateX(1px);
+  }
+}
+
+@keyframes widgetCatBlinkV28 {
+  0%, 83%, 91%, 100% {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+  86%, 88% {
+    transform: scaleY(0.16);
+    opacity: 0.84;
+  }
+}
+
+@keyframes widgetStirV28 {
+  0%, 100% {
+    transform: translate(0, 0) rotate(-8deg);
+  }
+  38% {
+    transform: translate(1.55px, -1.35px) rotate(8deg);
+  }
+  70% {
+    transform: translate(0.55px, 0.7px) rotate(-2deg);
+  }
+}
+
+@keyframes widgetSoupSloshV28 {
+  0%, 100% {
+    transform: translateX(0) scaleX(1);
+  }
+  38% {
+    transform: translateX(0.7px) scaleX(0.965);
+  }
+  70% {
+    transform: translateX(-0.5px) scaleX(1.018);
+  }
+}
+
+@keyframes widgetSoupBubbleV28 {
+  0%, 100% {
+    opacity: 0.18;
+    transform: translateY(0) scale(0.7);
+  }
+  46% {
+    opacity: 0.9;
+    transform: translateY(-1.25px) scale(1.04);
+  }
+}
+
+@keyframes widgetSteamSlowV28 {
+  0% {
+    opacity: 0;
+    transform: translateY(6px) scale(0.78);
+  }
+  35% {
+    opacity: 0.72;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-9px) scale(1.12);
+  }
+}
+
+@keyframes widgetLeafTinyV28 {
+  0%, 100% {
+    transform: rotate(-1deg);
+  }
+  50% {
+    transform: rotate(2deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  button.tiny-widget .widget-stage *,
+  button.tiny-widget .mini-scene::before,
+  button.tiny-widget .mini-scene::after {
+    animation: none !important;
+  }
+}
