@@ -1,0 +1,977 @@
+{
+  "metadata": {
+    "id": "vertical_slice_fixture_v1",
+    "date": "2026-05-26",
+    "status": "draft_fixture",
+    "schemaDraft": "docs/game-data-types.v1.ts",
+    "assetManifest": "docs/asset-manifest.slice.v1.json",
+    "notes": [
+      "This fixture is a planning artifact, not shipped runtime data.",
+      "All numeric values are draft values for first vertical-slice validation.",
+      "Reference roles must stay aligned with docs/reference-role-map-slice-v1.md."
+    ]
+  },
+  "data": {
+    "cards": [
+      {
+        "id": "card_sun_jab",
+        "displayNameKo": "햇살 찌르기",
+        "descriptionKo": "앞의 적에게 피해 7. 공격 룬 피해 보너스를 받을 수 있다.",
+        "tags": ["starter", "attack", "single_target"],
+        "referenceRole": "starter_cost_1_attack",
+        "evidence": {
+          "level": "source_level",
+          "sources": ["research/card-gap-map.md"],
+          "notes": "Draft originalized starter attack for slice validation."
+        },
+        "type": "attack",
+        "cost": 1,
+        "rarity": "starter",
+        "colorKey": "coral",
+        "effects": [
+          {
+            "op": "deal_damage",
+            "timing": "on_play",
+            "value": { "amount": 7, "target": "front_enemy" },
+            "previewKo": "앞의 적에게 피해 7"
+          }
+        ],
+        "runeSlots": [{ "socketType": "attack", "unlockedByDefault": true }],
+        "assetKeys": {
+          "frame": "card_frame_attack",
+          "illustration": "card_art_sun_jab",
+          "typeIcon": "icon_card_attack"
+        },
+        "balance": {
+          "role": "starter_damage",
+          "powerBand": "starter",
+          "expectedValue": 7,
+          "lockState": "draft"
+        }
+      },
+      {
+        "id": "card_fold_guard",
+        "displayNameKo": "접힌 방패",
+        "descriptionKo": "보호막 6. 방어 룬을 장착하면 보호막이 증가한다.",
+        "tags": ["starter", "defense", "block"],
+        "referenceRole": "starter_basic_guard",
+        "evidence": {
+          "level": "source_level",
+          "sources": ["research/card-gap-map.md"],
+          "notes": "Draft originalized starter guard card."
+        },
+        "type": "defense",
+        "cost": 1,
+        "rarity": "starter",
+        "colorKey": "ivory",
+        "effects": [
+          {
+            "op": "gain_block",
+            "timing": "on_play",
+            "value": { "amount": 6, "target": "self" },
+            "previewKo": "보호막 6"
+          }
+        ],
+        "runeSlots": [{ "socketType": "defense", "unlockedByDefault": true }],
+        "assetKeys": {
+          "frame": "card_frame_defense",
+          "illustration": "card_art_fold_guard",
+          "typeIcon": "icon_card_defense"
+        },
+        "balance": {
+          "role": "starter_guard",
+          "powerBand": "starter",
+          "expectedValue": 6,
+          "lockState": "draft"
+        }
+      },
+      {
+        "id": "card_page_step",
+        "displayNameKo": "책장 넘기기",
+        "descriptionKo": "카드 1장을 뽑는다. 다음 카드 비용 -1.",
+        "tags": ["starter", "skill", "draw", "cost_flow"],
+        "referenceRole": "starter_draw_cycle",
+        "evidence": {
+          "level": "source_level",
+          "sources": ["research/card-gap-map.md"],
+          "notes": "Draft cycle card for hand-flow validation."
+        },
+        "type": "skill",
+        "cost": 0,
+        "rarity": "starter",
+        "colorKey": "mint",
+        "effects": [
+          {
+            "op": "draw_cards",
+            "timing": "on_play",
+            "value": { "amount": 1, "target": "self" },
+            "previewKo": "카드 1장 뽑기"
+          },
+          {
+            "op": "discount_next_card",
+            "timing": "on_play",
+            "value": { "amount": 1, "target": "self" },
+            "previewKo": "다음 카드 비용 -1"
+          }
+        ],
+        "runeSlots": [{ "socketType": "skill", "unlockedByDefault": true }],
+        "assetKeys": {
+          "frame": "card_frame_skill",
+          "illustration": "card_art_page_step",
+          "typeIcon": "icon_card_skill"
+        },
+        "balance": {
+          "role": "starter_cycle",
+          "powerBand": "starter",
+          "expectedValue": 1,
+          "lockState": "draft"
+        }
+      },
+      {
+        "id": "card_ribbon_snap",
+        "displayNameKo": "리본 튕기기",
+        "descriptionKo": "앞의 적에게 피해 4. 연쇄 3 이상이면 피해 +3.",
+        "tags": ["reward", "attack", "chain"],
+        "referenceRole": "starter_chain_attack",
+        "evidence": {
+          "level": "source_level",
+          "sources": ["research/systems-rules.md"],
+          "notes": "Draft chain payoff card."
+        },
+        "type": "attack",
+        "cost": 1,
+        "rarity": "common",
+        "colorKey": "coral",
+        "effects": [
+          {
+            "op": "deal_damage",
+            "timing": "on_play",
+            "value": { "amount": 4, "target": "front_enemy" },
+            "previewKo": "앞의 적에게 피해 4"
+          },
+          {
+            "op": "conditional_bonus_damage",
+            "timing": "on_play",
+            "value": { "amount": 3, "target": "front_enemy" },
+            "condition": "chain_count >= 3",
+            "previewKo": "연쇄 3 이상이면 +3"
+          }
+        ],
+        "runeSlots": [{ "socketType": "attack", "unlockedByDefault": true }],
+        "assetKeys": {
+          "frame": "card_frame_attack",
+          "illustration": "card_art_ribbon_snap",
+          "typeIcon": "icon_card_attack"
+        },
+        "balance": {
+          "role": "chain_payoff",
+          "powerBand": "early",
+          "expectedValue": 7,
+          "lockState": "draft"
+        }
+      },
+      {
+        "id": "card_lamplight_mark",
+        "displayNameKo": "등불 표식",
+        "descriptionKo": "앞의 적에게 표식 2. 표식은 다음 피해를 +2 한다.",
+        "tags": ["reward", "skill", "mark"],
+        "referenceRole": "starter_mark_setup",
+        "evidence": {
+          "level": "source_level",
+          "sources": ["research/systems-rules.md"],
+          "notes": "Draft mark setup for state UI validation."
+        },
+        "type": "skill",
+        "cost": 1,
+        "rarity": "common",
+        "colorKey": "gold",
+        "effects": [
+          {
+            "op": "apply_mark",
+            "timing": "on_play",
+            "value": { "amount": 2, "target": "front_enemy" },
+            "previewKo": "표식 2"
+          }
+        ],
+        "runeSlots": [{ "socketType": "skill", "unlockedByDefault": true }],
+        "assetKeys": {
+          "frame": "card_frame_skill",
+          "illustration": "card_art_lamplight_mark",
+          "typeIcon": "icon_card_skill"
+        },
+        "balance": {
+          "role": "mark_setup",
+          "powerBand": "early",
+          "expectedValue": 2,
+          "lockState": "draft"
+        }
+      },
+      {
+        "id": "card_stage_patch",
+        "displayNameKo": "무대 덧대기",
+        "descriptionKo": "보호막 11. 다음 피해를 1 줄인다.",
+        "tags": ["reward", "defense", "mitigation"],
+        "referenceRole": "starter_big_guard",
+        "evidence": {
+          "level": "source_level",
+          "sources": ["research/card-gap-map.md"],
+          "notes": "Draft larger guard option."
+        },
+        "type": "defense",
+        "cost": 2,
+        "rarity": "common",
+        "colorKey": "ivory",
+        "effects": [
+          {
+            "op": "gain_block",
+            "timing": "on_play",
+            "value": { "amount": 11, "target": "self" },
+            "previewKo": "보호막 11"
+          },
+          {
+            "op": "reduce_next_damage",
+            "timing": "on_play",
+            "value": { "amount": 1, "target": "self" },
+            "previewKo": "다음 피해 -1"
+          }
+        ],
+        "runeSlots": [{ "socketType": "defense", "unlockedByDefault": true }],
+        "assetKeys": {
+          "frame": "card_frame_defense",
+          "illustration": "card_art_stage_patch",
+          "typeIcon": "icon_card_defense"
+        },
+        "balance": {
+          "role": "large_guard",
+          "powerBand": "early",
+          "expectedValue": 12,
+          "lockState": "draft"
+        }
+      },
+      {
+        "id": "card_ink_spill",
+        "displayNameKo": "잉크 번짐",
+        "descriptionKo": "모든 적에게 피해 4.",
+        "tags": ["reward", "attack", "area"],
+        "referenceRole": "starter_area_attack",
+        "evidence": {
+          "level": "source_level",
+          "sources": ["research/card-gap-map.md"],
+          "notes": "Draft area card for multi-enemy pressure."
+        },
+        "type": "attack",
+        "cost": 2,
+        "rarity": "common",
+        "colorKey": "inkblue",
+        "effects": [
+          {
+            "op": "deal_damage",
+            "timing": "on_play",
+            "value": { "amount": 4, "target": "all_enemies" },
+            "previewKo": "모든 적에게 피해 4"
+          }
+        ],
+        "runeSlots": [{ "socketType": "attack", "unlockedByDefault": true }],
+        "assetKeys": {
+          "frame": "card_frame_attack",
+          "illustration": "card_art_ink_spill",
+          "typeIcon": "icon_card_attack"
+        },
+        "balance": {
+          "role": "area_damage",
+          "powerBand": "early",
+          "expectedValue": 8,
+          "lockState": "draft"
+        }
+      },
+      {
+        "id": "card_paper_bloom",
+        "displayNameKo": "종이꽃 회복",
+        "descriptionKo": "HP 3 회복.",
+        "tags": ["reward", "skill", "heal"],
+        "referenceRole": "starter_small_heal",
+        "evidence": {
+          "level": "source_level",
+          "sources": ["research/systems-rules.md"],
+          "notes": "Draft sustain card."
+        },
+        "type": "skill",
+        "cost": 1,
+        "rarity": "common",
+        "colorKey": "leaf",
+        "effects": [
+          {
+            "op": "heal",
+            "timing": "on_play",
+            "value": { "amount": 3, "target": "self" },
+            "previewKo": "HP 3 회복"
+          }
+        ],
+        "runeSlots": [{ "socketType": "skill", "unlockedByDefault": true }],
+        "assetKeys": {
+          "frame": "card_frame_skill",
+          "illustration": "card_art_paper_bloom",
+          "typeIcon": "icon_card_skill"
+        },
+        "balance": {
+          "role": "small_heal",
+          "powerBand": "early",
+          "expectedValue": 3,
+          "lockState": "draft"
+        }
+      },
+      {
+        "id": "card_pinpoint_glint",
+        "displayNameKo": "금핀 반짝임",
+        "descriptionKo": "앞의 적에게 피해 3. 0비용 룬 발동 테스트 카드.",
+        "tags": ["reward", "attack", "free"],
+        "referenceRole": "starter_free_chip",
+        "evidence": {
+          "level": "source_level",
+          "sources": ["research/card-gap-map.md"],
+          "notes": "Draft zero-cost card for chain and rune validation."
+        },
+        "type": "attack",
+        "cost": 0,
+        "rarity": "common",
+        "colorKey": "gold",
+        "effects": [
+          {
+            "op": "deal_damage",
+            "timing": "on_play",
+            "value": { "amount": 3, "target": "front_enemy" },
+            "previewKo": "앞의 적에게 피해 3"
+          }
+        ],
+        "runeSlots": [{ "socketType": "attack", "unlockedByDefault": true }],
+        "assetKeys": {
+          "frame": "card_frame_attack",
+          "illustration": "card_art_pinpoint_glint",
+          "typeIcon": "icon_card_attack"
+        },
+        "balance": {
+          "role": "free_chip",
+          "powerBand": "early",
+          "expectedValue": 3,
+          "lockState": "draft"
+        }
+      },
+      {
+        "id": "card_curtain_call",
+        "displayNameKo": "커튼콜",
+        "descriptionKo": "이번 전투 후 카드 보상 선택지 +1.",
+        "tags": ["reward", "skill", "reward_setup"],
+        "referenceRole": "starter_reward_setup",
+        "evidence": {
+          "level": "source_level",
+          "sources": ["research/systems-rules.md"],
+          "notes": "Draft reward-flow modifier."
+        },
+        "type": "skill",
+        "cost": 2,
+        "rarity": "common",
+        "colorKey": "gold",
+        "effects": [
+          {
+            "op": "increase_next_card_reward_options",
+            "timing": "on_play",
+            "value": { "amount": 1, "target": "run" },
+            "previewKo": "다음 카드 보상 선택지 +1"
+          }
+        ],
+        "runeSlots": [{ "socketType": "skill", "unlockedByDefault": true }],
+        "assetKeys": {
+          "frame": "card_frame_skill",
+          "illustration": "card_art_curtain_call",
+          "typeIcon": "icon_card_skill"
+        },
+        "balance": {
+          "role": "reward_setup",
+          "powerBand": "early",
+          "expectedValue": 1,
+          "lockState": "draft"
+        }
+      }
+    ],
+    "runes": [
+      {
+        "id": "rune_paper_spark",
+        "displayNameKo": "종이 불씨 룬",
+        "descriptionKo": "장착한 공격 카드의 피해 +2.",
+        "tags": ["attack", "damage", "slice"],
+        "referenceRole": "basic_socket_modifier",
+        "evidence": {
+          "level": "source_level",
+          "sources": ["research/gem-gap-map.md"],
+          "notes": "Draft attack socket modifier."
+        },
+        "socketType": "attack",
+        "rarity": "common",
+        "effects": [
+          {
+            "op": "modify_attached_card_damage",
+            "timing": "on_play",
+            "value": { "amount": 2, "target": "card" },
+            "previewKo": "장착 카드 피해 +2"
+          }
+        ],
+        "validCardTypes": ["attack"],
+        "assetKeys": { "icon": "rune_paper_spark_icon" },
+        "recommendation": { "bestRoles": ["starter_damage", "chain_payoff"] }
+      },
+      {
+        "id": "rune_ribbon_loop",
+        "displayNameKo": "리본 고리 룬",
+        "descriptionKo": "장착한 기술 카드를 사용하면 연쇄 +1.",
+        "tags": ["skill", "chain", "slice"],
+        "referenceRole": "chain_bridge_modifier",
+        "evidence": {
+          "level": "source_level",
+          "sources": ["research/gem-gap-map.md"],
+          "notes": "Draft chain socket modifier."
+        },
+        "socketType": "skill",
+        "rarity": "common",
+        "effects": [
+          {
+            "op": "gain_chain",
+            "timing": "on_play",
+            "value": { "amount": 1, "target": "self" },
+            "previewKo": "연쇄 +1"
+          }
+        ],
+        "validCardTypes": ["skill"],
+        "assetKeys": { "icon": "rune_ribbon_loop_icon" },
+        "recommendation": { "bestRoles": ["starter_cycle", "mark_setup"] }
+      },
+      {
+        "id": "rune_glass_leaf",
+        "displayNameKo": "유리잎 룬",
+        "descriptionKo": "장착한 방어 카드의 보호막 +3.",
+        "tags": ["defense", "block", "slice"],
+        "referenceRole": "defense_socket_modifier",
+        "evidence": {
+          "level": "source_level",
+          "sources": ["research/gem-gap-map.md"],
+          "notes": "Draft defense socket modifier."
+        },
+        "socketType": "defense",
+        "rarity": "common",
+        "effects": [
+          {
+            "op": "modify_attached_card_block",
+            "timing": "on_play",
+            "value": { "amount": 3, "target": "card" },
+            "previewKo": "장착 카드 보호막 +3"
+          }
+        ],
+        "validCardTypes": ["defense"],
+        "assetKeys": { "icon": "rune_glass_leaf_icon" },
+        "recommendation": { "bestRoles": ["starter_guard", "large_guard"] }
+      }
+    ],
+    "relics": [
+      {
+        "id": "relic_brass_bookmark",
+        "displayNameKo": "황동 책갈피",
+        "descriptionKo": "전투 시작 시 카드 1장을 추가로 뽑는다.",
+        "tags": ["relic", "draw", "slice_reward"],
+        "referenceRole": "first_reward_relic",
+        "evidence": {
+          "level": "source_level",
+          "sources": ["research/relic-gap-map.md"],
+          "notes": "Draft boss reward relic."
+        },
+        "rarity": "common",
+        "effects": [
+          {
+            "op": "draw_cards",
+            "timing": "combat_start",
+            "value": { "amount": 1, "target": "self" },
+            "previewKo": "전투 시작 시 카드 1장"
+          }
+        ],
+        "assetKeys": { "icon": "relic_brass_bookmark_icon" }
+      }
+    ],
+    "arcanas": [],
+    "characters": [
+      {
+        "id": "char_mina_pagehand",
+        "displayNameKo": "미나 종이손",
+        "descriptionKo": "접힌 책장 사이를 누비는 초보 무대 조수. 첫 공격 카드가 조금 강하다.",
+        "tags": ["starter", "balanced", "slice"],
+        "referenceRole": "starter_balanced_character",
+        "evidence": {
+          "level": "source_level",
+          "sources": ["research/character-gap-map.md"],
+          "notes": "Originalized starter character for slice validation."
+        },
+        "maxHp": 42,
+        "startingEnergy": 3,
+        "startingDeck": [
+          "card_sun_jab",
+          "card_sun_jab",
+          "card_sun_jab",
+          "card_fold_guard",
+          "card_fold_guard",
+          "card_page_step"
+        ],
+        "passives": [
+          {
+            "op": "first_attack_bonus_damage",
+            "timing": "combat_start",
+            "value": { "amount": 1, "target": "self" },
+            "previewKo": "전투마다 첫 공격 카드 피해 +1"
+          }
+        ],
+        "assetKeys": {
+          "portrait": "char_mina_pagehand_portrait",
+          "sprite": "char_mina_pagehand_sprite"
+        }
+      }
+    ],
+    "stages": [
+      {
+        "id": "stage_lantern_foyer",
+        "displayNameKo": "등불 현관",
+        "descriptionKo": "접힌 종이 등불이 줄지어 선 첫 무대. 전투, 보상, 장착, 보스 흐름을 검증한다.",
+        "tags": ["stage", "slice", "foyer"],
+        "referenceRole": "first_slice_stage",
+        "evidence": {
+          "level": "source_level",
+          "sources": ["research/stage-gap-map.md"],
+          "notes": "Originalized first stage for slice validation."
+        },
+        "order": 1,
+        "biomeKey": "paper_lantern_foyer",
+        "route": [
+          {
+            "id": "room_intro_combat",
+            "type": "combat",
+            "encounterPoolId": "encounter_pool_intro_combat",
+            "rewardPoolId": "reward_pool_card_intro",
+            "requiredClear": true
+          },
+          {
+            "id": "room_card_reward",
+            "type": "reward",
+            "rewardPoolId": "reward_pool_card_intro",
+            "requiredClear": true
+          },
+          {
+            "id": "room_rune_bench",
+            "type": "event",
+            "encounterPoolId": "encounter_pool_rune_bench",
+            "requiredClear": true
+          },
+          {
+            "id": "room_pressure_combat",
+            "type": "combat",
+            "encounterPoolId": "encounter_pool_pressure_combat",
+            "rewardPoolId": "reward_pool_rune_intro",
+            "requiredClear": true
+          },
+          {
+            "id": "room_foyer_boss",
+            "type": "boss",
+            "encounterPoolId": "encounter_pool_foyer_boss",
+            "rewardPoolId": "reward_pool_boss_clear",
+            "requiredClear": true
+          }
+        ],
+        "bossId": "boss_curtain_lion",
+        "unlockId": "unlock_stage_route_key",
+        "rewardPools": [
+          "reward_pool_card_intro",
+          "reward_pool_rune_intro",
+          "reward_pool_boss_clear"
+        ],
+        "assetKeys": {
+          "backgroundSet": "bg_lantern_foyer_set",
+          "mapIcon": "map_icon_lantern_foyer"
+        }
+      }
+    ],
+    "encounterPools": [
+      {
+        "id": "encounter_pool_intro_combat",
+        "displayNameKo": "현관 첫 전투 풀",
+        "descriptionKo": "첫 전투에서 접힌 파수꾼을 선택하는 세로 조각 전투 풀.",
+        "tags": ["encounter_pool", "combat", "slice"],
+        "referenceRole": "first_slice_stage",
+        "evidence": {
+          "level": "source_level",
+          "sources": ["research/stage-gap-map.md"],
+          "notes": "Explicit encounter pool for the first slice combat."
+        },
+        "type": "combat",
+        "entries": [
+          { "contentId": "enemy_folded_sentry", "weight": 1 }
+        ],
+        "rules": [
+          {
+            "id": "rule_intro_single_enemy",
+            "descriptionKo": "세로 조각 첫 전투는 항상 접힌 파수꾼 1종을 선택한다."
+          }
+        ]
+      },
+      {
+        "id": "encounter_pool_rune_bench",
+        "displayNameKo": "룬 작업대 이벤트 풀",
+        "descriptionKo": "접힌 작업대 이벤트를 선택하는 세로 조각 이벤트 풀.",
+        "tags": ["encounter_pool", "event", "slice"],
+        "referenceRole": "rune_socket_event",
+        "evidence": {
+          "level": "source_level",
+          "sources": ["research/event-gap-map.md"],
+          "notes": "Explicit encounter pool for the rune bench event."
+        },
+        "type": "event",
+        "entries": [
+          { "contentId": "event_rune_bench", "weight": 1 }
+        ],
+        "rules": [
+          {
+            "id": "rule_rune_bench_single_event",
+            "descriptionKo": "세로 조각에서는 접힌 작업대 이벤트만 선택한다."
+          }
+        ]
+      },
+      {
+        "id": "encounter_pool_pressure_combat",
+        "displayNameKo": "현관 압박 전투 풀",
+        "descriptionKo": "룬 장착 후 잉크 얼룩불을 선택하는 세로 조각 전투 풀.",
+        "tags": ["encounter_pool", "combat", "slice"],
+        "referenceRole": "first_slice_stage",
+        "evidence": {
+          "level": "source_level",
+          "sources": ["research/stage-gap-map.md"],
+          "notes": "Explicit encounter pool for the second slice combat."
+        },
+        "type": "combat",
+        "entries": [
+          { "contentId": "enemy_ink_mote", "weight": 1 }
+        ],
+        "rules": [
+          {
+            "id": "rule_pressure_single_enemy",
+            "descriptionKo": "세로 조각 두 번째 전투는 항상 잉크 얼룩불 1종을 선택한다."
+          }
+        ]
+      },
+      {
+        "id": "encounter_pool_foyer_boss",
+        "displayNameKo": "현관 보스 풀",
+        "descriptionKo": "등불 현관의 보스 커튼 사자무대를 선택하는 세로 조각 보스 풀.",
+        "tags": ["encounter_pool", "boss", "slice"],
+        "referenceRole": "first_boss_phase_gate",
+        "evidence": {
+          "level": "source_level",
+          "sources": ["research/boss-gap-map.md"],
+          "notes": "Explicit encounter pool for the first slice boss."
+        },
+        "type": "boss",
+        "entries": [
+          { "contentId": "boss_curtain_lion", "weight": 1 }
+        ],
+        "rules": [
+          {
+            "id": "rule_foyer_single_boss",
+            "descriptionKo": "세로 조각 보스 방은 항상 커튼 사자무대를 선택한다."
+          }
+        ]
+      }
+    ],
+    "enemies": [
+      {
+        "id": "enemy_folded_sentry",
+        "displayNameKo": "접힌 파수꾼",
+        "descriptionKo": "종이 갑옷을 접어 세운 현관의 파수꾼.",
+        "tags": ["enemy", "attacker", "slice"],
+        "referenceRole": "early_basic_attacker",
+        "evidence": {
+          "level": "source_level",
+          "sources": ["research/enemy-gap-map.md"],
+          "notes": "Originalized early attacker."
+        },
+        "role": "attacker",
+        "maxHp": 24,
+        "block": 0,
+        "intents": [
+          {
+            "id": "intent_sentry_poke",
+            "displayNameKo": "종이창 찌르기",
+            "telegraphKo": "공격 6",
+            "effects": [
+              {
+                "op": "deal_damage_to_player",
+                "timing": "turn_end",
+                "value": { "amount": 6, "target": "self" },
+                "previewKo": "플레이어에게 피해 6"
+              }
+            ],
+            "weight": 1
+          }
+        ],
+        "assetKeys": {
+          "sprite": "monster_folded_sentry",
+          "intentIcons": ["icon_intent_attack"]
+        }
+      },
+      {
+        "id": "enemy_ink_mote",
+        "displayNameKo": "잉크 얼룩불",
+        "descriptionKo": "젖은 종이 위에서 흔들리는 잉크빛 불씨.",
+        "tags": ["enemy", "disruptor", "slice"],
+        "referenceRole": "early_light_disruptor",
+        "evidence": {
+          "level": "source_level",
+          "sources": ["research/enemy-gap-map.md"],
+          "notes": "Originalized early disruptor."
+        },
+        "role": "disruptor",
+        "maxHp": 18,
+        "block": 0,
+        "intents": [
+          {
+            "id": "intent_ink_prick",
+            "displayNameKo": "잉크 튐",
+            "telegraphKo": "공격 4",
+            "effects": [
+              {
+                "op": "deal_damage_to_player",
+                "timing": "turn_end",
+                "value": { "amount": 4, "target": "self" },
+                "previewKo": "플레이어에게 피해 4"
+              }
+            ],
+            "weight": 2
+          },
+          {
+            "id": "intent_ink_drag",
+            "displayNameKo": "끈적한 번짐",
+            "telegraphKo": "다음 카드 비용 +1",
+            "effects": [
+              {
+                "op": "increase_next_card_cost",
+                "timing": "turn_end",
+                "value": { "amount": 1, "target": "self" },
+                "previewKo": "다음 카드 비용 +1"
+              }
+            ],
+            "weight": 1
+          }
+        ],
+        "assetKeys": {
+          "sprite": "monster_ink_mote",
+          "intentIcons": ["icon_intent_attack", "icon_intent_disrupt"]
+        }
+      }
+    ],
+    "bosses": [
+      {
+        "id": "boss_curtain_lion",
+        "displayNameKo": "커튼 사자무대",
+        "descriptionKo": "찢어진 커튼과 황동 핀이 사자 얼굴처럼 펼쳐진 첫 보스.",
+        "tags": ["boss", "hybrid", "phase", "slice"],
+        "referenceRole": "first_boss_phase_gate",
+        "evidence": {
+          "level": "source_level",
+          "sources": ["research/enemy-gap-map.md"],
+          "notes": "Originalized first boss gate."
+        },
+        "role": "hybrid",
+        "maxHp": 64,
+        "block": 0,
+        "intents": [
+          {
+            "id": "intent_lion_swipe",
+            "displayNameKo": "커튼 발톱",
+            "telegraphKo": "공격 7",
+            "effects": [
+              {
+                "op": "deal_damage_to_player",
+                "timing": "turn_end",
+                "value": { "amount": 7, "target": "self" },
+                "previewKo": "플레이어에게 피해 7"
+              }
+            ],
+            "weight": 2
+          },
+          {
+            "id": "intent_lion_stage_wall",
+            "displayNameKo": "무대 장벽",
+            "telegraphKo": "장벽 5",
+            "effects": [
+              {
+                "op": "gain_enemy_block",
+                "timing": "turn_end",
+                "value": { "amount": 5, "target": "self" },
+                "previewKo": "보스 보호막 5"
+              }
+            ],
+            "weight": 1
+          }
+        ],
+        "assetKeys": {
+          "sprite": "boss_curtain_lion",
+          "intentIcons": ["icon_intent_attack", "icon_intent_block"]
+        },
+        "phases": [
+          {
+            "id": "phase_lion_half_curtain",
+            "hpRatioAtOrBelow": 0.5,
+            "displayNameKo": "커튼 전환",
+            "effects": [
+              {
+                "op": "boss_next_attack_bonus",
+                "timing": "turn_start",
+                "value": { "amount": 3, "target": "self" },
+                "previewKo": "다음 공격 +3"
+              }
+            ],
+            "visualCueKey": "effect_stage_spotlight"
+          }
+        ]
+      }
+    ],
+    "events": [
+      {
+        "id": "event_rune_bench",
+        "displayNameKo": "접힌 작업대",
+        "descriptionKo": "종이와 유리룬이 놓인 작은 작업대. 카드 하나에 룬을 장착한다.",
+        "tags": ["event", "rune_socket", "slice"],
+        "referenceRole": "rune_socket_event",
+        "evidence": {
+          "level": "source_level",
+          "sources": ["research/gem-gap-map.md"],
+          "notes": "Originalized socket event for slice validation."
+        },
+        "choices": [
+          {
+            "id": "choice_socket_attack",
+            "displayNameKo": "공격 카드에 불씨 룬",
+            "descriptionKo": "공격 카드 1장에 종이 불씨 룬을 장착한다.",
+            "rewards": [
+              {
+                "id": "reward_socket_paper_spark",
+                "type": "rune",
+                "contentId": "rune_paper_spark",
+                "amount": 1
+              }
+            ],
+            "riskKey": "none"
+          },
+          {
+            "id": "choice_socket_defense",
+            "displayNameKo": "방어 카드에 유리잎 룬",
+            "descriptionKo": "방어 카드 1장에 유리잎 룬을 장착한다.",
+            "rewards": [
+              {
+                "id": "reward_socket_glass_leaf",
+                "type": "rune",
+                "contentId": "rune_glass_leaf",
+                "amount": 1
+              }
+            ],
+            "riskKey": "none"
+          },
+          {
+            "id": "choice_skip_socket_heal",
+            "displayNameKo": "정리하고 쉬기",
+            "descriptionKo": "룬을 장착하지 않고 HP 2 회복.",
+            "rewards": [
+              {
+                "id": "reward_skip_socket_heal",
+                "type": "heal",
+                "amount": 2
+              }
+            ],
+            "riskKey": "skip_growth"
+          }
+        ],
+        "assetKeys": {
+          "scene": "scene_rune_bench"
+        }
+      }
+    ],
+    "rewardPools": [
+      {
+        "id": "reward_pool_card_intro",
+        "displayNameKo": "첫 카드 보상",
+        "entries": [
+          { "id": "reward_card_ribbon_snap", "type": "card", "contentId": "card_ribbon_snap", "weight": 2 },
+          { "id": "reward_card_lamplight_mark", "type": "card", "contentId": "card_lamplight_mark", "weight": 2 },
+          { "id": "reward_card_stage_patch", "type": "card", "contentId": "card_stage_patch", "weight": 1 },
+          { "id": "reward_card_ink_spill", "type": "card", "contentId": "card_ink_spill", "weight": 1 },
+          { "id": "reward_card_paper_bloom", "type": "card", "contentId": "card_paper_bloom", "weight": 1 },
+          { "id": "reward_card_pinpoint_glint", "type": "card", "contentId": "card_pinpoint_glint", "weight": 1 },
+          { "id": "reward_card_curtain_call", "type": "card", "contentId": "card_curtain_call", "weight": 1 }
+        ],
+        "rules": [
+          {
+            "id": "rule_offer_three_cards",
+            "descriptionKo": "기본 카드 보상은 3장 중 1장을 고른다."
+          }
+        ]
+      },
+      {
+        "id": "reward_pool_rune_intro",
+        "displayNameKo": "첫 룬 보상",
+        "entries": [
+          { "id": "reward_rune_paper_spark", "type": "rune", "contentId": "rune_paper_spark", "weight": 1 },
+          { "id": "reward_rune_ribbon_loop", "type": "rune", "contentId": "rune_ribbon_loop", "weight": 1 },
+          { "id": "reward_rune_glass_leaf", "type": "rune", "contentId": "rune_glass_leaf", "weight": 1 }
+        ],
+        "rules": [
+          {
+            "id": "rule_offer_three_runes",
+            "descriptionKo": "룬 보상은 3개 후보를 보여준다."
+          }
+        ]
+      },
+      {
+        "id": "reward_pool_boss_clear",
+        "displayNameKo": "첫 보스 보상",
+        "entries": [
+          { "id": "reward_relic_brass_bookmark", "type": "relic", "contentId": "relic_brass_bookmark", "weight": 1 },
+          { "id": "reward_unlock_stage_route_key", "type": "unlock", "contentId": "unlock_stage_route_key", "weight": 1 }
+        ],
+        "rules": [
+          {
+            "id": "rule_boss_reward_unlock",
+            "descriptionKo": "첫 보스 클리어 시 유물과 해금 결과를 보여준다."
+          }
+        ]
+      }
+    ],
+    "unlocks": [
+      {
+        "id": "unlock_stage_route_key",
+        "displayNameKo": "첫 무대 열쇠",
+        "descriptionKo": "등불 현관을 클리어하면 다음 무대 placeholder가 열린다.",
+        "tags": ["unlock", "stage", "slice"],
+        "referenceRole": "first_stage_clear_unlock",
+        "evidence": {
+          "level": "source_level",
+          "sources": ["research/stage-gap-map.md"],
+          "notes": "Draft first clear unlock."
+        },
+        "trigger": {
+          "op": "clear_stage",
+          "targetId": "stage_lantern_foyer",
+          "amount": 1
+        },
+        "grants": [
+          {
+            "type": "stage_clear",
+            "contentId": "stage_lantern_foyer"
+          }
+        ]
+      }
+    ],
+    "evolutions": [],
+    "powerUps": []
+  }
+}

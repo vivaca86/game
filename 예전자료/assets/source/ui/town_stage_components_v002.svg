@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900">
+  <rect width="1600" height="900" fill="#fff7e8"/>
+  <rect x="90" y="92" width="1420" height="716" fill="#f9e7bd" stroke="#b98c34" stroke-width="6" opacity="0.55"/>
+  <rect x="488" y="58" width="624" height="108" rx="16" fill="#fff6df" stroke="#5a4638" stroke-width="8"/>
+  <text x="800" y="112" text-anchor="middle" font-family="serif" font-size="42" font-weight="700" fill="#1e2a3e">Town v002 source sheet</text>
+  <text x="800" y="150" text-anchor="middle" font-family="serif" font-size="20" fill="#805845">profile-driven expedition hub, stamps, next locked chapter, route preview</text>
+
+  <g transform="translate(140 230)">
+    <rect width="430" height="500" rx="14" fill="#fff6df" stroke="#5a4638" stroke-width="8"/>
+    <text x="38" y="58" font-family="serif" font-size="34" font-weight="700" fill="#32415a">Village diorama</text>
+    <text x="38" y="96" font-family="serif" font-size="22" font-weight="700" fill="#805845">active stage name</text>
+    <ellipse cx="214" cy="356" rx="178" ry="32" fill="#32415a" opacity="0.14"/>
+    <rect x="80" y="234" width="112" height="150" fill="#f5d58a" stroke="#b98c34" stroke-width="5"/>
+    <rect x="190" y="168" width="140" height="216" fill="#fffaf0" stroke="#c6a65e" stroke-width="5"/>
+    <rect x="332" y="250" width="82" height="132" fill="#f4c7a1" stroke="#b98c34" stroke-width="5"/>
+    <rect x="72" y="194" width="120" height="44" fill="#fff6df" stroke="#c6a65e" stroke-width="4"/>
+    <text x="132" y="220" text-anchor="middle" font-family="serif" font-size="16" fill="#1e2a3e">map open</text>
+    <rect x="210" y="126" width="120" height="44" fill="#fff6df" stroke="#c6a65e" stroke-width="4"/>
+    <text x="270" y="152" text-anchor="middle" font-family="serif" font-size="16" fill="#1e2a3e">run ready</text>
+    <rect x="318" y="208" width="120" height="44" fill="#fff6df" stroke="#c6a65e" stroke-width="4"/>
+    <text x="378" y="234" text-anchor="middle" font-family="serif" font-size="16" fill="#1e2a3e">next sealed</text>
+    <rect x="0" y="414" width="430" height="86" rx="12" fill="#fffaf0" stroke="#5a4638" stroke-width="6"/>
+    <text x="36" y="452" font-family="serif" font-size="24" font-weight="700" fill="#32415a">Passport: character, HP, gold</text>
+  </g>
+
+  <g transform="translate(640 220)">
+    <rect width="680" height="394" rx="14" fill="#fffaf0" stroke="#5a4638" stroke-width="8"/>
+    <text x="40" y="60" font-family="serif" font-size="36" font-weight="700" fill="#32415a">Expedition board</text>
+    <text x="40" y="102" font-family="serif" font-size="28" font-weight="700" fill="#1e2a3e">current stage</text>
+    <g>
+      <rect x="48" y="126" width="140" height="72" rx="10" fill="#f7e1a2" stroke="#d7ba6a" stroke-width="4"/>
+      <text x="118" y="154" text-anchor="middle" font-family="serif" font-size="18" fill="#805845">unlocked</text>
+      <text x="118" y="188" text-anchor="middle" font-family="serif" font-size="28" font-weight="700" fill="#1e2a3e">1/15</text>
+      <rect x="222" y="126" width="140" height="72" rx="10" fill="#f7e1a2" stroke="#d7ba6a" stroke-width="4"/>
+      <text x="292" y="154" text-anchor="middle" font-family="serif" font-size="18" fill="#805845">cleared</text>
+      <text x="292" y="188" text-anchor="middle" font-family="serif" font-size="28" font-weight="700" fill="#1e2a3e">0/15</text>
+      <rect x="396" y="126" width="140" height="72" rx="10" fill="#f7e1a2" stroke="#d7ba6a" stroke-width="4"/>
+      <text x="466" y="154" text-anchor="middle" font-family="serif" font-size="18" fill="#805845">remaining</text>
+      <text x="466" y="188" text-anchor="middle" font-family="serif" font-size="28" font-weight="700" fill="#1e2a3e">15</text>
+    </g>
+    <rect x="58" y="216" width="500" height="58" fill="#fff6df" stroke="#c6a65e" stroke-width="4"/>
+    <text x="82" y="240" font-family="serif" font-size="17" fill="#1f8a70">next expedition</text>
+    <text x="210" y="242" font-family="serif" font-size="22" font-weight="700" fill="#1e2a3e">active unlocked stage</text>
+    <rect x="58" y="282" width="500" height="46" fill="#fff6df" stroke="#c6a65e" stroke-width="4"/>
+    <text x="82" y="312" font-family="serif" font-size="18" fill="#805845">completion stamps from save profile</text>
+    <g>
+      <text x="320" y="356" text-anchor="middle" font-family="serif" font-size="20" font-weight="700" fill="#32415a">route preview</text>
+      <circle cx="220" cy="382" r="28" fill="#5d8d86" stroke="#fff3b0" stroke-width="5"/>
+      <circle cx="292" cy="382" r="28" fill="#ce5869" stroke="#ffffff" stroke-width="4"/>
+      <circle cx="364" cy="382" r="28" fill="#6c8fd6" stroke="#ffffff" stroke-width="4"/>
+      <circle cx="436" cy="382" r="28" fill="#5d8d86" stroke="#ffffff" stroke-width="4"/>
+      <text x="220" y="390" text-anchor="middle" font-family="serif" font-size="20" fill="#fff5d7">1</text>
+      <text x="292" y="390" text-anchor="middle" font-family="serif" font-size="20" fill="#fff5d7">2</text>
+      <text x="364" y="390" text-anchor="middle" font-family="serif" font-size="20" fill="#fff5d7">3</text>
+      <text x="436" y="390" text-anchor="middle" font-family="serif" font-size="20" fill="#fff5d7">4</text>
+    </g>
+  </g>
+
+  <g transform="translate(1070 640)">
+    <rect width="270" height="110" rx="10" fill="#fff6df" stroke="#c6a65e" stroke-width="5"/>
+    <text x="135" y="34" text-anchor="middle" font-family="serif" font-size="18" fill="#805845">next sealed chapter</text>
+    <text x="135" y="66" text-anchor="middle" font-family="serif" font-size="20" font-weight="700" fill="#1e2a3e">next locked stage</text>
+    <text x="135" y="92" text-anchor="middle" font-family="serif" font-size="15" fill="#805845">unlocked by boss clear</text>
+  </g>
+</svg>

@@ -1,0 +1,5097 @@
+[
+  {
+    "id": "card_sunbean_punch",
+    "name": "햇콩 펀치",
+    "type": "attack",
+    "rarity": "basic",
+    "cost": 1,
+    "color": "coral",
+    "frame": "rounded_attack",
+    "sockets": {
+      "base": 1,
+      "max": 3
+    },
+    "tags": [
+      "타격",
+      "연쇄"
+    ],
+    "illustration": {
+      "subject": "웃는 햇콩 장갑",
+      "mood": "밝고 경쾌함"
+    },
+    "text": "가장 앞의 적에게 피해 8. 이번 턴에 낸 카드가 2장 이상이면 피해 +3.",
+    "effects": [
+      {
+        "op": "damage_front",
+        "amount": 8
+      },
+      {
+        "op": "damage_bonus_if_cards_played_at_least",
+        "threshold": 2,
+        "amount": 3
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "damage_front",
+          "amount": 11
+        }
+      ]
+    },
+    "unlock": {
+      "type": "starter"
+    }
+  },
+  {
+    "id": "card_cloud_cushion",
+    "name": "구름 방석",
+    "type": "guard",
+    "rarity": "basic",
+    "cost": 1,
+    "color": "sky",
+    "frame": "rounded_guard",
+    "sockets": {
+      "base": 1,
+      "max": 3
+    },
+    "tags": [
+      "방어",
+      "유지"
+    ],
+    "illustration": {
+      "subject": "푹신한 구름 방패",
+      "mood": "말랑하고 안전함"
+    },
+    "text": "보호막 7. 다음 턴 시작 시 보호막 2를 남깁니다.",
+    "effects": [
+      {
+        "op": "gain_shield",
+        "amount": 7
+      },
+      {
+        "op": "retain_shield_next_turn",
+        "amount": 2
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "gain_shield",
+          "amount": 10
+        }
+      ]
+    },
+    "unlock": {
+      "type": "starter"
+    }
+  },
+  {
+    "id": "card_mint_spark",
+    "name": "민트 반짝",
+    "type": "skill",
+    "rarity": "basic",
+    "cost": 0,
+    "color": "mint",
+    "frame": "rounded_skill",
+    "sockets": {
+      "base": 0,
+      "max": 2
+    },
+    "tags": [
+      "드로우",
+      "기운"
+    ],
+    "illustration": {
+      "subject": "작은 민트 별빛",
+      "mood": "상쾌함"
+    },
+    "text": "카드 1장을 뽑습니다. 이번 턴 다음 카드 비용 -1.",
+    "effects": [
+      {
+        "op": "draw",
+        "amount": 1
+      },
+      {
+        "op": "discount_next_card",
+        "amount": 1
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "draw",
+          "amount": 2
+        }
+      ]
+    },
+    "unlock": {
+      "type": "starter"
+    }
+  },
+  {
+    "id": "card_peach_dash",
+    "name": "복숭아 돌진",
+    "type": "attack",
+    "rarity": "common",
+    "cost": 2,
+    "color": "peach",
+    "frame": "rounded_attack",
+    "sockets": {
+      "base": 1,
+      "max": 3
+    },
+    "tags": [
+      "관통",
+      "이동"
+    ],
+    "illustration": {
+      "subject": "복숭아 빛 꼬리별",
+      "mood": "빠르고 귀여움"
+    },
+    "text": "가장 앞의 적에게 피해 12. 적을 쓰러뜨리면 카드 1장을 뽑습니다.",
+    "effects": [
+      {
+        "op": "damage_front",
+        "amount": 12
+      },
+      {
+        "op": "draw_if_kill",
+        "amount": 1
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "damage_front",
+          "amount": 16
+        }
+      ]
+    },
+    "unlock": {
+      "type": "pool",
+      "stageId": "stage_sunny_gate"
+    }
+  },
+  {
+    "id": "card_paper_charm",
+    "name": "종이부적 톡",
+    "type": "skill",
+    "rarity": "common",
+    "cost": 1,
+    "color": "lavender",
+    "frame": "rounded_skill",
+    "sockets": {
+      "base": 1,
+      "max": 2
+    },
+    "tags": [
+      "약화",
+      "표식"
+    ],
+    "illustration": {
+      "subject": "웃는 종이부적",
+      "mood": "장난스러움"
+    },
+    "text": "적 하나에게 표식 2. 표식이 있는 적은 받는 피해가 증가합니다.",
+    "effects": [
+      {
+        "op": "apply_mark",
+        "amount": 2
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "apply_mark",
+          "amount": 3
+        }
+      ]
+    },
+    "unlock": {
+      "type": "pool",
+      "stageId": "stage_sunny_gate"
+    }
+  },
+  {
+    "id": "card_lantern_puff",
+    "name": "등불 퐁",
+    "type": "attack",
+    "rarity": "common",
+    "cost": 1,
+    "color": "yellow",
+    "frame": "rounded_attack",
+    "sockets": {
+      "base": 2,
+      "max": 3
+    },
+    "tags": [
+      "다단",
+      "빛"
+    ],
+    "illustration": {
+      "subject": "작은 등불 솜방울",
+      "mood": "따뜻함"
+    },
+    "text": "무작위 적에게 피해 3을 3번 줍니다.",
+    "effects": [
+      {
+        "op": "damage_random",
+        "amount": 3,
+        "hits": 3
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "damage_random",
+          "amount": 4,
+          "hits": 3
+        }
+      ]
+    },
+    "unlock": {
+      "type": "pool",
+      "stageId": "stage_lavender_hall"
+    }
+  },
+  {
+    "id": "card_sprout_guard",
+    "name": "새싹 파수",
+    "type": "guard",
+    "rarity": "common",
+    "cost": 2,
+    "color": "mint",
+    "frame": "rounded_guard",
+    "sockets": {
+      "base": 1,
+      "max": 3
+    },
+    "tags": [
+      "방어",
+      "회복"
+    ],
+    "illustration": {
+      "subject": "방패를 든 새싹 기사",
+      "mood": "든든함"
+    },
+    "text": "보호막 12. 체력이 절반 이하라면 체력 3 회복.",
+    "effects": [
+      {
+        "op": "gain_shield",
+        "amount": 12
+      },
+      {
+        "op": "heal_if_hp_ratio_below",
+        "ratio": 0.5,
+        "amount": 3
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "gain_shield",
+          "amount": 16
+        }
+      ]
+    },
+    "unlock": {
+      "type": "pool",
+      "stageId": "stage_lavender_hall"
+    }
+  },
+  {
+    "id": "card_star_candy",
+    "name": "별사탕 충전",
+    "type": "skill",
+    "rarity": "rare",
+    "cost": 0,
+    "color": "yellow",
+    "frame": "rounded_skill",
+    "sockets": {
+      "base": 0,
+      "max": 2
+    },
+    "tags": [
+      "기운",
+      "소멸"
+    ],
+    "illustration": {
+      "subject": "반짝이는 별사탕 병",
+      "mood": "달콤함"
+    },
+    "text": "기운 2를 얻습니다. 사용 후 이번 전투에서 사라집니다.",
+    "effects": [
+      {
+        "op": "gain_energy",
+        "amount": 2
+      },
+      {
+        "op": "exhaust_self"
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "gain_energy",
+          "amount": 3
+        }
+      ]
+    },
+    "unlock": {
+      "type": "achievement",
+      "achievementId": "ach_first_elite"
+    }
+  },
+  {
+    "id": "card_round_mirror",
+    "name": "동글 거울막",
+    "type": "guard",
+    "rarity": "rare",
+    "cost": 2,
+    "color": "sky",
+    "frame": "rounded_guard",
+    "sockets": {
+      "base": 2,
+      "max": 3
+    },
+    "tags": [
+      "반사",
+      "방어"
+    ],
+    "illustration": {
+      "subject": "웃는 원형 거울",
+      "mood": "반짝임"
+    },
+    "text": "보호막 9. 이번 턴 받은 피해의 절반을 가장 앞의 적에게 되돌립니다.",
+    "effects": [
+      {
+        "op": "gain_shield",
+        "amount": 9
+      },
+      {
+        "op": "enable_reflect_damage",
+        "ratio": 0.5
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "gain_shield",
+          "amount": 13
+        }
+      ]
+    },
+    "unlock": {
+      "type": "pool",
+      "stageId": "stage_mint_garden"
+    }
+  },
+  {
+    "id": "card_ribbon_loop",
+    "name": "리본 연쇄",
+    "type": "skill",
+    "rarity": "rare",
+    "cost": 3,
+    "color": "lavender",
+    "frame": "rounded_skill",
+    "sockets": {
+      "base": 1,
+      "max": 3
+    },
+    "tags": [
+      "연쇄",
+      "복사"
+    ],
+    "illustration": {
+      "subject": "하늘에 둥글게 묶인 리본",
+      "mood": "화려함"
+    },
+    "text": "이번 턴 마지막으로 낸 카드의 기본 효과를 한 번 더 발동합니다.",
+    "effects": [
+      {
+        "op": "repeat_previous_basic_effect",
+        "amount": 1
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "repeat_previous_basic_effect",
+          "amount": 1
+        },
+        {
+          "op": "draw",
+          "amount": 1
+        }
+      ]
+    },
+    "unlock": {
+      "type": "pool",
+      "stageId": "stage_mint_garden"
+    }
+  },
+  {
+    "id": "card_pudding_wallop",
+    "name": "푸딩 쿵",
+    "type": "attack",
+    "rarity": "uncommon",
+    "cost": 3,
+    "color": "peach",
+    "frame": "rounded_attack",
+    "sockets": {
+      "base": 2,
+      "max": 4
+    },
+    "tags": [
+      "광역",
+      "묵직함"
+    ],
+    "illustration": {
+      "subject": "커다란 푸딩 망치",
+      "mood": "우스꽝스러움"
+    },
+    "text": "모든 적에게 피해 14. 손패가 2장 이하라면 피해 +6.",
+    "effects": [
+      {
+        "op": "damage_all",
+        "amount": 14
+      },
+      {
+        "op": "damage_bonus_if_hand_at_most",
+        "threshold": 2,
+        "amount": 6
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "damage_all",
+          "amount": 19
+        }
+      ]
+    },
+    "unlock": {
+      "type": "pool",
+      "stageId": "stage_mint_garden"
+    }
+  },
+  {
+    "id": "card_bubble_map",
+    "name": "방울 지도",
+    "type": "skill",
+    "rarity": "uncommon",
+    "cost": 1,
+    "color": "sky",
+    "frame": "rounded_skill",
+    "sockets": {
+      "base": 1,
+      "max": 2
+    },
+    "tags": [
+      "탐색",
+      "보상"
+    ],
+    "illustration": {
+      "subject": "비눗방울 속 작은 지도",
+      "mood": "호기심"
+    },
+    "text": "카드 2장을 뽑습니다. 다음 보상에서 카드 선택지가 1개 늘어납니다.",
+    "effects": [
+      {
+        "op": "draw",
+        "amount": 2
+      },
+      {
+        "op": "increase_next_card_reward_options",
+        "amount": 1
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "draw",
+          "amount": 3
+        }
+      ]
+    },
+    "unlock": {
+      "type": "pool",
+      "stageId": "stage_lavender_hall"
+    }
+  },
+  {
+    "id": "card_morning_sunhook",
+    "name": "아침 햇갈고리",
+    "type": "attack",
+    "rarity": "common",
+    "cost": 1,
+    "color": "yellow",
+    "frame": "rounded_attack",
+    "sockets": {
+      "base": 1,
+      "max": 3
+    },
+    "tags": [
+      "타격",
+      "연쇄"
+    ],
+    "illustration": {
+      "subject": "아침빛 갈고리 장갑",
+      "mood": "빠르고 밝음"
+    },
+    "text": "가장 앞의 적에게 피해 9. 이번 턴에 낸 카드가 2장 이상이면 피해 +3.",
+    "effects": [
+      {
+        "op": "damage_front",
+        "amount": 9
+      },
+      {
+        "op": "damage_bonus_if_cards_played_at_least",
+        "threshold": 2,
+        "amount": 3
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "damage_front",
+          "amount": 12
+        }
+      ]
+    },
+    "unlock": {
+      "type": "base_pool",
+      "tier": 1
+    }
+  },
+  {
+    "id": "card_morning_daybreak",
+    "name": "아침 여명결",
+    "type": "attack",
+    "rarity": "uncommon",
+    "cost": 2,
+    "color": "yellow",
+    "frame": "rounded_attack",
+    "sockets": {
+      "base": 1,
+      "max": 3
+    },
+    "tags": [
+      "광역",
+      "처치"
+    ],
+    "illustration": {
+      "subject": "종이 무대 위로 퍼지는 여명 물결",
+      "mood": "환하고 산뜻함"
+    },
+    "text": "모든 적에게 피해 6. 이 카드로 적을 쓰러뜨리면 카드 1장을 뽑습니다.",
+    "effects": [
+      {
+        "op": "damage_all",
+        "amount": 6
+      },
+      {
+        "op": "draw_if_kill",
+        "amount": 1
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "damage_all",
+          "amount": 9
+        }
+      ]
+    },
+    "unlock": {
+      "type": "base_pool",
+      "tier": 1
+    }
+  },
+  {
+    "id": "card_morning_windowshade",
+    "name": "아침 창가림",
+    "type": "guard",
+    "rarity": "common",
+    "cost": 1,
+    "color": "yellow",
+    "frame": "rounded_guard",
+    "sockets": {
+      "base": 1,
+      "max": 3
+    },
+    "tags": [
+      "방어",
+      "유지"
+    ],
+    "illustration": {
+      "subject": "햇살을 걸러내는 종이 창가림",
+      "mood": "따뜻하고 단단함"
+    },
+    "text": "보호막 8. 다음 턴 시작 시 보호막 2를 남깁니다.",
+    "effects": [
+      {
+        "op": "gain_shield",
+        "amount": 8
+      },
+      {
+        "op": "retain_shield_next_turn",
+        "amount": 2
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "gain_shield",
+          "amount": 11
+        }
+      ]
+    },
+    "unlock": {
+      "type": "base_pool",
+      "tier": 1
+    }
+  },
+  {
+    "id": "card_morning_bellnote",
+    "name": "아침 종소리",
+    "type": "skill",
+    "rarity": "common",
+    "cost": 1,
+    "color": "yellow",
+    "frame": "rounded_skill",
+    "sockets": {
+      "base": 1,
+      "max": 2
+    },
+    "tags": [
+      "순환",
+      "비용"
+    ],
+    "illustration": {
+      "subject": "작은 종에서 튀는 금빛 음표",
+      "mood": "경쾌함"
+    },
+    "text": "카드 1장을 뽑습니다. 이번 턴 다음 카드 비용 -1.",
+    "effects": [
+      {
+        "op": "draw",
+        "amount": 1
+      },
+      {
+        "op": "discount_next_card",
+        "amount": 1
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "draw",
+          "amount": 2
+        }
+      ]
+    },
+    "unlock": {
+      "type": "base_pool",
+      "tier": 1
+    }
+  },
+  {
+    "id": "card_morning_breakfast",
+    "name": "아침 도시락",
+    "type": "skill",
+    "rarity": "common",
+    "cost": 0,
+    "color": "yellow",
+    "frame": "rounded_skill",
+    "sockets": {
+      "base": 0,
+      "max": 2
+    },
+    "tags": [
+      "기운",
+      "회복"
+    ],
+    "illustration": {
+      "subject": "노란 손수건에 싸인 작은 도시락",
+      "mood": "포근함"
+    },
+    "text": "기운 1을 얻습니다. 체력이 65% 이하라면 체력 2를 회복합니다.",
+    "effects": [
+      {
+        "op": "gain_energy",
+        "amount": 1
+      },
+      {
+        "op": "heal_if_hp_ratio_below",
+        "ratio": 0.65,
+        "amount": 2
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "gain_energy",
+          "amount": 2
+        }
+      ]
+    },
+    "unlock": {
+      "type": "base_pool",
+      "tier": 1
+    }
+  },
+  {
+    "id": "card_morning_goldenrule",
+    "name": "아침 금빛 규칙",
+    "type": "power",
+    "rarity": "rare",
+    "cost": 2,
+    "color": "yellow",
+    "frame": "rounded_power",
+    "sockets": {
+      "base": 0,
+      "max": 1
+    },
+    "tags": [
+      "지속",
+      "방어"
+    ],
+    "illustration": {
+      "subject": "금색 리본으로 묶인 전투 규칙 카드",
+      "mood": "의식적이고 선명함"
+    },
+    "text": "이번 전투 동안 노란 계열 카드를 낼 때마다 보호막 2. 즉시 보호막 3.",
+    "effects": [
+      {
+        "op": "add_battle_rule",
+        "rule": "shield_on_color_play",
+        "color": "yellow",
+        "amount": 2
+      },
+      {
+        "op": "gain_shield",
+        "amount": 3
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "add_battle_rule",
+          "rule": "shield_on_color_play",
+          "color": "yellow",
+          "amount": 3
+        }
+      ]
+    },
+    "unlock": {
+      "type": "base_pool",
+      "tier": 1
+    }
+  },
+  {
+    "id": "card_morning_sunshower",
+    "name": "아침 햇소나기",
+    "type": "attack",
+    "rarity": "rare",
+    "cost": 3,
+    "color": "yellow",
+    "frame": "rounded_attack",
+    "sockets": {
+      "base": 2,
+      "max": 4
+    },
+    "tags": [
+      "다단",
+      "표식"
+    ],
+    "illustration": {
+      "subject": "무대 위로 쏟아지는 노란 종이비",
+      "mood": "밝고 빠름"
+    },
+    "text": "무작위 적에게 피해 3을 4번 줍니다. 가장 앞의 적에게 표식 1.",
+    "effects": [
+      {
+        "op": "damage_random",
+        "amount": 3,
+        "hits": 4
+      },
+      {
+        "op": "apply_mark",
+        "amount": 1
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "damage_random",
+          "amount": 4,
+          "hits": 4
+        }
+      ]
+    },
+    "unlock": {
+      "type": "base_pool",
+      "tier": 1
+    }
+  },
+  {
+    "id": "card_morning_parcel",
+    "name": "아침 꾸러미",
+    "type": "skill",
+    "rarity": "uncommon",
+    "cost": 2,
+    "color": "yellow",
+    "frame": "rounded_skill",
+    "sockets": {
+      "base": 1,
+      "max": 3
+    },
+    "tags": [
+      "보상",
+      "순환"
+    ],
+    "illustration": {
+      "subject": "노란 끈으로 묶은 작은 선물 꾸러미",
+      "mood": "기대감 있음"
+    },
+    "text": "이번 전투 후 카드 보상 선택지 +1. 카드 1장을 뽑습니다.",
+    "effects": [
+      {
+        "op": "increase_next_card_reward_options",
+        "amount": 1
+      },
+      {
+        "op": "draw",
+        "amount": 1
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "increase_next_card_reward_options",
+          "amount": 2
+        }
+      ]
+    },
+    "unlock": {
+      "type": "base_pool",
+      "tier": 1
+    }
+  },
+  {
+    "id": "card_cloud_pillowtap",
+    "name": "구름 베개톡",
+    "type": "attack",
+    "rarity": "common",
+    "cost": 1,
+    "color": "sky",
+    "frame": "rounded_attack",
+    "sockets": {
+      "base": 1,
+      "max": 3
+    },
+    "tags": [
+      "타격",
+      "표식"
+    ],
+    "illustration": {
+      "subject": "푹신한 구름 베개 펀치",
+      "mood": "가볍고 장난스러움"
+    },
+    "text": "가장 앞의 적에게 피해 7. 표식 1을 남깁니다.",
+    "effects": [
+      {
+        "op": "damage_front",
+        "amount": 7
+      },
+      {
+        "op": "apply_mark",
+        "amount": 1
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "damage_front",
+          "amount": 10
+        }
+      ]
+    },
+    "unlock": {
+      "type": "base_pool",
+      "tier": 1
+    }
+  },
+  {
+    "id": "card_cloud_mistspill",
+    "name": "구름 안개흘림",
+    "type": "attack",
+    "rarity": "uncommon",
+    "cost": 2,
+    "color": "sky",
+    "frame": "rounded_attack",
+    "sockets": {
+      "base": 1,
+      "max": 3
+    },
+    "tags": [
+      "광역",
+      "완화"
+    ],
+    "illustration": {
+      "subject": "무대를 낮게 덮는 푸른 안개",
+      "mood": "느긋하고 안전함"
+    },
+    "text": "모든 적에게 피해 5. 다음 적 공격 피해를 2 줄입니다.",
+    "effects": [
+      {
+        "op": "damage_all",
+        "amount": 5
+      },
+      {
+        "op": "reduce_next_attack",
+        "amount": 2
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "damage_all",
+          "amount": 8
+        }
+      ]
+    },
+    "unlock": {
+      "type": "base_pool",
+      "tier": 1
+    }
+  },
+  {
+    "id": "card_cloud_blanketbank",
+    "name": "구름 담요둑",
+    "type": "guard",
+    "rarity": "common",
+    "cost": 1,
+    "color": "sky",
+    "frame": "rounded_guard",
+    "sockets": {
+      "base": 1,
+      "max": 3
+    },
+    "tags": [
+      "방어",
+      "순환"
+    ],
+    "illustration": {
+      "subject": "겹겹이 쌓인 구름 담요",
+      "mood": "폭신함"
+    },
+    "text": "보호막 6. 카드 1장을 뽑습니다.",
+    "effects": [
+      {
+        "op": "gain_shield",
+        "amount": 6
+      },
+      {
+        "op": "draw",
+        "amount": 1
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "gain_shield",
+          "amount": 9
+        }
+      ]
+    },
+    "unlock": {
+      "type": "base_pool",
+      "tier": 1
+    }
+  },
+  {
+    "id": "card_cloud_doodles",
+    "name": "구름 낙서별",
+    "type": "skill",
+    "rarity": "common",
+    "cost": 1,
+    "color": "sky",
+    "frame": "rounded_skill",
+    "sockets": {
+      "base": 1,
+      "max": 2
+    },
+    "tags": [
+      "표식",
+      "비용"
+    ],
+    "illustration": {
+      "subject": "구름 위에 그린 작은 별 낙서",
+      "mood": "맑고 장난스러움"
+    },
+    "text": "가장 앞의 적에게 표식 2. 이번 턴 다음 카드 비용 -1.",
+    "effects": [
+      {
+        "op": "apply_mark",
+        "amount": 2
+      },
+      {
+        "op": "discount_next_card",
+        "amount": 1
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "apply_mark",
+          "amount": 3
+        }
+      ]
+    },
+    "unlock": {
+      "type": "base_pool",
+      "tier": 1
+    }
+  },
+  {
+    "id": "card_cloud_breeze",
+    "name": "구름 숨돌림",
+    "type": "skill",
+    "rarity": "common",
+    "cost": 0,
+    "color": "sky",
+    "frame": "rounded_skill",
+    "sockets": {
+      "base": 0,
+      "max": 2
+    },
+    "tags": [
+      "기운",
+      "유지"
+    ],
+    "illustration": {
+      "subject": "작은 구름 숨결",
+      "mood": "차분함"
+    },
+    "text": "기운 1을 얻습니다. 다음 턴 시작 시 보호막 1을 남깁니다.",
+    "effects": [
+      {
+        "op": "gain_energy",
+        "amount": 1
+      },
+      {
+        "op": "retain_shield_next_turn",
+        "amount": 1
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "gain_energy",
+          "amount": 2
+        }
+      ]
+    },
+    "unlock": {
+      "type": "base_pool",
+      "tier": 1
+    }
+  },
+  {
+    "id": "card_cloud_rainrule",
+    "name": "구름 비규칙",
+    "type": "power",
+    "rarity": "rare",
+    "cost": 2,
+    "color": "sky",
+    "frame": "rounded_power",
+    "sockets": {
+      "base": 0,
+      "max": 1
+    },
+    "tags": [
+      "지속",
+      "완화"
+    ],
+    "illustration": {
+      "subject": "비방울 모양 규칙표",
+      "mood": "부드러운 긴장감"
+    },
+    "text": "이번 전투 동안 하늘 계열 카드를 낼 때마다 보호막 2. 다음 적 공격 피해를 2 줄입니다.",
+    "effects": [
+      {
+        "op": "add_battle_rule",
+        "rule": "shield_on_color_play",
+        "color": "sky",
+        "amount": 2
+      },
+      {
+        "op": "reduce_next_attack",
+        "amount": 2
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "add_battle_rule",
+          "rule": "shield_on_color_play",
+          "color": "sky",
+          "amount": 3
+        }
+      ]
+    },
+    "unlock": {
+      "type": "base_pool",
+      "tier": 1
+    }
+  },
+  {
+    "id": "card_cloud_hailpop",
+    "name": "구름 톡톡우박",
+    "type": "attack",
+    "rarity": "rare",
+    "cost": 3,
+    "color": "sky",
+    "frame": "rounded_attack",
+    "sockets": {
+      "base": 2,
+      "max": 4
+    },
+    "tags": [
+      "다단",
+      "표식"
+    ],
+    "illustration": {
+      "subject": "작은 우박 조각들이 튀는 장면",
+      "mood": "통통 튐"
+    },
+    "text": "무작위 적에게 피해 4를 3번 줍니다. 표식이 있는 적에게 피해 +2.",
+    "effects": [
+      {
+        "op": "damage_random",
+        "amount": 4,
+        "hits": 3
+      },
+      {
+        "op": "damage_bonus_vs_marked",
+        "amount": 2
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "damage_random",
+          "amount": 5,
+          "hits": 3
+        }
+      ]
+    },
+    "unlock": {
+      "type": "base_pool",
+      "tier": 1
+    }
+  },
+  {
+    "id": "card_cloud_floatbox",
+    "name": "구름 둥실상자",
+    "type": "skill",
+    "rarity": "uncommon",
+    "cost": 2,
+    "color": "sky",
+    "frame": "rounded_skill",
+    "sockets": {
+      "base": 1,
+      "max": 3
+    },
+    "tags": [
+      "소켓",
+      "비용"
+    ],
+    "illustration": {
+      "subject": "둥실 떠 있는 푸른 상자",
+      "mood": "가벼움"
+    },
+    "text": "손패의 무작위 카드가 임시 소켓 보너스 1을 얻습니다. 이번 턴 다음 카드 비용 -1.",
+    "effects": [
+      {
+        "op": "prepare_socket_bonus",
+        "amount": 1
+      },
+      {
+        "op": "discount_next_card",
+        "amount": 1
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "prepare_socket_bonus",
+          "amount": 2
+        }
+      ]
+    },
+    "unlock": {
+      "type": "base_pool",
+      "tier": 1
+    }
+  },
+  {
+    "id": "card_mint_leafjab",
+    "name": "민트 잎찌르기",
+    "type": "attack",
+    "rarity": "common",
+    "cost": 1,
+    "color": "mint",
+    "frame": "rounded_attack",
+    "sockets": {
+      "base": 1,
+      "max": 3
+    },
+    "tags": [
+      "타격",
+      "회복"
+    ],
+    "illustration": {
+      "subject": "민트 잎 모양 찌르기",
+      "mood": "상쾌함"
+    },
+    "text": "가장 앞의 적에게 피해 8. 체력이 절반 이하라면 체력 2를 회복합니다.",
+    "effects": [
+      {
+        "op": "damage_front",
+        "amount": 8
+      },
+      {
+        "op": "heal_if_hp_ratio_below",
+        "ratio": 0.5,
+        "amount": 2
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "damage_front",
+          "amount": 11
+        }
+      ]
+    },
+    "unlock": {
+      "type": "base_pool",
+      "tier": 1
+    }
+  },
+  {
+    "id": "card_mint_gardensweep",
+    "name": "민트 정원쓸기",
+    "type": "attack",
+    "rarity": "uncommon",
+    "cost": 2,
+    "color": "mint",
+    "frame": "rounded_attack",
+    "sockets": {
+      "base": 1,
+      "max": 3
+    },
+    "tags": [
+      "광역",
+      "표식"
+    ],
+    "illustration": {
+      "subject": "정원을 쓸고 지나가는 민트색 붓",
+      "mood": "깨끗함"
+    },
+    "text": "모든 적에게 피해 5. 가장 앞의 적에게 표식 1.",
+    "effects": [
+      {
+        "op": "damage_all",
+        "amount": 5
+      },
+      {
+        "op": "apply_mark",
+        "amount": 1
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "damage_all",
+          "amount": 8
+        }
+      ]
+    },
+    "unlock": {
+      "type": "base_pool",
+      "tier": 1
+    }
+  },
+  {
+    "id": "card_mint_vinescreen",
+    "name": "민트 덩굴막",
+    "type": "guard",
+    "rarity": "common",
+    "cost": 1,
+    "color": "mint",
+    "frame": "rounded_guard",
+    "sockets": {
+      "base": 1,
+      "max": 3
+    },
+    "tags": [
+      "방어",
+      "표식"
+    ],
+    "illustration": {
+      "subject": "덩굴처럼 감기는 민트 막",
+      "mood": "싱그러움"
+    },
+    "text": "보호막 7. 가장 앞의 적에게 표식 1.",
+    "effects": [
+      {
+        "op": "gain_shield",
+        "amount": 7
+      },
+      {
+        "op": "apply_mark",
+        "amount": 1
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "gain_shield",
+          "amount": 10
+        }
+      ]
+    },
+    "unlock": {
+      "type": "base_pool",
+      "tier": 1
+    }
+  },
+  {
+    "id": "card_mint_notedrop",
+    "name": "민트 음표방울",
+    "type": "skill",
+    "rarity": "common",
+    "cost": 1,
+    "color": "mint",
+    "frame": "rounded_skill",
+    "sockets": {
+      "base": 1,
+      "max": 2
+    },
+    "tags": [
+      "순환",
+      "방어"
+    ],
+    "illustration": {
+      "subject": "민트색 음표 방울",
+      "mood": "맑음"
+    },
+    "text": "카드 2장을 뽑습니다. 보호막 3.",
+    "effects": [
+      {
+        "op": "draw",
+        "amount": 2
+      },
+      {
+        "op": "gain_shield",
+        "amount": 3
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "draw",
+          "amount": 3
+        }
+      ]
+    },
+    "unlock": {
+      "type": "base_pool",
+      "tier": 1
+    }
+  },
+  {
+    "id": "card_mint_freshbreath",
+    "name": "민트 숨고르기",
+    "type": "skill",
+    "rarity": "common",
+    "cost": 0,
+    "color": "mint",
+    "frame": "rounded_skill",
+    "sockets": {
+      "base": 0,
+      "max": 2
+    },
+    "tags": [
+      "기운",
+      "완화"
+    ],
+    "illustration": {
+      "subject": "상쾌한 민트 숨결",
+      "mood": "차갑고 깨끗함"
+    },
+    "text": "기운 1을 얻습니다. 다음 적 공격 피해를 1 줄입니다.",
+    "effects": [
+      {
+        "op": "gain_energy",
+        "amount": 1
+      },
+      {
+        "op": "reduce_next_attack",
+        "amount": 1
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "gain_energy",
+          "amount": 2
+        }
+      ]
+    },
+    "unlock": {
+      "type": "base_pool",
+      "tier": 1
+    }
+  },
+  {
+    "id": "card_mint_gardenrule",
+    "name": "민트 정원규칙",
+    "type": "power",
+    "rarity": "rare",
+    "cost": 2,
+    "color": "mint",
+    "frame": "rounded_power",
+    "sockets": {
+      "base": 0,
+      "max": 1
+    },
+    "tags": [
+      "지속",
+      "순환"
+    ],
+    "illustration": {
+      "subject": "정원 표지판처럼 세운 규칙 카드",
+      "mood": "정돈됨"
+    },
+    "text": "이번 전투 동안 민트 계열 카드를 낼 때마다 보호막 2. 카드 1장을 뽑습니다.",
+    "effects": [
+      {
+        "op": "add_battle_rule",
+        "rule": "shield_on_color_play",
+        "color": "mint",
+        "amount": 2
+      },
+      {
+        "op": "draw",
+        "amount": 1
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "add_battle_rule",
+          "rule": "shield_on_color_play",
+          "color": "mint",
+          "amount": 3
+        }
+      ]
+    },
+    "unlock": {
+      "type": "base_pool",
+      "tier": 1
+    }
+  },
+  {
+    "id": "card_mint_needlerain",
+    "name": "민트 바늘비",
+    "type": "attack",
+    "rarity": "rare",
+    "cost": 3,
+    "color": "mint",
+    "frame": "rounded_attack",
+    "sockets": {
+      "base": 2,
+      "max": 4
+    },
+    "tags": [
+      "다단",
+      "처치"
+    ],
+    "illustration": {
+      "subject": "가는 민트색 바늘비",
+      "mood": "빠르고 시원함"
+    },
+    "text": "무작위 적에게 피해 2를 5번 줍니다. 이 카드로 적을 쓰러뜨리면 카드 1장을 뽑습니다.",
+    "effects": [
+      {
+        "op": "damage_random",
+        "amount": 2,
+        "hits": 5
+      },
+      {
+        "op": "draw_if_kill",
+        "amount": 1
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "damage_random",
+          "amount": 3,
+          "hits": 5
+        }
+      ]
+    },
+    "unlock": {
+      "type": "base_pool",
+      "tier": 1
+    }
+  },
+  {
+    "id": "card_mint_workshop",
+    "name": "민트 공방도구",
+    "type": "skill",
+    "rarity": "uncommon",
+    "cost": 2,
+    "color": "mint",
+    "frame": "rounded_skill",
+    "sockets": {
+      "base": 1,
+      "max": 3
+    },
+    "tags": [
+      "소켓",
+      "방어"
+    ],
+    "illustration": {
+      "subject": "민트색 소켓 공방 도구",
+      "mood": "꼼꼼함"
+    },
+    "text": "손패의 무작위 카드가 임시 소켓 보너스 1을 얻습니다. 보호막 4.",
+    "effects": [
+      {
+        "op": "prepare_socket_bonus",
+        "amount": 1
+      },
+      {
+        "op": "gain_shield",
+        "amount": 4
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "prepare_socket_bonus",
+          "amount": 2
+        }
+      ]
+    },
+    "unlock": {
+      "type": "base_pool",
+      "tier": 1
+    }
+  },
+  {
+    "id": "card_peach_blushdash",
+    "name": "복숭아 볼돌진",
+    "type": "attack",
+    "rarity": "common",
+    "cost": 1,
+    "color": "peach",
+    "frame": "rounded_attack",
+    "sockets": {
+      "base": 1,
+      "max": 3
+    },
+    "tags": [
+      "타격",
+      "비용"
+    ],
+    "illustration": {
+      "subject": "분홍 볼이 앞질러 돌진하는 모습",
+      "mood": "활기참"
+    },
+    "text": "가장 앞의 적에게 피해 11. 이번 턴 다음 카드 비용 -1.",
+    "effects": [
+      {
+        "op": "damage_front",
+        "amount": 11
+      },
+      {
+        "op": "discount_next_card",
+        "amount": 1
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "damage_front",
+          "amount": 14
+        }
+      ]
+    },
+    "unlock": {
+      "type": "card_pool_tier",
+      "tier": 2
+    }
+  },
+  {
+    "id": "card_peach_jamwave",
+    "name": "복숭아 잼물결",
+    "type": "attack",
+    "rarity": "uncommon",
+    "cost": 2,
+    "color": "peach",
+    "frame": "rounded_attack",
+    "sockets": {
+      "base": 1,
+      "max": 3
+    },
+    "tags": [
+      "광역",
+      "연쇄"
+    ],
+    "illustration": {
+      "subject": "잼처럼 퍼지는 복숭아빛 물결",
+      "mood": "달콤하고 무거움"
+    },
+    "text": "모든 적에게 피해 8. 이번 턴에 낸 카드가 2장 이상이면 피해 +3.",
+    "effects": [
+      {
+        "op": "damage_all",
+        "amount": 8
+      },
+      {
+        "op": "damage_bonus_if_cards_played_at_least",
+        "threshold": 2,
+        "amount": 3
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "damage_all",
+          "amount": 11
+        }
+      ]
+    },
+    "unlock": {
+      "type": "card_pool_tier",
+      "tier": 2
+    }
+  },
+  {
+    "id": "card_peach_softguard",
+    "name": "복숭아 말랑방패",
+    "type": "guard",
+    "rarity": "common",
+    "cost": 1,
+    "color": "peach",
+    "frame": "rounded_guard",
+    "sockets": {
+      "base": 1,
+      "max": 3
+    },
+    "tags": [
+      "방어",
+      "회복"
+    ],
+    "illustration": {
+      "subject": "말랑한 복숭아 방패",
+      "mood": "부드럽고 든든함"
+    },
+    "text": "보호막 10. 체력이 60% 이하라면 체력 3을 회복합니다.",
+    "effects": [
+      {
+        "op": "gain_shield",
+        "amount": 10
+      },
+      {
+        "op": "heal_if_hp_ratio_below",
+        "ratio": 0.6,
+        "amount": 3
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "gain_shield",
+          "amount": 13
+        }
+      ]
+    },
+    "unlock": {
+      "type": "card_pool_tier",
+      "tier": 2
+    }
+  },
+  {
+    "id": "card_peach_sticker",
+    "name": "복숭아 스티커별",
+    "type": "skill",
+    "rarity": "common",
+    "cost": 1,
+    "color": "peach",
+    "frame": "rounded_skill",
+    "sockets": {
+      "base": 1,
+      "max": 2
+    },
+    "tags": [
+      "순환",
+      "표식"
+    ],
+    "illustration": {
+      "subject": "복숭아 모양 스티커 별",
+      "mood": "귀엽고 날렵함"
+    },
+    "text": "카드 1장을 뽑습니다. 표식이 있는 적에게 피해 +4.",
+    "effects": [
+      {
+        "op": "draw",
+        "amount": 1
+      },
+      {
+        "op": "damage_bonus_vs_marked",
+        "amount": 4
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "draw",
+          "amount": 2
+        }
+      ]
+    },
+    "unlock": {
+      "type": "card_pool_tier",
+      "tier": 2
+    }
+  },
+  {
+    "id": "card_peach_picnic",
+    "name": "복숭아 소풍칸",
+    "type": "skill",
+    "rarity": "common",
+    "cost": 0,
+    "color": "peach",
+    "frame": "rounded_skill",
+    "sockets": {
+      "base": 0,
+      "max": 2
+    },
+    "tags": [
+      "기운",
+      "표식"
+    ],
+    "illustration": {
+      "subject": "작은 복숭아 소풍 칸",
+      "mood": "가볍고 들뜸"
+    },
+    "text": "기운 1을 얻습니다. 가장 앞의 적에게 표식 1.",
+    "effects": [
+      {
+        "op": "gain_energy",
+        "amount": 1
+      },
+      {
+        "op": "apply_mark",
+        "amount": 1
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "gain_energy",
+          "amount": 2
+        }
+      ]
+    },
+    "unlock": {
+      "type": "card_pool_tier",
+      "tier": 2
+    }
+  },
+  {
+    "id": "card_peach_warmrule",
+    "name": "복숭아 온기규칙",
+    "type": "power",
+    "rarity": "rare",
+    "cost": 2,
+    "color": "peach",
+    "frame": "rounded_power",
+    "sockets": {
+      "base": 0,
+      "max": 1
+    },
+    "tags": [
+      "지속",
+      "회복"
+    ],
+    "illustration": {
+      "subject": "복숭아빛 온기 규칙서",
+      "mood": "다정함"
+    },
+    "text": "이번 전투 동안 복숭아 계열 카드를 낼 때마다 보호막 2. 체력이 75% 이하라면 체력 2를 회복합니다.",
+    "effects": [
+      {
+        "op": "add_battle_rule",
+        "rule": "shield_on_color_play",
+        "color": "peach",
+        "amount": 2
+      },
+      {
+        "op": "heal_if_hp_ratio_below",
+        "ratio": 0.75,
+        "amount": 2
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "add_battle_rule",
+          "rule": "shield_on_color_play",
+          "color": "peach",
+          "amount": 3
+        }
+      ]
+    },
+    "unlock": {
+      "type": "card_pool_tier",
+      "tier": 2
+    }
+  },
+  {
+    "id": "card_peach_pitscatter",
+    "name": "복숭아 씨앗흩기",
+    "type": "attack",
+    "rarity": "rare",
+    "cost": 3,
+    "color": "peach",
+    "frame": "rounded_attack",
+    "sockets": {
+      "base": 2,
+      "max": 4
+    },
+    "tags": [
+      "다단",
+      "완화"
+    ],
+    "illustration": {
+      "subject": "흩뿌려지는 복숭아 씨앗",
+      "mood": "묵직하고 산뜻함"
+    },
+    "text": "무작위 적에게 피해 5를 2번 줍니다. 다음 적 공격 피해를 2 줄입니다.",
+    "effects": [
+      {
+        "op": "damage_random",
+        "amount": 5,
+        "hits": 2
+      },
+      {
+        "op": "reduce_next_attack",
+        "amount": 2
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "damage_random",
+          "amount": 7,
+          "hits": 2
+        }
+      ]
+    },
+    "unlock": {
+      "type": "card_pool_tier",
+      "tier": 2
+    }
+  },
+  {
+    "id": "card_peach_lunchbox",
+    "name": "복숭아 도시락상자",
+    "type": "skill",
+    "rarity": "uncommon",
+    "cost": 2,
+    "color": "peach",
+    "frame": "rounded_skill",
+    "sockets": {
+      "base": 1,
+      "max": 3
+    },
+    "tags": [
+      "보상",
+      "회복"
+    ],
+    "illustration": {
+      "subject": "분홍 끈으로 묶은 도시락상자",
+      "mood": "든든함"
+    },
+    "text": "이번 전투 후 카드 보상 선택지 +1. 체력이 80% 이하라면 체력 2를 회복합니다.",
+    "effects": [
+      {
+        "op": "increase_next_card_reward_options",
+        "amount": 1
+      },
+      {
+        "op": "heal_if_hp_ratio_below",
+        "ratio": 0.8,
+        "amount": 2
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "increase_next_card_reward_options",
+          "amount": 2
+        }
+      ]
+    },
+    "unlock": {
+      "type": "card_pool_tier",
+      "tier": 2
+    }
+  },
+  {
+    "id": "card_lavender_tap",
+    "name": "라벤더 톡",
+    "type": "attack",
+    "rarity": "common",
+    "cost": 1,
+    "color": "lavender",
+    "frame": "rounded_attack",
+    "sockets": {
+      "base": 1,
+      "max": 3
+    },
+    "tags": [
+      "타격",
+      "연쇄"
+    ],
+    "illustration": {
+      "subject": "보랏빛 종이부적의 톡",
+      "mood": "차분하고 장난스러움"
+    },
+    "text": "가장 앞의 적에게 피해 13. 연쇄가 3 이상이면 피해 +4.",
+    "effects": [
+      {
+        "op": "damage_front",
+        "amount": 13
+      },
+      {
+        "op": "damage_bonus_if_chain_at_least",
+        "threshold": 3,
+        "amount": 4
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "damage_front",
+          "amount": 17
+        }
+      ]
+    },
+    "unlock": {
+      "type": "card_pool_tier",
+      "tier": 2
+    }
+  },
+  {
+    "id": "card_lavender_wave",
+    "name": "라벤더 물결",
+    "type": "attack",
+    "rarity": "uncommon",
+    "cost": 2,
+    "color": "lavender",
+    "frame": "rounded_attack",
+    "sockets": {
+      "base": 1,
+      "max": 3
+    },
+    "tags": [
+      "광역",
+      "표식"
+    ],
+    "illustration": {
+      "subject": "보랏빛 종이부적의 물결",
+      "mood": "차분하고 장난스러움"
+    },
+    "text": "모든 적에게 피해 11. 표식이 있는 적에게 피해 +4.",
+    "effects": [
+      {
+        "op": "damage_all",
+        "amount": 11
+      },
+      {
+        "op": "damage_bonus_vs_marked",
+        "amount": 4
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "damage_all",
+          "amount": 16
+        }
+      ]
+    },
+    "unlock": {
+      "type": "card_pool_tier",
+      "tier": 2
+    }
+  },
+  {
+    "id": "card_lavender_pad",
+    "name": "라벤더 쿠션",
+    "type": "guard",
+    "rarity": "common",
+    "cost": 1,
+    "color": "lavender",
+    "frame": "rounded_guard",
+    "sockets": {
+      "base": 1,
+      "max": 3
+    },
+    "tags": [
+      "방어",
+      "완충"
+    ],
+    "illustration": {
+      "subject": "보랏빛 종이부적의 쿠션",
+      "mood": "차분하고 장난스러움"
+    },
+    "text": "보호막 12. 다음 적 공격 피해를 3 줄입니다.",
+    "effects": [
+      {
+        "op": "gain_shield",
+        "amount": 12
+      },
+      {
+        "op": "reduce_next_attack",
+        "amount": 3
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "gain_shield",
+          "amount": 16
+        }
+      ]
+    },
+    "unlock": {
+      "type": "card_pool_tier",
+      "tier": 2
+    }
+  },
+  {
+    "id": "card_lavender_sparkle",
+    "name": "라벤더 반짝",
+    "type": "skill",
+    "rarity": "common",
+    "cost": 1,
+    "color": "lavender",
+    "frame": "rounded_skill",
+    "sockets": {
+      "base": 1,
+      "max": 2
+    },
+    "tags": [
+      "드로우",
+      "표식"
+    ],
+    "illustration": {
+      "subject": "보랏빛 종이부적의 반짝",
+      "mood": "차분하고 장난스러움"
+    },
+    "text": "카드 2장을 뽑습니다. 가장 앞의 적에게 표식 3.",
+    "effects": [
+      {
+        "op": "draw",
+        "amount": 2
+      },
+      {
+        "op": "apply_mark",
+        "amount": 3
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "draw",
+          "amount": 3
+        }
+      ]
+    },
+    "unlock": {
+      "type": "card_pool_tier",
+      "tier": 2
+    }
+  },
+  {
+    "id": "card_lavender_snack",
+    "name": "라벤더 간식",
+    "type": "skill",
+    "rarity": "common",
+    "cost": 0,
+    "color": "lavender",
+    "frame": "rounded_skill",
+    "sockets": {
+      "base": 0,
+      "max": 2
+    },
+    "tags": [
+      "기운",
+      "비용"
+    ],
+    "illustration": {
+      "subject": "보랏빛 종이부적의 간식",
+      "mood": "차분하고 장난스러움"
+    },
+    "text": "기운 1을 얻습니다. 다음 카드 비용 -1.",
+    "effects": [
+      {
+        "op": "gain_energy",
+        "amount": 1
+      },
+      {
+        "op": "discount_next_card",
+        "amount": 1
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "gain_energy",
+          "amount": 2
+        }
+      ]
+    },
+    "unlock": {
+      "type": "card_pool_tier",
+      "tier": 2
+    }
+  },
+  {
+    "id": "card_lavender_promise",
+    "name": "라벤더 약속",
+    "type": "power",
+    "rarity": "rare",
+    "cost": 2,
+    "color": "lavender",
+    "frame": "rounded_power",
+    "sockets": {
+      "base": 0,
+      "max": 1
+    },
+    "tags": [
+      "지속",
+      "전투"
+    ],
+    "illustration": {
+      "subject": "보랏빛 종이부적의 약속",
+      "mood": "차분하고 장난스러움"
+    },
+    "text": "이번 전투 동안 라벤더 계열 카드를 낼 때마다 보호막 2.",
+    "effects": [
+      {
+        "op": "add_battle_rule",
+        "rule": "shield_on_color_play",
+        "color": "lavender",
+        "amount": 2
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "add_battle_rule",
+          "rule": "shield_on_color_play",
+          "color": "lavender",
+          "amount": 3
+        }
+      ]
+    },
+    "unlock": {
+      "type": "card_pool_tier",
+      "tier": 2
+    }
+  },
+  {
+    "id": "card_lavender_shower",
+    "name": "라벤더 소나기",
+    "type": "attack",
+    "rarity": "rare",
+    "cost": 3,
+    "color": "lavender",
+    "frame": "rounded_attack",
+    "sockets": {
+      "base": 2,
+      "max": 4
+    },
+    "tags": [
+      "다단",
+      "무작위"
+    ],
+    "illustration": {
+      "subject": "보랏빛 종이부적의 소나기",
+      "mood": "차분하고 장난스러움"
+    },
+    "text": "무작위 적에게 피해 6를 3번 줍니다.",
+    "effects": [
+      {
+        "op": "damage_random",
+        "amount": 6,
+        "hits": 3
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "damage_random",
+          "amount": 8,
+          "hits": 3
+        }
+      ]
+    },
+    "unlock": {
+      "type": "card_pool_tier",
+      "tier": 2
+    }
+  },
+  {
+    "id": "card_lavender_gift",
+    "name": "라벤더 선물",
+    "type": "skill",
+    "rarity": "uncommon",
+    "cost": 2,
+    "color": "lavender",
+    "frame": "rounded_skill",
+    "sockets": {
+      "base": 1,
+      "max": 3
+    },
+    "tags": [
+      "보상",
+      "소켓"
+    ],
+    "illustration": {
+      "subject": "보랏빛 종이부적의 선물",
+      "mood": "차분하고 장난스러움"
+    },
+    "text": "이번 전투 후 카드 보상 선택지 +1. 손패의 무작위 카드가 임시 소켓 보너스 2를 얻습니다.",
+    "effects": [
+      {
+        "op": "increase_next_card_reward_options",
+        "amount": 1
+      },
+      {
+        "op": "prepare_socket_bonus",
+        "amount": 2
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "prepare_socket_bonus",
+          "amount": 3
+        }
+      ]
+    },
+    "unlock": {
+      "type": "card_pool_tier",
+      "tier": 2
+    }
+  },
+  {
+    "id": "card_bubble_tap",
+    "name": "방울 톡",
+    "type": "attack",
+    "rarity": "common",
+    "cost": 1,
+    "color": "sky",
+    "frame": "rounded_attack",
+    "sockets": {
+      "base": 1,
+      "max": 3
+    },
+    "tags": [
+      "타격",
+      "연쇄"
+    ],
+    "illustration": {
+      "subject": "비눗방울 요정의 톡",
+      "mood": "맑고 통통 튐"
+    },
+    "text": "가장 앞의 적에게 피해 13. 연쇄가 3 이상이면 피해 +4.",
+    "effects": [
+      {
+        "op": "damage_front",
+        "amount": 13
+      },
+      {
+        "op": "damage_bonus_if_chain_at_least",
+        "threshold": 3,
+        "amount": 4
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "damage_front",
+          "amount": 17
+        }
+      ]
+    },
+    "unlock": {
+      "type": "card_pool_tier",
+      "tier": 2
+    }
+  },
+  {
+    "id": "card_bubble_wave",
+    "name": "방울 물결",
+    "type": "attack",
+    "rarity": "uncommon",
+    "cost": 2,
+    "color": "sky",
+    "frame": "rounded_attack",
+    "sockets": {
+      "base": 1,
+      "max": 3
+    },
+    "tags": [
+      "광역",
+      "표식"
+    ],
+    "illustration": {
+      "subject": "비눗방울 요정의 물결",
+      "mood": "맑고 통통 튐"
+    },
+    "text": "모든 적에게 피해 11. 표식이 있는 적에게 피해 +4.",
+    "effects": [
+      {
+        "op": "damage_all",
+        "amount": 11
+      },
+      {
+        "op": "damage_bonus_vs_marked",
+        "amount": 4
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "damage_all",
+          "amount": 16
+        }
+      ]
+    },
+    "unlock": {
+      "type": "card_pool_tier",
+      "tier": 2
+    }
+  },
+  {
+    "id": "card_bubble_pad",
+    "name": "방울 쿠션",
+    "type": "guard",
+    "rarity": "common",
+    "cost": 1,
+    "color": "sky",
+    "frame": "rounded_guard",
+    "sockets": {
+      "base": 1,
+      "max": 3
+    },
+    "tags": [
+      "방어",
+      "완충"
+    ],
+    "illustration": {
+      "subject": "비눗방울 요정의 쿠션",
+      "mood": "맑고 통통 튐"
+    },
+    "text": "보호막 12. 다음 적 공격 피해를 3 줄입니다.",
+    "effects": [
+      {
+        "op": "gain_shield",
+        "amount": 12
+      },
+      {
+        "op": "reduce_next_attack",
+        "amount": 3
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "gain_shield",
+          "amount": 16
+        }
+      ]
+    },
+    "unlock": {
+      "type": "card_pool_tier",
+      "tier": 2
+    }
+  },
+  {
+    "id": "card_bubble_sparkle",
+    "name": "방울 반짝",
+    "type": "skill",
+    "rarity": "common",
+    "cost": 1,
+    "color": "sky",
+    "frame": "rounded_skill",
+    "sockets": {
+      "base": 1,
+      "max": 2
+    },
+    "tags": [
+      "드로우",
+      "표식"
+    ],
+    "illustration": {
+      "subject": "비눗방울 요정의 반짝",
+      "mood": "맑고 통통 튐"
+    },
+    "text": "카드 2장을 뽑습니다. 가장 앞의 적에게 표식 3.",
+    "effects": [
+      {
+        "op": "draw",
+        "amount": 2
+      },
+      {
+        "op": "apply_mark",
+        "amount": 3
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "draw",
+          "amount": 3
+        }
+      ]
+    },
+    "unlock": {
+      "type": "card_pool_tier",
+      "tier": 2
+    }
+  },
+  {
+    "id": "card_bubble_snack",
+    "name": "방울 간식",
+    "type": "skill",
+    "rarity": "common",
+    "cost": 0,
+    "color": "sky",
+    "frame": "rounded_skill",
+    "sockets": {
+      "base": 0,
+      "max": 2
+    },
+    "tags": [
+      "기운",
+      "비용"
+    ],
+    "illustration": {
+      "subject": "비눗방울 요정의 간식",
+      "mood": "맑고 통통 튐"
+    },
+    "text": "기운 1을 얻습니다. 다음 카드 비용 -1.",
+    "effects": [
+      {
+        "op": "gain_energy",
+        "amount": 1
+      },
+      {
+        "op": "discount_next_card",
+        "amount": 1
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "gain_energy",
+          "amount": 2
+        }
+      ]
+    },
+    "unlock": {
+      "type": "card_pool_tier",
+      "tier": 2
+    }
+  },
+  {
+    "id": "card_bubble_promise",
+    "name": "방울 약속",
+    "type": "power",
+    "rarity": "rare",
+    "cost": 2,
+    "color": "sky",
+    "frame": "rounded_power",
+    "sockets": {
+      "base": 0,
+      "max": 1
+    },
+    "tags": [
+      "지속",
+      "전투"
+    ],
+    "illustration": {
+      "subject": "비눗방울 요정의 약속",
+      "mood": "맑고 통통 튐"
+    },
+    "text": "이번 전투 동안 방울 계열 카드를 낼 때마다 보호막 2.",
+    "effects": [
+      {
+        "op": "add_battle_rule",
+        "rule": "shield_on_color_play",
+        "color": "sky",
+        "amount": 2
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "add_battle_rule",
+          "rule": "shield_on_color_play",
+          "color": "sky",
+          "amount": 3
+        }
+      ]
+    },
+    "unlock": {
+      "type": "card_pool_tier",
+      "tier": 2
+    }
+  },
+  {
+    "id": "card_bubble_shower",
+    "name": "방울 소나기",
+    "type": "attack",
+    "rarity": "rare",
+    "cost": 3,
+    "color": "sky",
+    "frame": "rounded_attack",
+    "sockets": {
+      "base": 2,
+      "max": 4
+    },
+    "tags": [
+      "다단",
+      "무작위"
+    ],
+    "illustration": {
+      "subject": "비눗방울 요정의 소나기",
+      "mood": "맑고 통통 튐"
+    },
+    "text": "무작위 적에게 피해 6를 4번 줍니다.",
+    "effects": [
+      {
+        "op": "damage_random",
+        "amount": 6,
+        "hits": 4
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "damage_random",
+          "amount": 8,
+          "hits": 4
+        }
+      ]
+    },
+    "unlock": {
+      "type": "card_pool_tier",
+      "tier": 2
+    }
+  },
+  {
+    "id": "card_bubble_gift",
+    "name": "방울 선물",
+    "type": "skill",
+    "rarity": "uncommon",
+    "cost": 2,
+    "color": "sky",
+    "frame": "rounded_skill",
+    "sockets": {
+      "base": 1,
+      "max": 3
+    },
+    "tags": [
+      "보상",
+      "소켓"
+    ],
+    "illustration": {
+      "subject": "비눗방울 요정의 선물",
+      "mood": "맑고 통통 튐"
+    },
+    "text": "이번 전투 후 카드 보상 선택지 +1. 손패의 무작위 카드가 임시 소켓 보너스 2를 얻습니다.",
+    "effects": [
+      {
+        "op": "increase_next_card_reward_options",
+        "amount": 1
+      },
+      {
+        "op": "prepare_socket_bonus",
+        "amount": 2
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "prepare_socket_bonus",
+          "amount": 3
+        }
+      ]
+    },
+    "unlock": {
+      "type": "card_pool_tier",
+      "tier": 2
+    }
+  },
+  {
+    "id": "card_ribbon_tap",
+    "name": "리본 톡",
+    "type": "attack",
+    "rarity": "common",
+    "cost": 1,
+    "color": "lavender",
+    "frame": "rounded_attack",
+    "sockets": {
+      "base": 1,
+      "max": 3
+    },
+    "tags": [
+      "타격",
+      "연쇄"
+    ],
+    "illustration": {
+      "subject": "리본 마술사의 톡",
+      "mood": "화려하고 유쾌함"
+    },
+    "text": "가장 앞의 적에게 피해 15. 연쇄가 3 이상이면 피해 +5.",
+    "effects": [
+      {
+        "op": "damage_front",
+        "amount": 15
+      },
+      {
+        "op": "damage_bonus_if_chain_at_least",
+        "threshold": 3,
+        "amount": 5
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "damage_front",
+          "amount": 19
+        }
+      ]
+    },
+    "unlock": {
+      "type": "card_pool_tier",
+      "tier": 3
+    }
+  },
+  {
+    "id": "card_ribbon_wave",
+    "name": "리본 물결",
+    "type": "attack",
+    "rarity": "uncommon",
+    "cost": 2,
+    "color": "lavender",
+    "frame": "rounded_attack",
+    "sockets": {
+      "base": 1,
+      "max": 3
+    },
+    "tags": [
+      "광역",
+      "표식"
+    ],
+    "illustration": {
+      "subject": "리본 마술사의 물결",
+      "mood": "화려하고 유쾌함"
+    },
+    "text": "모든 적에게 피해 13. 표식이 있는 적에게 피해 +5.",
+    "effects": [
+      {
+        "op": "damage_all",
+        "amount": 13
+      },
+      {
+        "op": "damage_bonus_vs_marked",
+        "amount": 5
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "damage_all",
+          "amount": 18
+        }
+      ]
+    },
+    "unlock": {
+      "type": "card_pool_tier",
+      "tier": 3
+    }
+  },
+  {
+    "id": "card_ribbon_pad",
+    "name": "리본 쿠션",
+    "type": "guard",
+    "rarity": "common",
+    "cost": 1,
+    "color": "lavender",
+    "frame": "rounded_guard",
+    "sockets": {
+      "base": 1,
+      "max": 3
+    },
+    "tags": [
+      "방어",
+      "완충"
+    ],
+    "illustration": {
+      "subject": "리본 마술사의 쿠션",
+      "mood": "화려하고 유쾌함"
+    },
+    "text": "보호막 14. 다음 적 공격 피해를 4 줄입니다.",
+    "effects": [
+      {
+        "op": "gain_shield",
+        "amount": 14
+      },
+      {
+        "op": "reduce_next_attack",
+        "amount": 4
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "gain_shield",
+          "amount": 18
+        }
+      ]
+    },
+    "unlock": {
+      "type": "card_pool_tier",
+      "tier": 3
+    }
+  },
+  {
+    "id": "card_ribbon_sparkle",
+    "name": "리본 반짝",
+    "type": "skill",
+    "rarity": "common",
+    "cost": 1,
+    "color": "lavender",
+    "frame": "rounded_skill",
+    "sockets": {
+      "base": 1,
+      "max": 2
+    },
+    "tags": [
+      "드로우",
+      "표식"
+    ],
+    "illustration": {
+      "subject": "리본 마술사의 반짝",
+      "mood": "화려하고 유쾌함"
+    },
+    "text": "카드 2장을 뽑습니다. 가장 앞의 적에게 표식 4.",
+    "effects": [
+      {
+        "op": "draw",
+        "amount": 2
+      },
+      {
+        "op": "apply_mark",
+        "amount": 4
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "draw",
+          "amount": 3
+        }
+      ]
+    },
+    "unlock": {
+      "type": "card_pool_tier",
+      "tier": 3
+    }
+  },
+  {
+    "id": "card_ribbon_snack",
+    "name": "리본 간식",
+    "type": "skill",
+    "rarity": "common",
+    "cost": 0,
+    "color": "lavender",
+    "frame": "rounded_skill",
+    "sockets": {
+      "base": 0,
+      "max": 2
+    },
+    "tags": [
+      "기운",
+      "비용"
+    ],
+    "illustration": {
+      "subject": "리본 마술사의 간식",
+      "mood": "화려하고 유쾌함"
+    },
+    "text": "기운 1을 얻습니다. 다음 카드 비용 -1.",
+    "effects": [
+      {
+        "op": "gain_energy",
+        "amount": 1
+      },
+      {
+        "op": "discount_next_card",
+        "amount": 1
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "gain_energy",
+          "amount": 2
+        }
+      ]
+    },
+    "unlock": {
+      "type": "card_pool_tier",
+      "tier": 3
+    }
+  },
+  {
+    "id": "card_ribbon_promise",
+    "name": "리본 약속",
+    "type": "power",
+    "rarity": "rare",
+    "cost": 2,
+    "color": "lavender",
+    "frame": "rounded_power",
+    "sockets": {
+      "base": 0,
+      "max": 1
+    },
+    "tags": [
+      "지속",
+      "전투"
+    ],
+    "illustration": {
+      "subject": "리본 마술사의 약속",
+      "mood": "화려하고 유쾌함"
+    },
+    "text": "이번 전투 동안 리본 계열 카드를 낼 때마다 보호막 3.",
+    "effects": [
+      {
+        "op": "add_battle_rule",
+        "rule": "shield_on_color_play",
+        "color": "lavender",
+        "amount": 3
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "add_battle_rule",
+          "rule": "shield_on_color_play",
+          "color": "lavender",
+          "amount": 4
+        }
+      ]
+    },
+    "unlock": {
+      "type": "card_pool_tier",
+      "tier": 3
+    }
+  },
+  {
+    "id": "card_ribbon_shower",
+    "name": "리본 소나기",
+    "type": "attack",
+    "rarity": "rare",
+    "cost": 3,
+    "color": "lavender",
+    "frame": "rounded_attack",
+    "sockets": {
+      "base": 2,
+      "max": 4
+    },
+    "tags": [
+      "다단",
+      "무작위"
+    ],
+    "illustration": {
+      "subject": "리본 마술사의 소나기",
+      "mood": "화려하고 유쾌함"
+    },
+    "text": "무작위 적에게 피해 8를 3번 줍니다.",
+    "effects": [
+      {
+        "op": "damage_random",
+        "amount": 8,
+        "hits": 3
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "damage_random",
+          "amount": 10,
+          "hits": 3
+        }
+      ]
+    },
+    "unlock": {
+      "type": "card_pool_tier",
+      "tier": 3
+    }
+  },
+  {
+    "id": "card_ribbon_gift",
+    "name": "리본 선물",
+    "type": "skill",
+    "rarity": "uncommon",
+    "cost": 2,
+    "color": "lavender",
+    "frame": "rounded_skill",
+    "sockets": {
+      "base": 1,
+      "max": 3
+    },
+    "tags": [
+      "보상",
+      "소켓"
+    ],
+    "illustration": {
+      "subject": "리본 마술사의 선물",
+      "mood": "화려하고 유쾌함"
+    },
+    "text": "이번 전투 후 카드 보상 선택지 +1. 손패의 무작위 카드가 임시 소켓 보너스 2를 얻습니다.",
+    "effects": [
+      {
+        "op": "increase_next_card_reward_options",
+        "amount": 1
+      },
+      {
+        "op": "prepare_socket_bonus",
+        "amount": 2
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "prepare_socket_bonus",
+          "amount": 3
+        }
+      ]
+    },
+    "unlock": {
+      "type": "card_pool_tier",
+      "tier": 3
+    }
+  },
+  {
+    "id": "card_candy_tap",
+    "name": "별사탕 톡",
+    "type": "attack",
+    "rarity": "common",
+    "cost": 1,
+    "color": "yellow",
+    "frame": "rounded_attack",
+    "sockets": {
+      "base": 1,
+      "max": 3
+    },
+    "tags": [
+      "타격",
+      "연쇄"
+    ],
+    "illustration": {
+      "subject": "별사탕 병정의 톡",
+      "mood": "달콤하고 반짝임"
+    },
+    "text": "가장 앞의 적에게 피해 15. 연쇄가 3 이상이면 피해 +5.",
+    "effects": [
+      {
+        "op": "damage_front",
+        "amount": 15
+      },
+      {
+        "op": "damage_bonus_if_chain_at_least",
+        "threshold": 3,
+        "amount": 5
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "damage_front",
+          "amount": 19
+        }
+      ]
+    },
+    "unlock": {
+      "type": "card_pool_tier",
+      "tier": 3
+    }
+  },
+  {
+    "id": "card_candy_wave",
+    "name": "별사탕 물결",
+    "type": "attack",
+    "rarity": "uncommon",
+    "cost": 2,
+    "color": "yellow",
+    "frame": "rounded_attack",
+    "sockets": {
+      "base": 1,
+      "max": 3
+    },
+    "tags": [
+      "광역",
+      "표식"
+    ],
+    "illustration": {
+      "subject": "별사탕 병정의 물결",
+      "mood": "달콤하고 반짝임"
+    },
+    "text": "모든 적에게 피해 13. 표식이 있는 적에게 피해 +5.",
+    "effects": [
+      {
+        "op": "damage_all",
+        "amount": 13
+      },
+      {
+        "op": "damage_bonus_vs_marked",
+        "amount": 5
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "damage_all",
+          "amount": 18
+        }
+      ]
+    },
+    "unlock": {
+      "type": "card_pool_tier",
+      "tier": 3
+    }
+  },
+  {
+    "id": "card_candy_pad",
+    "name": "별사탕 쿠션",
+    "type": "guard",
+    "rarity": "common",
+    "cost": 1,
+    "color": "yellow",
+    "frame": "rounded_guard",
+    "sockets": {
+      "base": 1,
+      "max": 3
+    },
+    "tags": [
+      "방어",
+      "완충"
+    ],
+    "illustration": {
+      "subject": "별사탕 병정의 쿠션",
+      "mood": "달콤하고 반짝임"
+    },
+    "text": "보호막 14. 다음 적 공격 피해를 4 줄입니다.",
+    "effects": [
+      {
+        "op": "gain_shield",
+        "amount": 14
+      },
+      {
+        "op": "reduce_next_attack",
+        "amount": 4
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "gain_shield",
+          "amount": 18
+        }
+      ]
+    },
+    "unlock": {
+      "type": "card_pool_tier",
+      "tier": 3
+    }
+  },
+  {
+    "id": "card_candy_sparkle",
+    "name": "별사탕 반짝",
+    "type": "skill",
+    "rarity": "common",
+    "cost": 1,
+    "color": "yellow",
+    "frame": "rounded_skill",
+    "sockets": {
+      "base": 1,
+      "max": 2
+    },
+    "tags": [
+      "드로우",
+      "표식"
+    ],
+    "illustration": {
+      "subject": "별사탕 병정의 반짝",
+      "mood": "달콤하고 반짝임"
+    },
+    "text": "카드 2장을 뽑습니다. 가장 앞의 적에게 표식 4.",
+    "effects": [
+      {
+        "op": "draw",
+        "amount": 2
+      },
+      {
+        "op": "apply_mark",
+        "amount": 4
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "draw",
+          "amount": 3
+        }
+      ]
+    },
+    "unlock": {
+      "type": "card_pool_tier",
+      "tier": 3
+    }
+  },
+  {
+    "id": "card_candy_snack",
+    "name": "별사탕 간식",
+    "type": "skill",
+    "rarity": "common",
+    "cost": 0,
+    "color": "yellow",
+    "frame": "rounded_skill",
+    "sockets": {
+      "base": 0,
+      "max": 2
+    },
+    "tags": [
+      "기운",
+      "비용"
+    ],
+    "illustration": {
+      "subject": "별사탕 병정의 간식",
+      "mood": "달콤하고 반짝임"
+    },
+    "text": "기운 1을 얻습니다. 다음 카드 비용 -1.",
+    "effects": [
+      {
+        "op": "gain_energy",
+        "amount": 1
+      },
+      {
+        "op": "discount_next_card",
+        "amount": 1
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "gain_energy",
+          "amount": 2
+        }
+      ]
+    },
+    "unlock": {
+      "type": "card_pool_tier",
+      "tier": 3
+    }
+  },
+  {
+    "id": "card_candy_promise",
+    "name": "별사탕 약속",
+    "type": "power",
+    "rarity": "rare",
+    "cost": 2,
+    "color": "yellow",
+    "frame": "rounded_power",
+    "sockets": {
+      "base": 0,
+      "max": 1
+    },
+    "tags": [
+      "지속",
+      "전투"
+    ],
+    "illustration": {
+      "subject": "별사탕 병정의 약속",
+      "mood": "달콤하고 반짝임"
+    },
+    "text": "이번 전투 동안 별사탕 계열 카드를 낼 때마다 보호막 3.",
+    "effects": [
+      {
+        "op": "add_battle_rule",
+        "rule": "shield_on_color_play",
+        "color": "yellow",
+        "amount": 3
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "add_battle_rule",
+          "rule": "shield_on_color_play",
+          "color": "yellow",
+          "amount": 4
+        }
+      ]
+    },
+    "unlock": {
+      "type": "card_pool_tier",
+      "tier": 3
+    }
+  },
+  {
+    "id": "card_candy_shower",
+    "name": "별사탕 소나기",
+    "type": "attack",
+    "rarity": "rare",
+    "cost": 3,
+    "color": "yellow",
+    "frame": "rounded_attack",
+    "sockets": {
+      "base": 2,
+      "max": 4
+    },
+    "tags": [
+      "다단",
+      "무작위"
+    ],
+    "illustration": {
+      "subject": "별사탕 병정의 소나기",
+      "mood": "달콤하고 반짝임"
+    },
+    "text": "무작위 적에게 피해 8를 4번 줍니다.",
+    "effects": [
+      {
+        "op": "damage_random",
+        "amount": 8,
+        "hits": 4
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "damage_random",
+          "amount": 10,
+          "hits": 4
+        }
+      ]
+    },
+    "unlock": {
+      "type": "card_pool_tier",
+      "tier": 3
+    }
+  },
+  {
+    "id": "card_candy_gift",
+    "name": "별사탕 선물",
+    "type": "skill",
+    "rarity": "uncommon",
+    "cost": 2,
+    "color": "yellow",
+    "frame": "rounded_skill",
+    "sockets": {
+      "base": 1,
+      "max": 3
+    },
+    "tags": [
+      "보상",
+      "소켓"
+    ],
+    "illustration": {
+      "subject": "별사탕 병정의 선물",
+      "mood": "달콤하고 반짝임"
+    },
+    "text": "이번 전투 후 카드 보상 선택지 +1. 손패의 무작위 카드가 임시 소켓 보너스 2를 얻습니다.",
+    "effects": [
+      {
+        "op": "increase_next_card_reward_options",
+        "amount": 1
+      },
+      {
+        "op": "prepare_socket_bonus",
+        "amount": 2
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "prepare_socket_bonus",
+          "amount": 3
+        }
+      ]
+    },
+    "unlock": {
+      "type": "card_pool_tier",
+      "tier": 3
+    }
+  },
+  {
+    "id": "card_sprout_tap",
+    "name": "새싹 톡",
+    "type": "attack",
+    "rarity": "common",
+    "cost": 1,
+    "color": "mint",
+    "frame": "rounded_attack",
+    "sockets": {
+      "base": 1,
+      "max": 3
+    },
+    "tags": [
+      "타격",
+      "연쇄"
+    ],
+    "illustration": {
+      "subject": "잎사귀 기사의 톡",
+      "mood": "든든하고 싱그러움"
+    },
+    "text": "가장 앞의 적에게 피해 17. 연쇄가 3 이상이면 피해 +5.",
+    "effects": [
+      {
+        "op": "damage_front",
+        "amount": 17
+      },
+      {
+        "op": "damage_bonus_if_chain_at_least",
+        "threshold": 3,
+        "amount": 5
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "damage_front",
+          "amount": 21
+        }
+      ]
+    },
+    "unlock": {
+      "type": "card_pool_tier",
+      "tier": 3
+    }
+  },
+  {
+    "id": "card_sprout_wave",
+    "name": "새싹 물결",
+    "type": "attack",
+    "rarity": "uncommon",
+    "cost": 2,
+    "color": "mint",
+    "frame": "rounded_attack",
+    "sockets": {
+      "base": 1,
+      "max": 3
+    },
+    "tags": [
+      "광역",
+      "표식"
+    ],
+    "illustration": {
+      "subject": "잎사귀 기사의 물결",
+      "mood": "든든하고 싱그러움"
+    },
+    "text": "모든 적에게 피해 15. 표식이 있는 적에게 피해 +5.",
+    "effects": [
+      {
+        "op": "damage_all",
+        "amount": 15
+      },
+      {
+        "op": "damage_bonus_vs_marked",
+        "amount": 5
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "damage_all",
+          "amount": 20
+        }
+      ]
+    },
+    "unlock": {
+      "type": "card_pool_tier",
+      "tier": 3
+    }
+  },
+  {
+    "id": "card_sprout_pad",
+    "name": "새싹 쿠션",
+    "type": "guard",
+    "rarity": "common",
+    "cost": 1,
+    "color": "mint",
+    "frame": "rounded_guard",
+    "sockets": {
+      "base": 1,
+      "max": 3
+    },
+    "tags": [
+      "방어",
+      "완충"
+    ],
+    "illustration": {
+      "subject": "잎사귀 기사의 쿠션",
+      "mood": "든든하고 싱그러움"
+    },
+    "text": "보호막 16. 다음 적 공격 피해를 4 줄입니다.",
+    "effects": [
+      {
+        "op": "gain_shield",
+        "amount": 16
+      },
+      {
+        "op": "reduce_next_attack",
+        "amount": 4
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "gain_shield",
+          "amount": 20
+        }
+      ]
+    },
+    "unlock": {
+      "type": "card_pool_tier",
+      "tier": 3
+    }
+  },
+  {
+    "id": "card_sprout_sparkle",
+    "name": "새싹 반짝",
+    "type": "skill",
+    "rarity": "common",
+    "cost": 1,
+    "color": "mint",
+    "frame": "rounded_skill",
+    "sockets": {
+      "base": 1,
+      "max": 2
+    },
+    "tags": [
+      "드로우",
+      "표식"
+    ],
+    "illustration": {
+      "subject": "잎사귀 기사의 반짝",
+      "mood": "든든하고 싱그러움"
+    },
+    "text": "카드 2장을 뽑습니다. 가장 앞의 적에게 표식 4.",
+    "effects": [
+      {
+        "op": "draw",
+        "amount": 2
+      },
+      {
+        "op": "apply_mark",
+        "amount": 4
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "draw",
+          "amount": 3
+        }
+      ]
+    },
+    "unlock": {
+      "type": "card_pool_tier",
+      "tier": 3
+    }
+  },
+  {
+    "id": "card_sprout_snack",
+    "name": "새싹 간식",
+    "type": "skill",
+    "rarity": "common",
+    "cost": 0,
+    "color": "mint",
+    "frame": "rounded_skill",
+    "sockets": {
+      "base": 0,
+      "max": 2
+    },
+    "tags": [
+      "기운",
+      "비용"
+    ],
+    "illustration": {
+      "subject": "잎사귀 기사의 간식",
+      "mood": "든든하고 싱그러움"
+    },
+    "text": "기운 1을 얻습니다. 다음 카드 비용 -1.",
+    "effects": [
+      {
+        "op": "gain_energy",
+        "amount": 1
+      },
+      {
+        "op": "discount_next_card",
+        "amount": 1
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "gain_energy",
+          "amount": 2
+        }
+      ]
+    },
+    "unlock": {
+      "type": "card_pool_tier",
+      "tier": 3
+    }
+  },
+  {
+    "id": "card_sprout_promise",
+    "name": "새싹 약속",
+    "type": "power",
+    "rarity": "rare",
+    "cost": 2,
+    "color": "mint",
+    "frame": "rounded_power",
+    "sockets": {
+      "base": 0,
+      "max": 1
+    },
+    "tags": [
+      "지속",
+      "전투"
+    ],
+    "illustration": {
+      "subject": "잎사귀 기사의 약속",
+      "mood": "든든하고 싱그러움"
+    },
+    "text": "이번 전투 동안 새싹 계열 카드를 낼 때마다 보호막 3.",
+    "effects": [
+      {
+        "op": "add_battle_rule",
+        "rule": "shield_on_color_play",
+        "color": "mint",
+        "amount": 3
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "add_battle_rule",
+          "rule": "shield_on_color_play",
+          "color": "mint",
+          "amount": 4
+        }
+      ]
+    },
+    "unlock": {
+      "type": "card_pool_tier",
+      "tier": 3
+    }
+  },
+  {
+    "id": "card_sprout_shower",
+    "name": "새싹 소나기",
+    "type": "attack",
+    "rarity": "rare",
+    "cost": 3,
+    "color": "mint",
+    "frame": "rounded_attack",
+    "sockets": {
+      "base": 2,
+      "max": 4
+    },
+    "tags": [
+      "다단",
+      "무작위"
+    ],
+    "illustration": {
+      "subject": "잎사귀 기사의 소나기",
+      "mood": "든든하고 싱그러움"
+    },
+    "text": "무작위 적에게 피해 8를 3번 줍니다.",
+    "effects": [
+      {
+        "op": "damage_random",
+        "amount": 8,
+        "hits": 3
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "damage_random",
+          "amount": 10,
+          "hits": 3
+        }
+      ]
+    },
+    "unlock": {
+      "type": "card_pool_tier",
+      "tier": 3
+    }
+  },
+  {
+    "id": "card_sprout_gift",
+    "name": "새싹 선물",
+    "type": "skill",
+    "rarity": "uncommon",
+    "cost": 2,
+    "color": "mint",
+    "frame": "rounded_skill",
+    "sockets": {
+      "base": 1,
+      "max": 3
+    },
+    "tags": [
+      "보상",
+      "소켓"
+    ],
+    "illustration": {
+      "subject": "잎사귀 기사의 선물",
+      "mood": "든든하고 싱그러움"
+    },
+    "text": "이번 전투 후 카드 보상 선택지 +1. 손패의 무작위 카드가 임시 소켓 보너스 2를 얻습니다.",
+    "effects": [
+      {
+        "op": "increase_next_card_reward_options",
+        "amount": 1
+      },
+      {
+        "op": "prepare_socket_bonus",
+        "amount": 2
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "prepare_socket_bonus",
+          "amount": 3
+        }
+      ]
+    },
+    "unlock": {
+      "type": "card_pool_tier",
+      "tier": 3
+    }
+  },
+  {
+    "id": "card_plush_tap",
+    "name": "말랑 톡",
+    "type": "attack",
+    "rarity": "common",
+    "cost": 1,
+    "color": "peach",
+    "frame": "rounded_attack",
+    "sockets": {
+      "base": 1,
+      "max": 3
+    },
+    "tags": [
+      "타격",
+      "연쇄"
+    ],
+    "illustration": {
+      "subject": "봉제 인형 수호자의 톡",
+      "mood": "귀엽고 묵직함"
+    },
+    "text": "가장 앞의 적에게 피해 19. 연쇄가 3 이상이면 피해 +6.",
+    "effects": [
+      {
+        "op": "damage_front",
+        "amount": 19
+      },
+      {
+        "op": "damage_bonus_if_chain_at_least",
+        "threshold": 3,
+        "amount": 6
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "damage_front",
+          "amount": 23
+        }
+      ]
+    },
+    "unlock": {
+      "type": "advanced_pool",
+      "tier": 4
+    }
+  },
+  {
+    "id": "card_plush_wave",
+    "name": "말랑 물결",
+    "type": "attack",
+    "rarity": "uncommon",
+    "cost": 2,
+    "color": "peach",
+    "frame": "rounded_attack",
+    "sockets": {
+      "base": 1,
+      "max": 3
+    },
+    "tags": [
+      "광역",
+      "표식"
+    ],
+    "illustration": {
+      "subject": "봉제 인형 수호자의 물결",
+      "mood": "귀엽고 묵직함"
+    },
+    "text": "모든 적에게 피해 17. 표식이 있는 적에게 피해 +6.",
+    "effects": [
+      {
+        "op": "damage_all",
+        "amount": 17
+      },
+      {
+        "op": "damage_bonus_vs_marked",
+        "amount": 6
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "damage_all",
+          "amount": 22
+        }
+      ]
+    },
+    "unlock": {
+      "type": "advanced_pool",
+      "tier": 4
+    }
+  },
+  {
+    "id": "card_plush_pad",
+    "name": "말랑 쿠션",
+    "type": "guard",
+    "rarity": "common",
+    "cost": 1,
+    "color": "peach",
+    "frame": "rounded_guard",
+    "sockets": {
+      "base": 1,
+      "max": 3
+    },
+    "tags": [
+      "방어",
+      "완충"
+    ],
+    "illustration": {
+      "subject": "봉제 인형 수호자의 쿠션",
+      "mood": "귀엽고 묵직함"
+    },
+    "text": "보호막 18. 다음 적 공격 피해를 5 줄입니다.",
+    "effects": [
+      {
+        "op": "gain_shield",
+        "amount": 18
+      },
+      {
+        "op": "reduce_next_attack",
+        "amount": 5
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "gain_shield",
+          "amount": 22
+        }
+      ]
+    },
+    "unlock": {
+      "type": "advanced_pool",
+      "tier": 4
+    }
+  },
+  {
+    "id": "card_plush_sparkle",
+    "name": "말랑 반짝",
+    "type": "skill",
+    "rarity": "common",
+    "cost": 1,
+    "color": "peach",
+    "frame": "rounded_skill",
+    "sockets": {
+      "base": 1,
+      "max": 2
+    },
+    "tags": [
+      "드로우",
+      "표식"
+    ],
+    "illustration": {
+      "subject": "봉제 인형 수호자의 반짝",
+      "mood": "귀엽고 묵직함"
+    },
+    "text": "카드 2장을 뽑습니다. 가장 앞의 적에게 표식 4.",
+    "effects": [
+      {
+        "op": "draw",
+        "amount": 2
+      },
+      {
+        "op": "apply_mark",
+        "amount": 4
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "draw",
+          "amount": 3
+        }
+      ]
+    },
+    "unlock": {
+      "type": "advanced_pool",
+      "tier": 4
+    }
+  },
+  {
+    "id": "card_plush_snack",
+    "name": "말랑 간식",
+    "type": "skill",
+    "rarity": "common",
+    "cost": 0,
+    "color": "peach",
+    "frame": "rounded_skill",
+    "sockets": {
+      "base": 0,
+      "max": 2
+    },
+    "tags": [
+      "기운",
+      "비용"
+    ],
+    "illustration": {
+      "subject": "봉제 인형 수호자의 간식",
+      "mood": "귀엽고 묵직함"
+    },
+    "text": "기운 2을 얻습니다. 다음 카드 비용 -1.",
+    "effects": [
+      {
+        "op": "gain_energy",
+        "amount": 2
+      },
+      {
+        "op": "discount_next_card",
+        "amount": 1
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "gain_energy",
+          "amount": 3
+        }
+      ]
+    },
+    "unlock": {
+      "type": "advanced_pool",
+      "tier": 4
+    }
+  },
+  {
+    "id": "card_plush_promise",
+    "name": "말랑 약속",
+    "type": "power",
+    "rarity": "rare",
+    "cost": 2,
+    "color": "peach",
+    "frame": "rounded_power",
+    "sockets": {
+      "base": 0,
+      "max": 1
+    },
+    "tags": [
+      "지속",
+      "전투"
+    ],
+    "illustration": {
+      "subject": "봉제 인형 수호자의 약속",
+      "mood": "귀엽고 묵직함"
+    },
+    "text": "이번 전투 동안 말랑 계열 카드를 낼 때마다 보호막 3.",
+    "effects": [
+      {
+        "op": "add_battle_rule",
+        "rule": "shield_on_color_play",
+        "color": "peach",
+        "amount": 3
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "add_battle_rule",
+          "rule": "shield_on_color_play",
+          "color": "peach",
+          "amount": 4
+        }
+      ]
+    },
+    "unlock": {
+      "type": "advanced_pool",
+      "tier": 4
+    }
+  },
+  {
+    "id": "card_plush_shower",
+    "name": "말랑 소나기",
+    "type": "attack",
+    "rarity": "rare",
+    "cost": 3,
+    "color": "peach",
+    "frame": "rounded_attack",
+    "sockets": {
+      "base": 2,
+      "max": 4
+    },
+    "tags": [
+      "다단",
+      "무작위"
+    ],
+    "illustration": {
+      "subject": "봉제 인형 수호자의 소나기",
+      "mood": "귀엽고 묵직함"
+    },
+    "text": "무작위 적에게 피해 10를 4번 줍니다.",
+    "effects": [
+      {
+        "op": "damage_random",
+        "amount": 10,
+        "hits": 4
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "damage_random",
+          "amount": 12,
+          "hits": 4
+        }
+      ]
+    },
+    "unlock": {
+      "type": "advanced_pool",
+      "tier": 4
+    }
+  },
+  {
+    "id": "card_plush_gift",
+    "name": "말랑 선물",
+    "type": "skill",
+    "rarity": "uncommon",
+    "cost": 2,
+    "color": "peach",
+    "frame": "rounded_skill",
+    "sockets": {
+      "base": 1,
+      "max": 3
+    },
+    "tags": [
+      "보상",
+      "소켓"
+    ],
+    "illustration": {
+      "subject": "봉제 인형 수호자의 선물",
+      "mood": "귀엽고 묵직함"
+    },
+    "text": "이번 전투 후 카드 보상 선택지 +1. 손패의 무작위 카드가 임시 소켓 보너스 3를 얻습니다.",
+    "effects": [
+      {
+        "op": "increase_next_card_reward_options",
+        "amount": 1
+      },
+      {
+        "op": "prepare_socket_bonus",
+        "amount": 3
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "prepare_socket_bonus",
+          "amount": 4
+        }
+      ]
+    },
+    "unlock": {
+      "type": "advanced_pool",
+      "tier": 4
+    }
+  },
+  {
+    "id": "card_prism_tap",
+    "name": "프리즘 톡",
+    "type": "attack",
+    "rarity": "common",
+    "cost": 1,
+    "color": "lavender",
+    "frame": "rounded_attack",
+    "sockets": {
+      "base": 1,
+      "max": 3
+    },
+    "tags": [
+      "타격",
+      "연쇄"
+    ],
+    "illustration": {
+      "subject": "무지개 조각새의 톡",
+      "mood": "맑고 신비함"
+    },
+    "text": "가장 앞의 적에게 피해 19. 연쇄가 3 이상이면 피해 +6.",
+    "effects": [
+      {
+        "op": "damage_front",
+        "amount": 19
+      },
+      {
+        "op": "damage_bonus_if_chain_at_least",
+        "threshold": 3,
+        "amount": 6
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "damage_front",
+          "amount": 23
+        }
+      ]
+    },
+    "unlock": {
+      "type": "advanced_pool",
+      "tier": 4
+    }
+  },
+  {
+    "id": "card_prism_wave",
+    "name": "프리즘 물결",
+    "type": "attack",
+    "rarity": "uncommon",
+    "cost": 2,
+    "color": "lavender",
+    "frame": "rounded_attack",
+    "sockets": {
+      "base": 1,
+      "max": 3
+    },
+    "tags": [
+      "광역",
+      "표식"
+    ],
+    "illustration": {
+      "subject": "무지개 조각새의 물결",
+      "mood": "맑고 신비함"
+    },
+    "text": "모든 적에게 피해 17. 표식이 있는 적에게 피해 +6.",
+    "effects": [
+      {
+        "op": "damage_all",
+        "amount": 17
+      },
+      {
+        "op": "damage_bonus_vs_marked",
+        "amount": 6
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "damage_all",
+          "amount": 22
+        }
+      ]
+    },
+    "unlock": {
+      "type": "advanced_pool",
+      "tier": 4
+    }
+  },
+  {
+    "id": "card_prism_pad",
+    "name": "프리즘 쿠션",
+    "type": "guard",
+    "rarity": "common",
+    "cost": 1,
+    "color": "lavender",
+    "frame": "rounded_guard",
+    "sockets": {
+      "base": 1,
+      "max": 3
+    },
+    "tags": [
+      "방어",
+      "완충"
+    ],
+    "illustration": {
+      "subject": "무지개 조각새의 쿠션",
+      "mood": "맑고 신비함"
+    },
+    "text": "보호막 18. 다음 적 공격 피해를 5 줄입니다.",
+    "effects": [
+      {
+        "op": "gain_shield",
+        "amount": 18
+      },
+      {
+        "op": "reduce_next_attack",
+        "amount": 5
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "gain_shield",
+          "amount": 22
+        }
+      ]
+    },
+    "unlock": {
+      "type": "advanced_pool",
+      "tier": 4
+    }
+  },
+  {
+    "id": "card_prism_sparkle",
+    "name": "프리즘 반짝",
+    "type": "skill",
+    "rarity": "common",
+    "cost": 1,
+    "color": "lavender",
+    "frame": "rounded_skill",
+    "sockets": {
+      "base": 1,
+      "max": 2
+    },
+    "tags": [
+      "드로우",
+      "표식"
+    ],
+    "illustration": {
+      "subject": "무지개 조각새의 반짝",
+      "mood": "맑고 신비함"
+    },
+    "text": "카드 2장을 뽑습니다. 가장 앞의 적에게 표식 4.",
+    "effects": [
+      {
+        "op": "draw",
+        "amount": 2
+      },
+      {
+        "op": "apply_mark",
+        "amount": 4
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "draw",
+          "amount": 3
+        }
+      ]
+    },
+    "unlock": {
+      "type": "advanced_pool",
+      "tier": 4
+    }
+  },
+  {
+    "id": "card_prism_snack",
+    "name": "프리즘 간식",
+    "type": "skill",
+    "rarity": "common",
+    "cost": 0,
+    "color": "lavender",
+    "frame": "rounded_skill",
+    "sockets": {
+      "base": 0,
+      "max": 2
+    },
+    "tags": [
+      "기운",
+      "비용"
+    ],
+    "illustration": {
+      "subject": "무지개 조각새의 간식",
+      "mood": "맑고 신비함"
+    },
+    "text": "기운 2을 얻습니다. 다음 카드 비용 -1.",
+    "effects": [
+      {
+        "op": "gain_energy",
+        "amount": 2
+      },
+      {
+        "op": "discount_next_card",
+        "amount": 1
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "gain_energy",
+          "amount": 3
+        }
+      ]
+    },
+    "unlock": {
+      "type": "advanced_pool",
+      "tier": 4
+    }
+  },
+  {
+    "id": "card_prism_promise",
+    "name": "프리즘 약속",
+    "type": "power",
+    "rarity": "rare",
+    "cost": 2,
+    "color": "lavender",
+    "frame": "rounded_power",
+    "sockets": {
+      "base": 0,
+      "max": 1
+    },
+    "tags": [
+      "지속",
+      "전투"
+    ],
+    "illustration": {
+      "subject": "무지개 조각새의 약속",
+      "mood": "맑고 신비함"
+    },
+    "text": "이번 전투 동안 프리즘 계열 카드를 낼 때마다 보호막 3.",
+    "effects": [
+      {
+        "op": "add_battle_rule",
+        "rule": "shield_on_color_play",
+        "color": "lavender",
+        "amount": 3
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "add_battle_rule",
+          "rule": "shield_on_color_play",
+          "color": "lavender",
+          "amount": 4
+        }
+      ]
+    },
+    "unlock": {
+      "type": "advanced_pool",
+      "tier": 4
+    }
+  },
+  {
+    "id": "card_prism_shower",
+    "name": "프리즘 소나기",
+    "type": "attack",
+    "rarity": "rare",
+    "cost": 3,
+    "color": "lavender",
+    "frame": "rounded_attack",
+    "sockets": {
+      "base": 2,
+      "max": 4
+    },
+    "tags": [
+      "다단",
+      "무작위"
+    ],
+    "illustration": {
+      "subject": "무지개 조각새의 소나기",
+      "mood": "맑고 신비함"
+    },
+    "text": "무작위 적에게 피해 10를 3번 줍니다.",
+    "effects": [
+      {
+        "op": "damage_random",
+        "amount": 10,
+        "hits": 3
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "damage_random",
+          "amount": 12,
+          "hits": 3
+        }
+      ]
+    },
+    "unlock": {
+      "type": "advanced_pool",
+      "tier": 4
+    }
+  },
+  {
+    "id": "card_prism_gift",
+    "name": "프리즘 선물",
+    "type": "skill",
+    "rarity": "uncommon",
+    "cost": 2,
+    "color": "lavender",
+    "frame": "rounded_skill",
+    "sockets": {
+      "base": 1,
+      "max": 3
+    },
+    "tags": [
+      "보상",
+      "소켓"
+    ],
+    "illustration": {
+      "subject": "무지개 조각새의 선물",
+      "mood": "맑고 신비함"
+    },
+    "text": "이번 전투 후 카드 보상 선택지 +1. 손패의 무작위 카드가 임시 소켓 보너스 3를 얻습니다.",
+    "effects": [
+      {
+        "op": "increase_next_card_reward_options",
+        "amount": 1
+      },
+      {
+        "op": "prepare_socket_bonus",
+        "amount": 3
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "prepare_socket_bonus",
+          "amount": 4
+        }
+      ]
+    },
+    "unlock": {
+      "type": "advanced_pool",
+      "tier": 4
+    }
+  },
+  {
+    "id": "card_moon_tap",
+    "name": "달빛 톡",
+    "type": "attack",
+    "rarity": "common",
+    "cost": 1,
+    "color": "sky",
+    "frame": "rounded_attack",
+    "sockets": {
+      "base": 1,
+      "max": 3
+    },
+    "tags": [
+      "타격",
+      "연쇄"
+    ],
+    "illustration": {
+      "subject": "졸린 달토끼의 톡",
+      "mood": "부드럽고 조용함"
+    },
+    "text": "가장 앞의 적에게 피해 21. 연쇄가 3 이상이면 피해 +7.",
+    "effects": [
+      {
+        "op": "damage_front",
+        "amount": 21
+      },
+      {
+        "op": "damage_bonus_if_chain_at_least",
+        "threshold": 3,
+        "amount": 7
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "damage_front",
+          "amount": 25
+        }
+      ]
+    },
+    "unlock": {
+      "type": "advanced_pool",
+      "tier": 5
+    }
+  },
+  {
+    "id": "card_moon_wave",
+    "name": "달빛 물결",
+    "type": "attack",
+    "rarity": "uncommon",
+    "cost": 2,
+    "color": "sky",
+    "frame": "rounded_attack",
+    "sockets": {
+      "base": 1,
+      "max": 3
+    },
+    "tags": [
+      "광역",
+      "표식"
+    ],
+    "illustration": {
+      "subject": "졸린 달토끼의 물결",
+      "mood": "부드럽고 조용함"
+    },
+    "text": "모든 적에게 피해 19. 표식이 있는 적에게 피해 +7.",
+    "effects": [
+      {
+        "op": "damage_all",
+        "amount": 19
+      },
+      {
+        "op": "damage_bonus_vs_marked",
+        "amount": 7
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "damage_all",
+          "amount": 24
+        }
+      ]
+    },
+    "unlock": {
+      "type": "advanced_pool",
+      "tier": 5
+    }
+  },
+  {
+    "id": "card_moon_pad",
+    "name": "달빛 쿠션",
+    "type": "guard",
+    "rarity": "common",
+    "cost": 1,
+    "color": "sky",
+    "frame": "rounded_guard",
+    "sockets": {
+      "base": 1,
+      "max": 3
+    },
+    "tags": [
+      "방어",
+      "완충"
+    ],
+    "illustration": {
+      "subject": "졸린 달토끼의 쿠션",
+      "mood": "부드럽고 조용함"
+    },
+    "text": "보호막 20. 다음 적 공격 피해를 5 줄입니다.",
+    "effects": [
+      {
+        "op": "gain_shield",
+        "amount": 20
+      },
+      {
+        "op": "reduce_next_attack",
+        "amount": 5
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "gain_shield",
+          "amount": 24
+        }
+      ]
+    },
+    "unlock": {
+      "type": "advanced_pool",
+      "tier": 5
+    }
+  },
+  {
+    "id": "card_moon_sparkle",
+    "name": "달빛 반짝",
+    "type": "skill",
+    "rarity": "common",
+    "cost": 1,
+    "color": "sky",
+    "frame": "rounded_skill",
+    "sockets": {
+      "base": 1,
+      "max": 2
+    },
+    "tags": [
+      "드로우",
+      "표식"
+    ],
+    "illustration": {
+      "subject": "졸린 달토끼의 반짝",
+      "mood": "부드럽고 조용함"
+    },
+    "text": "카드 2장을 뽑습니다. 가장 앞의 적에게 표식 4.",
+    "effects": [
+      {
+        "op": "draw",
+        "amount": 2
+      },
+      {
+        "op": "apply_mark",
+        "amount": 4
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "draw",
+          "amount": 3
+        }
+      ]
+    },
+    "unlock": {
+      "type": "advanced_pool",
+      "tier": 5
+    }
+  },
+  {
+    "id": "card_moon_snack",
+    "name": "달빛 간식",
+    "type": "skill",
+    "rarity": "common",
+    "cost": 0,
+    "color": "sky",
+    "frame": "rounded_skill",
+    "sockets": {
+      "base": 0,
+      "max": 2
+    },
+    "tags": [
+      "기운",
+      "비용"
+    ],
+    "illustration": {
+      "subject": "졸린 달토끼의 간식",
+      "mood": "부드럽고 조용함"
+    },
+    "text": "기운 2을 얻습니다. 다음 카드 비용 -1.",
+    "effects": [
+      {
+        "op": "gain_energy",
+        "amount": 2
+      },
+      {
+        "op": "discount_next_card",
+        "amount": 1
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "gain_energy",
+          "amount": 3
+        }
+      ]
+    },
+    "unlock": {
+      "type": "advanced_pool",
+      "tier": 5
+    }
+  },
+  {
+    "id": "card_moon_promise",
+    "name": "달빛 약속",
+    "type": "power",
+    "rarity": "rare",
+    "cost": 2,
+    "color": "sky",
+    "frame": "rounded_power",
+    "sockets": {
+      "base": 0,
+      "max": 1
+    },
+    "tags": [
+      "지속",
+      "전투"
+    ],
+    "illustration": {
+      "subject": "졸린 달토끼의 약속",
+      "mood": "부드럽고 조용함"
+    },
+    "text": "이번 전투 동안 달빛 계열 카드를 낼 때마다 보호막 4.",
+    "effects": [
+      {
+        "op": "add_battle_rule",
+        "rule": "shield_on_color_play",
+        "color": "sky",
+        "amount": 4
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "add_battle_rule",
+          "rule": "shield_on_color_play",
+          "color": "sky",
+          "amount": 5
+        }
+      ]
+    },
+    "unlock": {
+      "type": "advanced_pool",
+      "tier": 5
+    }
+  },
+  {
+    "id": "card_moon_shower",
+    "name": "달빛 소나기",
+    "type": "attack",
+    "rarity": "rare",
+    "cost": 3,
+    "color": "sky",
+    "frame": "rounded_attack",
+    "sockets": {
+      "base": 2,
+      "max": 4
+    },
+    "tags": [
+      "다단",
+      "무작위"
+    ],
+    "illustration": {
+      "subject": "졸린 달토끼의 소나기",
+      "mood": "부드럽고 조용함"
+    },
+    "text": "무작위 적에게 피해 11를 4번 줍니다.",
+    "effects": [
+      {
+        "op": "damage_random",
+        "amount": 11,
+        "hits": 4
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "damage_random",
+          "amount": 13,
+          "hits": 4
+        }
+      ]
+    },
+    "unlock": {
+      "type": "advanced_pool",
+      "tier": 5
+    }
+  },
+  {
+    "id": "card_moon_gift",
+    "name": "달빛 선물",
+    "type": "skill",
+    "rarity": "uncommon",
+    "cost": 2,
+    "color": "sky",
+    "frame": "rounded_skill",
+    "sockets": {
+      "base": 1,
+      "max": 3
+    },
+    "tags": [
+      "보상",
+      "소켓"
+    ],
+    "illustration": {
+      "subject": "졸린 달토끼의 선물",
+      "mood": "부드럽고 조용함"
+    },
+    "text": "이번 전투 후 카드 보상 선택지 +1. 손패의 무작위 카드가 임시 소켓 보너스 3를 얻습니다.",
+    "effects": [
+      {
+        "op": "increase_next_card_reward_options",
+        "amount": 1
+      },
+      {
+        "op": "prepare_socket_bonus",
+        "amount": 3
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "prepare_socket_bonus",
+          "amount": 4
+        }
+      ]
+    },
+    "unlock": {
+      "type": "advanced_pool",
+      "tier": 5
+    }
+  },
+  {
+    "id": "card_temp_dust",
+    "name": "먼지 카드",
+    "type": "temp",
+    "rarity": "common",
+    "cost": 1,
+    "color": "peach",
+    "frame": "rounded_temp",
+    "sockets": {
+      "base": 0,
+      "max": 0
+    },
+    "tags": [
+      "임시",
+      "방해"
+    ],
+    "illustration": {
+      "subject": "작은 먼지 뭉치",
+      "mood": "가볍고 성가심"
+    },
+    "text": "아무 효과가 없습니다. 사용 후 이번 전투에서 사라집니다.",
+    "effects": [
+      {
+        "op": "exhaust_self"
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "exhaust_self"
+        }
+      ]
+    },
+    "unlock": {
+      "type": "enemy_created"
+    }
+  },
+  {
+    "id": "card_temp_sleepy",
+    "name": "졸음 하품",
+    "type": "curse",
+    "rarity": "common",
+    "cost": 1,
+    "color": "sky",
+    "frame": "rounded_temp",
+    "sockets": {
+      "base": 0,
+      "max": 0
+    },
+    "tags": [
+      "임시",
+      "졸림"
+    ],
+    "illustration": {
+      "subject": "하품하는 달토끼",
+      "mood": "나른함"
+    },
+    "text": "기운 1을 잃습니다. 사용 후 이번 전투에서 사라집니다.",
+    "effects": [
+      {
+        "op": "lose_energy",
+        "amount": 1
+      },
+      {
+        "op": "exhaust_self"
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "exhaust_self"
+        }
+      ]
+    },
+    "unlock": {
+      "type": "enemy_created"
+    }
+  },
+  {
+    "id": "card_temp_tangle",
+    "name": "엉킨 리본",
+    "type": "curse",
+    "rarity": "uncommon",
+    "cost": 2,
+    "color": "lavender",
+    "frame": "rounded_temp",
+    "sockets": {
+      "base": 0,
+      "max": 0
+    },
+    "tags": [
+      "임시",
+      "연쇄"
+    ],
+    "illustration": {
+      "subject": "엉킨 보라 리본",
+      "mood": "복잡함"
+    },
+    "text": "연쇄를 0으로 만듭니다. 사용 후 이번 전투에서 사라집니다.",
+    "effects": [
+      {
+        "op": "reset_chain"
+      },
+      {
+        "op": "exhaust_self"
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "exhaust_self"
+        }
+      ]
+    },
+    "unlock": {
+      "type": "enemy_created"
+    }
+  },
+  {
+    "id": "card_temp_soggy",
+    "name": "눅눅한 지도",
+    "type": "temp",
+    "rarity": "uncommon",
+    "cost": 0,
+    "color": "mint",
+    "frame": "rounded_temp",
+    "sockets": {
+      "base": 0,
+      "max": 0
+    },
+    "tags": [
+      "임시",
+      "탐색"
+    ],
+    "illustration": {
+      "subject": "젖은 종이 지도",
+      "mood": "난감함"
+    },
+    "text": "카드 1장을 뽑지만 다음 카드 비용 +1. 사용 후 사라집니다.",
+    "effects": [
+      {
+        "op": "draw",
+        "amount": 1
+      },
+      {
+        "op": "increase_next_card_cost",
+        "amount": 1
+      },
+      {
+        "op": "exhaust_self"
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "draw",
+          "amount": 1
+        },
+        {
+          "op": "exhaust_self"
+        }
+      ]
+    },
+    "unlock": {
+      "type": "enemy_created"
+    }
+  },
+  {
+    "id": "card_temp_blank",
+    "name": "빈 스티커",
+    "type": "temp",
+    "rarity": "rare",
+    "cost": 0,
+    "color": "yellow",
+    "frame": "rounded_temp",
+    "sockets": {
+      "base": 0,
+      "max": 0
+    },
+    "tags": [
+      "임시",
+      "복사"
+    ],
+    "illustration": {
+      "subject": "하얀 별 모양 스티커",
+      "mood": "비어 있지만 귀여움"
+    },
+    "text": "이번 턴 마지막으로 낸 1비용 이하 카드의 기본 효과를 반복합니다. 사용 후 사라집니다.",
+    "effects": [
+      {
+        "op": "repeat_previous_basic_effect_if_cost_at_most",
+        "cost": 1,
+        "amount": 1
+      },
+      {
+        "op": "exhaust_self"
+      }
+    ],
+    "upgrade": {
+      "nameSuffix": "+",
+      "effects": [
+        {
+          "op": "repeat_previous_basic_effect_if_cost_at_most",
+          "cost": 2,
+          "amount": 1
+        },
+        {
+          "op": "exhaust_self"
+        }
+      ]
+    },
+    "unlock": {
+      "type": "enemy_created"
+    }
+  }
+]

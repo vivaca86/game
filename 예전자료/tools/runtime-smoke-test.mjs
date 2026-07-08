@@ -1,0 +1,447 @@
+import { readFile } from "node:fs/promises";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import { createGameIndex, assertRuntimeData } from "../src/core/data-loader.js";
+import { cardRoleAudit } from "../src/core/card-roles.js";
+import { gemAudit } from "../src/core/gem-roles.js";
+import { buildItemAudit } from "../src/core/build-roles.js";
+import { eventAudit } from "../src/core/event-roles.js";
+import { rewardOptionInsightAudit } from "../src/core/reward-insights.js";
+import { checkAchievements } from "../src/core/achievements.js";
+import { cleanseDisruption, playCard, endTurn, startCombat } from "../src/core/combat.js";
+import { startRun, advanceRoom } from "../src/core/progression.js";
+import { applyEventChoice, applyRewardOption } from "../src/core/rewards.js";
+import { cardCost } from "../src/core/card-effects.js";
+import { equipGemToCard, grantGem, openSocketForCard, socketCapacity } from "../src/core/gems.js";
+import { createSaveSnapshot, restoreRunState } from "../src/core/persistence.js";
+import { createRewardOptions } from "../src/core/rewards.js";
+import { adjustedRewardCost, grantArcana, grantRelic } from "../src/core/run-modifiers.js";
+import { createDefaultProfile, finalizeRunProfile } from "../src/core/profile.js";
+
+const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const dataDir = path.join(rootDir, "src", "data", "ko");
+const readJson = async (fileName) => JSON.parse(await readFile(path.join(dataDir, fileName), "utf8"));
+
+const data = {
+  targets: await readJson("content-targets.json"),
+  strings: await readJson("strings.json"),
+  cards: await readJson("cards.json"),
+  gems: await readJson("gems.json"),
+  relics: await readJson("relics.json"),
+  arcanas: await readJson("arcanas.json"),
+  characters: await readJson("characters.json"),
+  enemies: await readJson("enemies.json"),
+  stages: await readJson("stages.json"),
+  events: await readJson("events.json"),
+  metaUpgrades: await readJson("meta-upgrades.json"),
+  achievements: await readJson("achievements.json")
+};
+
+const index = createGameIndex(data);
+assertRuntimeData(data, index);
+
+const cardAudit = cardRoleAudit(data.cards);
+if (cardAudit.missingRoles.length > 0) throw new Error(`카드 역할 미분류: ${cardAudit.missingRoles.join(",")}`);
+if (Object.keys(cardAudit.roleCounts).length < 10) throw new Error("카드 역할 분포 부족");
+const gemRoleAudit = gemAudit(data.gems);
+if (gemRoleAudit.missingRoles.length > 0) throw new Error(`보석 역할 미분류: ${gemRoleAudit.missingRoles.join(",")}`);
+if (Object.keys(gemRoleAudit.roleCounts).length < 8) throw new Error("보석 역할 분포 부족");
+const buildRoleAudit = buildItemAudit(data.relics, data.arcanas);
+if (buildRoleAudit.missingRoles.length > 0) throw new Error(`유물/기운 역할 미분류: ${buildRoleAudit.missingRoles.join(",")}`);
+if (buildRoleAudit.missingHints.length > 0) throw new Error(`유물/기운 추천 힌트 누락: ${buildRoleAudit.missingHints.join(",")}`);
+if (Object.keys(buildRoleAudit.roleCounts).length < 8) throw new Error("유물/기운 역할 분포 부족");
+const eventRoleAudit = eventAudit(data.events);
+if (eventRoleAudit.missingRoles.length > 0) throw new Error(`이벤트 역할 미분류: ${eventRoleAudit.missingRoles.join(",")}`);
+if (eventRoleAudit.missingNoUpfrontCost.length > 0) throw new Error(`이벤트 즉시 비용 없는 선택지 누락: ${eventRoleAudit.missingNoUpfrontCost.join(",")}`);
+if (Object.keys(eventRoleAudit.choiceRoleCounts).length < 6) throw new Error("이벤트 선택지 역할 분포 부족");
+
+let profile = createDefaultProfile(index);
+if (profile.unlockedStages.includes("stage_lavender_hall")) throw new Error("초기 스테이지 잠금 검증 실패");
+if (!profile.unlockedCharacters.includes("char_haru")) throw new Error("초기 캐릭터 해금 검증 실패");
+profile.unlockedArcanas.push("arcana_bubble_luck");
+
+const characterPassiveOps = new Set(data.characters.flatMap((character) => (character.passiveEffects || []).map((effect) => effect.op)));
+if (characterPassiveOps.size < 12) throw new Error(`캐릭터 패시브 종류 부족: ${characterPassiveOps.size}`);
+const thinPassiveCharacters = data.characters.filter((character) => (character.passiveEffects || []).length < 2);
+if (thinPassiveCharacters.length > 0) throw new Error(`캐릭터 보조 패시브 누락: ${thinPassiveCharacters.map((character) => character.id).join(",")}`);
+
+const characterMarkState = startRun(index, {
+  characterId: "char_haru",
+  stageId: "stage_sunny_gate",
+  seed: 20260601,
+  profile
+});
+if ((characterMarkState.enemies[0]?.status?.mark || 0) < 1) throw new Error("캐릭터 시작 표식 패시브 검증 실패");
+
+const characterGuardState = startRun(index, {
+  characterId: "char_moru",
+  stageId: "stage_sunny_gate",
+  seed: 20260602,
+  profile
+});
+characterGuardState.player.energy = 20;
+characterGuardState.hand = ["card_sprout_guard"];
+const guardShieldBefore = characterGuardState.player.shield;
+if (!playCard(characterGuardState, index, 0)) throw new Error("캐릭터 첫 방어 패시브 카드 사용 실패");
+if (!characterGuardState.status.characterFirstGuardShieldUsed || characterGuardState.player.shield <= guardShieldBefore) {
+  throw new Error("캐릭터 첫 방어 보호막 패시브 검증 실패");
+}
+
+const characterDiscountState = startRun(index, {
+  characterId: "char_riri",
+  stageId: "stage_sunny_gate",
+  seed: 20260603,
+  profile
+});
+const discountedAttack = index.cards.get("card_cloud_pillowtap");
+if (cardCost(discountedAttack, characterDiscountState, index) !== Math.max(0, discountedAttack.cost - 1)) {
+  throw new Error("캐릭터 첫 타입 비용 감소 패시브 검증 실패");
+}
+
+const characterEnergyState = startRun(index, {
+  characterId: "char_duri",
+  stageId: "stage_sunny_gate",
+  seed: 20260604,
+  profile
+});
+if (characterEnergyState.player.energy <= characterEnergyState.player.maxEnergy) throw new Error("캐릭터 전투 시작 기운 패시브 검증 실패");
+
+const eventCombatState = startRun(index, {
+  characterId: "char_haru",
+  stageId: "stage_sunny_gate",
+  seed: 20260605,
+  profile
+});
+eventCombatState.phase = "event";
+eventCombatState.currentRoomType = "event";
+eventCombatState.pendingEvent = structuredClone(index.events.get("event_bubble_shop"));
+eventCombatState.player.gold = 120;
+if (!applyEventChoice(eventCombatState, index, 2)) throw new Error("이벤트 추가 전투 선택 실패");
+if (eventCombatState.phase !== "room_complete" || eventCombatState.status.eventCombatEnemyId !== "enemy_cloud_buddy") throw new Error("이벤트 추가 전투 예약 실패");
+if (!advanceRoom(eventCombatState, index)) throw new Error("이벤트 추가 전투 진입 실패");
+if (eventCombatState.phase !== "combat" || eventCombatState.enemies[0]?.id !== "enemy_cloud_buddy") throw new Error("이벤트 추가 전투 적 배치 실패");
+
+const achievementBatchState = startRun(index, {
+  characterId: "char_haru",
+  stageId: "stage_sunny_gate",
+  seed: 20260606,
+  profile
+});
+achievementBatchState.inventory.unlockedCards = data.cards.slice(0, 48).map((card) => card.id);
+checkAchievements(achievementBatchState, index, "collect_cards");
+if (!achievementBatchState.inventory.achievements.includes("ach_picnic_goal_001")) throw new Error("release achievement card collection trigger failed");
+if (!achievementBatchState.inventory.achievements.includes("ach_picnic_goal_004")) throw new Error("release achievement card relic milestone failed");
+if (!achievementBatchState.inventory.relics.includes("relic_bubble_lens")) throw new Error("release achievement unlockRelicId reward failed");
+achievementBatchState.inventory.gems = data.gems.slice(0, 12).map((gem) => gem.id);
+checkAchievements(achievementBatchState, index, "collect_gems");
+if (!achievementBatchState.inventory.achievements.includes("ach_picnic_goal_009")) throw new Error("release achievement gem collection trigger failed");
+if (!achievementBatchState.inventory.gems.includes("gem_peach_spark")) throw new Error("release achievement unlockGemId reward failed");
+achievementBatchState.inventory.relics = data.relics.slice(0, 8).map((relic) => relic.id);
+checkAchievements(achievementBatchState, index, "collect_relics");
+if (!achievementBatchState.inventory.achievements.includes("ach_picnic_goal_017")) throw new Error("release achievement relic collection trigger failed");
+if (!achievementBatchState.inventory.gems.includes("gem_prism_edge")) throw new Error("release achievement relic reward bridge failed");
+achievementBatchState.inventory.arcanas = data.arcanas.slice(0, 9).map((arcana) => arcana.id);
+checkAchievements(achievementBatchState, index, "collect_arcanas");
+if (!achievementBatchState.inventory.achievements.includes("ach_picnic_goal_023")) throw new Error("release achievement arcana collection trigger failed");
+if (!achievementBatchState.inventory.gems.includes("gem_rainbow_bridge")) throw new Error("release achievement arcana reward bridge failed");
+achievementBatchState.status.chain = 18;
+checkAchievements(achievementBatchState, index, "reach_chain");
+if (!achievementBatchState.inventory.achievements.includes("ach_picnic_goal_028")) throw new Error("release achievement chain trigger failed");
+if (!achievementBatchState.inventory.relics.includes("relic_prism_stamp")) throw new Error("release achievement chain reward bridge failed");
+
+const enemyBatch2WeakState = startRun(index, {
+  characterId: "char_haru",
+  stageId: "stage_moon_attic",
+  seed: 20260607,
+  profile
+});
+startCombat(enemyBatch2WeakState, index, "combat", { enemyIds: ["enemy_prism_trick"], label: "release enemy batch 2" });
+if (enemyBatch2WeakState.enemies[0]?.intents[0]?.status !== "weak") {
+  throw new Error("release enemy batch 2 weak intent not first for prism trick");
+}
+const enemyBatch2TempState = startRun(index, {
+  characterId: "char_haru",
+  stageId: "stage_moon_attic",
+  seed: 20260608,
+  profile
+});
+enemyBatch2TempState.player.maxHp = 999;
+enemyBatch2TempState.player.hp = 999;
+startCombat(enemyBatch2TempState, index, "combat", { enemyIds: ["enemy_toy_buddy"], label: "release enemy batch 2" });
+endTurn(enemyBatch2TempState, index);
+if (![enemyBatch2TempState.hand, enemyBatch2TempState.drawPile, enemyBatch2TempState.discardPile, enemyBatch2TempState.exhaustPile]
+  .some((pile) => pile.includes("card_temp_dust"))) {
+  throw new Error("release enemy batch 2 temp-card intent did not enter a card zone");
+}
+
+const state = startRun(index, {
+  characterId: "char_haru",
+  stageId: "stage_sunny_gate",
+  seed: 20260523,
+  profile
+});
+state.player.maxHp = 999;
+state.player.hp = 999;
+
+const interactionState = startRun(index, {
+  characterId: "char_haru",
+  stageId: "stage_sunny_gate",
+  seed: 20260525,
+  profile
+});
+interactionState.player.maxHp = 999;
+interactionState.player.hp = 999;
+interactionState.player.energy = 20;
+const promiseCard = index.cards.get("card_morning_goldenrule");
+const matchingColorCard = data.cards.find((card) => card.color === promiseCard.color && card.id !== promiseCard.id && !["curse", "temp"].includes(card.type));
+interactionState.hand = [promiseCard.id, matchingColorCard.id];
+const ruleShieldBefore = interactionState.player.shield;
+if (!playCard(interactionState, index, 0)) throw new Error("전투 규칙 카드 사용 실패");
+if (!interactionState.battleRules.some((rule) => rule.rule === "shield_on_color_play")) throw new Error("전투 규칙 등록 실패");
+if (interactionState.player.shield <= ruleShieldBefore) throw new Error("전투 규칙 즉시 발동 실패");
+const shieldAfterPromise = interactionState.player.shield;
+if (!playCard(interactionState, index, 0)) throw new Error("전투 규칙 후속 카드 사용 실패");
+if (interactionState.player.shield <= shieldAfterPromise) throw new Error("전투 규칙 후속 발동 실패");
+if ((interactionState.status.battleRuleTriggers || 0) < 2) throw new Error("전투 규칙 발동 횟수 기록 실패");
+
+const reflectState = startRun(index, {
+  characterId: "char_haru",
+  stageId: "stage_sunny_gate",
+  seed: 20260526,
+  profile
+});
+reflectState.player.maxHp = 999;
+reflectState.player.hp = 999;
+reflectState.player.energy = 20;
+reflectState.hand = ["card_round_mirror"];
+reflectState.enemies[0].hp = 120;
+reflectState.enemies[0].maxHp = 120;
+reflectState.enemies[0].block = 0;
+reflectState.enemies[0].intents = [{ type: "attack", amount: 30, label: "테스트 공격" }];
+const reflectEnemyHpBefore = reflectState.enemies[0].hp;
+if (!playCard(reflectState, index, 0)) throw new Error("반사 카드 사용 실패");
+if ((reflectState.status.reflectRatio || 0) <= 0) throw new Error("반사 상태 등록 실패");
+endTurn(reflectState, index);
+if (reflectState.enemies[0]?.hp >= reflectEnemyHpBefore) throw new Error("반사 피해 적용 실패");
+if ((reflectState.status.reflectRatio || 0) !== 0) throw new Error("반사 상태 턴 종료 초기화 실패");
+
+const markState = startRun(index, {
+  characterId: "char_haru",
+  stageId: "stage_sunny_gate",
+  seed: 20260527,
+  profile
+});
+markState.player.maxHp = 999;
+markState.player.hp = 999;
+markState.player.energy = 20;
+markState.hand = ["card_paper_charm", "card_sunbean_punch"];
+markState.enemies[0].hp = 100;
+markState.enemies[0].maxHp = 100;
+markState.enemies[0].block = 0;
+if (!playCard(markState, index, 0)) throw new Error("표식 카드 사용 실패");
+if ((markState.enemies[0].status.mark || 0) < 2) throw new Error("표식 누적 실패");
+const markedHpBefore = markState.enemies[0].hp;
+if (!playCard(markState, index, 0)) throw new Error("표식 피해 카드 사용 실패");
+const markedDamage = markedHpBefore - markState.enemies[0].hp;
+if (markedDamage <= 11) throw new Error(`표식 피해 보너스 실패: ${markedDamage}`);
+if ((markState.enemies[0].status.mark || 0) < 1) throw new Error("표식 소모 실패");
+
+const disruptionState = startRun(index, {
+  characterId: "char_haru",
+  stageId: "stage_sunny_gate",
+  seed: 20260528,
+  profile
+});
+disruptionState.player.energy = 1;
+disruptionState.hand = ["card_temp_dust", "card_sunbean_punch"];
+const disruptionEnergyBefore = disruptionState.player.energy;
+if (!cleanseDisruption(disruptionState, index)) throw new Error("방해 카드 정리 실패");
+if (disruptionState.hand.includes("card_temp_dust")) throw new Error("방해 카드 손패 제거 실패");
+if (!disruptionState.exhaustPile.includes("card_temp_dust")) throw new Error("방해 카드 소멸 더미 이동 실패");
+if (disruptionState.player.energy !== disruptionEnergyBefore - 1) throw new Error("방해 카드 정리 비용 실패");
+if (disruptionState.status.chain) throw new Error("방해 카드 정리가 연쇄를 올리면 안 됩니다");
+if ((disruptionState.status.disruptionsCleared || 0) !== 1) throw new Error("방해 카드 정리 기록 실패");
+if (disruptionState.player.energy !== 0 || disruptionState.hand.some((cardId) => ["card_temp_dust"].includes(cardId))) throw new Error("방해 카드 정리 후 상태 검증 실패");
+
+const curseState = startRun(index, {
+  characterId: "char_haru",
+  stageId: "stage_sunny_gate",
+  seed: 20260529,
+  profile
+});
+curseState.player.energy = 1;
+curseState.hand = ["card_temp_sleepy"];
+if (cleanseDisruption(curseState, index)) throw new Error("저주 카드 저비용 정리 차단 실패");
+curseState.player.energy = 2;
+if (!cleanseDisruption(curseState, index)) throw new Error("저주 카드 정리 실패");
+if (curseState.player.energy !== 0) throw new Error("저주 카드 정리 비용 실패");
+
+const firstCardId = state.deck[0];
+const firstCard = index.cards.get(firstCardId);
+const discountGem = grantGem(state, "gem_sky_discount");
+const equipResult = equipGemToCard(state, index, discountGem.instanceId, firstCardId);
+const gemBatchState = startRun(index, {
+  characterId: "char_haru",
+  stageId: "stage_sunny_gate",
+  seed: 20260603,
+  profile
+});
+gemBatchState.player.energy = 20;
+gemBatchState.hand = ["card_sunbean_punch"];
+gemBatchState.enemies[0].hp = 100;
+gemBatchState.enemies[0].maxHp = 100;
+gemBatchState.enemies[0].block = 0;
+const edgeGem = grantGem(gemBatchState, "gem_morning_edge");
+if (!equipGemToCard(gemBatchState, index, edgeGem.instanceId, "card_sunbean_punch").ok) {
+  throw new Error("release gem batch equip failed");
+}
+const gemBatchHpBefore = gemBatchState.enemies[0].hp;
+if (!playCard(gemBatchState, index, 0)) throw new Error("release gem batch card play failed");
+const gemBatchDamage = gemBatchHpBefore - gemBatchState.enemies[0].hp;
+if (gemBatchDamage < 10) throw new Error(`release gem batch damage modifier failed: ${gemBatchDamage}`);
+if (!gemBatchState.status.preserveNextChain) throw new Error("release gem batch preserve-chain effect failed");
+if (!equipResult.ok) throw new Error("보석 장착 검증 실패");
+if (socketCapacity(state, index, firstCardId) < 1) throw new Error("카드 소켓 검증 실패");
+if (cardCost(firstCard, state, index) > Math.max(0, firstCard.cost - 1)) throw new Error("보석 비용 감소 검증 실패");
+if (!state.inventory.arcanas.includes("arcana_picnic_rhythm")) throw new Error("시작 기운 지급 검증 실패");
+if (!grantRelic(state, index, "relic_ribbon_box")) throw new Error("유물 지급 검증 실패");
+if (!grantArcana(state, index, "arcana_star_bakery")) throw new Error("기운 지급 검증 실패");
+const rewardOptions = createRewardOptions(state, index, "reward");
+if (rewardOptions.filter((option) => option.type === "card").length < 4) throw new Error("유물 카드 보상 증가 검증 실패");
+if (!rewardOptions.some((option) => option.type === "relic")) throw new Error("유물 보상 선택지 검증 실패");
+if (!rewardOptions.some((option) => option.type === "arcana")) throw new Error("기운 보상 선택지 검증 실패");
+const rewardInsightAudit = rewardOptionInsightAudit(state, index, rewardOptions);
+if (rewardInsightAudit.missingInsights.length > 0) throw new Error(`보상 추천 신호 누락: ${rewardInsightAudit.missingInsights.join(",")}`);
+if (Object.keys(rewardInsightAudit.typeCounts).length < 4) throw new Error("보상 추천 타입 폭 부족");
+
+const socketTestCardId = state.deck.find((cardId) => {
+  const card = index.cards.get(cardId);
+  return socketCapacity(state, index, cardId) < card.sockets.max;
+});
+if (!socketTestCardId) throw new Error("소켓 확장 대상 검증 실패");
+const beforeSocketCapacity = socketCapacity(state, index, socketTestCardId);
+if (openSocketForCard(state, index, socketTestCardId)) throw new Error("소켓 충전 없는 확장 차단 검증 실패");
+state.status.gemWorkshopCharges = 1;
+if (!openSocketForCard(state, index, socketTestCardId)) throw new Error("소켓 확장 검증 실패");
+if (socketCapacity(state, index, socketTestCardId) !== beforeSocketCapacity + 1) throw new Error("소켓 수 증가 검증 실패");
+if ((state.status.gemWorkshopCharges || 0) !== 0) throw new Error("소켓 충전 소비 검증 실패");
+
+let safety = 0;
+while (state.phase !== "stage_clear" && state.phase !== "defeat" && safety < 240) {
+  safety += 1;
+  if (state.phase === "combat") {
+    const playableIndex = state.hand.findIndex((cardId) => {
+      const card = index.cards.get(cardId);
+      return card && cardCost(card, state, index) <= state.player.energy;
+    });
+    if (playableIndex >= 0) playCard(state, index, playableIndex);
+    else endTurn(state, index);
+    continue;
+  }
+  if (state.phase === "event") {
+    const choiceIndex = firstAffordableEventChoiceIndex(state, index);
+    if (choiceIndex < 0) {
+      throw new Error(`No affordable event choice: ${state.pendingEvent?.id || "unknown"}`);
+    }
+    if (!applyEventChoice(state, index, choiceIndex)) {
+      throw new Error(`Event choice application failed: ${state.pendingEvent?.id || "unknown"}#${choiceIndex}`);
+    }
+    continue;
+  }
+  if (state.phase === "reward") {
+    applyRewardOption(state, index, state.pendingReward.options[0].id);
+    continue;
+  }
+  if (state.phase === "room_complete") {
+    advanceRoom(state, index);
+    continue;
+  }
+}
+
+if (state.phase !== "stage_clear") {
+  throw new Error(`런타임 스모크 실패: phase=${state.phase}, safety=${safety}`);
+}
+if (state.metrics.roomsCleared < 4) {
+  throw new Error(`방 진행 검증 실패: ${state.metrics.roomsCleared}`);
+}
+if (state.inventory.unlockedCards.length <= 5) {
+  throw new Error("보상 카드 획득 검증 실패");
+}
+if (state.inventory.achievements.length === 0) {
+  throw new Error("업적 보상 연결 검증 실패");
+}
+if ((state.metrics.enemyIntentsResolved || 0) <= 0) throw new Error("적 의도 처리 검증 실패");
+if ((state.metrics.bossPhaseTriggers || 0) <= 0) throw new Error("보스 페이즈 검증 실패");
+const profileResult = finalizeRunProfile(state, index, profile);
+profile = profileResult.profile;
+if (!profile.clearedStages.includes("stage_sunny_gate")) throw new Error("프로필 스테이지 클리어 기록 실패");
+if (!profile.unlockedStages.includes("stage_lavender_hall")) throw new Error("프로필 다음 스테이지 해금 실패");
+if (!profile.unlockedCharacters.includes("char_riri")) throw new Error("프로필 스테이지 캐릭터 해금 실패");
+if (!state.resultSummary?.unlocks?.length) throw new Error("런 결과 신규 해금 요약 실패");
+if (!profile.achievements.includes("ach_character_01")) throw new Error("캐릭터 해금 업적 기록 실패");
+if (!profile.unlockedCharacters.includes("char_duri")) throw new Error("캐릭터 해금 업적 보상 실패");
+if (!profile.unlockedGems.includes("gem_sprout_edge")) throw new Error("연쇄 캐릭터 업적 보상 실패");
+const nextRun = startRun(index, {
+  characterId: "char_haru",
+  stageId: "stage_lavender_hall",
+  seed: 20260524,
+  profile
+});
+if (nextRun.stageId !== "stage_lavender_hall") throw new Error("해금 스테이지 새 런 시작 실패");
+if (!nextRun.enemies.some((enemy) => enemy.role && enemy.intents.length >= 3)) throw new Error("적 역할/추가 패턴 검증 실패");
+
+function firstAffordableEventChoiceIndex(state, index) {
+  const event = state.pendingEvent;
+  if (!event?.choices?.length) return -1;
+  return event.choices.findIndex((choice) => {
+    const cost = adjustedRewardCost(state, index, choice.cost || {}, {
+      source: event.type,
+      reward: choice.reward || {}
+    });
+    return canPayEventCost(state, cost);
+  });
+}
+
+function canPayEventCost(state, cost = {}) {
+  if (cost.gold && state.player.gold < cost.gold) return false;
+  if (cost.hp && state.player.hp <= cost.hp) return false;
+  return true;
+}
+
+const familyIntentLabels = new Set();
+const familyRoles = new Set();
+let ribbonCostIncreaseSeen = false;
+for (const stage of data.stages) {
+  for (let seedOffset = 0; seedOffset < 8; seedOffset += 1) {
+    const probe = startRun(index, {
+      characterId: "char_haru",
+      stageId: stage.id,
+      seed: 20260700 + stage.order * 10 + seedOffset,
+      profile
+    });
+    if (probe.phase !== "combat") continue;
+    probe.enemies.forEach((enemy) => {
+      if (enemy.role) familyRoles.add(enemy.role);
+      if (enemy.family === "리본" && enemy.intents.some((intent) => intent.effect === "chain_down" && intent.costIncrease > 0)) {
+        ribbonCostIncreaseSeen = true;
+      }
+      enemy.intents.forEach((intent) => familyIntentLabels.add(intent.label));
+    });
+  }
+}
+const expectedFamilyLabels = ["몽실 숨기", "부적 표식", "새싹 돋기", "리본 헝클기", "방울 먼지", "프리즘 관통", "장난감 먼지", "쿠키 방패"];
+expectedFamilyLabels.forEach((label) => {
+  if (!familyIntentLabels.has(label)) throw new Error(`가족별 몬스터 특수 의도 누락: ${label}`);
+});
+if (familyRoles.size < 8) throw new Error(`몬스터 역할 차별화 부족: ${familyRoles.size}`);
+if (!ribbonCostIncreaseSeen) throw new Error("리본 계열 다음 카드 비용 압박 검증 실패");
+const snapshot = createSaveSnapshot(state);
+const restored = restoreRunState(snapshot, index);
+if (!restored?.inventory?.gemBag?.length) throw new Error("저장 보석 보관함 복원 실패");
+if (!Object.keys(restored.cardSockets || {}).length) throw new Error("저장 장착 보석 복원 실패");
+if (!restored.inventory.relics.includes("relic_ribbon_box")) throw new Error("저장 유물 복원 실패");
+if (!restored.inventory.arcanas.includes("arcana_star_bakery")) throw new Error("저장 기운 복원 실패");
+if (!restored.resultSummary?.unlocks?.length) throw new Error("저장 런 결과 복원 실패");
+
+console.log("런타임 스모크 통과");
+console.log(`phase=${state.phase}, rooms=${state.metrics.roomsCleared}, cards=${state.inventory.unlockedCards.length}, gems=${state.inventory.gemBag.length}, achievements=${state.inventory.achievements.length}, intents=${state.metrics.enemyIntentsResolved}, bossPhases=${state.metrics.bossPhaseTriggers}, profileStages=${profile.unlockedStages.length}, gold=${state.player.gold}`);

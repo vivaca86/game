@@ -1,0 +1,4448 @@
+# UI Visual Quality Rubric
+
+Date: 2026-06-01
+
+This rubric is the required standard for the `UI skin` release gate. It exists because a technical 9-slice/runtime-helper pass was incorrectly reported as complete visual UI work.
+
+The art direction source of truth is:
+
+- `docs/art-bible.md`
+- `docs/asset-production-spec.md`
+- `docs/release-readiness-checklist.md`
+
+## Completion Rule
+
+`UI skin` can be marked `Done` only when all of these are true:
+
+1. Total score is 95/100 or higher.
+2. No red-line blocker is present.
+3. Reward, Event, Combat, Town, WorldMap, Dungeon, RuneBench, Boss, Result, and Settings have debug-less screenshot evidence.
+4. Concept/source evidence exists for the UI direction and reusable UI parts.
+5. Automated smoke and asset audits pass after the final visual pass.
+
+If any condition is missing, the status is not `Done`.
+
+Allowed status terms for this gate:
+
+- Done
+- Not done
+- Needs verification
+- Blocked
+- Cannot judge completion
+
+## 100-Point Criteria
+
+| Area | Points | Requirement |
+| --- | ---: | --- |
+| Concept/source pipeline evidence | 15 | UI has approved reference/concept/source evidence under asset pipeline folders, and final runtime pieces are derived from that direction. A deterministic asset generator alone is not enough. |
+| Art bible fidelity | 15 | The screen clearly reads as premium popup-book fantasy card crawler: layered paper stage, brass pins, ribbons/thread, folded corners, paper thickness, tactile cutout silhouettes, bright but mysterious tone. |
+| Screen composition and game feel | 15 | Primary screens feel like game scenes, not prototype menus. Reward feels like an unfolding paper stage; Event feels like a story diorama; Combat preserves playfield clarity while carrying the same material language. |
+| Component craft and states | 15 | Panels, buttons, reward slots, choice slots, cards, tooltips, disabled/focus/hover/down/selected states all have distinct material treatment, not only tint or outline changes. |
+| Gameplay readability and hierarchy | 15 | Korean text is readable at 1920x1080 and 1280x720, critical info is visible within 2 seconds, no clipping/overlap, action hierarchy is obvious, decoration never fights the game state. |
+| Coverage and consistency | 10 | Town, WorldMap, Dungeon, Combat, Reward, Event, RuneBench, Boss, Result, and Settings share one coherent visual system with scene-specific identity. |
+| Technical/runtime integration | 10 | Manifest-backed runtime assets load without fallback, 9-slice or equivalent scalable components work in Phaser, smoke/check/audit pass, performance warnings are tracked. |
+| Manual acceptance evidence | 5 | Debug-less screenshots are reviewed against this rubric, problems are logged, and the latest manual review does not reject the result. |
+
+## Score Bands
+
+| Score | Judgment |
+| ---: | --- |
+| 95-100 | Done candidate, only if no red-line blocker exists |
+| 80-94 | Strong progress, not done |
+| 60-79 | Partial visual pass, not done |
+| 0-59 | Prototype/technical proof, not done |
+
+## Red-Line Blockers
+
+Any one blocker prevents `UI skin = Done` even if the numeric score looks high.
+
+- No concept/source evidence for final UI direction.
+- Current proof uses debug overlay screenshots as final acceptance evidence.
+- Deterministic generated placeholders are treated as final art.
+- Reward, Event, or Combat scores below 85.
+- Any current primary screen scores below 80.
+- UI reads as generic rounded rectangles, flat mobile menu, or developer prototype.
+- Korean text clips, overlaps, or becomes unreadable in a primary workflow.
+- Decoration hides player HP, enemy intent, card cost, reward type, event cost, or primary action.
+- Asset ownership/licensing/originality is unclear for final UI pieces.
+- Screenshot review is skipped after visual changes.
+
+## Required Evidence
+
+Before this gate can move to `Done`, the evidence package must include:
+
+- Concept/reference evidence in `assets/refs/ui/` or `assets/concepts/ui/`.
+- Source UI pieces in `assets/source/ui/` or a documented equivalent source folder.
+- Runtime UI assets in `public/assets/runtime/ui/` and release equivalents where needed.
+- Manifest entries in `docs/asset-manifest.slice.v1.json`, `src/data/assetManifest.slice.v1.json`, and release manifests if release mode uses the assets.
+- Debug-less screenshots under `tmp/ui-quality/` or an equivalent logged verification folder.
+- A score table for every primary screen.
+- Passing results for `npm.cmd run assets:audit`, `npm.cmd run assets:audit:release-visuals` when release visual assets are touched, `npm.cmd run check`, and `npm.cmd run phaser:smoke`.
+
+## Baseline Reward Screen Judgment Before Rebuild
+
+Target URL reviewed by the user:
+
+`http://127.0.0.1:5173/?entry=reward&resetSave=1`
+
+Current judgment: `Not done`
+
+Current score estimate: 37/100
+
+| Area | Score | Reason |
+| --- | ---: | --- |
+| Concept/source pipeline evidence | 2/15 | Runtime assets and manifests exist, but no UI concept/source evidence was used for the final visible Reward screen. |
+| Art bible fidelity | 4/15 | Some paper-like assets exist, but the screen does not clearly read as premium popup-book fantasy. |
+| Screen composition and game feel | 3/15 | Reward still reads closer to a functional list/menu than an unfolding paper-stage reward moment. |
+| Component craft and states | 7/15 | 9-slice buttons/slots and hover/down/disabled states exist, but they are technical candidates rather than crafted final material states. |
+| Gameplay readability and hierarchy | 9/15 | Automated text/layout smoke has been improved, but final hierarchy and reward presentation are not visually accepted. |
+| Coverage and consistency | 4/10 | Shared helpers cover many screens, but final visual consistency has not been accepted across all primary screens. |
+| Technical/runtime integration | 8/10 | Manifest-backed assets, shared helpers, and smoke checks are in place. This is the strongest part of the current work. |
+| Manual acceptance evidence | 0/5 | Manual user review rejected the result as final UI. |
+
+Current blockers:
+
+- No concept/source-backed UI art evidence.
+- Deterministic candidate assets were treated too strongly.
+- Reward screen score is far below 85.
+- Manual review rejected the current visible result.
+
+## First Rebuild Checkpoint
+
+Date: 2026-06-01
+
+Evidence:
+
+- `assets/concepts/ui/reward_event_ui_concept_v001.png`
+- `assets/concepts/ui/reward_event_ui_concept_v001.md`
+- `tmp/ui-quality/reward-after-route-fix.png`
+- `tmp/ui-quality/event-after-route-fix.png`
+- `npm.cmd run phaser:smoke`
+- `npm.cmd run check`
+- `git diff --check`
+
+Current status: `Not done`
+
+Reward score after first rebuild: 60/100
+
+| Area | Score | Reason |
+| --- | ---: | --- |
+| Concept/source pipeline evidence | 9/15 | A concept image and prompt record now exist, but reusable source UI parts are still not fully separated or approved. |
+| Art bible fidelity | 8/15 | Reward now has paper-stage/ribbon/brass-pin language, but it is still simpler and less crafted than the concept target. |
+| Screen composition and game feel | 9/15 | Reward choices now read as cards on a stage instead of a row list, but the shared shell and background still need a more deliberate scene composition. |
+| Component craft and states | 9/15 | Reward cards and Event choices are interactive and smoke-tested, but material state polish is still not final. |
+| Gameplay readability and hierarchy | 10/15 | Smoke text-overlap checks pass after fixes, but visual hierarchy still needs manual polish at real review sizes. |
+| Coverage and consistency | 5/10 | Reward and Event moved first; the full primary-screen set has not been rebuilt to this direction. |
+| Technical/runtime integration | 9/10 | `phaser:smoke`, `check`, and `git diff --check` pass after the rebuild. |
+| Manual acceptance evidence | 1/5 | Internal screenshots exist, but the user has not accepted the rebuilt result. |
+
+Event score after first rebuild: 58/100
+
+Main remaining blockers:
+
+- Reward/Event are improved but still below the 85-per-critical-screen red line.
+- Concept exists, but production source pieces are not yet separated into a complete UI asset pipeline.
+- Town/WorldMap/Dungeon/Combat/RuneBench/Boss/Result/Settings have not been rebuilt to the same standard.
+- No user acceptance has happened after the first rebuild.
+
+## Second Rebuild Checkpoint
+
+Date: 2026-06-01
+
+Evidence:
+
+- `tmp/ui-quality/reward-immersive-chrome-v2.png`
+- `tmp/ui-quality/event-immersive-chrome-v2.png`
+- `tmp/ui-quality/reward-immersive-chrome-v3.png`
+- `tmp/ui-quality/event-immersive-chrome-v3.png`
+- `npx.cmd tsc --noEmit`
+- `npm.cmd run phaser:smoke`
+- `npm.cmd run check`
+- `npm.cmd run data:validate`
+- `npm.cmd run quality:audit:report`
+- `npm.cmd run assets:audit:release-visuals`
+- `git diff --check`
+
+Current status: `Not done`
+
+Reward score after second rebuild: 70/100
+
+| Area | Score | Reason |
+| --- | ---: | --- |
+| Concept/source pipeline evidence | 10/15 | Concept evidence exists and the runtime composition follows it more closely, but production source UI parts are still not separated or approved. |
+| Art bible fidelity | 10/15 | The larger reward cards, hanging threads, pins, ribbons, and folded corners read more like popup-book paper theater, but the card material and illustration treatment still need final source-backed craft. |
+| Screen composition and game feel | 11/15 | Reward now feels more like a stage with selectable prizes than a compact list, but the surrounding shell and reusable component polish are not final. |
+| Component craft and states | 11/15 | Reward cards are larger, clickable, hover-tested, and have stronger badges/details, but state art is still a candidate implementation rather than final production UI. |
+| Gameplay readability and hierarchy | 11/15 | Smoke text checks pass and reward type/detail hierarchy is clearer, but small browser review still shows text/detail density that needs further polish. |
+| Coverage and consistency | 5/10 | Reward/Event moved again; the other primary screens have not been rebuilt to this visual standard. |
+| Technical/runtime integration | 10/10 | Typecheck, smoke, check, data validation, quality audit report, release visual audit, and diff check passed after the pass. |
+| Manual acceptance evidence | 2/5 | Debug-less screenshots were captured and internally rejected as not done; user acceptance is still missing. |
+
+Event score after second rebuild: 68/100
+
+| Area | Score | Reason |
+| --- | ---: | --- |
+| Concept/source pipeline evidence | 10/15 | Concept evidence exists and Event now has a story diorama direction, but source UI pieces are not yet production-separated or approved. |
+| Art bible fidelity | 10/15 | The paper stage, diorama window, rail lines, pins, and choice cards better match the art bible, but the event art and material depth still feel candidate-level. |
+| Screen composition and game feel | 11/15 | Event now separates story scene from choices and reads more like an event moment, but it still needs stronger scene identity and final art polish. |
+| Component craft and states | 10/15 | Choice cards include costs, rewards, descriptions, disabled/focus styling, and smoke-tested clicks, but state treatment is still mostly tint/shape plus candidate 9-slice. |
+| Gameplay readability and hierarchy | 10/15 | Smoke layout checks pass, but the choice cards remain dense and need more visual breathing room before final acceptance. |
+| Coverage and consistency | 5/10 | Only Reward/Event received this concept-backed rebuild pass. |
+| Technical/runtime integration | 10/10 | Typecheck, smoke, check, data validation, quality audit report, release visual audit, and diff check passed after the pass. |
+| Manual acceptance evidence | 2/5 | Debug-less screenshots were captured and reviewed; no final acceptance yet. |
+
+Main remaining blockers after the second rebuild:
+
+- Reward is 70 and Event is 68, both below the 85 critical-screen red line.
+- Combat has not been rebuilt or scored under this rubric, so another red-line blocker remains.
+- Town, WorldMap, Dungeon, RuneBench, Boss, Result, and Settings still need matching visual rebuild or score evidence.
+- Production source UI pieces and final UI asset ownership/originality review are still missing.
+- User acceptance is still missing.
+
+## Third Rebuild Checkpoint
+
+Date: 2026-06-01
+
+Evidence:
+
+- `assets/source/ui/reward_event_stage_components_v001.svg`
+- `assets/source/ui/reward_event_stage_components_v001.md`
+- `tmp/ui-quality/reward-immersive-chrome-v4.png`
+- `tmp/ui-quality/event-immersive-chrome-v4.png`
+- `tmp/ui-quality/reward-1920-debugless-v4.png`
+- `tmp/ui-quality/event-1920-debugless-v4.png`
+- `npx.cmd tsc --noEmit`
+- `npm.cmd run phaser:smoke`
+- `npm.cmd run check`
+- `npm.cmd run data:validate`
+- `npm.cmd run quality:audit:report`
+- `npm.cmd run assets:audit:release-visuals`
+- `git diff --check`
+
+Current status: `Not done`
+
+Reward score after third rebuild: 76/100
+
+| Area | Score | Reason |
+| --- | ---: | --- |
+| Concept/source pipeline evidence | 12/15 | Concept and a source component sheet now exist, and runtime Reward composition maps to those parts. Source pieces are still not final approved production art. |
+| Art bible fidelity | 11/15 | Reward reads more clearly as layered paper theater with pins, ribbons, threads, folds, and large prize cards, but illustration and material detail still need final polish. |
+| Screen composition and game feel | 12/15 | Removing the extra immersive chrome makes the stage own the screen and the prizes read stronger. The narrow browser view still makes the 16:9 canvas feel small. |
+| Component craft and states | 12/15 | Card badges, art windows, detail labels, footer bands, folded corners, hover/click states, and source components are stronger. Final state art is still candidate-level. |
+| Gameplay readability and hierarchy | 12/15 | Debug-less 1920 review and smoke checks show clear reward choice hierarchy. Some dense card detail remains in small browser captures. |
+| Coverage and consistency | 6/10 | Reward/Event now share source direction; the other primary screens still need matching rebuild/scoring. |
+| Technical/runtime integration | 10/10 | Typecheck, smoke, check, data validation, quality report, release visual audit, and diff check passed after this pass. |
+| Manual acceptance evidence | 1/5 | Debug-less screenshots exist and were internally reviewed, but user acceptance is not present and earlier manual review rejected the UI. |
+
+Event score after third rebuild: 75/100
+
+| Area | Score | Reason |
+| --- | ---: | --- |
+| Concept/source pipeline evidence | 12/15 | Concept and a source component sheet now exist, and Event maps to the diorama/choice-card source parts. Source pieces are still not final approved production art. |
+| Art bible fidelity | 11/15 | The diorama, teal ribbon, pins, scene-art window, and stronger choice cards support the popup-book fantasy better. Final scene identity and material detail are not there yet. |
+| Screen composition and game feel | 12/15 | The event reads more like a story scene with choices instead of a plain menu. The stage still has unused space and needs stronger event-specific staging. |
+| Component craft and states | 12/15 | Choice cards now separate title, description, cost, reward, and selection affordance more clearly. Disabled/focus/hover states are still mostly candidate treatment. |
+| Gameplay readability and hierarchy | 12/15 | 1920 debug-less review and smoke checks are readable; narrow browser captures still make the lower choice cards feel small. |
+| Coverage and consistency | 6/10 | Reward/Event now share source direction; the remaining primary screens need matching evidence. |
+| Technical/runtime integration | 10/10 | Typecheck, smoke, check, data validation, quality report, release visual audit, and diff check passed after this pass. |
+| Manual acceptance evidence | 0/5 | Debug-less screenshots exist, but there is no user acceptance after the previous rejection. |
+
+Main remaining blockers after the third rebuild:
+
+- Reward is 76 and Event is 75, both still below the 85 critical-screen red line.
+- Combat has not been rebuilt or scored under this rubric.
+- The rest of the primary screens have not been rebuilt/scored against the source component direction.
+- The narrow in-app browser view still makes the 16:9 canvas feel small, so responsive presentation needs a deliberate solution.
+- Final UI asset approval, ownership/originality review, and user acceptance are still missing.
+
+## Combat First Rebuild Checkpoint
+
+Date: 2026-06-01
+
+Evidence:
+
+- `assets/source/ui/combat_stage_components_v001.svg`
+- `assets/source/ui/combat_stage_components_v001.md`
+- `tmp/ui-quality/combat-1920-debugless-v1.png`
+- `tmp/ui-quality/combat-1920-debugless-v2.png`
+- In-app browser screenshot review at `http://127.0.0.1:5173/?entry=combat&resetSave=1`
+- `npx.cmd tsc --noEmit`
+- `npm.cmd run phaser:smoke`
+- `npm.cmd run check`
+- `npm.cmd run data:validate`
+- `npm.cmd run quality:audit:report`
+- `npm.cmd run assets:audit:release-visuals`
+- `git diff --check`
+
+Current status: `Not done`
+
+Combat score after first rebuild: 72/100
+
+| Area | Score | Reason |
+| --- | ---: | --- |
+| Concept/source pipeline evidence | 11/15 | A combat source component sheet now exists and the runtime layout follows it. This is still candidate source evidence, not approved final production UI. |
+| Art bible fidelity | 10/15 | Combat now reads more like a paper theater with a title ribbon, pinned route strip, paper panels, stage arch, and character standee. Material depth and final illustration quality remain candidate-level. |
+| Screen composition and game feel | 11/15 | The previous top-stack collision was removed, the title ribbon is readable, and the playfield is clearer. The player panel, enemy panel, and hand still feel dense and need more deliberate final staging. |
+| Component craft and states | 10/15 | Combat uses shared skinned cards/buttons/panels and has hover/click smoke coverage. Enemy intent, player status, and route states still rely mostly on candidate panels and simple shape treatment. |
+| Gameplay readability and hierarchy | 12/15 | The 1920 debug-less screenshot and `phaser:smoke` show readable title, route, player stats, enemy intent, end-turn button, and card hand. The narrow in-app view still makes the whole 16:9 canvas feel cramped. |
+| Coverage and consistency | 6/10 | Reward/Event/Combat now have concept/source-backed rebuild checkpoints, but Town, WorldMap, Dungeon, RuneBench, Boss, Result, and Settings are not rebuilt/scored to the same standard. |
+| Technical/runtime integration | 10/10 | Typecheck, smoke, check, data validation, quality report, release visual audit, and diff check passed after this pass. |
+| Manual acceptance evidence | 2/5 | Debug-less and in-app screenshots were reviewed internally, but there is no user acceptance and the screen is below the 85 Combat red line. |
+
+Main remaining blockers after the Combat first rebuild:
+
+- Reward is 76, Event is 75, and Combat is 72; all three critical screens remain below the 85 red line.
+- Combat top overlap was fixed, but it is still not a 95-point or shippable final UI candidate.
+- Town, WorldMap, Dungeon, RuneBench, Boss, Result, and Settings still need matching rebuild/scoring.
+- Responsive presentation remains unresolved because the in-app browser can make the 16:9 canvas feel small.
+- Final UI asset approval, ownership/originality review, broad manual acceptance, and production component state art are still missing.
+
+## Combat Second Rebuild Checkpoint
+
+Date: 2026-06-01
+
+Evidence:
+
+- `assets/source/ui/combat_stage_components_v002.svg`
+- `assets/source/ui/combat_stage_components_v002.md`
+- `tmp/ui-quality/combat-1920-debugless-v3.png`
+- `tmp/ui-quality/combat-1920-debugless-v4.png`
+- `npx.cmd tsc --noEmit`
+- `npm.cmd run phaser:smoke`
+- `npm.cmd run check`
+- `npm.cmd run data:validate`
+- `npm.cmd run quality:audit:report`
+- `npm.cmd run assets:audit:release-visuals`
+- `git diff --check`
+
+Current status: `Not done`
+
+Combat score after second rebuild: 78/100
+
+| Area | Score | Reason |
+| --- | ---: | --- |
+| Concept/source pipeline evidence | 12/15 | A v2 source component sheet now records the tighter stat tags, route strip, side wings, and combat-flow lane. It is still candidate source evidence, not final approved production UI. |
+| Art bible fidelity | 11/15 | Side paper wings, hanging pins, title ribbon, route strip, stat tags, and flow lane improve the popup-book theater read. Final illustration depth, material polish, and bespoke state art remain unfinished. |
+| Screen composition and game feel | 12/15 | The v3 pass exposed text issues, then v4 fixed the hidden central text and out-of-panel gold. Combat now reads more like a stage, but the enemy panel and lower hand still feel dense. |
+| Component craft and states | 11/15 | Player state is split into clearer material tags and the route has a stronger connector treatment. Enemy intent, combat flow, hover/down states, and cards are still candidate-level components. |
+| Gameplay readability and hierarchy | 13/15 | The 1920 debug-less v4 screenshot plus `phaser:smoke` show no critical overlap for title, route, player stats, enemy intent, end-turn, or card hand. Narrow browser presentation remains cramped. |
+| Coverage and consistency | 6/10 | Reward/Event/Combat now have source-backed rebuild checkpoints, but the remaining primary screens are not rebuilt/scored to this standard. |
+| Technical/runtime integration | 10/10 | Typecheck, smoke, check, data validation, quality report, release visual audit, and diff check passed after this pass. |
+| Manual acceptance evidence | 3/5 | Debug-less screenshots were reviewed internally and v3 defects were corrected, but user acceptance is absent and the score is still below the 85 Combat red line. |
+
+Main remaining blockers after the Combat second rebuild:
+
+- Reward is 76, Event is 75, and Combat is 78; all three critical screens remain below the 85 red line.
+- Combat improved, but it is still below the strong critical-screen threshold and below the 95 UI completion rule.
+- Town, WorldMap, Dungeon, RuneBench, Boss, Result, and Settings still need matching rebuild/scoring.
+- Responsive presentation remains unresolved because the in-app browser can make the 16:9 canvas feel small.
+- Final UI asset approval, ownership/originality review, broad manual acceptance, and production component state art are still missing.
+
+## Event Fourth Rebuild Checkpoint
+
+Date: 2026-06-01
+
+Evidence:
+
+- `assets/source/ui/event_stage_components_v002.svg`
+- `assets/source/ui/event_stage_components_v002.md`
+- `tmp/ui-quality/event-1920-debugless-v5.png`
+- `tmp/ui-quality/event-release-1920-debugless-v5.png`
+- `tmp/ui-quality/event-1920-debugless-v6.png`
+- `tmp/ui-quality/event-release-1920-debugless-v6.png`
+- `npx.cmd tsc --noEmit`
+- `npm.cmd run phaser:smoke`
+- `npm.cmd run check`
+- `npm.cmd run data:validate`
+- `npm.cmd run quality:audit:report`
+- `npm.cmd run assets:audit:release-visuals`
+- `git diff --check`
+
+Current status: `Not done`
+
+Event score after fourth rebuild: 81/100
+
+| Area | Score | Reason |
+| --- | ---: | --- |
+| Concept/source pipeline evidence | 13/15 | Event now has dedicated v2 source component evidence in addition to the shared Reward/Event sheet. It is still candidate source evidence, not approved final production UI. |
+| Art bible fidelity | 12/15 | Side paper wings, teal ribbon, brass pins, diorama label band, choice shelf, and cost/result rows improve the popup-book event read. Final illustration/material polish remains unfinished. |
+| Screen composition and game feel | 13/15 | The event reads more like a story diorama with decisions instead of a meta explanation panel. Release four-choice evidence found a button collision, then v6 moved the confirm button below the cards. |
+| Component craft and states | 12/15 | Choice cards now have stronger header rails, description wells, cost/result rows, and clearer selection affordance. Disabled/hover/down state art is still candidate-level. |
+| Gameplay readability and hierarchy | 13/15 | Debug-less slice and release screenshots plus smoke checks show readable event title, narrative, costs, rewards, choice numbers, and release four-choice layout. Narrow browser presentation remains unresolved. |
+| Coverage and consistency | 7/10 | Reward/Event/Combat now share source-backed stage language, and Event has release four-choice screenshot evidence. Other primary screens still need matching rebuild/scoring. |
+| Technical/runtime integration | 10/10 | Typecheck, smoke, check, data validation, quality report, release visual audit, and diff check passed after this pass. |
+| Manual acceptance evidence | 1/5 | Internal screenshot review found and fixed the v5 release-button collision, but user acceptance is absent and the screen is still below the 85 Event red line. |
+
+Main remaining blockers after the Event fourth rebuild:
+
+- Reward is 76, Event is 81, and Combat is 78; all three critical screens remain below the 85 red line.
+- Event improved into the 80-94 score band, but it is still not a shippable final UI candidate.
+- Town, WorldMap, Dungeon, RuneBench, Boss, Result, and Settings still need matching rebuild/scoring.
+- Responsive presentation remains unresolved because the in-app browser can make the 16:9 canvas feel small.
+- Final UI asset approval, ownership/originality review, broad manual acceptance, and production component state art are still missing.
+
+## Reward Fifth Rebuild Checkpoint
+
+Date: 2026-06-01
+
+Evidence:
+
+- `assets/source/ui/reward_stage_components_v002.svg`
+- `assets/source/ui/reward_stage_components_v002.md`
+- `tmp/ui-quality/reward-1920-debugless-v5.png`
+- `tmp/ui-quality/reward-release-cards-1920-debugless-v5.png`
+- `tmp/ui-quality/reward-release-runes-1920-debugless-v5.png`
+- `tmp/ui-quality/reward-1920-debugless-v6.png`
+- `tmp/ui-quality/reward-release-cards-1920-debugless-v6.png`
+- `tmp/ui-quality/reward-release-runes-1920-debugless-v6.png`
+- `tmp/ui-quality/reward-1280-debugless-v6.png`
+- `tmp/ui-quality/reward-release-cards-1280-debugless-v6.png`
+- `npx.cmd tsc --noEmit`
+- `npm.cmd run phaser:smoke`
+- `npm.cmd run check`
+- `npm.cmd run data:validate`
+- `npm.cmd run quality:audit:report`
+- `npm.cmd run assets:audit`
+- `npm.cmd run assets:audit:release-visuals`
+- `git diff --check`
+
+Current status: `Not done`
+
+Reward score after fifth rebuild: 85/100
+
+| Area | Score | Reason |
+| --- | ---: | --- |
+| Concept/source pipeline evidence | 14/15 | Reward now has a dedicated v2 source sheet separate from the shared Reward/Event sheet, and the runtime card/header/shelf composition maps to it. This is still candidate source evidence, not approved final production art. |
+| Art bible fidelity | 12/15 | The screen now reads more like a popup-book prize stage with side wings, hanging pins, shelf, medallions, icon stamps, matted art windows, and folded corners. Final illustration polish and bespoke material-state art remain unfinished. |
+| Screen composition and game feel | 13/15 | Reward is more clearly a reward moment instead of a slot menu, and both 3-option slice and 4-option release layouts fit. The overall screen still relies on shape-built source candidates rather than final painted UI. |
+| Component craft and states | 13/15 | Reward cards now have top type ribbons, numbered medallions, icon stamps, detail wells, footer action strips, default-selection tag, hover/click targets, and folded corners. Hover/down state art is still shared candidate treatment. |
+| Gameplay readability and hierarchy | 13/15 | Debug-less 1920 and 1280 screenshots show readable title, reward names, details, type/action labels, tooltip, and primary action for slice and release four-card layouts. Narrow in-app presentation still needs a broader responsive pass. |
+| Coverage and consistency | 7/10 | Reward now matches the stronger Event/Combat paper-stage direction and has release card/rune screenshot evidence. Town, WorldMap, Dungeon, RuneBench, Boss, Result, and Settings still need matching visual scoring. |
+| Technical/runtime integration | 10/10 | Typecheck, smoke, check, data validation, quality report, asset audits, release visual audit, and diff check passed after this pass. The Vite large chunk warning remains tracked under Performance, not this row. |
+| Manual acceptance evidence | 3/5 | Internal screenshot review found English release-pool titles and an obscured shelf label in v5, both fixed in v6. User acceptance is still absent, and earlier manual review rejected the prior Reward UI. |
+
+Main remaining blockers after the Reward fifth rebuild:
+
+- Reward reaches the internal 85 critical-screen threshold, but it is still not a 95-point UI completion candidate and has no user acceptance.
+- Event is 81 and Combat is 78, both still below the 85 critical-screen red line.
+- Town, WorldMap, Dungeon, RuneBench, Boss, Result, and Settings still need matching rebuild/scoring.
+- Responsive presentation beyond the verified 1920 and 1280 captures still needs a deliberate pass.
+- Final UI asset approval, ownership/originality review, broad manual acceptance, and production component state art are still missing.
+
+## Combat Third Rebuild Checkpoint
+
+Date: 2026-06-02
+
+Evidence:
+
+- `assets/source/ui/combat_stage_components_v003.svg`
+- `assets/source/ui/combat_stage_components_v003.md`
+- `tmp/ui-quality/combat-1920-debugless-v5.png`
+- `tmp/ui-quality/combat-1280-debugless-v5.png`
+- `tmp/ui-quality/combat-release-1920-debugless-v5.png`
+- `tmp/ui-quality/boss-combat-panel-1920-debugless-v5.png`
+- `tmp/ui-quality/combat-1920-debugless-v7.png`
+- `tmp/ui-quality/combat-1280-debugless-v7.png`
+- `tmp/ui-quality/combat-release-1920-debugless-v7.png`
+- `tmp/ui-quality/boss-combat-panel-1920-debugless-v7.png`
+- `npx.cmd tsc --noEmit`
+- `npm.cmd run phaser:smoke`
+- `npm.cmd run check`
+- `npm.cmd run data:validate`
+- `npm.cmd run quality:audit:report`
+- `npm.cmd run assets:audit`
+- `npm.cmd run assets:audit:release-visuals`
+- `git diff --check`
+
+Current status: `Not done`
+
+Combat score after third rebuild: 85/100
+
+| Area | Score | Reason |
+| --- | ---: | --- |
+| Concept/source pipeline evidence | 13/15 | Combat now has dedicated v3 source evidence and runtime composition maps to the v3 title ribbon, player ledger, route strip, flow lane, and enemy intent ledger. It is still candidate source evidence, not approved final production art. |
+| Art bible fidelity | 12/15 | The screen reads more strongly as a paper-theater combat board with side wings, pins, ribbon, ledgers, route labels, and stage mechanics. Final painted material detail and bespoke state art remain unfinished. |
+| Screen composition and game feel | 13/15 | Removing duplicate overlay layers makes the combat stage clearer, and the player/enemy information now frames the standee and hand without hiding card play. The Boss shared panel was also checked for visible regression. |
+| Component craft and states | 13/15 | Player stats, route nodes, enemy HP/block/mark, portrait stamp, and intent row now have distinct material surfaces instead of simple stacked text. Hover/down state art is still shared candidate treatment. |
+| Gameplay readability and hierarchy | 14/15 | Debug-less 1920/1280/release screenshots plus smoke show readable title, route, player stats, enemy HP/block/mark, intent, card hand, and End Turn action. A long release enemy name overlap was caught by smoke and fixed with a font-size guard. |
+| Coverage and consistency | 7/10 | Reward/Event/Combat now have source-backed stage language, and Combat has slice, release, 1280, and Boss shared-panel evidence. Town, WorldMap, Dungeon, RuneBench, Result, and Settings still need matching visual scoring. |
+| Technical/runtime integration | 10/10 | Typecheck, smoke, check, data validation, quality report, asset audits, release visual audit, and diff check passed after this pass. The Vite large chunk warning remains tracked under Performance, not this row. |
+| Manual acceptance evidence | 3/5 | Internal screenshot review found and corrected v5 duplicate-layer/label issues and the smoke-found release enemy name overlap. User acceptance is still absent. |
+
+Main remaining blockers after the Combat third rebuild:
+
+- Combat reaches the internal 85 critical-screen threshold, but it is still not a 95-point UI completion candidate and has no user acceptance.
+- Event is 81 and remains below the 85 critical-screen red line.
+- Reward and Combat are internal 85-point progress candidates only; they are not final production UI, not user-accepted, and not release-complete.
+- Town, WorldMap, Dungeon, RuneBench, Boss, Result, and Settings still need matching rebuild/scoring under this rubric.
+- Responsive presentation beyond the verified 1920 and 1280 captures still needs a deliberate pass.
+- Final UI asset approval, ownership/originality review, broad manual acceptance, and production component state art are still missing.
+
+## Event Fifth Rebuild Checkpoint
+
+Date: 2026-06-02
+
+Evidence:
+
+- `assets/source/ui/event_stage_components_v003.svg`
+- `assets/source/ui/event_stage_components_v003.md`
+- `tmp/ui-quality/event-1920-debugless-v7.png`
+- `tmp/ui-quality/event-1280-debugless-v7.png`
+- `tmp/ui-quality/event-release-1920-debugless-v7.png`
+- `tmp/ui-quality/event-release-1280-debugless-v7.png`
+- `tmp/ui-quality/event-1920-debugless-v8.png`
+- `tmp/ui-quality/event-1280-debugless-v8.png`
+- `tmp/ui-quality/event-release-1920-debugless-v8.png`
+- `tmp/ui-quality/event-release-1280-debugless-v8.png`
+- `npx.cmd tsc --noEmit`
+- `npm.cmd run phaser:smoke`
+- `npm.cmd run check`
+- `npm.cmd run data:validate`
+- `npm.cmd run quality:audit:report`
+- `npm.cmd run assets:audit`
+- `npm.cmd run assets:audit:release-visuals`
+- `git diff --check`
+
+Current status: `Not done`
+
+Event score after fifth rebuild: 85/100
+
+| Area | Score | Reason |
+| --- | ---: | --- |
+| Concept/source pipeline evidence | 13/15 | Event now has dedicated v3 source evidence for the choice summary card and compact release reward rows. It is still candidate source evidence, not approved final production art. |
+| Art bible fidelity | 12/15 | The teal ribbon, pinned stage, side wings, diorama, card corners, and cost/result ledgers keep the popup-book event read. Final painted scene art and bespoke material-state art remain unfinished. |
+| Screen composition and game feel | 13/15 | The Event screen reads as a story diorama with decisions, and release four-choice layout now uses compact reward summaries instead of cramped long item lists. |
+| Component craft and states | 13/15 | Choice cards now separate title, description, cost label, cost value, result label, compact result value, selection chip, and disabled/focus state more clearly. Hover/down state art is still shared candidate treatment. |
+| Gameplay readability and hierarchy | 14/15 | Debug-less 1920/1280 slice and release screenshots plus smoke show readable event title, gold, story, choice names, costs, results, selection affordance, and release four-choice layout. The v7 cost/value crowding was fixed before v8. |
+| Coverage and consistency | 7/10 | Reward/Event/Combat now share source-backed paper-stage language with critical-screen 85-point candidates. Town, WorldMap, Dungeon, RuneBench, Result, and Settings still need matching visual scoring. |
+| Technical/runtime integration | 10/10 | Typecheck, smoke, check, data validation, quality report, asset audits, release visual audit, and diff check passed after this pass. The Vite large chunk warning remains tracked under Performance, not this row. |
+| Manual acceptance evidence | 3/5 | Internal screenshot review found and corrected v7 cost/value crowding, but user acceptance is still absent. |
+
+Main remaining blockers after the Event fifth rebuild:
+
+- Reward, Event, and Combat now each reach the internal 85 critical-screen threshold, but none is a 95-point UI completion candidate or user-accepted final UI.
+- Town, WorldMap, Dungeon, RuneBench, Boss, Result, and Settings still need matching rebuild/scoring under this rubric.
+- Responsive presentation beyond the verified 1920 and 1280 captures still needs a deliberate pass.
+- Final UI asset approval, ownership/originality review, broad manual acceptance, and production component state art are still missing.
+- The total `UI skin` gate remains below 95 and must stay `Not done`.
+
+## Boss First Rebuild Checkpoint
+
+Date: 2026-06-02
+
+Evidence:
+
+- `assets/source/ui/boss_stage_components_v001.svg`
+- `assets/source/ui/boss_stage_components_v001.md`
+- `tmp/ui-quality/boss-1920-debugless-v4.png`
+- `tmp/ui-quality/boss-1280-debugless-v4.png`
+- `tmp/ui-quality/boss-release-1920-debugless-v4.png`
+- `npx.cmd tsc --noEmit`
+- `npm.cmd run phaser:smoke`
+- `npm.cmd run check`
+- `npm.cmd run data:validate`
+- `npm.cmd run quality:audit:report`
+- `npm.cmd run assets:audit`
+- `npm.cmd run assets:audit:release-visuals`
+- `git diff --check`
+
+Current status: `Not done`
+
+Boss score after first rebuild: 84/100
+
+| Area | Score | Reason |
+| --- | ---: | --- |
+| Concept/source pipeline evidence | 13/15 | Boss now has dedicated source evidence and the runtime screen maps to the Combat v3 paper-theater family with boss-specific wings, ribbon color, enemy ledger, and phase ledger. This is still candidate source evidence, not final approved production art. |
+| Art bible fidelity | 12/15 | The screen now reads closer to a boss paper stage with purple/brass accents, pinned theater layers, ledgers, and a phase label. Final painted boss materials, animation drama, and bespoke boss-state art remain unfinished. |
+| Screen composition and game feel | 13/15 | Boss no longer reuses the standard menu shell over a combat panel; it now presents the boss as a full playfield scene with player standee, boss ledger, route strip, card hand, and phase signal. |
+| Component craft and states | 12/15 | Boss reuses the stronger Combat ledgers and adds a phase surface, but phase-transition art, boss-specific warning states, and final hover/down treatment are still candidate-level. |
+| Gameplay readability and hierarchy | 13/15 | Debug-less 1920/1280/release screenshots plus smoke show readable boss title, player stats, boss HP/block/mark, compact intent, phase state, hand, and End Turn action. The initial phase-ledger overlap and long release intent label were caught and fixed before v4. |
+| Coverage and consistency | 8/10 | Reward/Event/Combat/Boss now share source-backed paper-stage language. Town, WorldMap, Dungeon, RuneBench, Result, and Settings still need matching visual scoring. |
+| Technical/runtime integration | 10/10 | Typecheck, smoke, check, data validation, quality report, asset audits, release visual audit, and diff check passed after this pass. The Vite large chunk warning remains tracked under Performance, not this row. |
+| Manual acceptance evidence | 3/5 | Internal screenshot review found and corrected phase-ledger overlap and release intent crowding, but user acceptance is still absent. |
+
+Main remaining blockers after the Boss first rebuild:
+
+- Boss is an 84-point internal progress candidate, not a 95-point UI completion candidate and not user-accepted final UI.
+- Town, WorldMap, Dungeon, RuneBench, Result, and Settings still need matching rebuild/scoring under this rubric.
+- Reward/Event/Combat/Boss still use candidate source art, not final production-approved UI art.
+- Responsive presentation beyond the verified 1920 and 1280 captures still needs a deliberate pass.
+- Final UI asset approval, ownership/originality review, broad manual acceptance, and production component state art are still missing.
+- The total `UI skin` gate remains below 95 and must stay `Not done`.
+
+## Town First Rebuild Checkpoint
+
+Date: 2026-06-02
+
+Evidence:
+
+- `assets/source/ui/town_stage_components_v001.svg`
+- `assets/source/ui/town_stage_components_v001.md`
+- `tmp/ui-quality/town-1920-debugless-v4.png`
+- `tmp/ui-quality/town-1280-debugless-v4.png`
+- `tmp/ui-quality/town-release-1920-debugless-v4.png`
+- `npx.cmd tsc --noEmit`
+- `npm.cmd run phaser:smoke`
+- `npm.cmd run check`
+- `npm.cmd run data:validate`
+- `npm.cmd run quality:audit:report`
+- `npm.cmd run assets:audit`
+- `npm.cmd run assets:audit:release-visuals`
+- `git diff --check`
+
+Current status: `Not done`
+
+Town score after first rebuild: 83/100
+
+| Area | Score | Reason |
+| --- | ---: | --- |
+| Concept/source pipeline evidence | 13/15 | Town now has dedicated source evidence and the runtime screen maps to the title ribbon, side paper wings, village diorama, expedition board, route markers, and passport panel. This is still candidate source evidence, not final approved production art. |
+| Art bible fidelity | 12/15 | The screen reads more like a popup-book village hub with paper buildings, brass pins, paper panels, and hanging stage accents. Final painted town art, richer building identity, and bespoke state art remain unfinished. |
+| Screen composition and game feel | 12/15 | Town no longer reads as only a standard shell plus three buttons; it now separates village diorama, player passport, and expedition board. The actual Town/meta systems are still thin, so the scene cannot score higher yet. |
+| Component craft and states | 12/15 | Action buttons, stat stamps, record slot, route markers, passport, and tooltip use the shared material system. Hover/down state art is still shared candidate treatment, and non-interactive town buildings are visual only. |
+| Gameplay readability and hierarchy | 13/15 | Debug-less 1920/1280/release screenshots plus smoke show readable title, stage, unlocked/completed counts, route markers, HP/gold, world-map/reset/settings actions, and no critical overlap after v4. |
+| Coverage and consistency | 8/10 | Reward/Event/Combat/Boss/Town now share source-backed paper-stage language. WorldMap, Dungeon, RuneBench, Result, and Settings still need matching visual scoring. |
+| Technical/runtime integration | 10/10 | Typecheck, smoke, check, data validation, quality report, asset audits, release visual audit, and diff check passed after this pass. The Vite large chunk warning remains tracked under Performance, not this row. |
+| Manual acceptance evidence | 3/5 | Internal screenshot review found and corrected route-button overlap, crowded village labels, crowded passport text, and shortcut-like tooltip copy. User acceptance is still absent. |
+
+Main remaining blockers after the Town first rebuild:
+
+- Town is an 83-point internal progress candidate, not a 95-point UI completion candidate and not user-accepted final UI.
+- WorldMap, Dungeon, RuneBench, Result, and Settings still need matching rebuild/scoring under this rubric.
+- Town/meta gameplay remains incomplete outside this visual pass; this screen does not complete Town/meta systems.
+- Reward/Event/Combat/Boss/Town still use candidate source art, not final production-approved UI art.
+- Responsive presentation beyond the verified 1920 and 1280 captures still needs a deliberate pass.
+- Final UI asset approval, ownership/originality review, broad manual acceptance, and production component state art are still missing.
+- The total `UI skin` gate remains below 95 and must stay `Not done`.
+
+## WorldMap First Rebuild Checkpoint
+
+Date: 2026-06-02
+
+Evidence:
+
+- `assets/source/ui/world_map_stage_components_v001.svg`
+- `assets/source/ui/world_map_stage_components_v001.md`
+- `tmp/ui-quality/world-map-1920-debugless-v1.png`
+- `tmp/ui-quality/world-map-1280-debugless-v1.png`
+- `tmp/ui-quality/world-map-release-1920-debugless-v1.png`
+- `tmp/ui-quality/world-map-1920-debugless-v2.png`
+- `tmp/ui-quality/world-map-1280-debugless-v2.png`
+- `tmp/ui-quality/world-map-release-1920-debugless-v2.png`
+- `tmp/ui-quality/world-map-1920-debugless-v3.png`
+- `tmp/ui-quality/world-map-1280-debugless-v3.png`
+- `tmp/ui-quality/world-map-release-1920-debugless-v3.png`
+- `npx.cmd tsc --noEmit`
+- `npm.cmd run phaser:smoke`
+- `npm.cmd run check`
+- `npm.cmd run data:validate`
+- `npm.cmd run quality:audit:report`
+- `npm.cmd run assets:audit`
+- `npm.cmd run assets:audit:release-visuals`
+- `git diff --check`
+
+Current status: `Not done`
+
+WorldMap score after first rebuild: 82/100
+
+| Area | Score | Reason |
+| --- | ---: | --- |
+| Concept/source pipeline evidence | 13/15 | WorldMap now has dedicated source evidence and the runtime screen maps to the left map drawer, folded route sheet, right record ledger, pins, folds, route nodes, and current-stage icon. This is still candidate source evidence, not final approved production art. |
+| Art bible fidelity | 12/15 | The screen reads more like an unfolded paper-theater map with brass pins, folded sheet panels, side paper wings, and a route path. Final map illustration detail, material depth, and production state art remain unfinished. |
+| Screen composition and game feel | 12/15 | WorldMap no longer reads as a generic shell plus a single button; it now presents a current expedition route and map ledger. It still does not implement a full multi-stage selection map, so the score cannot rise higher yet. |
+| Component craft and states | 12/15 | The map drawer, route nodes, current-stage icon, record ledger, and `던전으로` action use the shared paper material language. Node interaction/state art and final hover/down treatment are still candidate-level. |
+| Gameplay readability and hierarchy | 13/15 | Debug-less 1920 slice/release screenshots plus smoke show readable title, current stage, route nodes, room labels, boss record, and primary dungeon action. The 1280 layout remains tight, especially between the left drawer and center map. |
+| Coverage and consistency | 8/10 | Reward/Event/Combat/Boss/Town/WorldMap now share source-backed paper-stage language. Dungeon, RuneBench, Result, and Settings still need matching visual scoring. |
+| Technical/runtime integration | 10/10 | Typecheck, smoke, check, data validation, quality report, asset audits, release visual audit, and diff check passed after this pass. The Vite large chunk warning remains tracked under Performance, not this row. |
+| Manual acceptance evidence | 2/5 | Internal screenshot review found and corrected v1/v2 route-ledger/tooltip crowding, but user acceptance is absent and the 1280 capture is only acceptable as progress evidence. |
+
+Main remaining blockers after the WorldMap first rebuild:
+
+- WorldMap is an 82-point internal progress candidate, not a 95-point UI completion candidate and not user-accepted final UI.
+- Dungeon, RuneBench, Result, and Settings still need matching rebuild/scoring under this rubric.
+- WorldMap visual polish does not complete a full multi-stage selectable map system.
+- Reward/Event/Combat/Boss/Town/WorldMap still use candidate source art, not final production-approved UI art.
+- Responsive presentation beyond the verified 1920 and 1280 captures still needs a deliberate pass.
+- Final UI asset approval, ownership/originality review, broad manual acceptance, and production component state art are still missing.
+- The total `UI skin` gate remains below 95 and must stay `Not done`.
+
+## WorldMap Second Rebuild Checkpoint
+
+Date: 2026-06-02
+
+Evidence:
+
+- `assets/source/ui/world_map_stage_components_v002.svg`
+- `assets/source/ui/world_map_stage_components_v002.md`
+- `tmp/ui-quality/world-map-1920-debugless-v4.png`
+- `tmp/ui-quality/world-map-1280-debugless-v4.png`
+- `tmp/ui-quality/world-map-release-1920-debugless-v4.png`
+- `tmp/ui-quality/world-map-release-unlocked-1920-debugless-v4.png`
+- `tmp/ui-quality/world-map-release-selected-1920-debugless-v4.png`
+- `tmp/ui-quality/world-map-1920-debugless-v5.png`
+- `tmp/ui-quality/world-map-1280-debugless-v5.png`
+- `tmp/ui-quality/world-map-release-1920-debugless-v5.png`
+- `tmp/ui-quality/world-map-release-unlocked-1920-debugless-v5.png`
+- `tmp/ui-quality/world-map-release-selected-1920-debugless-v5.png`
+- `npx.cmd tsc --noEmit`
+- `npm.cmd run phaser:smoke`
+- `npm.cmd run check`
+- `npm.cmd run data:validate`
+- `npm.cmd run quality:audit:report`
+- `npm.cmd run assets:audit`
+- `npm.cmd run assets:audit:release-visuals`
+- `git diff --check`
+
+Current status: `Not done`
+
+WorldMap score after second rebuild: 86/100
+
+| Area | Score | Reason |
+| --- | ---: | --- |
+| Concept/source pipeline evidence | 14/15 | v002 source evidence adds explicit current/complete, selectable, and next-locked stage drawer states, and the runtime now maps those states to save/profile data instead of only a decorative current-route row. This is still candidate source evidence, not final approved production art. |
+| Art bible fidelity | 12/15 | The screen keeps the popup-book unfolded map, brass pins, route sheet, map-icon medallion, side paper wings, and ledger material. It still lacks final painted atlas detail, stronger biome identity, and production state art. |
+| Screen composition and game feel | 13/15 | WorldMap now behaves more like a map selection surface: a cleared release stage unlocks the next stage, the drawer exposes selectable rows, and selecting the second stage updates the current route. It still does not show a full 15-stage atlas or final stage-select UX. |
+| Component craft and states | 13/15 | Drawer rows now have disabled/current/selectable treatment, stage icons, short status labels, and preserved click behavior. The visual state language is still candidate-level and not a final component-state art pass. |
+| Gameplay readability and hierarchy | 12/15 | v5 slice/release/default/unlocked/selected screenshots fix the v4 bottom-helper crowding and long row-status labels. The 1280 view remains compact, and the drawer intentionally shows a limited unlocked/current/next-locked subset rather than the full catalog. |
+| Coverage and consistency | 10/10 | All primary screens now have first-pass source-backed paper-stage evidence, and WorldMap has a second pass with release unlock/selection screenshots. |
+| Technical/runtime integration | 10/10 | Typecheck, Phaser smoke, check, data validation, quality report, asset audits, release visual audit, and diff check passed for the new stage-select/unlock logic. The Vite large chunk warning remains tracked under Performance, not this row. |
+| Manual acceptance evidence | 2/5 | Internal screenshot review rejected v4 bottom-helper/status crowding and accepted v5 as progress evidence. User acceptance is absent, so this cannot become a final UI completion candidate. |
+
+Main remaining blockers after the WorldMap second rebuild:
+
+- WorldMap is an 86-point internal progress candidate, not a 95-point UI completion candidate and not user-accepted final UI.
+- The pass proves the first next-stage unlock and selectable-stage path only; it does not complete all stage progression, all route unlock rules, or a full 15-stage world atlas.
+- The screen still uses candidate source art, not final production-approved map/UI art.
+- Responsive presentation beyond the verified 1920 and 1280 captures still needs a deliberate pass.
+- Final UI asset approval, ownership/originality review, broad manual acceptance, and production component state art are still missing.
+- The total `UI skin` gate remains below 95 and must stay `Not done`.
+
+## Dungeon First Rebuild Checkpoint
+
+Date: 2026-06-02
+
+Evidence:
+
+- `assets/source/ui/dungeon_stage_components_v001.svg`
+- `assets/source/ui/dungeon_stage_components_v001.md`
+- `tmp/ui-quality/dungeon-1920-debugless-v1.png`
+- `tmp/ui-quality/dungeon-1280-debugless-v1.png`
+- `tmp/ui-quality/dungeon-release-1920-debugless-v1.png`
+- `tmp/ui-quality/dungeon-1920-debugless-v2.png`
+- `tmp/ui-quality/dungeon-1280-debugless-v2.png`
+- `tmp/ui-quality/dungeon-release-1920-debugless-v2.png`
+- `tmp/ui-quality/dungeon-1920-debugless-v3.png`
+- `tmp/ui-quality/dungeon-1280-debugless-v3.png`
+- `tmp/ui-quality/dungeon-release-1920-debugless-v3.png`
+- `npx.cmd tsc --noEmit`
+- `npm.cmd run phaser:smoke`
+- `npm.cmd run check`
+- `npm.cmd run data:validate`
+- `npm.cmd run quality:audit:report`
+- `npm.cmd run assets:audit`
+- `npm.cmd run assets:audit:release-visuals`
+
+Current status: `Not done`
+
+Dungeon score after first rebuild: 82/100
+
+| Area | Score | Reason |
+| --- | ---: | --- |
+| Concept/source pipeline evidence | 13/15 | Dungeon now has dedicated source evidence and the runtime screen maps to the first-person paper corridor, left exploration ledger, center door, right route ledger, pins, folds, and side wings. This is still candidate source evidence, not final approved production art. |
+| Art bible fidelity | 12/15 | The screen reads more like a popup-book corridor with layered paper, brass pins, folds, translucent cutouts, and stage lighting. Final painted dungeon material, room-specific identity, and bespoke state art remain unfinished. |
+| Screen composition and game feel | 12/15 | Dungeon no longer reads as only current-room text plus one button; it now presents the current room, expected threat, and route context as an in-world stage. It still does not implement a free-look or full spatial dungeon navigation system, so the score cannot rise higher yet. |
+| Component craft and states | 12/15 | The room ledger, route rail, door card, encounter plaque, and `방 입장` action use the shared paper material language. Door/room state art and final hover/down treatment are still candidate-level. |
+| Gameplay readability and hierarchy | 13/15 | Debug-less 1920/1280/release screenshots plus smoke show readable title, stage, room index, HP/gold, current room, next-room hint, route entries, encounter name, and primary action. v1/v2 found route-helper and room-number/button overlap risks; v3 fixes the smoke-found button overlap. |
+| Coverage and consistency | 8/10 | Reward/Event/Combat/Boss/Town/WorldMap/Dungeon now share source-backed paper-stage language. RuneBench, Result, and Settings still need matching visual scoring. |
+| Technical/runtime integration | 10/10 | Typecheck, smoke, check, data validation, quality report, asset audits, and release visual audit passed for this pass. The Vite large chunk warning remains tracked under Performance, not this row. |
+| Manual acceptance evidence | 2/5 | Internal screenshot review found and corrected route-helper crowding and the smoke-found room-number/button overlap. User acceptance is absent, and the 1280 layout is still only acceptable as progress evidence. |
+
+Main remaining blockers after the Dungeon first rebuild:
+
+- Dungeon is an 82-point internal progress candidate, not a 95-point UI completion candidate and not user-accepted final UI.
+- RuneBench, Result, and Settings still need matching rebuild/scoring under this rubric.
+- Dungeon visual polish does not complete a full spatial dungeon navigation system.
+- Reward/Event/Combat/Boss/Town/WorldMap/Dungeon still use candidate source art, not final production-approved UI art.
+- Responsive presentation beyond the verified 1920 and 1280 captures still needs a deliberate pass.
+- Final UI asset approval, ownership/originality review, broad manual acceptance, and production component state art are still missing.
+- The total `UI skin` gate remains below 95 and must stay `Not done`.
+
+## Dungeon Second Rebuild Checkpoint
+
+Date: 2026-06-02
+
+Evidence:
+
+- `assets/source/ui/dungeon_stage_components_v002.svg`
+- `assets/source/ui/dungeon_stage_components_v002.md`
+- `tmp/ui-quality/dungeon-1920-debugless-v4.png`
+- `tmp/ui-quality/dungeon-1280-debugless-v4.png`
+- `tmp/ui-quality/dungeon-release-1920-debugless-v4.png`
+- `tmp/ui-quality/dungeon-release-compass-1920-debugless-v4.png`
+- `tmp/ui-quality/dungeon-1920-debugless-v5.png`
+- `tmp/ui-quality/dungeon-1280-debugless-v5.png`
+- `tmp/ui-quality/dungeon-release-1920-debugless-v5.png`
+- `tmp/ui-quality/dungeon-release-compass-1920-debugless-v5.png`
+- `tmp/phaser-dungeon-release-soft-compass.png`
+- `npx.cmd tsc --noEmit`
+- `npm.cmd run phaser:smoke`
+- `npm.cmd run check`
+- `npm.cmd run data:validate`
+- `npm.cmd run quality:audit:report`
+- `npm.cmd run assets:audit`
+- `npm.cmd run assets:audit:release-visuals`
+- `git diff --check`
+
+Current status: `Not done`
+
+Dungeon score after second rebuild: 85/100
+
+| Area | Score | Reason |
+| --- | ---: | --- |
+| Concept/source pipeline evidence | 14/15 | v002 source evidence maps the left exploration ledger, current/next intel cards, boss-distance row, resource row, and route state labels to actual Dungeon runtime state. This is still candidate source evidence, not final approved production art. |
+| Art bible fidelity | 12/15 | The paper corridor, pins, folded side wings, door plaque, and route rail keep the popup-book dungeon direction. Final painted dungeon backgrounds, room-specific set dressing, and bespoke state art remain unfinished. |
+| Screen composition and game feel | 13/15 | Dungeon now exposes more of the actual decision state: current marker, sealed/revealed next marker, boss distance, resource pressure, and route position. It still does not implement free-look, branching choices, or a full spatial dungeon navigation system. |
+| Component craft and states | 13/15 | Current/next intel cards, focused ledger rows, route state labels, and reveal-specific green helper copy are stronger than the first pass. Door states, hover/down state art, and room-type-specific component art remain candidate-level. |
+| Gameplay readability and hierarchy | 12/15 | v5 slice, 1280, release, and soft-compass screenshots fix the v4 intel-card overlap and show readable sealed/revealed next-room states. The 1280 layout remains dense and only acceptable as progress evidence. |
+| Coverage and consistency | 10/10 | All primary screens now have first-pass source-backed scoring, and Dungeon now has a second pass with release compass reveal evidence. |
+| Technical/runtime integration | 10/10 | Typecheck, Phaser smoke, check, data validation, quality report, asset audits, release visual audit, and diff check passed for the state-driven Dungeon pass. The Vite large chunk warning remains tracked under Performance, not this row. |
+| Manual acceptance evidence | 1/5 | Internal review rejected v4 because the next-room intel card overlapped the route panel, then accepted v5 as progress evidence only. User acceptance is absent, so this cannot become a final UI completion candidate. |
+
+Main remaining blockers after the Dungeon second rebuild:
+
+- Dungeon is an 85-point internal progress candidate, not a 95-point UI completion candidate and not user-accepted final UI.
+- The pass proves next-room reveal surfacing and route-state readability only; it does not complete full dungeon navigation, branching decisions, encounter pacing, or final dungeon background art.
+- RuneBench remains the weakest current primary UI score at 82/100.
+- Reward/Event/Combat/Boss/Town/WorldMap/Dungeon/RuneBench/Result/Settings still use candidate source art, not final production-approved UI art.
+- Responsive presentation beyond the verified 1920 and 1280 captures still needs a deliberate pass.
+- Final UI asset approval, ownership/originality review, broad manual acceptance, and production component state art are still missing.
+- The total `UI skin` gate remains below 95 and must stay `Not done`.
+
+## RuneBench First Rebuild Checkpoint
+
+Date: 2026-06-02
+
+Evidence:
+
+- `assets/source/ui/rune_bench_stage_components_v001.svg`
+- `assets/source/ui/rune_bench_stage_components_v001.md`
+- `tmp/ui-quality/rune-bench-1920-debugless-v1.png`
+- `tmp/ui-quality/rune-bench-1280-debugless-v1.png`
+- `tmp/ui-quality/rune-bench-release-1920-debugless-v1.png`
+- `tmp/ui-quality/rune-bench-1920-debugless-v2.png`
+- `tmp/ui-quality/rune-bench-1280-debugless-v2.png`
+- `tmp/ui-quality/rune-bench-release-1920-debugless-v2.png`
+- `tmp/ui-quality/rune-bench-1920-debugless-v3.png`
+- `tmp/ui-quality/rune-bench-1280-debugless-v3.png`
+- `tmp/ui-quality/rune-bench-release-1920-debugless-v3.png`
+- `npx.cmd tsc --noEmit`
+- `npm.cmd run phaser:smoke`
+- `npm.cmd run check`
+- `npm.cmd run data:validate`
+- `npm.cmd run quality:audit:report`
+- `npm.cmd run assets:audit`
+- `npm.cmd run assets:audit:release-visuals`
+- `git diff --check`
+
+Current status: `Not done`
+
+RuneBench score after first rebuild: 82/100
+
+| Area | Score | Reason |
+| --- | ---: | --- |
+| Concept/source pipeline evidence | 13/15 | RuneBench now has dedicated source evidence and the runtime screen maps to the rune inventory ledger, paper tuning table, target-card preview, rune stone, socket connector, right ledger, and preserved primary action. This is still candidate source evidence, not final approved production art. |
+| Art bible fidelity | 12/15 | The screen reads more like a popup-book workbench with paper ledgers, pinned surfaces, rune stone, socket line, and tabletop staging. Final painted rune material, socket animation, and bespoke state art remain unfinished. |
+| Screen composition and game feel | 12/15 | RuneBench no longer reads as a standard shell plus rune-name rows; it now shows what rune is being attached to which card. It still lacks a full manual card/rune selection UI, so the score cannot rise higher yet. |
+| Component craft and states | 12/15 | The rune row, target card, socket ledger, rune stone, and `룬 장착` action use the shared paper material system. Final selected/invalid/socket states are still candidate-level. |
+| Gameplay readability and hierarchy | 13/15 | Debug-less 1920/1280/release screenshots plus smoke show readable title, held/equipped counts, rune name, socket type, Korean effect summary, target card, and primary action. v1/v2 found button/card crowding and raw internal op text; v3 fixes those. |
+| Coverage and consistency | 8/10 | Reward/Event/Combat/Boss/Town/WorldMap/Dungeon/RuneBench now share source-backed paper-stage language. Result and Settings still need matching visual scoring. |
+| Technical/runtime integration | 10/10 | Typecheck, smoke, check, data validation, quality report, asset audits, release visual audit, and diff check passed after this pass. The Vite large chunk warning remains tracked under Performance, not this row. |
+| Manual acceptance evidence | 2/5 | Internal screenshot review found and corrected button/card overlap and raw op text. User acceptance is absent, and 1280 remains only acceptable as progress evidence. |
+
+Main remaining blockers after the RuneBench first rebuild:
+
+- RuneBench is an 82-point internal progress candidate, not a 95-point UI completion candidate and not user-accepted final UI.
+- Result and Settings still need matching rebuild/scoring under this rubric.
+- RuneBench visual polish does not complete full rune selection, socket progression, rune balance, or final rune art.
+- Reward/Event/Combat/Boss/Town/WorldMap/Dungeon/RuneBench still use candidate source art, not final production-approved UI art.
+- Responsive presentation beyond the verified 1920 and 1280 captures still needs a deliberate pass.
+- Final UI asset approval, ownership/originality review, broad manual acceptance, and production component state art are still missing.
+- The total `UI skin` gate remains below 95 and must stay `Not done`.
+
+## RuneBench Second Rebuild Checkpoint
+
+Date: 2026-06-02
+
+Evidence:
+
+- `assets/source/ui/rune_bench_stage_components_v002.svg`
+- `assets/source/ui/rune_bench_stage_components_v002.md`
+- `tmp/ui-quality/rune-bench-1920-debugless-v4.png`
+- `tmp/ui-quality/rune-bench-1280-debugless-v4.png`
+- `tmp/ui-quality/rune-bench-release-1920-debugless-v4.png`
+- `tmp/ui-quality/rune-bench-1920-debugless-v5.png`
+- `tmp/ui-quality/rune-bench-1280-debugless-v5.png`
+- `tmp/ui-quality/rune-bench-release-1920-debugless-v5.png`
+- `npx.cmd tsc --noEmit`
+- `npm.cmd run phaser:smoke`
+- `npm.cmd run check`
+- `npm.cmd run data:validate`
+- `npm.cmd run quality:audit:report`
+- `npm.cmd run assets:audit`
+- `npm.cmd run assets:audit:release-visuals`
+- `git diff --check`
+
+Current status: `Not done`
+
+RuneBench score after second rebuild: 85/100
+
+| Area | Score | Reason |
+| --- | ---: | --- |
+| Concept/source pipeline evidence | 14/15 | v002 source evidence maps the inventory, target card, before/after preview cards, compatibility proof band, and change ledger to the runtime deterministic rune-equip path. This is still candidate source evidence, not final approved production art. |
+| Art bible fidelity | 12/15 | The socket table, rune stone, pinned ledgers, and paper workbench continue the popup-book material language. Final rune-stone art, socket animation, and bespoke state art remain unfinished. |
+| Screen composition and game feel | 13/15 | RuneBench now communicates a buildcraft choice: the player sees the target card, why the rune is compatible, and what changes after attachment. It still lacks manual card/rune selection and broader rune progression, so it cannot score higher yet. |
+| Component craft and states | 13/15 | Before/after stat cards, compatibility band, recommendation line, and change row give the components clearer state roles than v001. Final selected/invalid/socket-unlock state art remains candidate-level. |
+| Gameplay readability and hierarchy | 12/15 | v5 1920, 1280, and release screenshots show readable cost/damage before/after and change rows. v4 was rejected by smoke because a decorative `룬` label overlapped the socket label; v5 fixes that. The 1280 layout remains dense. |
+| Coverage and consistency | 10/10 | All primary screens have source-backed scoring, and RuneBench now has a second pass with release before/after stat evidence. |
+| Technical/runtime integration | 10/10 | Typecheck, Phaser smoke, check, data validation, quality report, asset audits, release visual audit, and diff check passed for the state-driven RuneBench pass. The Vite large chunk warning remains tracked under Performance, not this row. |
+| Manual acceptance evidence | 1/5 | Internal screenshot/smoke review rejected v4 and accepted v5 as progress evidence only. User acceptance is absent, so this cannot become a final UI completion candidate. |
+
+Main remaining blockers after the RuneBench second rebuild:
+
+- RuneBench is an 85-point internal progress candidate, not a 95-point UI completion candidate and not user-accepted final UI.
+- The pass proves deterministic attachment preview only; it does not complete manual card/rune selection, socket unlock progression, rune acquisition pacing, rune balance, or final rune art.
+- Town and Result are now the weakest current primary UI scores at 83/100.
+- Reward/Event/Combat/Boss/Town/WorldMap/Dungeon/RuneBench/Result/Settings still use candidate source art, not final production-approved UI art.
+- Responsive presentation beyond the verified 1920 and 1280 captures still needs a deliberate pass.
+- Final UI asset approval, ownership/originality review, broad manual acceptance, and production component state art are still missing.
+- The total `UI skin` gate remains below 95 and must stay `Not done`.
+
+## Town Second Rebuild Checkpoint
+
+Date: 2026-06-02
+
+Evidence:
+
+- `assets/source/ui/town_stage_components_v002.svg`
+- `assets/source/ui/town_stage_components_v002.md`
+- `tmp/ui-quality/town-1920-debugless-v5.png`
+- `tmp/ui-quality/town-1280-debugless-v5.png`
+- `tmp/ui-quality/town-release-1920-debugless-v5.png`
+- `tmp/ui-quality/town-release-progress-1920-debugless-v5.png`
+- `tmp/ui-quality/town-1920-debugless-v6.png`
+- `tmp/ui-quality/town-1280-debugless-v6.png`
+- `tmp/ui-quality/town-release-1920-debugless-v6.png`
+- `tmp/ui-quality/town-release-progress-1920-debugless-v6.png`
+- `tmp/ui-quality/town-1920-debugless-v8.png`
+- `tmp/ui-quality/town-1280-debugless-v8.png`
+- `tmp/ui-quality/town-release-1920-debugless-v8.png`
+- `tmp/ui-quality/town-release-progress-1920-debugless-v8.png`
+- `npx.cmd tsc --noEmit`
+- `npm.cmd run phaser:smoke`
+- `npm.cmd run check`
+- `npm.cmd run data:validate`
+- `npm.cmd run quality:audit:report`
+- `npm.cmd run assets:audit`
+- `npm.cmd run assets:audit:release-visuals`
+- `git diff --check`
+
+Current status: `Not done`
+
+Town score after second rebuild: 86/100
+
+| Area | Score | Reason |
+| --- | ---: | --- |
+| Concept/source pipeline evidence | 14/15 | v002 source evidence maps the village tags, save/profile counts, next expedition row, completed-stage stamp, route preview, and next-sealed summary to the runtime Town screen. This is still candidate source evidence, not final approved production art. |
+| Art bible fidelity | 12/15 | The paper-theater village remains coherent with pins, panels, folded accents, paper buildings, and stage tags. Final town background painting, bespoke building art, and production interaction states remain unfinished. |
+| Screen composition and game feel | 13/15 | Town now reads more like a progression hub: it shows unlock count, clear count, remaining chapters, the next expedition, completed stamps, and a progressed release save state. It still does not implement real town shops, upgrades, museum, or unlock-management surfaces. |
+| Component craft and states | 13/15 | Building tags, stat stamps, next-expedition slot, completed stamp, route preview, passport, and action rail have clearer roles than v001. The action rail and non-interactive buildings are still candidate-level component/state work. |
+| Gameplay readability and hierarchy | 13/15 | v8 slice, 1280, release, and progressed-release screenshots show the save/profile state without the v5/v6 route-card and bottom-line crowding defects. The 1280 layout remains compact and only acceptable as progress evidence. |
+| Coverage and consistency | 10/10 | All primary screens have source-backed scoring, and Town now has a second pass with release progressed-save evidence. |
+| Technical/runtime integration | 10/10 | Typecheck, Phaser smoke, check, data validation, quality report, asset audits, release visual audit, and diff check passed after the Town v2 pass. The Vite large chunk warning remains tracked under Performance, not this row. |
+| Manual acceptance evidence | 1/5 | Internal screenshot review rejected v5/v6/v7 placement defects and accepted v8 as progress evidence only. User acceptance is absent, so this cannot become a final UI completion candidate. |
+
+Main remaining blockers after the Town second rebuild:
+
+- Town is an 86-point internal progress candidate, not a 95-point UI completion candidate and not user-accepted final UI.
+- The pass proves save/profile readability only; it does not complete Town/meta systems such as shops, upgrades, character unlocks, museum, relic/arcana galleries, or long-term progression balance.
+- Result is now the weakest current primary UI score at 83/100, followed by Boss/Settings at 84/100.
+- Reward/Event/Combat/Boss/Town/WorldMap/Dungeon/RuneBench/Result/Settings still use candidate source art, not final production-approved UI art.
+- Responsive presentation beyond the verified 1920 and 1280 captures still needs a deliberate pass.
+- Final UI asset approval, ownership/originality review, broad manual acceptance, and production component state art are still missing.
+- The total `UI skin` gate remains below 95 and must stay `Not done`.
+
+## Result First Rebuild Checkpoint
+
+Date: 2026-06-02
+
+Evidence:
+
+- `assets/source/ui/result_stage_components_v001.svg`
+- `assets/source/ui/result_stage_components_v001.md`
+- `tmp/ui-quality/result-1920-debugless-v1.png`
+- `tmp/ui-quality/result-1280-debugless-v1.png`
+- `tmp/ui-quality/result-defeat-1920-debugless-v1.png`
+- `tmp/ui-quality/result-clear-1920-debugless-v1.png`
+- `tmp/ui-quality/result-release-clear-1920-debugless-v1.png`
+- `npx.cmd tsc --noEmit`
+- `npm.cmd run phaser:smoke`
+- `npm.cmd run check`
+- `npm.cmd run data:validate`
+- `npm.cmd run quality:audit:report`
+- `npm.cmd run assets:audit`
+- `npm.cmd run assets:audit:release-visuals`
+- `git diff --check`
+
+Current status: `Not done`
+
+Result score after first rebuild: 83/100
+
+| Area | Score | Reason |
+| --- | ---: | --- |
+| Concept/source pipeline evidence | 13/15 | Result now has dedicated source evidence and the runtime screen maps to the title ribbon, return ledger, curtain-call certificate, seal, collection ledger, and preserved primary return action. This is still candidate source evidence, not final approved production art. |
+| Art bible fidelity | 12/15 | The screen reads more like a popup-book result certificate with paper panels, brass pins, hanging tags, tone-colored clear/defeat/return seals, and stage-card material. Final result art, ending treatment, animation, and production paper depth remain unfinished. |
+| Screen composition and game feel | 12/15 | Result no longer reads as only a generic state summary; it separates run outcome, stage, HP/gold, collection counts, and the return action. It still does not provide an ending sequence, achievement summary, or full progression recap, so the score cannot rise higher yet. |
+| Component craft and states | 12/15 | The ledgers, seal, summary rows, relic icon row, helper panels, and `마을로` action use the shared paper material system. Final result-state animation, hover/down state art, and bespoke result decorations are still candidate-level. |
+| Gameplay readability and hierarchy | 13/15 | Debug-less neutral 1920/1280, defeat, slice-clear, and release-clear screenshots plus smoke show readable outcome, stage, HP, gold, completed count, collection counts, result message, and primary return action. The 1280 layout remains compact and only acceptable as progress evidence. |
+| Coverage and consistency | 9/10 | Reward/Event/Combat/Boss/Town/WorldMap/Dungeon/RuneBench/Result now share source-backed paper-stage language. Settings still needs matching visual scoring. |
+| Technical/runtime integration | 10/10 | Typecheck, smoke, check, data validation, quality report, asset audits, release visual audit, and diff check passed after this pass. The Vite large chunk warning remains tracked under Performance, not this row. |
+| Manual acceptance evidence | 2/5 | Internal screenshot review covered neutral, defeat, clear, release-clear, and 1280 views, but user acceptance is absent and this is not final UI approval. |
+
+Main remaining blockers after the Result first rebuild:
+
+- Result is an 83-point internal progress candidate, not a 95-point UI completion candidate and not user-accepted final UI.
+- Settings still needs matching rebuild/scoring under this rubric.
+- Result visual polish does not complete ending cinematics, achievement surfacing, long-term progression recap, balance, or final result-state art.
+- Reward/Event/Combat/Boss/Town/WorldMap/Dungeon/RuneBench/Result still use candidate source art, not final production-approved UI art.
+- Responsive presentation beyond the verified 1920 and 1280 captures still needs a deliberate pass.
+- Final UI asset approval, ownership/originality review, broad manual acceptance, and production component state art are still missing.
+- The total `UI skin` gate remains below 95 and must stay `Not done`.
+
+## Result Second Rebuild Checkpoint
+
+Date: 2026-06-02
+
+Evidence:
+
+- `assets/source/ui/result_stage_components_v002.svg`
+- `assets/source/ui/result_stage_components_v002.md`
+- `tmp/ui-quality/result-1920-debugless-v5.png`
+- `tmp/ui-quality/result-1280-debugless-v5.png`
+- `tmp/ui-quality/result-defeat-1920-debugless-v5.png`
+- `tmp/ui-quality/result-clear-1920-debugless-v5.png`
+- `tmp/ui-quality/result-release-clear-1920-debugless-v5.png`
+- `npx.cmd tsc --noEmit`
+- `npm.cmd run phaser:smoke`
+- `npm.cmd run check`
+- `npm.cmd run data:validate`
+- `npm.cmd run quality:audit:report`
+- `npm.cmd run assets:audit`
+- `npm.cmd run assets:audit:release-visuals`
+- `git diff --check`
+
+Current status: `Not done`
+
+Result score after second rebuild: 86/100
+
+| Area | Score | Reason |
+| --- | ---: | --- |
+| Concept/source pipeline evidence | 14/15 | v002 source evidence maps progress, route composition, next record, collection delta, and preservation summary to the runtime Result screen. This is still candidate source evidence, not final approved production art. |
+| Art bible fidelity | 12/15 | The curtain-call certificate keeps the paper-theater direction and now avoids the rejected top-ribbon collision. Final result-state art, animation, ending treatment, and production paper depth remain unfinished. |
+| Screen composition and game feel | 13/15 | Result now communicates outcome, route progress, next action, saved clear count, deck delta, and preserved collection state. It still does not provide ending cinematics, achievements, long-term progression recap, or final consequence animation. |
+| Component craft and states | 13/15 | The progress ticket, lower next-record row, return ledger, seal, collection rows, and `마을로` action have clearer state roles than v001. Final hover/down state art and bespoke result-state decorations remain candidate-level. |
+| Gameplay readability and hierarchy | 13/15 | v5 debug-less neutral 1920/1280, defeat, slice-clear, and release-clear screenshots show no accepted text/panel overlap after rejecting v2/v3/v4. The 1280 layout remains compact and only acceptable as progress evidence. |
+| Coverage and consistency | 10/10 | All primary screens have source-backed scoring, and Result now has a second pass with state-driven run-recap evidence. |
+| Technical/runtime integration | 10/10 | Typecheck, smoke, check, data validation, quality report, asset audits, release visual audit, and diff check passed after this pass. The Vite large chunk warning remains tracked under Performance, not this row. |
+| Manual acceptance evidence | 1/5 | Internal screenshot review rejected v2, v3, and v4 before accepting v5 as progress evidence only. User acceptance is absent, so this cannot become a final UI completion candidate. |
+
+Main remaining blockers after the Result second rebuild:
+
+- Result is an 86-point internal progress candidate, not a 95-point UI completion candidate and not user-accepted final UI.
+- The pass proves run-recap readability only; it does not complete ending cinematics, achievement surfacing, long-term progression recap, balance, or final result-state art.
+- Boss and Settings are now the weakest current primary UI scores at 84/100.
+- Reward/Event/Combat/Boss/Town/WorldMap/Dungeon/RuneBench/Result/Settings still use candidate source art, not final production-approved UI art.
+- Responsive presentation beyond the verified 1920 and 1280 captures still needs a deliberate pass.
+- Final UI asset approval, ownership/originality review, broad manual acceptance, and production component state art are still missing.
+- The total `UI skin` gate remains below 95 and must stay `Not done`.
+
+## Settings First Rebuild Checkpoint
+
+Date: 2026-06-02
+
+Evidence:
+
+- `assets/source/ui/settings_stage_components_v001.svg`
+- `assets/source/ui/settings_stage_components_v001.md`
+- `tmp/ui-quality/settings-1920-debugless-v1.png`
+- `tmp/ui-quality/settings-1280-debugless-v1.png`
+- `tmp/ui-quality/settings-release-1920-debugless-v1.png`
+- `tmp/ui-quality/settings-high-contrast-1920-debugless-v1.png`
+- `tmp/ui-quality/settings-1920-debugless-v2.png`
+- `tmp/ui-quality/settings-1280-debugless-v2.png`
+- `tmp/ui-quality/settings-release-1920-debugless-v2.png`
+- `tmp/ui-quality/settings-high-contrast-1920-debugless-v2.png`
+- `npx.cmd tsc --noEmit`
+- `npm.cmd run phaser:smoke`
+- `npm.cmd run check`
+- `npm.cmd run data:validate`
+- `npm.cmd run quality:audit:report`
+- `npm.cmd run assets:audit`
+- `npm.cmd run assets:audit:release-visuals`
+- `git diff --check`
+
+Current status: `Not done`
+
+Settings score after first rebuild: 84/100
+
+| Area | Score | Reason |
+| --- | ---: | --- |
+| Concept/source pipeline evidence | 13/15 | Settings now has dedicated source evidence and the runtime screen maps to the title ribbon, hanging tags, save stamp, audio ledger, display/control ledger, tooltip, and bottom action rail. This is still candidate source evidence, not final approved production art. |
+| Art bible fidelity | 12/15 | The screen reads more like an in-world paper ledger with pins, hanging tags, stitched rows, and paper panels. Final settings iconography, state art, and accessibility-specific visual polish remain unfinished. |
+| Screen composition and game feel | 12/15 | Settings no longer reads as only a standard shell with controls; it separates saved state, audio, display/accessibility, controls, and reset/return actions. It is still a functional options panel, not a rich in-world menu with final sound/control UX. |
+| Component craft and states | 12/15 | Slotted rows, secondary plus/minus buttons, toggle buttons, tooltip, and bottom actions use the shared paper material system. The v1 oversized labels were corrected in v2, but final component state art remains candidate-level. |
+| Gameplay readability and hierarchy | 13/15 | Debug-less 1920, 1280, release, and high-contrast screenshots plus smoke show readable labels, values, reset actions, return action, and preserved click coordinates. The 1280 layout remains compact and only acceptable as progress evidence. |
+| Coverage and consistency | 10/10 | Reward/Event/Combat/Boss/Town/WorldMap/Dungeon/RuneBench/Result/Settings now all have first-pass source-backed paper-stage scoring evidence. |
+| Technical/runtime integration | 10/10 | Typecheck, smoke, check, data validation, quality report, asset audits, release visual audit, and diff check passed after this pass. The Vite large chunk warning remains tracked under Performance, not this row. |
+| Manual acceptance evidence | 2/5 | Internal screenshot review found and corrected v1 typography crowding, but user acceptance is absent and this is not final UI approval. |
+
+Main remaining blockers after the Settings first rebuild:
+
+- Settings is an 84-point internal progress candidate, not a 95-point UI completion candidate and not user-accepted final UI.
+- All primary screens now have first-pass source-backed scoring, but the total UI skin gate is still below the 95-point completion rule.
+- Settings visual polish does not complete music/SFX assets, sound licensing, full key remapping, or final accessibility acceptance.
+- Reward/Event/Combat/Boss/Town/WorldMap/Dungeon/RuneBench/Result/Settings still use candidate source art, not final production-approved UI art.
+- Responsive presentation beyond the verified 1920 and 1280 captures still needs a deliberate pass.
+- Final UI asset approval, ownership/originality review, broad manual acceptance, and production component state art are still missing.
+- The total `UI skin` gate remains below 95 and must stay `Not done`.
+
+## Immediate Target
+
+The next UI work must keep raising the full primary-screen set before any UI completion claim:
+
+1. Raise the weakest remaining UI screens, starting with Boss and Settings at 84/100, from low-80s candidates toward the 95 total UI gate without treating them as final.
+2. Add final production component-state art and source evidence where candidate source sheets are still too thin.
+3. Solve the narrow browser/responsive presentation problem without hiding gameplay information.
+4. Verify with debug-less screenshots and score again before touching the checklist state.
+
+## Combat Raster Concept-Match Checkpoint
+
+Date: 2026-06-04
+
+Evidence:
+
+- `assets/concepts/ui/combat_multi_enemy_ui_concept_v001.png`
+- `assets/source/ui/combat_raster_underlay_concept_v001.png`
+- `assets/source/characters/char_mina_pagehand_sprite_raster_v001.png`
+- `assets/source/monsters/monster_folded_sentry_sprite_raster_v001.png`
+- `assets/source/cards/card_art_sun_jab_raster_v001.png`
+- `assets/source/cards/card_art_fold_guard_raster_v001.png`
+- `assets/source/cards/card_art_page_step_raster_v001.png`
+- `tmp/ui-quality/combat-raster-underlay-v2-1920.png`
+- `tmp/ui-quality/combat-raster-underlay-v3-1920.png`
+- `tmp/ui-quality/combat-raster-underlay-v4-cards-1920.png`
+- `tmp/ui-quality/combat-raster-underlay-v6-panel-1920.png`
+- `tmp/ui-quality/combat-raster-underlay-v6-panel-1280.png`
+- `npm.cmd run assets:generate:dev`
+- `npm.cmd run assets:audit`
+- `npm.cmd run check`
+- `npm.cmd run phaser:smoke`
+- `git diff --check`
+
+Current status: `Needs user review`
+
+Completion level: `Partially complete`
+
+This checkpoint specifically addresses the user's rejection of vector/procedural-looking Combat visuals after the concept-art target was chosen. The Combat first view now uses a raster underlay, raster player/enemy standees, and raster art for the visible starter cards instead of relying on the earlier procedural placeholder look. v2 found green chroma remnants in the folded sentry sprite, v3 removed them, v4 replaced the starter-card placeholder art, and v6 cleaned the enemy panel text placement.
+
+This is stronger concept-art fidelity evidence than the previous concept reset, but it is not a final UI-skin completion candidate. User acceptance is still absent, full multi-enemy combat logic is still not proven, only the visible starter-card art has been raster-upgraded, and the rest of the primary screens still need the same raster/source-art scrutiny before any 95-point or release-ready UI claim.
+
+## Boss Raster Concept-Match Checkpoint
+
+Date: 2026-06-04
+
+Evidence:
+
+- `assets/concepts/ui/boss_combat_ui_concept_v001.png`
+- `assets/source/ui/boss_raster_underlay_concept_v001.png`
+- `public/assets/runtime/ui/boss_raster_underlay_concept_v001.png`
+- `tmp/ui-quality/boss-current-before-raster-1920.png`
+- `tmp/ui-quality/boss-raster-underlay-v1-1920.png`
+- `tmp/ui-quality/boss-raster-underlay-v2-1920.png`
+- `tmp/ui-quality/boss-raster-underlay-v3-1920.png`
+- `tmp/ui-quality/boss-raster-underlay-v4-1920.png`
+- `tmp/ui-quality/boss-raster-underlay-v4-1280.png`
+- `npm.cmd run assets:generate:dev`
+- `npm.cmd run check`
+- `npm.cmd run phaser:smoke`
+- `npx.cmd tsc --noEmit`
+- `git diff --check`
+
+Current status: `Needs user review`
+
+Completion level: `Partially complete`
+
+This checkpoint extends the raster concept-match correction from normal Combat to Boss. Boss no longer presents the rejected procedural/vector shell in the first view when the raster underlay is available. The runtime overlays now sit on top of `boss_raster_underlay_concept`, the default duplicate card-art overlay was removed for Boss, and the End Turn control was moved to a lower-right visual control area with updated smoke coverage.
+
+This is progress toward the active concept-art quality goal, not completion. Boss state overlays remain candidate-level, Boss-specific card text is intentionally minimal, final boss animation/state art is not done, and user acceptance is still missing. Other primary screens still need the same raster/source-art scrutiny before any broad UI completion claim.
+
+## Reward Raster Concept-Match Checkpoint
+
+Date: 2026-06-04
+
+Evidence:
+
+- `assets/concepts/ui/reward_ui_concept_v001.png`
+- `assets/source/ui/reward_raster_underlay_concept_v001.png`
+- `public/assets/runtime/ui/reward_raster_underlay_concept_v001.png`
+- `tmp/ui-quality/reward-raster-underlay-v1-1920.png`
+- `tmp/ui-quality/reward-raster-underlay-v1-1280.png`
+- `tmp/ui-quality/reward-raster-underlay-v2-1920.png`
+- `tmp/ui-quality/reward-raster-underlay-v2-1280.png`
+- `tmp/ui-quality/reward-raster-underlay-v3-1920.png`
+- `tmp/ui-quality/reward-raster-underlay-v3-1280.png`
+- `npm.cmd run assets:generate:dev`
+- source/runtime SHA256 hash match for `reward_raster_underlay_concept_v001.png`
+- `npx.cmd tsc --noEmit`
+- `npm.cmd run check`
+- `npm.cmd run phaser:smoke`
+- `git diff --check`
+
+Current status: `Needs user review`
+
+Completion level: `Partially complete`
+
+This checkpoint extends the raster concept-match correction to Reward. Reward no longer presents the rejected procedural/vector-like reward shell when the raster underlay is available. The runtime now uses `reward_raster_underlay_concept`, keeps overlays minimal, places choice labels on the concept card frames, preserves clickable reward/confirm targets, and moves guidance copy into the intended right-side panel area.
+
+This is progress toward the active concept-art quality goal, not completion. Reward overlays are still candidate-level, the fourth concept card frame is not yet used by the current three-offer reward data, final reward animation/state art is not done, and user acceptance is still missing. Event, Town, WorldMap, Dungeon, RuneBench, Result, Settings, and remaining card/component art still need the same raster/source-art scrutiny before any broad UI completion claim.
+
+## Event Raster Concept-Match Checkpoint
+
+Date: 2026-06-04
+
+Evidence:
+
+- `assets/concepts/ui/event_ui_concept_v001.png`
+- `assets/source/ui/event_raster_underlay_concept_v001.png`
+- `public/assets/runtime/ui/event_raster_underlay_concept_v001.png`
+- `tmp/ui-quality/event-raster-underlay-v1-1920.png`
+- `tmp/ui-quality/event-raster-underlay-v2-1920.png`
+- `tmp/ui-quality/event-raster-underlay-v3-1920.png`
+- `tmp/ui-quality/event-raster-underlay-v4-1920.png`
+- `tmp/ui-quality/event-raster-underlay-v5-1920.png`
+- `tmp/ui-quality/event-raster-underlay-v5-1280.png`
+- `tmp/ui-quality/event-raster-underlay-release-v1-1920.png`
+- `tmp/ui-quality/event-raster-underlay-release-v3-1920.png`
+- `npm.cmd run assets:generate:dev`
+- source/runtime SHA256 hash match for `event_raster_underlay_concept_v001.png`
+- `npx.cmd tsc --noEmit`
+- `npm.cmd run check`
+- `npm.cmd run phaser:smoke`
+
+Current status: `Needs user review`
+
+Completion level: `Partially complete`
+
+This checkpoint extends the raster concept-match correction to Event. Event no longer presents the rejected procedural/vector-like event shell when the raster underlay is available. The slice runtime uses `event_raster_underlay_concept`, keeps overlays minimal, places choice labels and descriptions on the concept card frames, keeps cost/result details in the right record panel, and preserves clickable choice targets with hover/down feedback.
+
+This checkpoint also fixes a mode-specific mismatch: release Event initially still used the procedural fallback because release mode did not load the shared UI raster underlays. `releaseCatalogAdapter` now adds the shared Combat/Boss/Reward/Event raster UI assets to the release runtime bundle, and `tmp/ui-quality/event-raster-underlay-release-v3-1920.png` verifies the release Event raster path.
+
+This is progress toward the active concept-art quality goal, not completion. Event overlays are still candidate-level, final event animation/state art is not done, the left status panel is currently relying on concept artwork rather than dynamic numeric labels, and user acceptance is still missing. Town, WorldMap, Dungeon, RuneBench, Result, Settings, and remaining card/component art still need the same raster/source-art scrutiny before any broad UI completion claim.
+
+## Town Raster Concept-Match Checkpoint
+
+Date: 2026-06-04
+
+Evidence:
+
+- `assets/concepts/ui/town_ui_concept_v001.png`
+- `assets/source/ui/town_raster_underlay_concept_v001.png`
+- `public/assets/runtime/ui/town_raster_underlay_concept_v001.png`
+- `tmp/ui-quality/town-raster-underlay-v1-1920.png`
+- `tmp/ui-quality/town-raster-underlay-v1-1280.png`
+- `tmp/ui-quality/town-raster-underlay-release-v1-1920.png`
+- `tmp/ui-quality/town-raster-underlay-v2-1920.png`
+- `tmp/ui-quality/town-raster-underlay-v2-1280.png`
+- `tmp/ui-quality/town-raster-underlay-release-v2-1920.png`
+- `npm.cmd run assets:generate:dev`
+- source/runtime SHA256 hash match for `town_raster_underlay_concept_v001.png`
+- `npx.cmd tsc --noEmit`
+- `npm.cmd run check`
+- `npm.cmd run phaser:smoke`
+
+Current status: `Needs user review`
+
+Completion level: `Partially complete`
+
+This checkpoint extends the raster concept-match correction to Town. Town no longer presents the rejected procedural/vector-like village shell when the raster underlay is available. The slice and release runtime bundles load `town_raster_underlay_concept`, the central town art is preserved, and runtime text is limited to side-panel character/stage information. Existing smoke-covered start/reset/settings coordinates remain clickable through transparent hit targets, with additional concept-toolbar affordances for settings/reset.
+
+This is progress toward the active concept-art quality goal, not completion. Town overlays are still candidate-level, final hub UX labels and icon semantics are not resolved, the central concept buildings are not yet individually interactive, and user acceptance is still missing. WorldMap, Dungeon, RuneBench, Result, Settings, and remaining card/component art still need the same raster/source-art scrutiny before any broad UI completion claim.
+
+## WorldMap Raster Concept-Match Checkpoint
+
+Date: 2026-06-04
+
+Evidence:
+
+- `assets/concepts/ui/world_map_ui_concept_v001.png`
+- `assets/source/ui/world_map_raster_underlay_concept_v001.png`
+- `public/assets/runtime/ui/world_map_raster_underlay_concept_v001.png`
+- `tmp/ui-quality/world-map-raster-underlay-v1-1920.png`
+- `tmp/ui-quality/world-map-raster-underlay-v2-1920.png`
+- `tmp/ui-quality/world-map-raster-underlay-v3-1920.png`
+- `tmp/ui-quality/world-map-raster-underlay-v5-1280.png`
+- `tmp/ui-quality/world-map-raster-underlay-release-v5-1920.png`
+- `tmp/ui-quality/world-map-raster-underlay-v6-node-hit-1280.png`
+- `tmp/ui-quality/world-map-raster-underlay-release-v6-node-hit-1920.png`
+- `npm.cmd run assets:generate:dev`
+- `npm.cmd run check`
+- `npm.cmd run phaser:smoke`
+- `git diff --check`
+
+Current status: `Needs user review`
+
+Completion level: `Partially complete`
+
+This checkpoint extends the raster concept-match correction to WorldMap. WorldMap no longer presents the rejected procedural/vector-like unfolded map shell when the raster underlay is available. The slice and release runtime bundles load `world_map_raster_underlay_concept`, and the visible screen is now the concept art itself rather than a code-drawn map UI.
+
+The first raster passes still overlaid runtime text on the portrait and right ledger, so those labels were removed. To preserve gameplay function without reintroducing procedural UI, unlocked stage selection was remapped to invisible hit targets over the concept map's numbered nodes. `phaser:smoke` now clears `stage_sunny_gate`, verifies `stage_lavender_hall` is unlocked, clicks node 2 at `808,756`, and verifies `flow:stage_select:stage_lavender_hall`.
+
+This is progress toward the active concept-art quality goal, not completion. WorldMap is visually much closer to the concept target, but final map UX labels, selected/unlocked state animation, accessibility affordances, and user acceptance are still missing. The current raster path also relies on the concept image for most readable information, so a later safe text/tooltip pass may be needed without compromising the artwork.
+
+## Dungeon Raster Concept-Match Checkpoint
+
+Date: 2026-06-04
+
+Evidence:
+
+- `assets/concepts/ui/dungeon_ui_concept_v001.png`
+- `assets/source/ui/dungeon_raster_underlay_concept_v001.png`
+- `public/assets/runtime/ui/dungeon_raster_underlay_concept_v001.png`
+- `tmp/ui-quality/dungeon-raster-underlay-v1-1920.png`
+- `tmp/ui-quality/dungeon-raster-underlay-v1-1280.png`
+- `tmp/ui-quality/dungeon-raster-underlay-release-v1-1920.png`
+- `tmp/ui-quality/dungeon-raster-underlay-v2-1920.png`
+- `tmp/ui-quality/dungeon-raster-underlay-v2-1280.png`
+- `tmp/ui-quality/dungeon-raster-underlay-release-v2-1920.png`
+- `tmp/ui-quality/dungeon-raster-underlay-v3-1920.png`
+- `tmp/ui-quality/dungeon-raster-underlay-release-v3-1920.png`
+- `npm.cmd run assets:generate:dev`
+- `npm.cmd run check`
+- `npm.cmd run phaser:smoke`
+- `git diff --check`
+
+Current status: `Needs user review`
+
+Completion level: `Partially complete`
+
+This checkpoint extends the raster concept-match correction to Dungeon. Dungeon no longer presents the rejected procedural/vector-like dungeon shell when the raster underlay is available. The slice and release runtime bundles load `dungeon_raster_underlay_concept`, and the visible screen uses the full concept art with transparent confirm hit targets.
+
+The first Dungeon raster pass pasted runtime labels over the left ledger, central doors, and right route panel. That made the concept image feel like a background under a debug overlay, so the latest pass removed those labels and kept the concept art clean. `phaser:smoke` was updated to allow this intentional raster-only textless scene only when the matching underlay is present and visible.
+
+This is progress toward the active concept-art quality goal, not completion. Dungeon's first-view art now matches the concept target more closely, but final state communication, route selection semantics, safe tooltip/text zones, animation, accessibility affordances, and user acceptance are still missing.
+
+## RuneBench Raster Concept-Match Checkpoint
+
+Date: 2026-06-04
+
+Evidence:
+
+- `assets/concepts/ui/rune_bench_ui_concept_v001.png`
+- `assets/source/ui/rune_bench_raster_underlay_concept_v001.png`
+- `public/assets/runtime/ui/rune_bench_raster_underlay_concept_v001.png`
+- `tmp/ui-quality/rune-bench-raster-underlay-v1-1920.png`
+- `tmp/ui-quality/rune-bench-raster-underlay-v1-1280.png`
+- `tmp/ui-quality/rune-bench-raster-underlay-release-v1-1920.png`
+- `npm.cmd run assets:generate:dev`
+- source/runtime SHA256 hash match for `rune_bench_raster_underlay_concept_v001.png`
+- `npm.cmd run check`
+- `npm.cmd run phaser:smoke`
+- `git diff --check`
+
+Current status: `Needs user review`
+
+Completion level: `Partially complete`
+
+This checkpoint extends the raster concept-match correction to RuneBench. RuneBench no longer presents the rejected procedural/vector-like workbench shell when the raster underlay is available. The slice and release runtime bundles load `rune_bench_raster_underlay_concept`, and the visible screen uses the full concept art with transparent equip hit targets.
+
+The previous RuneBench rebuild improved function and text readability, but under the user's current standard it still looked like a code-drawn UI rather than the selected concept art. This pass replaces the visible workbench with the raster concept target and updates the smoke text audit so the scene can be intentionally textless only when the matching underlay is present.
+
+This is progress toward the active concept-art quality goal, not completion. RuneBench's first-view art now matches the concept target more closely, but final state communication, rune selection semantics, safe tooltip/text zones, animation, accessibility affordances, and user acceptance are still missing.
+
+## Result Raster Concept-Match Checkpoint
+
+Date: 2026-06-04
+
+Evidence:
+
+- `assets/concepts/ui/result_ui_concept_v001.png`
+- `assets/source/ui/result_raster_underlay_concept_v001.png`
+- `public/assets/runtime/ui/result_raster_underlay_concept_v001.png`
+- `tmp/ui-quality/result-raster-underlay-v1-1920.png`
+- `tmp/ui-quality/result-raster-underlay-v1-1280.png`
+- `tmp/ui-quality/result-raster-underlay-release-v1-1920.png`
+- `npm.cmd run assets:generate:dev`
+- source/runtime SHA256 hash match for `result_raster_underlay_concept_v001.png`
+- `npm.cmd run check`
+- `npm.cmd run phaser:smoke`
+- `git diff --check`
+
+Current status: `Needs user review`
+
+Completion level: `Partially complete`
+
+This checkpoint extends the raster concept-match correction to Result. Result no longer presents the rejected procedural/vector-like certificate shell when the raster underlay is available. The slice and release runtime bundles load `result_raster_underlay_concept`, and the visible screen uses the full concept art with transparent return hit targets.
+
+The previous Result rebuild improved run-recap readability, but under the user's current standard it still looked like a code-drawn UI rather than the selected concept art. This pass replaces the visible Result surface with the raster concept target and updates the smoke text audit so the scene can be intentionally textless only when the matching underlay is present.
+
+This is progress toward the active concept-art quality goal, not completion. Result's first-view art now matches the concept target more closely, but final clear/defeat state communication, safe dynamic recap zones, animation, accessibility affordances, and user acceptance are still missing.
+
+## Settings Raster Concept-Match Checkpoint
+
+Date: 2026-06-04
+
+Evidence:
+
+- `assets/concepts/ui/settings_ui_concept_v001.png`
+- `assets/source/ui/settings_raster_underlay_concept_v001.png`
+- `public/assets/runtime/ui/settings_raster_underlay_concept_v001.png`
+- `tmp/ui-quality/settings-raster-underlay-v1-1920.png`
+- `tmp/ui-quality/settings-raster-underlay-v1-1280.png`
+- `tmp/ui-quality/settings-raster-underlay-release-v1-1920.png`
+- `npm.cmd run assets:generate:dev`
+- source/runtime SHA256 hash match for `settings_raster_underlay_concept_v001.png`
+- `npm.cmd run check`
+- `npm.cmd run phaser:smoke`
+- `git diff --check`
+
+Current status: `Needs user review`
+
+Completion level: `Partially complete`
+
+This checkpoint extends the raster concept-match correction to Settings. Settings no longer presents the rejected procedural/vector-like options shell when the raster underlay is available. The slice and release runtime bundles load `settings_raster_underlay_concept`, and the visible screen uses the full concept art with transparent settings hit targets.
+
+Settings is more control-heavy than the other raster-only screens, so this pass preserves the smoke-covered volume, display/accessibility toggle, reset, save-reset, and return controls with invisible hit targets. `npm.cmd run check` initially caught a native-size mismatch because the Settings concept is `1677x938`; the manifests now record that actual size.
+
+This is progress toward the active concept-art quality goal, not completion. Settings's first-view art now matches the concept target more closely, but final dynamic labels, accessibility/readability acceptance, safe tooltip zones, final state art, and user acceptance are still missing.
+
+## Combat Full Concept Raster Recheck
+
+Date: 2026-06-04
+
+Evidence:
+
+- `assets/concepts/ui/combat_ui_concept_v001.png`
+- `assets/source/ui/combat_raster_underlay_concept_v001.png`
+- `public/assets/runtime/ui/combat_raster_underlay_concept_v001.png`
+- SHA256 concept/source/runtime hash match for `combat_raster_underlay_concept_v001.png`
+- `tmp/ui-quality/combat-release-raster-clean-v1-1920.png`
+- `tmp/ui-quality/combat-release-full-concept-v2-1920.png`
+- `tmp/phaser-release-catalog-combat.png`
+- `npm.cmd run check`
+- `npm.cmd run phaser:smoke`
+- `git diff --check`
+
+Current status: `Needs user review`
+
+Completion level: `Partially complete`
+
+This checkpoint corrects the user's direct complaint that Combat still looked vector/procedural after the concept-art pass. The release Combat screen was loading a raster underlay, but runtime placeholder standees, card art, icons, text, and temporary effects were still drawn over it. The runtime underlay was also a clean empty UI template rather than the full approved Combat concept image.
+
+The Combat runtime/source underlay now matches the actual full Combat concept art. In raster mode, `CombatScene` renders the concept image as the visible UI and keeps only transparent hit targets for the card slots and end-turn button. Placeholder standees, runtime card art/text/icon overlays, dynamic raster-mode text, and placeholder combat effects are not drawn over the concept art.
+
+This is progress toward the active concept-art quality goal, not completion. Combat now better matches the selected concept screenshot, but dynamic state communication, combat animation/effect art, accessibility/readability, and user acceptance still need later passes that do not reintroduce procedural-looking overlays.
+
+## Boss Full Concept Raster Recheck
+
+Date: 2026-06-04
+
+Evidence:
+
+- `assets/concepts/ui/boss_combat_ui_concept_v001.png`
+- `assets/source/ui/boss_raster_underlay_concept_v001.png`
+- `public/assets/runtime/ui/boss_raster_underlay_concept_v001.png`
+- SHA256 concept/source/runtime hash match for `boss_raster_underlay_concept_v001.png`
+- `tmp/ui-quality/boss-raster-clean-v1-1920.png`
+- `tmp/phaser-1920-BossScene.png`
+- `npm.cmd run check`
+- `npm.cmd run phaser:smoke`
+- `git diff --check`
+
+Current status: `Needs user review`
+
+Completion level: `Partially complete`
+
+This checkpoint applies the same correction to Boss. The Boss raster asset itself already matched the full concept art, but the runtime screen still drew dynamic text, card labels, and a visible end-turn control over the concept. That made the screen look like a mixed procedural overlay rather than a clean concept-art UI.
+
+`BossScene` now uses an underlay-only raster path when `boss_raster_underlay_concept` is present. It preserves card and end-turn input with transparent hit targets, while the visible screen remains the concept image. The old Boss raster text helpers and the procedural fallback remain in the file for fallback paths, but they are not used for the concept-underlay path.
+
+This is progress toward the active concept-art quality goal, not completion. Boss now better matches the selected concept screenshot, but dynamic boss state communication, phase feedback, combat animation/effect art, accessibility/readability, and user acceptance still need later passes that do not reintroduce procedural-looking overlays.
+
+## Reward/Event/Town Textless Raster Recheck
+
+Date: 2026-06-04
+
+Evidence:
+
+- `assets/concepts/ui/reward_ui_concept_v001.png`
+- `assets/source/ui/reward_raster_underlay_concept_v001.png`
+- `public/assets/runtime/ui/reward_raster_underlay_concept_v001.png`
+- `tmp/ui-quality/reward-raster-textless-v1-1920.png`
+- `assets/concepts/ui/event_ui_concept_v001.png`
+- `assets/source/ui/event_raster_underlay_concept_v001.png`
+- `public/assets/runtime/ui/event_raster_underlay_concept_v001.png`
+- `tmp/ui-quality/event-raster-textless-v1-1920.png`
+- `assets/concepts/ui/town_ui_concept_v001.png`
+- `assets/source/ui/town_raster_underlay_concept_v001.png`
+- `public/assets/runtime/ui/town_raster_underlay_concept_v001.png`
+- `tmp/ui-quality/town-raster-textless-v1-1920.png`
+- browser audit: Reward/Event/Town each had `hasUnderlay=true`, `textCount=0`, and `visibleRectsAboveUnderlay=0`
+- `npm.cmd run check`
+- `node tmp/run-phaser-smoke-with-vite.mjs` -> `Phaser smoke OK`
+- `git diff --check`
+
+Current status: `Needs user review`
+
+Completion level: `Partially complete`
+
+This checkpoint corrects the softer version of the same issue found in Combat and Boss. Reward, Event, and Town already loaded their full raster concept underlays, but the runtime still drew Phaser text over the concept panels. Under the user's current standard, that still reads as a procedural/vector-like overlay layer.
+
+Reward, Event, and Town now render their concept art as the visible first-view UI in raster mode. Card choices, event choices, town start/reset/settings controls, and existing smoke-covered behavior are preserved with transparent hit targets and hover/down feedback. The procedural/text renderers remain only as fallback paths when the raster underlay is unavailable.
+
+This is progress toward the active concept-art quality goal, not completion. These screens now better match the selected concept screenshots, but final dynamic state communication, safe text/tooltips, accessibility affordances, animation, and user acceptance still need later passes that do not reintroduce pasted procedural UI.
+
+## Raster Hover No-Vector Recheck
+
+Date: 2026-06-04
+
+Evidence:
+
+- `src/phaser/view/sceneShell.ts`
+- `src/phaser/scenes/CombatScene.ts`
+- `src/phaser/scenes/BossScene.ts`
+- `src/phaser/scenes/RewardScene.ts`
+- `src/phaser/scenes/EventScene.ts`
+- `src/phaser/scenes/TownScene.ts`
+- `src/phaser/scenes/WorldMapScene.ts`
+- `src/phaser/scenes/DungeonScene.ts`
+- `src/phaser/scenes/RuneBenchScene.ts`
+- `src/phaser/scenes/ResultScene.ts`
+- `src/phaser/scenes/SettingsScene.ts`
+- `tools/phaser-smoke-test.mjs`
+- hover audit screenshots under `tmp/ui-quality/*-hover-no-vector-v1-1920.png`
+- hover audit: Town, WorldMap, Dungeon, Combat, Reward, Event, RuneBench, Boss, Result, and Settings each had `hasUnderlay=true`, `textCount=0`, and `visibleRectsAboveUnderlay=0` after pointer hover
+- `npm.cmd run check`
+- `node tmp/run-phaser-smoke-with-vite.mjs` -> `Phaser smoke OK`
+- `git diff --check`
+
+Current status: `Needs user review`
+
+Completion level: `Partially complete`
+
+This checkpoint extends the no-vector-overlay correction from idle screenshots into interaction states. Before this pass, raster hit targets could still draw Phaser rectangle strokes and tints on hover/down. That made the screens vulnerable to the same visual mismatch the user rejected, even though the resting screenshots were clean.
+
+The raster concept paths now use transparent hit targets that do not draw hover/down rectangles over the concept image. Smoke was changed to guard this direction: representative raster controls must keep the canvas stable on hover while click/state assertions continue to prove that the controls work.
+
+This is progress toward the active concept-art quality goal, not completion. The current interaction state is intentionally invisible rather than final. A later pass still needs approved raster-quality hover, selected, disabled, and focus state art that matches the concept style without reintroducing procedural overlays.
+
+## Combat Raster Hover-State Art Checkpoint
+
+Date: 2026-06-04
+
+Evidence:
+
+- `assets/concepts/ui/ui_component_sheet_concept_v001.png`
+- `assets/source/ui/ui_hover_gold_seal_concept_v001.png`
+- `public/assets/runtime/ui/ui_hover_gold_seal_concept_v001.png`
+- `tools/extract-ui-state-assets.mjs`
+- `tools/generate-dev-runtime-assets.mjs`
+- `src/phaser/view/sceneShell.ts`
+- `src/phaser/scenes/CombatScene.ts`
+- `tools/phaser-smoke-test.mjs`
+- `tmp/ui-quality/combat-raster-card-hover-state-v1-1920.png`
+- `tmp/ui-quality/combat-raster-end-turn-hover-state-v1-1920.png`
+- targeted audit: `hasUnderlay=true`, `textCount=0`, `visibleRectsAboveUnderlay=0`, `visibleHoverImages=1`
+- 10-screen hover audit: Town, WorldMap, Dungeon, Combat, Reward, Event, RuneBench, Boss, Result, and Settings each had `hasUnderlay=true`, `textCount=0`, and `visibleRectsAboveUnderlay=0`
+- `npm.cmd run check`
+- `node tmp/run-phaser-smoke-with-vite.mjs` -> `Phaser smoke OK`
+- `git diff --check`
+
+Current status: `Needs user review`
+
+Completion level: `Partially complete`
+
+This checkpoint starts replacing the temporary invisible raster interaction state with actual bitmap state art. Combat card slots and the visible bottom-right end-turn button now reveal a gold seal texture extracted from the approved component sheet. The state feedback is an image asset, not a Phaser rectangle stroke/tint or a text overlay.
+
+The end-turn target was also moved onto the visible crossed-swords concept button rather than the old procedural right-panel coordinate. This matters because transparent hit targets must match the concept art, not only preserve legacy test coordinates.
+
+This is progress toward the active concept-art quality goal, not completion. Only Combat has this first bitmap hover-state pass. Boss, Reward, Event, Town, WorldMap, Dungeon, RuneBench, Result, Settings, disabled states, selected states, keyboard focus states, and dynamic readability still need matching-quality raster-state or safe-zone passes.
+
+## Boss Raster Hover-State Art Checkpoint
+
+Date: 2026-06-04
+
+Evidence:
+
+- `assets/concepts/ui/ui_component_sheet_concept_v001.png`
+- `assets/source/ui/ui_hover_boss_skull_stamp_concept_v001.png`
+- `public/assets/runtime/ui/ui_hover_boss_skull_stamp_concept_v001.png`
+- `tools/extract-ui-state-assets.mjs`
+- `tools/generate-dev-runtime-assets.mjs`
+- `src/phaser/view/sceneShell.ts`
+- `src/phaser/scenes/BossScene.ts`
+- `tools/phaser-smoke-test.mjs`
+- `tmp/ui-quality/boss-raster-card-hover-state-v1-1920.png`
+- `tmp/ui-quality/boss-raster-end-turn-hover-state-v1-1920.png`
+- targeted Boss audit: `hasUnderlay=true`, `textCount=0`, `visibleRectsAboveUnderlay=0`, `visibleHoverImages=1`
+- 10-screen hover audit: Town, WorldMap, Dungeon, Combat, Reward, Event, RuneBench, Boss, Result, and Settings each had `hasUnderlay=true`, `textCount=0`, and `visibleRectsAboveUnderlay=0`
+- `node tmp/run-phaser-smoke-with-vite.mjs` -> `Phaser smoke OK`
+- `npm.cmd run check`
+- `git diff --check`
+
+Current status: `Needs user review`
+
+Completion level: `Partially complete`
+
+This checkpoint extends bitmap hover-state art to Boss. Boss card slots and the visible bottom-right turn button now reveal a red skull token extracted from the approved component sheet. The state feedback is a registered raster image asset, not a Phaser rectangle stroke/tint or text overlay.
+
+The first Boss hover candidate was rejected during visual comparison because it was too dark, partial, and small. It was replaced with a sharper route-node skull token from the same bitmap source, then the Boss card and turn-button positions were corrected against screenshots.
+
+This is progress toward the active concept-art quality goal, not completion. Combat and Boss now have first bitmap hover-state passes for card/end-turn style controls. Reward, Event, Town, WorldMap, Dungeon, RuneBench, Result, Settings, disabled states, selected states, keyboard focus states, dynamic readability, and accessibility-safe text/tooltips still need matching-quality raster-state or safe-zone passes.
+
+## WorldMap/Dungeon Route-Node Hover-State Art Checkpoint
+
+Date: 2026-06-04
+
+Evidence:
+
+- `assets/concepts/ui/ui_component_sheet_concept_v001.png`
+- `assets/source/ui/ui_hover_route_node_concept_v001.png`
+- `public/assets/runtime/ui/ui_hover_route_node_concept_v001.png`
+- `tools/extract-ui-state-assets.mjs`
+- `tools/generate-dev-runtime-assets.mjs`
+- `src/phaser/view/sceneShell.ts`
+- `src/phaser/scenes/WorldMapScene.ts`
+- `src/phaser/scenes/DungeonScene.ts`
+- `tools/phaser-smoke-test.mjs`
+- `tmp/ui-quality/world-map-raster-route-node-hover-state-v1-1920.png`
+- `tmp/ui-quality/dungeon-raster-route-node-hover-state-v1-1920.png`
+- targeted route-node audit: WorldMap and Dungeon each had `hasUnderlay=true`, `textCount=0`, `visibleRectsAboveUnderlay=0`, `visibleHoverImages=1`
+- 10-screen hover audit: Town, WorldMap, Dungeon, Combat, Reward, Event, RuneBench, Boss, Result, and Settings each had `hasUnderlay=true`, `textCount=0`, and `visibleRectsAboveUnderlay=0`
+- `node tmp/run-phaser-smoke-with-vite.mjs` -> `Phaser smoke OK`
+- `npm.cmd run check`
+- `git diff --check`
+
+Current status: `Needs user review`
+
+Completion level: `Partially complete`
+
+This checkpoint extends bitmap hover-state art to WorldMap and Dungeon. The new route-node token is extracted from the approved component sheet and used as a registered raster image asset, not a Phaser stroke, tint, text object, or generic shape.
+
+WorldMap stage-node feedback was adjusted after visual review. The first centered pass covered baked node information, so stage nodes now use the bitmap as a smaller corner badge while WorldMap/Dungeon confirm/progress targets use centered bitmap feedback.
+
+This is progress toward the active concept-art quality goal, not completion. Combat, Boss, WorldMap, and Dungeon now have first bitmap hover-state passes on representative controls. Reward, Event, Town, RuneBench, Result, Settings, disabled states, selected states, keyboard focus states, dynamic readability, and accessibility-safe text/tooltips still need matching-quality raster-state or safe-zone passes.
+
+## Reward/Event Choice-Badge Hover-State Art Checkpoint
+
+Date: 2026-06-04
+
+Evidence:
+
+- `assets/concepts/ui/ui_component_sheet_concept_v001.png`
+- `assets/source/ui/ui_hover_choice_badge_concept_v001.png`
+- `public/assets/runtime/ui/ui_hover_choice_badge_concept_v001.png`
+- `tools/extract-ui-state-assets.mjs`
+- `tools/generate-dev-runtime-assets.mjs`
+- `src/phaser/view/sceneShell.ts`
+- `src/phaser/scenes/RewardScene.ts`
+- `src/phaser/scenes/EventScene.ts`
+- `tools/phaser-smoke-test.mjs`
+- `tmp/ui-quality/reward-raster-choice-badge-hover-state-v1-1920.png`
+- `tmp/ui-quality/event-raster-choice-badge-hover-state-v1-1920.png`
+- targeted choice-badge audit: Reward and Event each had `hasUnderlay=true`, `textCount=0`, `visibleRectsAboveUnderlay=0`, `visibleHoverImages=1`, and successful click transitions
+- 10-screen hover audit: Town, WorldMap, Dungeon, Combat, Reward, Event, RuneBench, Boss, Result, and Settings each had `hasUnderlay=true`, `textCount=0`, and `visibleRectsAboveUnderlay=0`
+- `node tmp/run-phaser-smoke-with-vite.mjs` -> `Phaser smoke OK`
+- `npm.cmd run check`
+- `git diff --check`
+
+Current status: `Needs user review`
+
+Completion level: `Partially complete`
+
+This checkpoint extends bitmap hover-state art to Reward and Event choice cards. The choice badge is extracted from the approved component sheet and used as a registered raster image asset, not a Phaser stroke, tint, text object, or generic shape.
+
+Reward and Event placement was adjusted after visual review. The first pass either covered card art or floated too high; the current pass anchors the badge to the upper card frame/header so it reads as an added material state rather than an overlay pasted over the illustration.
+
+This is progress toward the active concept-art quality goal, not completion. Combat, Boss, WorldMap, Dungeon, Reward, and Event now have first bitmap hover-state passes on representative controls. Town, RuneBench, Result, Settings, disabled states, selected states, keyboard focus states, dynamic readability, and accessibility-safe text/tooltips still need matching-quality raster-state or safe-zone passes.
+
+## Town/RuneBench/Result/Settings Action-Seal Hover-State Art Checkpoint
+
+Date: 2026-06-04
+
+Evidence:
+
+- `assets/concepts/ui/ui_component_sheet_concept_v001.png`
+- `assets/source/ui/ui_hover_action_seal_concept_v001.png`
+- `public/assets/runtime/ui/ui_hover_action_seal_concept_v001.png`
+- `tools/extract-ui-state-assets.mjs`
+- `tools/generate-dev-runtime-assets.mjs`
+- `src/phaser/view/sceneShell.ts`
+- `src/phaser/scenes/TownScene.ts`
+- `src/phaser/scenes/RuneBenchScene.ts`
+- `src/phaser/scenes/ResultScene.ts`
+- `src/phaser/scenes/SettingsScene.ts`
+- `tools/phaser-smoke-test.mjs`
+- `tmp/ui-quality/town-raster-action-seal-hover-state-v1-1920.png`
+- `tmp/ui-quality/rune-bench-raster-action-seal-hover-state-v1-1920.png`
+- `tmp/ui-quality/result-raster-action-seal-hover-state-v1-1920.png`
+- `tmp/ui-quality/settings-raster-action-seal-hover-state-v1-1920.png`
+- targeted action-seal audit: Town, RuneBench, Result, and Settings each had `hasUnderlay=true`, `textCount=0`, `visibleRectsAboveUnderlay=0`, and `visibleHoverImages=1`
+- 10-screen hover audit: Town, WorldMap, Dungeon, Combat, Reward, Event, RuneBench, Boss, Result, and Settings each had `hasUnderlay=true`, `textCount=0`, and `visibleRectsAboveUnderlay=0`
+- screenshot review against the component-sheet material language
+- `npm.cmd run check`
+- `node tmp/run-phaser-smoke-with-vite.mjs` -> `Phaser smoke OK`
+- `git diff --check`
+
+Current status: `Needs user review`
+
+Completion level: `Partially complete`
+
+This checkpoint extends bitmap hover-state art to Town, RuneBench, Result, and Settings representative action/settings controls. The action seal is extracted from the approved component sheet and used as a registered raster image asset, not a Phaser stroke, tint, text object, or generic shape.
+
+The placement was reviewed against the captured screenshots. The current seal reads as first-pass material state feedback and does not cover the main baked concept information, but it is still a candidate state pass rather than final UI approval. Settings remains especially incomplete because the audit covers a representative control, not every control state on the settings page.
+
+This is progress toward the active concept-art quality goal, not completion. Combat, Boss, WorldMap, Dungeon, Reward, Event, Town, RuneBench, Result, and Settings now have first bitmap hover-state passes on representative controls. Disabled states, selected states, keyboard focus states, full Settings state coverage, dynamic readability, and accessibility-safe text/tooltips still need matching-quality raster-state or safe-zone passes.
+
+## Settings Full-Control Raster Hover Alignment Checkpoint
+
+Date: 2026-06-04
+
+Evidence:
+
+- `assets/concepts/ui/settings_ui_concept_v001.png`
+- `assets/concepts/ui/ui_component_sheet_concept_v001.png`
+- `assets/source/ui/ui_hover_action_seal_concept_v001.png`
+- `src/phaser/scenes/SettingsScene.ts`
+- `tools/phaser-smoke-test.mjs`
+- `tmp/settings-raster-hover-coverage-audit.mjs`
+- `tmp/ui-quality/settings-hover-coverage/volume-master-v1-1920.png`
+- `tmp/ui-quality/settings-hover-coverage/volume-music-v1-1920.png`
+- `tmp/ui-quality/settings-hover-coverage/volume-sfx-v1-1920.png`
+- `tmp/ui-quality/settings-hover-coverage/display-mode-v1-1920.png`
+- `tmp/ui-quality/settings-hover-coverage/large-text-v1-1920.png`
+- `tmp/ui-quality/settings-hover-coverage/reduced-motion-v1-1920.png`
+- `tmp/ui-quality/settings-hover-coverage/space-confirm-v1-1920.png`
+- `tmp/ui-quality/settings-hover-coverage/reset-save-v1-1920.png`
+- `tmp/ui-quality/settings-hover-coverage/reset-defaults-v1-1920.png`
+- `tmp/ui-quality/settings-hover-coverage/return-town-v1-1920.png`
+- Settings hover coverage audit: all ten targets had `hasUnderlay=true`, `textCount=0`, `visibleRectsAboveUnderlay=0`, and `visibleHoverImages=1`
+- 10-screen hover audit: Town, WorldMap, Dungeon, Combat, Reward, Event, RuneBench, Boss, Result, and Settings each had `hasUnderlay=true`, `textCount=0`, and `visibleRectsAboveUnderlay=0`
+- `node tmp/run-phaser-smoke-with-vite.mjs` -> `Phaser smoke OK`
+- `npm.cmd run check`
+- `git diff --check`
+
+Current status: `Needs user review`
+
+Completion level: `Partially complete`
+
+This checkpoint corrects Settings raster interaction alignment. The previous Settings hover pass used bitmap state art, but several coordinates still followed the old procedural Settings layout. The raster hit targets now align to the visible Settings concept controls: left-page audio sliders, right-page display/accessibility/control toggles, the skull save-reset panel, the gear settings-reset panel, and the bottom-right confirmation button.
+
+The smoke test now covers all ten major Settings hover targets, and the debugless 1920 audit captured every target with exactly one visible raster hover image and no visible Phaser text or rectangle overlay above the concept underlay.
+
+This is progress toward the active concept-art quality goal, not completion. Settings now has full current-control hover coverage, but selected states, disabled states, keyboard focus states, down-state language, dynamic readability, and accessibility-safe labels/tooltips still need matching-quality raster or safe-zone passes.
+
+## Combat/Boss Concept-Derived Raster Effect Checkpoint
+
+Date: 2026-06-04
+
+Evidence:
+
+- `assets/source/cards/card_art_sun_jab_raster_v001.png`
+- `assets/source/cards/card_art_fold_guard_raster_v001.png`
+- `assets/concepts/ui/ui_component_sheet_concept_v001.png`
+- `assets/source/effects/effect_paper_slash_concept_v001.png`
+- `assets/source/effects/effect_stage_spotlight_concept_v001.png`
+- `assets/source/effects/effect_ink_splash_concept_v001.png`
+- `assets/source/effects/release/effect_paper_slash_concept_v001.png`
+- `assets/source/effects/release/effect_stage_spotlight_concept_v001.png`
+- `assets/source/effects/release/effect_ink_splash_concept_v001.png`
+- `public/assets/runtime/effects/effect_paper_slash_v001.png`
+- `public/assets/runtime/effects/effect_stage_spotlight_v001.png`
+- `public/assets/runtime/effects/effect_ink_splash_v001.png`
+- `public/assets/runtime/release/effects/effect_paper_slash_v001.png`
+- `public/assets/runtime/release/effects/effect_stage_spotlight_v001.png`
+- `public/assets/runtime/release/effects/effect_ink_splash_v001.png`
+- `tools/extract-ui-state-assets.mjs`
+- `tools/generate-dev-runtime-assets.mjs`
+- `tools/generate-release-visual-assets.mjs`
+- `src/phaser/scenes/CombatScene.ts`
+- `src/phaser/scenes/BossScene.ts`
+- `tmp/raster-effect-concept-audit.mjs`
+- `tmp/ui-quality/effects/combat-paper-slash-v1-1920.png`
+- `tmp/ui-quality/effects/combat-ink-splash-v1-1920.png`
+- `tmp/ui-quality/effects/boss-stage-spotlight-v1-1920.png`
+- raster effect audit: Combat paper slash, Combat ink/purple mark, and Boss stage/phase effect each had `hasUnderlay=true`, `visibleEffectSprites=1`, `textCount=0`, and `visibleRectsAboveUnderlay=0`
+- 10-screen hover audit: Town, WorldMap, Dungeon, Combat, Reward, Event, RuneBench, Boss, Result, and Settings each had `hasUnderlay=true`, `textCount=0`, and `visibleRectsAboveUnderlay=0`
+- `node tmp/run-phaser-smoke-with-vite.mjs` -> `Phaser smoke OK`
+- `npm.cmd run check`
+
+Current status: `Needs user review`
+
+Completion level: `Partially complete`
+
+This checkpoint replaces the visibly flat/vector-like generated effect placeholders with concept-source-derived bitmap spritesheet candidates. Combat and Boss raster concept paths now show visible effect feedback again, but the visible objects are Phaser sprites using registered PNG textures rather than Phaser text, visible rectangles, strokes, or procedural effect shapes.
+
+Visual review found the attack effect is the strongest match because it comes directly from the `card_art_sun_jab` concept source. The purple mark effect is acceptable as a first-pass state cue after crop/mask cleanup. The Boss stage/phase effect is still candidate-level and needs a later dedicated boss VFX/phase art pass before it can be treated as final communication.
+
+This is progress toward the active concept-art quality goal, not completion. Effect timing, target-specific placement, boss phase readability, sound/VFX polish, selected/disabled/focus/down state art, dynamic labels, accessibility-safe tooltips, and user acceptance remain unfinished.
+
+## Boss/Combat Stage Effect Source Correction Checkpoint
+
+Date: 2026-06-05
+
+Evidence:
+
+- `assets/concepts/ui/ui_component_sheet_concept_v001.png`
+- `assets/source/effects/effect_stage_spotlight_concept_v001.png`
+- `assets/source/effects/release/effect_stage_spotlight_concept_v001.png`
+- `public/assets/runtime/effects/effect_stage_spotlight_v001.png`
+- `public/assets/runtime/release/effects/effect_stage_spotlight_v001.png`
+- `tools/extract-ui-state-assets.mjs`
+- `src/phaser/scenes/CombatScene.ts`
+- `tmp/ui-quality/effects/boss-stage-spotlight-v1-1920.png`
+- raster effect audit: Combat paper slash, Combat ink/purple mark, and Boss stage/phase effect each had `hasUnderlay=true`, `visibleEffectSprites=1`, `textCount=0`, and `visibleRectsAboveUnderlay=0`
+- 10-screen hover audit: Town, WorldMap, Dungeon, Combat, Reward, Event, RuneBench, Boss, Result, and Settings each had `hasUnderlay=true`, `textCount=0`, and `visibleRectsAboveUnderlay=0`
+- `node tmp/run-phaser-smoke-with-vite.mjs` -> `Phaser smoke OK`
+- `npm.cmd run check`
+- `git diff --check`
+
+Current status: `Needs user review`
+
+Completion level: `Partially complete`
+
+This checkpoint corrects the Boss/Combat `effect_stage_spotlight` source. The previous pass was a PNG spritesheet, but it still looked wrong on Boss because it came from `card_art_fold_guard` and read as shield/card-fragment art. The new stage spotlight is extracted from the Special card starburst in the approved component sheet. The crop and alpha mask were iterated until the sheet kept warm gold starburst strokes instead of a circular card-frame token.
+
+`CombatScene` placement was also adjusted so non-boss stage feedback sits around the player standee body and Boss stage/phase feedback appears around the boss body/phase focal area instead of the lower minion/platform zone. This improves the visible concept-language match for Boss phase feedback while preserving the raster-only rule: the visible overlay is still a sprite texture, with no Phaser text, visible rectangles, strokes, or procedural shapes added above the concept underlay.
+
+This is progress toward the active concept-art quality goal, not completion. Boss phase feedback is better than the shield-like candidate, but final VFX timing, animation readability, target-specific placement across all effects, sound/VFX polish, selected/disabled/focus/down state art, dynamic labels, accessibility-safe tooltips, and user acceptance remain unfinished.
+
+## Shared Raster Pressed/Down-State Checkpoint
+
+Date: 2026-06-05
+
+Evidence:
+
+- `assets/concepts/ui/ui_component_sheet_concept_v001.png`
+- `assets/source/ui/ui_down_pressed_stamp_concept_v001.png`
+- `public/assets/runtime/ui/ui_down_pressed_stamp_concept_v001.png`
+- `src/data/assetManifest.slice.v1.json`
+- `docs/asset-manifest.slice.v1.json`
+- `src/data/releaseCatalogAdapter.ts`
+- `src/phaser/view/sceneShell.ts`
+- `tools/extract-ui-state-assets.mjs`
+- `tools/generate-dev-runtime-assets.mjs`
+- `tools/phaser-smoke-test.mjs`
+- `tmp/ui-raster-down-audit.mjs`
+- `tmp/ui-quality/down/combat-down-pressed-v1-1920.png`
+- `tmp/ui-quality/down/settings-down-pressed-v1-1920.png`
+- `tmp/ui-quality/down/boss-down-pressed-v1-1920.png`
+- `tmp/ui-quality/down/worldmap-down-pressed-v1-1920.png`
+- 10-screen down audit: Town, WorldMap, Dungeon, Combat, Reward, Event, RuneBench, Boss, Result, and Settings each had `hasUnderlay=true`, `textCount=0`, `visibleRectsAboveUnderlay=0`, and `visibleDownImages=1`
+- 10-screen hover audit: Town, WorldMap, Dungeon, Combat, Reward, Event, RuneBench, Boss, Result, and Settings each had `hasUnderlay=true`, `textCount=0`, and `visibleRectsAboveUnderlay=0`
+- `node tmp/run-phaser-smoke-with-vite.mjs` -> `Phaser smoke OK`
+- `npm.cmd run check`
+- `git diff --check`
+
+Current status: `Needs user review`
+
+Completion level: `Partially complete`
+
+This checkpoint adds a first shared pressed/down state for raster concept screens. The new `ui_down_pressed_stamp_concept` is extracted from the approved component sheet's wax stamp material and darkened into a held-down state. It is now a registered slice asset, copied into runtime assets, and included in release catalog shared raster art.
+
+`renderRasterHoverHitTarget` now has separate hover and down image layers. Hover keeps the existing screen-specific concept bitmap badge, while pointer hold shows the pressed wax stamp. The helper now triggers actions on `pointerup`, which allows the pressed state to be visible and auditable during the hold. Smoke captures the down image without firing the control by moving the pointer outside before release.
+
+This is progress toward the active concept-art quality goal, not completion. The shared pressed stamp removes the previous alpha-only down-state gap across the ten primary raster screens, but final screen-specific pressed art, selected states, disabled states, keyboard focus states, dynamic readability, accessibility-safe tooltips, and user acceptance remain unfinished.
+
+## Event Raster Disabled-State Checkpoint
+
+Date: 2026-06-05
+
+Evidence:
+
+- `assets/concepts/ui/ui_component_sheet_concept_v001.png`
+- `assets/source/ui/ui_disabled_lock_stamp_concept_v001.png`
+- `public/assets/runtime/ui/ui_disabled_lock_stamp_concept_v001.png`
+- `src/data/assetManifest.slice.v1.json`
+- `docs/asset-manifest.slice.v1.json`
+- `src/data/releaseCatalogAdapter.ts`
+- `src/phaser/view/sceneShell.ts`
+- `src/phaser/scenes/EventScene.ts`
+- `src/phaser/scenes/RewardScene.ts`
+- `tools/extract-ui-state-assets.mjs`
+- `tools/generate-dev-runtime-assets.mjs`
+- `tools/phaser-smoke-test.mjs`
+- `tmp/ui-disabled-raster-audit.mjs`
+- `tmp/ui-quality/disabled/event-disabled-raster-v1-1920.png`
+- `tmp/phaser-ui-skin-event-disabled-choice.png`
+- `tmp/phaser-hover-event-choice.png`
+- `tmp/phaser-hover-reward-choice-card.png`
+- disabled audit: Event had `hasUnderlay=true`, `visibleLockImages=1`, `visibleTextCount=0`, and `visibleRectsAboveUnderlay=0`; clicking the disabled choice kept `EventScene` active
+- `node tmp/run-phaser-smoke-with-vite.mjs` -> `Phaser smoke OK`
+- `npm.cmd run check`
+- `git diff --check`
+
+Current status: `Needs user review`
+
+Completion level: `Partially complete`
+
+This checkpoint adds the first visible bitmap disabled state for the raster Event screen. The new `ui_disabled_lock_stamp_concept` is extracted from the approved component sheet's Rune Socket lock, processed as a darker disabled-state stamp, registered in the slice manifests, copied into runtime assets, and included in release shared raster art.
+
+`renderRasterDisabledHitTarget` now provides an inert non-hand-cursor hit target that can display a bitmap disabled state without adding visible Phaser rectangles, text, strokes, or vector-like overlays. `EventScene` uses it for unaffordable raster choices. The same pass also corrected choice-badge alignment: Reward hover badges are now centered on their card header axis, and Event hover/down/disabled badges use an `x - 32` badge-axis correction after screenshot comparison showed the previous placement drifting toward the card edge/route panel.
+
+This is progress toward the active concept-art quality goal, not completion. Event has a first audited disabled-state candidate on the release unaffordable choice, but broad disabled-state coverage across every screen/control, selected states, keyboard focus states, screen-specific pressed art, dynamic readability, accessibility-safe tooltips, and user acceptance remain unfinished.
+
+## WorldMap Raster Action-Hit-Target Alignment Checkpoint
+
+Date: 2026-06-05
+
+Evidence:
+
+- `assets/source/ui/world_map_raster_underlay_concept_v001.png`
+- `public/assets/runtime/ui/world_map_raster_underlay_concept_v001.png`
+- `src/phaser/scenes/WorldMapScene.ts`
+- `tools/phaser-smoke-test.mjs`
+- `tmp/ui-worldmap-action-hit-target-audit.mjs`
+- `tmp/ui-raster-hover-audit.mjs`
+- `tmp/ui-raster-down-audit.mjs`
+- `tmp/ui-quality/worldmap/worldmap-play-button-action-hover-v1-1920.png`
+- `tmp/ui-quality/worldmap-hover-no-vector-v1-1920.png`
+- `tmp/ui-quality/down/worldmap-down-pressed-v1-1920.png`
+- WorldMap action audit: old center coordinate `1010,512` kept `WorldMapScene` active; play-button hover had `hasUnderlay=true`, `visibleActionImages=1`, `visibleRouteImages=0`, `visibleTextCount=0`, and `visibleRectsAboveUnderlay=0`; play-button click advanced to `DungeonScene`
+- 10-screen hover audit: Town, WorldMap, Dungeon, Combat, Reward, Event, RuneBench, Boss, Result, and Settings each had `hasUnderlay=true`, `textCount=0`, and `visibleRectsAboveUnderlay=0`
+- 10-screen down audit: Town, WorldMap, Dungeon, Combat, Reward, Event, RuneBench, Boss, Result, and Settings each had `hasUnderlay=true`, `textCount=0`, `visibleRectsAboveUnderlay=0`, and `visibleDownImages=1`
+- `node tmp/run-phaser-smoke-with-vite.mjs` -> `Phaser smoke OK`
+- `npm.cmd run check`
+- `git diff --check`
+
+Current status: `Needs user review`
+
+Completion level: `Partially complete`
+
+This checkpoint aligns WorldMap's primary raster action with the visible concept control. The previous raster path still had a hidden center confirm target at `1010,512`; that coordinate belonged to the old procedural layout and caused hover/click feedback in the folded map illustration instead of on the visible play button. At this checkpoint, the raster WorldMap confirmed via the bottom-right play button at `1512,950`, while unlocked map nodes kept their route-node hover art for actual stage selection. The following checkpoint supersedes that first button state with button-specific hover/down textures.
+
+At this checkpoint, the play button still used the shared action seal bitmap for hover and the shared pressed stamp for down. A later checkpoint replaces those with button-specific textures cropped from the WorldMap concept underlay, so this entry should be read as the hit-target correction rather than final button-state art.
+
+This is progress toward the active concept-art quality goal, not completion. WorldMap primary-action hit targeting is now concept-aligned, but selected/current-stage state, locked-stage state beyond baked art, final button-state acceptance, dynamic labels, accessibility-safe tooltips, and user acceptance remain unfinished.
+
+## WorldMap Button-Specific Raster-State Checkpoint
+
+Date: 2026-06-05
+
+Evidence:
+
+- `assets/source/ui/world_map_raster_underlay_concept_v001.png`
+- `assets/source/ui/ui_hover_world_map_play_button_concept_v001.png`
+- `assets/source/ui/ui_down_world_map_play_button_concept_v001.png`
+- `public/assets/runtime/ui/ui_hover_world_map_play_button_concept_v001.png`
+- `public/assets/runtime/ui/ui_down_world_map_play_button_concept_v001.png`
+- `src/data/assetManifest.slice.v1.json`
+- `docs/asset-manifest.slice.v1.json`
+- `src/data/releaseCatalogAdapter.ts`
+- `src/phaser/scenes/WorldMapScene.ts`
+- `tools/extract-ui-state-assets.mjs`
+- `tools/generate-dev-runtime-assets.mjs`
+- `tools/phaser-smoke-test.mjs`
+- `tmp/ui-worldmap-action-hit-target-audit.mjs`
+- `tmp/ui-raster-hover-audit.mjs`
+- `tmp/ui-raster-down-audit.mjs`
+- `tmp/ui-quality/worldmap/worldmap-play-button-action-hover-v1-1920.png`
+- `tmp/ui-quality/worldmap-hover-no-vector-v1-1920.png`
+- `tmp/ui-quality/down/worldmap-down-pressed-v1-1920.png`
+- WorldMap action audit: old center coordinate `1010,512` kept `WorldMapScene` active; play-button hover had `hasUnderlay=true`, `visiblePlayImages=1`, `visibleRouteImages=0`, `visibleTextCount=0`, and `visibleRectsAboveUnderlay=0`; play-button click advanced to `DungeonScene`
+- 10-screen hover audit: Town, WorldMap, Dungeon, Combat, Reward, Event, RuneBench, Boss, Result, and Settings each had `hasUnderlay=true`, `textCount=0`, and `visibleRectsAboveUnderlay=0`
+- 10-screen down audit: Town, WorldMap, Dungeon, Combat, Reward, Event, RuneBench, Boss, Result, and Settings each had `hasUnderlay=true`, `textCount=0`, `visibleRectsAboveUnderlay=0`, and `visibleDownImages=1`
+- `node tmp/run-phaser-smoke-with-vite.mjs` -> `Phaser smoke OK`
+- `npm.cmd run check`
+- `git diff --check`
+
+Current status: `Needs user review`
+
+Completion level: `Partially complete`
+
+This checkpoint replaces the pasted-on shared WorldMap action seal with button-specific state art extracted from the WorldMap concept underlay. `ui_hover_world_map_play_button_concept` and `ui_down_world_map_play_button_concept` are cropped from the bottom-right play button area, masked to the button silhouette, and processed into hover/down variants so the control itself appears to brighten or depress rather than receiving a generic stamp overlay.
+
+`WorldMapScene` now audits the bottom-right play button at `1576,970` with a `280x144` hit target. The no-underlay fallback button coordinate was also moved to the same bottom-right action area so the old center confirm target does not silently return if the raster underlay is missing.
+
+This is progress toward the active concept-art quality goal, not completion. The button-specific hover/down first pass is closer to the concept art than the shared seal, but WorldMap selected/current-stage state, locked-stage behavior beyond baked art, keyboard focus state, dynamic labels, accessibility-safe tooltips, mobile/responsive review, and user acceptance remain unfinished.
+
+## WorldMap Current-Stage Marker Checkpoint
+
+Date: 2026-06-05
+
+Evidence:
+
+- `assets/source/ui/world_map_raster_underlay_concept_v001.png`
+- `assets/source/ui/ui_current_stage_marker_concept_v001.png`
+- `public/assets/runtime/ui/ui_current_stage_marker_concept_v001.png`
+- `src/data/assetManifest.slice.v1.json`
+- `docs/asset-manifest.slice.v1.json`
+- `src/data/releaseCatalogAdapter.ts`
+- `src/phaser/scenes/WorldMapScene.ts`
+- `tools/extract-ui-state-assets.mjs`
+- `tools/generate-dev-runtime-assets.mjs`
+- `tmp/ui-worldmap-action-hit-target-audit.mjs`
+- `tmp/ui-quality/worldmap/worldmap-play-button-action-hover-v1-1920.png`
+- `tmp/ui-quality/worldmap-hover-no-vector-v1-1920.png`
+- `tmp/ui-quality/down/worldmap-down-pressed-v1-1920.png`
+- WorldMap action/current audit: `currentStageId=stage_lantern_foyer`, `visibleCurrentMarkerImages=1`, `markerAtCurrentStage=true`, old center coordinate `1010,512` kept `WorldMapScene` active, play-button hover had `visiblePlayImages=1`, `visibleRouteImages=0`, `visibleTextCount=0`, and `visibleRectsAboveUnderlay=0`; play-button click advanced to `DungeonScene`
+- 10-screen hover audit: Town, WorldMap, Dungeon, Combat, Reward, Event, RuneBench, Boss, Result, and Settings each had `hasUnderlay=true`, `textCount=0`, and `visibleRectsAboveUnderlay=0`
+- 10-screen down audit: Town, WorldMap, Dungeon, Combat, Reward, Event, RuneBench, Boss, Result, and Settings each had `hasUnderlay=true`, `textCount=0`, `visibleRectsAboveUnderlay=0`, and `visibleDownImages=1`
+- `node tmp/run-phaser-smoke-with-vite.mjs` -> `Phaser smoke OK`
+- `npm.cmd run check`
+- `git diff --check`
+
+Current status: `Needs user review`
+
+Completion level: `Partially complete`
+
+This checkpoint adds a first runtime-driven current-stage marker to the raster WorldMap. The new marker is extracted from the WorldMap concept underlay's existing cyan diamond, masked to remove surrounding terrain, and rendered above the node matching `context.run.stageId`. In the default debug WorldMap state, the marker now appears over the first-stage node while the game's current stage is `stage_lantern_foyer`.
+
+This is progress toward the active concept-art quality goal, not completion. The static WorldMap underlay still bakes in a stage-4 glow/path, so the full selected/current-state problem is not solved yet. A later pass still needs either recomposed underlay variants or stronger state-specific masking/overlays for completed/current/locked stages, plus keyboard focus state, dynamic labels, accessibility-safe tooltips, mobile/responsive review, and user acceptance.
+
+## WorldMap Neutralized Runtime Underlay Checkpoint
+
+Date: 2026-06-05
+
+Evidence:
+
+- `assets/concepts/ui/world_map_ui_concept_v001.png`
+- `assets/source/ui/world_map_raster_underlay_concept_v001.png`
+- `public/assets/runtime/ui/world_map_raster_underlay_concept_v001.png`
+- `assets/source/ui/ui_hover_world_map_play_button_concept_v001.png`
+- `assets/source/ui/ui_down_world_map_play_button_concept_v001.png`
+- `assets/source/ui/ui_current_stage_marker_concept_v001.png`
+- `tools/extract-ui-state-assets.mjs`
+- `tools/generate-dev-runtime-assets.mjs`
+- `tmp/ui-worldmap-action-hit-target-audit.mjs`
+- `tmp/ui-quality/worldmap/worldmap-play-button-action-hover-v1-1920.png`
+- `tmp/ui-quality/worldmap-hover-no-vector-v1-1920.png`
+- `tmp/ui-quality/down/worldmap-down-pressed-v1-1920.png`
+- WorldMap neutralized-underlay audit: sampled baked-state pixels in the regenerated runtime underlay and verified they no longer have strong green/cyan state dominance after the stronger glow-remnant pass: `node1check=[111,97,80]`, `node2check=[108,94,78]`, `node3check=[116,101,84]`, and `stage4diamond=[109,95,79]`
+- WorldMap action/current audit: `currentStageId=stage_lantern_foyer`, `visibleCurrentMarkerImages=1`, `markerAtCurrentStage=true`, old center coordinate `1010,512` kept `WorldMapScene` active, play-button hover had `visiblePlayImages=1`, `visibleRouteImages=0`, `visibleTextCount=0`, and `visibleRectsAboveUnderlay=0`; play-button click advanced to `DungeonScene`
+- 10-screen hover audit: Town, WorldMap, Dungeon, Combat, Reward, Event, RuneBench, Boss, Result, and Settings each had `hasUnderlay=true`, `textCount=0`, and `visibleRectsAboveUnderlay=0`
+- 10-screen down audit: Town, WorldMap, Dungeon, Combat, Reward, Event, RuneBench, Boss, Result, and Settings each had `hasUnderlay=true`, `textCount=0`, `visibleRectsAboveUnderlay=0`, and `visibleDownImages=1`
+- `node tools/extract-ui-state-assets.mjs`
+- `npm.cmd run assets:generate:dev`
+- `npm.cmd run check`
+- `node tmp/ui-worldmap-action-hit-target-audit.mjs`
+- `node tmp/run-phaser-smoke-with-vite.mjs` -> `Phaser smoke OK`
+- `node tmp/ui-raster-hover-audit.mjs`
+- `node tmp/ui-raster-down-audit.mjs`
+- `git diff --check`
+
+Current status: `Needs user review`
+
+Completion level: `Partially complete`
+
+This checkpoint makes the WorldMap runtime underlay less misleading while keeping the visible UI in raster concept-art language. `tools/extract-ui-state-assets.mjs` now rebuilds `world_map_raster_underlay_concept_v001.png` from the original WorldMap concept image and selectively mutes the baked completed/current progress colors in the map region. This reduces the old 1-3 completed checks and stage-4 cyan diamond/path so they no longer overpower the runtime marker.
+
+The original concept art remains intact at `assets/concepts/ui/world_map_ui_concept_v001.png`. Button-specific state art and the current-stage marker now extract from that original concept file rather than from the neutralized runtime underlay, preserving their intended saturation while the background itself becomes safer for live state.
+
+This is progress toward the active concept-art quality goal, not completion. The runtime underlay is now closer to a neutral map surface, and the first runtime current marker is still verified at `stage_lantern_foyer`, but the WorldMap is not fully recomposed into dynamic current/selected/completed/locked stage variants. Baked route/node geometry remains, keyboard focus state, dynamic labels, accessibility-safe tooltips, mobile/responsive review, and user acceptance remain unfinished.
+
+## WorldMap Current Halo Checkpoint
+
+Date: 2026-06-05
+
+Evidence:
+
+- `assets/concepts/ui/world_map_ui_concept_v001.png`
+- `assets/source/ui/world_map_raster_underlay_concept_v001.png`
+- `assets/source/ui/ui_current_stage_marker_concept_v001.png`
+- `assets/source/ui/ui_current_stage_halo_concept_v001.png`
+- `public/assets/runtime/ui/world_map_raster_underlay_concept_v001.png`
+- `public/assets/runtime/ui/ui_current_stage_marker_concept_v001.png`
+- `public/assets/runtime/ui/ui_current_stage_halo_concept_v001.png`
+- `src/data/assetManifest.slice.v1.json`
+- `docs/asset-manifest.slice.v1.json`
+- `src/data/releaseCatalogAdapter.ts`
+- `src/phaser/scenes/WorldMapScene.ts`
+- `tools/extract-ui-state-assets.mjs`
+- `tools/generate-dev-runtime-assets.mjs`
+- `tmp/ui-worldmap-action-hit-target-audit.mjs`
+- `tmp/ui-quality/worldmap/worldmap-play-button-action-hover-v1-1920.png`
+- `tmp/ui-quality/worldmap-hover-no-vector-v1-1920.png`
+- `tmp/ui-quality/down/worldmap-down-pressed-v1-1920.png`
+- WorldMap action/current audit: `currentStageId=stage_lantern_foyer`, `visibleCurrentMarkerImages=1`, `markerAtCurrentStage=true`, `visibleCurrentHaloImages=1`, `haloAtCurrentStage=true`, old center coordinate `1010,512` kept `WorldMapScene` active, play-button hover had `visiblePlayImages=1`, `visibleRouteImages=0`, `visibleTextCount=0`, and `visibleRectsAboveUnderlay=0`; play-button click advanced to `DungeonScene`
+- WorldMap neutralized-underlay audit: sampled baked-state pixels remained below green/cyan state dominance limits: `node1check=[111,97,80]`, `node2check=[108,94,78]`, `node3check=[116,101,84]`, and `stage4diamond=[109,95,79]`
+- 10-screen hover audit: Town, WorldMap, Dungeon, Combat, Reward, Event, RuneBench, Boss, Result, and Settings each had `hasUnderlay=true`, `textCount=0`, and `visibleRectsAboveUnderlay=0`
+- 10-screen down audit: Town, WorldMap, Dungeon, Combat, Reward, Event, RuneBench, Boss, Result, and Settings each had `hasUnderlay=true`, `textCount=0`, `visibleRectsAboveUnderlay=0`, and `visibleDownImages=1`
+- `node tools/extract-ui-state-assets.mjs`
+- `npm.cmd run assets:generate:dev`
+- `npm.cmd run check`
+- `node tmp/ui-worldmap-action-hit-target-audit.mjs`
+- `node tmp/ui-raster-hover-audit.mjs`
+- `node tmp/ui-raster-down-audit.mjs`
+- `node tmp/run-phaser-smoke-with-vite.mjs` -> `Phaser smoke OK`
+- `git diff --check`
+
+Current status: `Needs user review`
+
+Completion level: `Partially complete`
+
+This checkpoint adds a stronger runtime current-state treatment to the raster WorldMap without using vector substitute art. `ui_current_stage_halo_concept` is extracted from the original WorldMap concept's cyan current-node glow, then masked so the baked `4` node plate and surrounding parchment fragments are removed. `WorldMapScene` now renders that halo and the existing current-stage marker at the node matching `context.run.stageId`.
+
+The same pass strengthens the runtime underlay's small-state-symbol cleanup for the baked completed check badges and old stage-4 marker sample area. This makes the default `stage_lantern_foyer` state more visually truthful than the earlier marker-only pass, because the actual current node now has both the concept-derived diamond marker and concept-derived cyan glow language.
+
+This is progress toward the active concept-art quality goal, not completion. The WorldMap still has baked node/route geometry, and the completed/current/locked state model is not fully recomposed into per-stage variants. Keyboard focus state, dynamic labels, accessibility-safe tooltips, mobile/responsive review, and user acceptance remain unfinished.
+
+## WorldMap Current Status Badge Checkpoint
+
+Date: 2026-06-05
+
+Evidence:
+
+- `assets/concepts/ui/world_map_ui_concept_v001.png`
+- `assets/source/ui/world_map_raster_underlay_concept_v001.png`
+- `assets/source/ui/ui_current_stage_marker_concept_v001.png`
+- `assets/source/ui/ui_current_stage_halo_concept_v001.png`
+- `assets/source/ui/ui_current_stage_status_badge_concept_v001.png`
+- `public/assets/runtime/ui/world_map_raster_underlay_concept_v001.png`
+- `public/assets/runtime/ui/ui_current_stage_marker_concept_v001.png`
+- `public/assets/runtime/ui/ui_current_stage_halo_concept_v001.png`
+- `public/assets/runtime/ui/ui_current_stage_status_badge_concept_v001.png`
+- `src/data/assetManifest.slice.v1.json`
+- `docs/asset-manifest.slice.v1.json`
+- `src/data/releaseCatalogAdapter.ts`
+- `src/phaser/scenes/WorldMapScene.ts`
+- `tools/extract-ui-state-assets.mjs`
+- `tools/generate-dev-runtime-assets.mjs`
+- `tmp/ui-worldmap-action-hit-target-audit.mjs`
+- `tmp/ui-quality/worldmap/worldmap-play-button-action-hover-v1-1920.png`
+- WorldMap action/current audit: `currentStageId=stage_lantern_foyer`, `visibleCurrentMarkerImages=1`, `markerAtCurrentStage=true`, `visibleCurrentHaloImages=1`, `haloAtCurrentStage=true`, `visibleCurrentStatusImages=1`, `statusAtCurrentStage=true`, old center coordinate `1010,512` kept `WorldMapScene` active, play-button hover had `visiblePlayImages=1`, `visibleRouteImages=0`, `visibleTextCount=0`, and `visibleRectsAboveUnderlay=0`; play-button click advanced to `DungeonScene`
+- WorldMap neutralized-underlay audit: sampled baked-state pixels remained below green/cyan state dominance limits: `node1check=[111,97,80]`, `node2check=[108,94,78]`, `node3check=[116,101,84]`, and `stage4diamond=[109,95,79]`
+- 10-screen hover audit: Town, WorldMap, Dungeon, Combat, Reward, Event, RuneBench, Boss, Result, and Settings each had `hasUnderlay=true`, `textCount=0`, and `visibleRectsAboveUnderlay=0`
+- 10-screen down audit: Town, WorldMap, Dungeon, Combat, Reward, Event, RuneBench, Boss, Result, and Settings each had `hasUnderlay=true`, `textCount=0`, `visibleRectsAboveUnderlay=0`, and `visibleDownImages=1`
+- `node tools/extract-ui-state-assets.mjs`
+- `npm.cmd run assets:generate:dev`
+- `node tmp/ui-worldmap-action-hit-target-audit.mjs`
+- `npm.cmd run check`
+- `git diff --check`
+- `node tmp/ui-raster-hover-audit.mjs`
+- `node tmp/ui-raster-down-audit.mjs`
+- `node tmp/run-phaser-smoke-with-vite.mjs` -> `Phaser smoke OK`
+
+Current status: `Needs user review`
+
+Completion level: `Partially complete`
+
+This checkpoint adds a lower current-status badge to the runtime WorldMap current node without returning to vector/procedural substitute art. `ui_current_stage_status_badge_concept` is cropped from the original WorldMap concept's gold current-status diamond/check area, then masked so it remains a state badge rather than a terrain fragment. `WorldMapScene` renders it on the lower area of the node matching `context.run.stageId`, next to the already verified current marker and halo.
+
+This is progress toward the active concept-art quality goal, not completion. The current node now has runtime-driven marker, halo, and status badge, but the WorldMap is still not fully recomposed into dynamic completed/current/locked stage variants. Baked node/route geometry remains, keyboard focus state, dynamic labels, accessibility-safe tooltips, mobile/responsive review, and user acceptance remain unfinished.
+
+## WorldMap Completed/Locked Badge Checkpoint
+
+Date: 2026-06-05
+
+Evidence:
+
+- `assets/concepts/ui/world_map_ui_concept_v001.png`
+- `assets/source/ui/world_map_raster_underlay_concept_v001.png`
+- `assets/source/ui/ui_completed_stage_badge_concept_v001.png`
+- `assets/source/ui/ui_locked_stage_badge_concept_v001.png`
+- `assets/source/ui/ui_sealed_stage_badge_concept_v001.png`
+- `public/assets/runtime/ui/world_map_raster_underlay_concept_v001.png`
+- `public/assets/runtime/ui/ui_completed_stage_badge_concept_v001.png`
+- `public/assets/runtime/ui/ui_locked_stage_badge_concept_v001.png`
+- `public/assets/runtime/ui/ui_sealed_stage_badge_concept_v001.png`
+- `src/data/assetManifest.slice.v1.json`
+- `docs/asset-manifest.slice.v1.json`
+- `src/data/releaseCatalogAdapter.ts`
+- `src/phaser/scenes/WorldMapScene.ts`
+- `tools/extract-ui-state-assets.mjs`
+- `tools/generate-dev-runtime-assets.mjs`
+- `tmp/ui-worldmap-action-hit-target-audit.mjs`
+- `tmp/ui-quality/worldmap/worldmap-state-overlays-v1-1920.png`
+- `tmp/ui-quality/worldmap/worldmap-progress-current-stage4-v1-1920.png`
+- `tmp/ui-quality/worldmap/worldmap-progress-current-stage9-v1-1920.png`
+- `tmp/ui-quality/worldmap/worldmap-play-button-action-hover-v1-1920.png`
+- WorldMap state overlay audit: seeded release state with `stage_sunny_gate` completed and `stage_lavender_hall` current; verified `visibleCompletedBadges=1`, `expectedCompletedBadges=1`, `completedAtExpectedNodes=true`, `completedStyleAtExpectedNodes=true`, `visibleLockedBadges=6`, `expectedLockedBadges=6`, `lockedAtExpectedNodes=true`, `lockedStyleAtExpectedNodes=true`, `visibleSealedBadges=1`, `expectedSealedBadges=1`, `sealedAtExpectedNodes=true`, `sealedStyleAtExpectedNodes=true`, `currentHasNoCompletedBadge=true`, and `currentHasNoLockedBadge=true`
+- WorldMap progressed-state overlay audit: seeded release state with stages 1-3 completed and `stage_peach_canal` current; verified `visibleCompletedBadges=3`, `expectedCompletedBadges=3`, `completedStyleAtExpectedNodes=true`, `visibleLockedBadges=6`, `expectedLockedBadges=6`, `lockedStyleAtExpectedNodes=true`, `visibleSealedBadges=1`, `expectedSealedBadges=1`, `sealedStyleAtExpectedNodes=true`, current marker/halo/status at the current node, and no completed/locked/sealed badge on the current node
+- WorldMap late-lock overlay audit: seeded release state with stages 1-8 completed and `stage_moon_attic` current; verified `visibleCompletedBadges=8`, `completedStyleAtExpectedNodes=true`, `visibleLockedBadges=6`, `lockedStyleAtExpectedNodes=true`, `visibleSealedBadges=0`, `expectedSealedBadges=0`, current marker/halo/status at the current node, and no completed/locked/sealed badge on the current node
+- WorldMap neutralized-underlay audit: sampled old completed/current/locked baked-state pixels remained under state-dominance thresholds, including red lock samples for stages 10-15
+- WorldMap neutralized-underlay audit also samples lower node body colors: `node1body`, `node2body`, `node3body`, and `stage4body`
+- WorldMap neutralized-underlay audit samples `stage4routeDots`, `stage5body`, and `stage5route` for the remaining current-route and next-node remnants
+- `node tools/extract-ui-state-assets.mjs`
+- `npm.cmd run assets:generate:dev`
+- `npm.cmd run check`
+- `node tmp/ui-worldmap-action-hit-target-audit.mjs`
+- `git diff --check`
+
+Current status: `Needs user review`
+
+Completion level: `Partially complete`
+
+This checkpoint adds first-pass runtime completed, locked, and sealed badges to the raster WorldMap. The badges are concept-derived PNGs, not Phaser vector overlays, and `WorldMapScene` renders them from save/profile state. Current stage art has priority, so the current node does not also show completed or locked badges. The upper red locks now use source-aligned anchors for stages 10-15, later completed nodes use smaller badges than the lower 1-3 completed nodes to reduce late-route clutter, and gray seal overlays are reserved for the next lower/mid locked node rather than every lower/mid locked node.
+
+This is progress toward runtime state truth, not final WorldMap recomposition. The lower 1-5 baked node body colors and the main stage-4 plus 4-to-5 route remnants are now muted, but route geometry and later node variants are still baked into the underlay. Gray-seal density has a cleaner first-pass hierarchy now, but still needs later user review as part of full state recomposition. The broad Phaser smoke wrapper timed out in this continuation, so this checkpoint relies on `npm.cmd run check`, the dedicated WorldMap audit, `git diff --check`, and screenshot review rather than a fresh broad smoke pass.
+
+## WorldMap Node Hover Halo Cleanup Checkpoint
+
+Date: 2026-06-05
+
+Evidence:
+
+- `assets/concepts/ui/world_map_ui_concept_v001.png`
+- `assets/source/ui/ui_current_stage_halo_concept_v001.png`
+- `public/assets/runtime/ui/ui_current_stage_halo_concept_v001.png`
+- `assets/source/ui/ui_hover_route_node_concept_v001.png`
+- `src/phaser/view/sceneShell.ts`
+- `src/phaser/scenes/WorldMapScene.ts`
+- `tools/extract-ui-state-assets.mjs`
+- `tools/generate-dev-runtime-assets.mjs`
+- `tmp/route-node-raster-hover-state-audit.mjs`
+- `tmp/ui-worldmap-action-hit-target-audit.mjs`
+- `tmp/ui-quality/worldmap/worldmap-node-halo-hover-state-v1-1920.png`
+- `tmp/ui-quality/worldmap/worldmap-progress-current-stage4-v1-1920.png`
+- WorldMap route-node hover audit: seeded release state with `stage_sunny_gate` completed and `stage_lavender_hall` current; verified `hoverKey=ui_current_stage_halo_concept`, `visibleHoverImages=2`, `textCount=0`, and `visibleRectsAboveUnderlay=0`
+- Dungeon route-node hover audit still verifies `hoverKey=ui_hover_route_node_concept`, `visibleHoverImages=1`, `textCount=0`, and `visibleRectsAboveUnderlay=0`
+- WorldMap action/state audit still verifies old center coordinate `1010,512` does not advance, bottom-right play hover uses `ui_hover_world_map_play_button_concept`, current marker/halo/status are at the current node, completed/locked/sealed counts match the early/stage-4/late release states, and current nodes do not receive completed/locked/sealed badges
+- `node tools\extract-ui-state-assets.mjs`
+- `npm.cmd run assets:generate:dev`
+- `node tmp\route-node-raster-hover-state-audit.mjs`
+- `node tmp\ui-worldmap-action-hit-target-audit.mjs`
+- `npm.cmd run check`
+- `git diff --check`
+
+Current status: `Needs user review`
+
+Completion level: `Partially complete`
+
+This checkpoint removes the most obvious pasted-on WorldMap node hover issue. WorldMap node hover/down now uses a cleaned version of `ui_current_stage_halo_concept` with additive blending instead of the shared component-sheet route token. The cleaned halo extraction removes the top diamond marker and lower route-dot fragments so hover does not carry stale current-route state pieces.
+
+This is progress toward the active concept-art quality goal, not completion. Pointer hover is cleaner on WorldMap nodes, but keyboard focus, selected state, mobile/responsive review, dynamic labels/tooltips, full state recomposition, and user acceptance remain unfinished.
+
+## WorldMap Keyboard Selection Checkpoint
+
+Date: 2026-06-05
+
+Evidence:
+
+- `assets/concepts/ui/world_map_ui_concept_v001.png`
+- `assets/source/ui/world_map_raster_underlay_concept_v001.png`
+- `public/assets/runtime/ui/world_map_raster_underlay_concept_v001.png`
+- `src/input/bindings.ts`
+- `src/phaser/scenes/WorldMapScene.ts`
+- `tools/extract-ui-state-assets.mjs`
+- `tools/generate-dev-runtime-assets.mjs`
+- `tmp/ui-worldmap-action-hit-target-audit.mjs`
+- `tmp/route-node-raster-hover-state-audit.mjs`
+- `tmp/ui-quality/worldmap/worldmap-keyboard-stage-select-v1-1920.png`
+- WorldMap keyboard audit: seeded release state with `stage_sunny_gate` completed and `stage_lavender_hall` current; pressed `ArrowLeft`; verified `currentStageId=stage_sunny_gate`, `markerAtSelectedStage=true`, `haloAtSelectedStage=true`, `statusAtSelectedStage=true`, `selectedStageHasNoCompletedBadge=true`, `visibleRouteHoverImages=0`, `visibleTextCount=0`, `visibleRectsAboveUnderlay=0`, and `hasStageSelectLog=true`
+- WorldMap neutralized-underlay audit after the lower-check patch: `node1check=[97,85,69]`, `node2check=[95,84,69]`, and `node3check=[99,87,71]`, so the old lower completed-check areas no longer carry green/cyan completed-state dominance
+- WorldMap action/state audit still verifies early, stage-4-progress, and late-lock state overlays after the keyboard-selection change
+- WorldMap route-node hover audit still verifies cleaned halo hover on stage 1 and shared route-token hover on Dungeon
+- `node tools\extract-ui-state-assets.mjs`
+- `npm.cmd run assets:generate:dev`
+- `node tmp\ui-worldmap-action-hit-target-audit.mjs`
+- `node tmp\route-node-raster-hover-state-audit.mjs`
+- `npm.cmd run check`
+- `git diff --check`
+
+Current status: `Needs user review`
+
+Completion level: `Partially complete`
+
+This checkpoint gives raster WorldMap a first keyboard stage-selection path without drawing a procedural focus ring. Directional input picks the nearest unlocked node in the pressed direction using the concept node positions and reuses the existing runtime current marker, halo, and status badge to show the selected stage. The underlay extraction also adds a stronger neutral patch over the old lower 1-3 baked check areas so runtime badges carry more of the state meaning; latest screenshot review shows this is reduced, not fully recomposed.
+
+This is progress toward selected/focus/keyboard coverage, not completion. The lower-node baked silhouettes are reduced but not fully recomposed, focus behavior is not yet generalized across screens, and mobile/responsive review, dynamic labels/tooltips, and user acceptance remain unfinished.
+
+## WorldMap Late Completed Badge Placement Checkpoint
+
+Date: 2026-06-05
+
+Evidence:
+
+- `src/phaser/scenes/WorldMapScene.ts`
+- `tmp/ui-worldmap-action-hit-target-audit.mjs`
+- `tmp/ui-quality/worldmap/worldmap-progress-current-stage9-v1-1920.png`
+- `tmp/ui-quality/worldmap/crops/worldmap-late-mid-route-completed-crop-after-placement.png`
+- WorldMap late-lock overlay audit: seeded release state with stages 1-8 completed and `stage_moon_attic` current; verified `visibleCompletedBadges=8`, `expectedCompletedBadges=8`, `completedAtExpectedNodes=true`, `completedStyleAtExpectedNodes=true`, `visibleLockedBadges=6`, `lockedStyleAtExpectedNodes=true`, `visibleSealedBadges=0`, current marker/halo/status at the current node, and no completed/locked/sealed badge on the current node
+- WorldMap route-node hover audit still verifies cleaned halo hover on stage 1 and shared route-token hover on Dungeon
+- `node tmp\ui-worldmap-action-hit-target-audit.mjs`
+- `node tmp\route-node-raster-hover-state-audit.mjs`
+- `npm.cmd run check`
+- `git diff --check`
+
+Current status: `Needs user review`
+
+Completion level: `Partially complete`
+
+This checkpoint refines late-progress completed-badge placement without adding a new art direction. The same concept-derived completed badge is now placed by mid-route node family: stages 6 and 7 sit closer to their illustrated node-base material, while stage 8 is smaller and quieter because the concept map does not expose a full numbered node there.
+
+This is still not final WorldMap recomposition. The later route/node family needs proper concept-level variants or a clearer dynamic route-state treatment before final approval, and mobile/responsive review, accessibility-safe labels/tooltips, and user acceptance remain unfinished.
+
+## Reward/Event Choice Pressed Badge Checkpoint
+
+Date: 2026-06-05
+
+Evidence:
+
+- `src/phaser/scenes/RewardScene.ts`
+- `src/phaser/scenes/EventScene.ts`
+- `tmp/ui-raster-down-audit.mjs`
+- `tmp/choice-badge-raster-hover-state-audit.mjs`
+- `tmp/ui-quality/down/reward-down-pressed-v1-1920.png`
+- `tmp/ui-quality/down/event-down-pressed-v1-1920.png`
+- `tmp/ui-quality/reward-raster-choice-badge-hover-state-v1-1920.png`
+- `tmp/ui-quality/event-raster-choice-badge-hover-state-v1-1920.png`
+- 10-screen down audit: Town, WorldMap, Dungeon, Combat, Reward, Event, RuneBench, Boss, Result, and Settings each had `hasUnderlay=true`, `textCount=0`, `visibleRectsAboveUnderlay=0`, and `visibleDownImages=1`; Reward and Event now expect `ui_hover_choice_badge_concept` as their down image key
+- Choice-badge hover audit: Reward and Event still verify `visibleHoverImages=1`, no text, no visible rectangles, and the expected post-click phase
+- `node tmp\ui-raster-down-audit.mjs`
+- `node tmp\choice-badge-raster-hover-state-audit.mjs`
+- `npm.cmd run check`
+- `git diff --check`
+
+Current status: `Needs user review`
+
+Completion level: `Partially complete`
+
+This checkpoint removes the generic pressed stamp from Reward/Event raster choices. Hover and down now use the same concept-derived choice badge family, with down slightly larger and stronger on the same header-badge axis. This makes the interaction state read as the card choice responding instead of a separate stamp floating over the card.
+
+This is not final screen-specific pressed-state coverage. Town, Dungeon, Combat, RuneBench, Boss, Result, and Settings still need deeper per-control pressed art review, and broad keyboard/focus, dynamic labels/tooltips, mobile/responsive review, and user acceptance remain unfinished.
+
+## All Audited Raster Pressed-State Family Checkpoint
+
+Date: 2026-06-05
+
+Evidence:
+
+- `src/phaser/scenes/TownScene.ts`
+- `src/phaser/scenes/DungeonScene.ts`
+- `src/phaser/scenes/CombatScene.ts`
+- `src/phaser/scenes/RuneBenchScene.ts`
+- `src/phaser/scenes/BossScene.ts`
+- `src/phaser/scenes/ResultScene.ts`
+- `src/phaser/scenes/SettingsScene.ts`
+- `tmp/ui-raster-down-audit.mjs`
+- `tmp/ui-quality/down/town-down-pressed-v1-1920.png`
+- `tmp/ui-quality/down/dungeon-down-pressed-v1-1920.png`
+- `tmp/ui-quality/down/combat-down-pressed-v1-1920.png`
+- `tmp/ui-quality/down/runebench-down-pressed-v1-1920.png`
+- `tmp/ui-quality/down/boss-down-pressed-v1-1920.png`
+- `tmp/ui-quality/down/result-down-pressed-v1-1920.png`
+- `tmp/ui-quality/down/settings-down-pressed-v1-1920.png`
+- 10-screen down audit: Town, WorldMap, Dungeon, Combat, Reward, Event, RuneBench, Boss, Result, and Settings each had `hasUnderlay=true`, `textCount=0`, `visibleRectsAboveUnderlay=0`, and `visibleDownImages=1`; the audit now expects control-family down keys instead of the shared fallback for every audited target
+- Combat hover audit and Boss hover audit still passed after the pressed-state key changes
+- `node tmp\ui-raster-down-audit.mjs`
+- `node tmp\combat-raster-hover-state-audit.mjs`
+- `node tmp\boss-raster-hover-state-audit.mjs`
+- `npm.cmd run check`
+- `git diff --check`
+
+Current status: `Needs user review`
+
+Completion level: `Partially complete`
+
+This checkpoint removes the shared pressed-stamp fallback from all audited raster pressed/down targets. Combat now presses with the gold seal family, Boss presses with the boss skull stamp family, Dungeon presses with the route-node family, Reward/Event press with the choice-badge family, WorldMap still uses its button-specific play art, and Town/RuneBench/Result/Settings press with the action-seal family already used for their hover states.
+
+This is broader pressed-state consistency, not final state-art approval. Town/RuneBench/Result/Settings still share a generic action-seal family, Settings still needs full per-control pressed/focus review, and mobile/responsive, dynamic labels/tooltips, accessibility-safe text, and user acceptance remain unfinished.
+
+## Settings Pressed Coverage And Return Anchor Checkpoint
+
+Date: 2026-06-05
+
+Evidence:
+
+- `src/phaser/scenes/SettingsScene.ts`
+- `tools/phaser-smoke-test.mjs`
+- `tmp/settings-raster-hover-coverage-audit.mjs`
+- `tmp/settings-raster-pressed-coverage-audit.mjs`
+- `tmp/ui-quality/settings-pressed-coverage/volume-master-v1-1920.png`
+- `tmp/ui-quality/settings-pressed-coverage/display-mode-v1-1920.png`
+- `tmp/ui-quality/settings-pressed-coverage/reset-save-v1-1920.png`
+- `tmp/ui-quality/settings-pressed-coverage/return-town-v1-1920.png`
+- Settings pressed coverage audit: all ten major Settings raster controls had `hasUnderlay=true`, `textCount=0`, `visibleRectsAboveUnderlay=0`, `visibleDownImages=1`, and nontrivial screenshot deltas
+- Settings hover coverage audit: all ten major Settings raster controls still had `visibleHoverImages=1`, no text, and no visible rectangles above the underlay after the return-coordinate correction
+- 10-screen down audit still passed after the Settings return target moved
+- `node tmp\settings-raster-pressed-coverage-audit.mjs`
+- `node tmp\settings-raster-hover-coverage-audit.mjs`
+- `node tmp\ui-raster-down-audit.mjs`
+- `npm.cmd run check`
+- `git diff --check`
+
+Current status: `Needs user review`
+
+Completion level: `Partially complete`
+
+This checkpoint adds Settings per-control pressed-state evidence and fixes the clearest coordinate mismatch found during screenshot review. The return-to-town feedback now sits on the bottom-right red check button instead of floating above it, while the other nine Settings controls retain their existing action-seal placement.
+
+This is not final Settings interaction approval. Settings still uses the broad action-seal family rather than bespoke control-state art, and selected/focus, disabled, mobile/responsive, dynamic labels/tooltips, accessibility-safe text, and user acceptance remain unfinished.
+
+## Settings Return Button-Specific State Checkpoint
+
+Date: 2026-06-05
+
+Evidence:
+
+- `assets/source/ui/ui_hover_settings_return_button_concept_v001.png`
+- `assets/source/ui/ui_down_settings_return_button_concept_v001.png`
+- `public/assets/runtime/ui/ui_hover_settings_return_button_concept_v001.png`
+- `public/assets/runtime/ui/ui_down_settings_return_button_concept_v001.png`
+- `src/data/assetManifest.slice.v1.json`
+- `docs/asset-manifest.slice.v1.json`
+- `src/data/releaseCatalogAdapter.ts`
+- `src/phaser/scenes/SettingsScene.ts`
+- `tools/extract-ui-state-assets.mjs`
+- `tools/generate-dev-runtime-assets.mjs`
+- `tmp/settings-raster-hover-coverage-audit.mjs`
+- `tmp/settings-raster-pressed-coverage-audit.mjs`
+- `tmp/ui-quality/settings-hover-coverage/return-town-v1-1920.png`
+- `tmp/ui-quality/settings-pressed-coverage/return-town-v1-1920.png`
+- Settings hover coverage audit: return-to-town now expects `ui_hover_settings_return_button_concept`; all ten Settings controls still verify one visible hover image, no text, and no visible rectangles above the underlay
+- Settings pressed coverage audit: return-to-town now expects `ui_down_settings_return_button_concept`; all ten Settings controls still verify one visible down image, no text, and no visible rectangles above the underlay
+- 10-screen down audit still passed after the button-specific state change
+- `node tools\extract-ui-state-assets.mjs`
+- `npm.cmd run assets:generate:dev`
+- `node tmp\settings-raster-hover-coverage-audit.mjs`
+- `node tmp\settings-raster-pressed-coverage-audit.mjs`
+- `node tmp\ui-raster-down-audit.mjs`
+- `npm.cmd run check`
+- `git diff --check`
+
+Current status: `Needs user review`
+
+Completion level: `Partially complete`
+
+This checkpoint brings the Settings bottom-right return/check button closer to the WorldMap play-button standard: the visible concept button now supplies its own hover and down state art instead of receiving the shared action seal. The first extraction attempt caught the wrong crop, and screenshot review forced a source-coordinate correction plus overlay alignment before acceptance.
+
+This is still not final Settings approval. The other Settings controls still use the broad action-seal family, and selected/focus, disabled, mobile/responsive, dynamic labels/tooltips, accessibility-safe text, and user acceptance remain unfinished.
+
+## Settings Reset Panel-Specific State Checkpoint
+
+Date: 2026-06-08
+
+Evidence:
+
+- `assets/source/ui/ui_hover_settings_reset_save_concept_v001.png`
+- `assets/source/ui/ui_down_settings_reset_save_concept_v001.png`
+- `assets/source/ui/ui_hover_settings_reset_defaults_concept_v001.png`
+- `assets/source/ui/ui_down_settings_reset_defaults_concept_v001.png`
+- `public/assets/runtime/ui/ui_hover_settings_reset_save_concept_v001.png`
+- `public/assets/runtime/ui/ui_down_settings_reset_save_concept_v001.png`
+- `public/assets/runtime/ui/ui_hover_settings_reset_defaults_concept_v001.png`
+- `public/assets/runtime/ui/ui_down_settings_reset_defaults_concept_v001.png`
+- `src/data/assetManifest.slice.v1.json`
+- `docs/asset-manifest.slice.v1.json`
+- `src/data/releaseCatalogAdapter.ts`
+- `src/phaser/scenes/SettingsScene.ts`
+- `tools/extract-ui-state-assets.mjs`
+- `tools/generate-dev-runtime-assets.mjs`
+- `tools/phaser-smoke-test.mjs`
+- `tmp/settings-raster-hover-coverage-audit.mjs`
+- `tmp/settings-raster-pressed-coverage-audit.mjs`
+- `tmp/ui-quality/settings-hover-coverage/reset-save-v1-1920.png`
+- `tmp/ui-quality/settings-hover-coverage/reset-defaults-v1-1920.png`
+- `tmp/ui-quality/settings-pressed-coverage/reset-save-v1-1920.png`
+- `tmp/ui-quality/settings-pressed-coverage/reset-defaults-v1-1920.png`
+- Settings hover coverage audit: reset-save now expects `ui_hover_settings_reset_save_concept`; reset-defaults now expects `ui_hover_settings_reset_defaults_concept`; all ten Settings controls still verify one visible hover image, no text, and no visible rectangles above the underlay
+- Settings pressed coverage audit: reset-save now expects `ui_down_settings_reset_save_concept`; reset-defaults now expects `ui_down_settings_reset_defaults_concept`; all ten Settings controls still verify one visible down image, no text, and no visible rectangles above the underlay
+- 10-screen down audit still passed after the reset-panel-specific state change
+- `node tools\extract-ui-state-assets.mjs`
+- `npm.cmd run assets:generate:dev`
+- `node tmp\settings-raster-hover-coverage-audit.mjs`
+- `node tmp\settings-raster-pressed-coverage-audit.mjs`
+- `node tmp\ui-raster-down-audit.mjs`
+- `npm.cmd run check`
+
+Current status: `Needs user review`
+
+Completion level: `Partially complete`
+
+This checkpoint extends the Settings return-button standard to the right-side reset panels. The skull save-reset card and gear defaults-reset card now brighten/darken as their own concept-derived panels instead of receiving the shared action seal. The crop was matched back to the source underlay, then the mask was tightened after source preview so the left book/page material did not become the main feedback surface.
+
+Broad Phaser smoke remains `Needs verification` for this continuation. `tmp/run-phaser-smoke-with-vite.mjs` passed through `checkClickableControls` after `tools/phaser-smoke-test.mjs` was updated to expect control-family down keys by default, then timed out during `checkFullInputCoverage`.
+
+This is still not final Settings approval. At this checkpoint the sliders/toggles still used the broad action-seal family, and selected/focus, disabled, mobile/responsive, dynamic labels/tooltips, accessibility-safe text, and user acceptance remained unfinished.
+
+## Settings Row/Toggle-Specific State Checkpoint
+
+Date: 2026-06-08
+
+Evidence:
+
+- `assets/source/ui/ui_hover_settings_volume_master_concept_v001.png`
+- `assets/source/ui/ui_down_settings_volume_master_concept_v001.png`
+- `assets/source/ui/ui_hover_settings_volume_music_concept_v001.png`
+- `assets/source/ui/ui_down_settings_volume_music_concept_v001.png`
+- `assets/source/ui/ui_hover_settings_volume_sfx_concept_v001.png`
+- `assets/source/ui/ui_down_settings_volume_sfx_concept_v001.png`
+- `assets/source/ui/ui_hover_settings_display_mode_concept_v001.png`
+- `assets/source/ui/ui_down_settings_display_mode_concept_v001.png`
+- `assets/source/ui/ui_hover_settings_large_text_concept_v001.png`
+- `assets/source/ui/ui_down_settings_large_text_concept_v001.png`
+- `assets/source/ui/ui_hover_settings_reduced_motion_concept_v001.png`
+- `assets/source/ui/ui_down_settings_reduced_motion_concept_v001.png`
+- `assets/source/ui/ui_hover_settings_space_confirm_concept_v001.png`
+- `assets/source/ui/ui_down_settings_space_confirm_concept_v001.png`
+- `public/assets/runtime/ui/ui_hover_settings_volume_master_concept_v001.png`
+- `public/assets/runtime/ui/ui_down_settings_volume_master_concept_v001.png`
+- `public/assets/runtime/ui/ui_hover_settings_display_mode_concept_v001.png`
+- `public/assets/runtime/ui/ui_down_settings_space_confirm_concept_v001.png`
+- `src/phaser/scenes/SettingsScene.ts`
+- `tools/extract-ui-state-assets.mjs`
+- `tools/generate-dev-runtime-assets.mjs`
+- `tools/phaser-smoke-test.mjs`
+- `tmp/settings-raster-hover-coverage-audit.mjs`
+- `tmp/settings-raster-pressed-coverage-audit.mjs`
+- `tmp/ui-quality/settings-hover-coverage/volume-master-v1-1920.png`
+- `tmp/ui-quality/settings-pressed-coverage/volume-master-v1-1920.png`
+- `tmp/ui-quality/settings-hover-coverage/display-mode-v1-1920.png`
+- `tmp/ui-quality/settings-hover-coverage/space-confirm-v1-1920.png`
+- Settings hover coverage audit: all ten Settings controls now expect Settings-specific hover raster keys and still verify one visible hover image, no text, and no visible rectangles above the underlay
+- Settings pressed coverage audit: all ten Settings controls now expect Settings-specific down raster keys and still verify one visible down image, no text, and no visible rectangles above the underlay
+- 10-screen down audit still passed after the row/toggle-specific state change
+- `node tools\extract-ui-state-assets.mjs`
+- `npm.cmd run assets:generate:dev`
+- `node tmp\settings-raster-hover-coverage-audit.mjs`
+- `node tmp\settings-raster-pressed-coverage-audit.mjs`
+- `node tmp\ui-raster-down-audit.mjs`
+- `npm.cmd run check`
+- `git diff --check`
+
+Current status: `Needs user review`
+
+Completion level: `Partially complete`
+
+This checkpoint removes the remaining shared action-seal dependency from the ten audited Settings controls. The three volume sliders, display-mode selector, large-text toggle, reduced-motion toggle, and space-confirm toggle now brighten/darken as their own concept-underlay row/control art.
+
+This is still not final Settings approval. Selected/focus, disabled, keyboard focus, mobile/responsive, dynamic labels/tooltips, accessibility-safe text, user acceptance, and final concept-match approval remain unfinished.
+
+## Town RuneBench Result Utility-Specific State Checkpoint
+
+Date: 2026-06-08
+
+Evidence:
+
+- `assets/source/ui/ui_hover_town_expedition_action_concept_v001.png`
+- `assets/source/ui/ui_down_town_expedition_action_concept_v001.png`
+- `assets/source/ui/ui_hover_runebench_action_rail_concept_v001.png`
+- `assets/source/ui/ui_down_runebench_action_rail_concept_v001.png`
+- `assets/source/ui/ui_hover_runebench_confirm_button_concept_v001.png`
+- `assets/source/ui/ui_down_runebench_confirm_button_concept_v001.png`
+- `assets/source/ui/ui_hover_result_action_card_concept_v001.png`
+- `assets/source/ui/ui_down_result_action_card_concept_v001.png`
+- `assets/source/ui/ui_hover_result_return_button_concept_v001.png`
+- `assets/source/ui/ui_down_result_return_button_concept_v001.png`
+- `public/assets/runtime/ui/ui_hover_town_expedition_action_concept_v001.png`
+- `public/assets/runtime/ui/ui_down_town_expedition_action_concept_v001.png`
+- `public/assets/runtime/ui/ui_hover_runebench_action_rail_concept_v001.png`
+- `public/assets/runtime/ui/ui_down_runebench_action_rail_concept_v001.png`
+- `public/assets/runtime/ui/ui_hover_result_action_card_concept_v001.png`
+- `public/assets/runtime/ui/ui_down_result_action_card_concept_v001.png`
+- `src/phaser/scenes/TownScene.ts`
+- `src/phaser/scenes/RuneBenchScene.ts`
+- `src/phaser/scenes/ResultScene.ts`
+- `tools/extract-ui-state-assets.mjs`
+- `tools/generate-dev-runtime-assets.mjs`
+- `tools/phaser-smoke-test.mjs`
+- `tmp/ui-raster-hover-audit.mjs`
+- `tmp/ui-raster-down-audit.mjs`
+- `tmp/ui-quality/town-hover-no-vector-v1-1920.png`
+- `tmp/ui-quality/down/town-down-pressed-v1-1920.png`
+- `tmp/ui-quality/runebench-hover-no-vector-v1-1920.png`
+- `tmp/ui-quality/down/runebench-down-pressed-v1-1920.png`
+- `tmp/ui-quality/result-hover-no-vector-v1-1920.png`
+- `tmp/ui-quality/down/result-down-pressed-v1-1920.png`
+- 10-screen hover audit now verifies one visible expected hover image for every audited scene, including `ui_hover_town_expedition_action_concept`, `ui_hover_runebench_action_rail_concept`, and `ui_hover_result_action_card_concept`
+- 10-screen down audit now expects `ui_down_town_expedition_action_concept`, `ui_down_runebench_action_rail_concept`, and `ui_down_result_action_card_concept`
+- `node tools\extract-ui-state-assets.mjs`
+- `npm.cmd run assets:generate:dev`
+- `node tmp\ui-raster-hover-audit.mjs`
+- `node tmp\ui-raster-down-audit.mjs`
+- `npm.cmd run check`
+- `git diff --check`
+
+Current status: `Needs user review`
+
+Completion level: `Partially complete`
+
+This checkpoint removes the shared action-seal family from the audited Town, RuneBench, and Result representative utility targets. Town now brightens/darkens the central expedition arrow button, RuneBench brightens/darkens the central rune action rail, and Result brightens/darkens the action card aligned with the legacy confirm coordinate. RuneBench's visible lower confirm button and Result's visible lower return button also have first-pass button-specific hover/down art wired from their own underlays.
+
+This is still not full utility-control approval. Secondary and legacy hit targets across Town/RuneBench/Result still need a deeper pass, selected/focus and disabled states remain incomplete, mobile/responsive review is not complete, broad Phaser smoke is still `Needs verification`, and there is no user acceptance or final concept-match approval.
+
+## Town Lower Toolbar State Checkpoint
+
+Date: 2026-06-08
+
+Evidence:
+
+- `assets/source/ui/ui_hover_town_toolbar_reset_concept_v001.png`
+- `assets/source/ui/ui_down_town_toolbar_reset_concept_v001.png`
+- `assets/source/ui/ui_hover_town_toolbar_settings_concept_v001.png`
+- `assets/source/ui/ui_down_town_toolbar_settings_concept_v001.png`
+- `public/assets/runtime/ui/ui_hover_town_toolbar_reset_concept_v001.png`
+- `public/assets/runtime/ui/ui_down_town_toolbar_reset_concept_v001.png`
+- `public/assets/runtime/ui/ui_hover_town_toolbar_settings_concept_v001.png`
+- `public/assets/runtime/ui/ui_down_town_toolbar_settings_concept_v001.png`
+- `src/phaser/scenes/TownScene.ts`
+- `tools/extract-ui-state-assets.mjs`
+- `tools/generate-dev-runtime-assets.mjs`
+- `tmp/town-raster-toolbar-state-audit.mjs`
+- `tmp/ui-quality/town-toolbar/toolbar-reset-hover-v1-1920.png`
+- `tmp/ui-quality/town-toolbar/toolbar-reset-down-v1-1920.png`
+- `tmp/ui-quality/town-toolbar/toolbar-settings-hover-v1-1920.png`
+- `tmp/ui-quality/town-toolbar/toolbar-settings-down-v1-1920.png`
+- Town toolbar audit verifies the lower reset/backpack and settings/gear controls show exactly one expected Town-specific hover/down image, no shared action-seal image, no Phaser text, and no visible rectangles above the raster underlay
+- Town toolbar audit also verifies the ambiguous central legacy reset/settings coordinates no longer show the shared action seal
+- `node tools\extract-ui-state-assets.mjs`
+- `npm.cmd run assets:generate:dev`
+- `node tmp\town-raster-toolbar-state-audit.mjs`
+- `node tmp\ui-raster-hover-audit.mjs`
+- `node tmp\ui-raster-down-audit.mjs`
+- `npm.cmd run check`
+- `git diff --check`
+
+Current status: `Needs user review`
+
+Completion level: `Partially complete`
+
+This checkpoint improves Town secondary utility feedback without inventing a new visual direction. The lower backpack/reset and gear/settings toolbar controls now brighten/darken as their own concept-underlay tiles. The settings toolbar hit target is re-anchored to the visible gear tile at `1340,976`, and the reset toolbar target is aligned to the visible backpack tile at `514,976`.
+
+The central legacy reset/settings hit targets at `1010,724` and `1010,806` still preserve behavior for existing flows, but they no longer show the shared action seal because crop review showed they sit over ambiguous town building/background material instead of one clear control. This remains a UX/architecture follow-up, not a final Town-control approval.
+
+## RuneBench Result Lower Button State Evidence Checkpoint
+
+Date: 2026-06-08
+
+Evidence:
+
+- `src/phaser/scenes/RuneBenchScene.ts`
+- `src/phaser/scenes/ResultScene.ts`
+- `assets/source/ui/ui_hover_runebench_confirm_button_concept_v001.png`
+- `assets/source/ui/ui_down_runebench_confirm_button_concept_v001.png`
+- `assets/source/ui/ui_hover_result_return_button_concept_v001.png`
+- `assets/source/ui/ui_down_result_return_button_concept_v001.png`
+- `tmp/runebench-result-lower-button-state-audit.mjs`
+- `tmp/ui-quality/lower-buttons/runebench-confirm-hover-v1-1920.png`
+- `tmp/ui-quality/lower-buttons/runebench-confirm-down-v1-1920.png`
+- `tmp/ui-quality/lower-buttons/result-return-hover-v1-1920.png`
+- `tmp/ui-quality/lower-buttons/result-return-down-v1-1920.png`
+- `tmp/ui-quality/lower-buttons/crops/runebench-confirm-hover-crop.png`
+- `tmp/ui-quality/lower-buttons/crops/runebench-confirm-down-crop.png`
+- `tmp/ui-quality/lower-buttons/crops/result-return-hover-crop.png`
+- `tmp/ui-quality/lower-buttons/crops/result-return-down-crop.png`
+- RuneBench/Result lower button audit verifies exactly one expected button-specific hover/down image, no shared action-seal image, no Phaser text, and no visible rectangles above each raster underlay
+- `node tmp\runebench-result-lower-button-state-audit.mjs`
+
+Current status: `Needs user review`
+
+Completion level: `Partially complete`
+
+This checkpoint does not add new art direction. It proves the already wired RuneBench lower confirm and Result lower return button-specific state art is aligned well enough to count as current evidence: RuneBench's green check tile brightens/darkens on its own surface, and Result's wide bottom return panel brightens/darkens as a full concept button.
+
+This is still not final utility-state approval. Remaining scope includes selected/focus, keyboard focus, broader disabled coverage, dynamic labels/tooltips, mobile/responsive review, broad Phaser smoke completion, user acceptance, and final concept-match approval.
+
+## Keyboard Confirm Raster Feedback Checkpoint
+
+Date: 2026-06-08
+
+Evidence:
+
+- `src/phaser/view/sceneShell.ts`
+- `src/phaser/scenes/TownScene.ts`
+- `src/phaser/scenes/RuneBenchScene.ts`
+- `src/phaser/scenes/ResultScene.ts`
+- `tmp/keyboard-confirm-raster-state-audit.mjs`
+- `tmp/ui-quality/keyboard-confirm/town-keyboard-confirm-down-v1-1920.png`
+- `tmp/ui-quality/keyboard-confirm/runebench-keyboard-confirm-down-v1-1920.png`
+- `tmp/ui-quality/keyboard-confirm/result-keyboard-confirm-down-v1-1920.png`
+- Keyboard confirm audit verifies exactly one expected concept-derived down image, no Phaser text, and no visible rectangles above the raster underlay for Town, RuneBench, and Result
+- `node tmp\keyboard-confirm-raster-state-audit.mjs`
+- `node tmp\town-raster-toolbar-state-audit.mjs`
+- `node tmp\runebench-result-lower-button-state-audit.mjs`
+- `node tmp\ui-raster-hover-audit.mjs`
+- `node tmp\ui-raster-down-audit.mjs`
+- `npm.cmd run check`
+- `git diff --check`
+
+Current status: `Needs user review`
+
+Completion level: `Partially complete`
+
+This checkpoint reuses existing concept-derived pressed art for keyboard confirm instead of adding a new procedural focus ring. Enter/confirm now briefly shows the primary raster down state before the existing action advances on Town, RuneBench, and Result. This makes keyboard activation feedback closer to pointer feedback for those utility screens.
+
+This is not broad keyboard focus completion. Reward/Event/Combat/Boss/Dungeon/Settings keyboard focus and selected/focus state art still need separate evidence, and broad disabled coverage, dynamic labels/tooltips, mobile/responsive review, broad Phaser smoke completion, user acceptance, and final concept-match approval remain unfinished.
+
+## Reward Event Dungeon Keyboard Confirm Raster Feedback Checkpoint
+
+Date: 2026-06-08
+
+Evidence:
+
+- `src/phaser/scenes/RewardScene.ts`
+- `src/phaser/scenes/EventScene.ts`
+- `src/phaser/scenes/DungeonScene.ts`
+- `tmp/keyboard-confirm-raster-state-audit.mjs`
+- `tmp/ui-quality/keyboard-confirm/reward-keyboard-confirm-down-v1-1920.png`
+- `tmp/ui-quality/keyboard-confirm/event-keyboard-confirm-down-v1-1920.png`
+- `tmp/ui-quality/keyboard-confirm/dungeon-keyboard-confirm-down-v1-1920.png`
+- `tmp/ui-quality/reward-raster-choice-badge-hover-state-v1-1920.png`
+- `tmp/ui-quality/event-raster-choice-badge-hover-state-v1-1920.png`
+- `tmp/ui-quality/dungeon-raster-route-node-hover-state-v1-1920.png`
+- Keyboard confirm audit verifies exactly one expected local down image, no Phaser text, and no visible rectangles above the raster underlay for Reward, Event, and Dungeon
+- `node tmp\keyboard-confirm-raster-state-audit.mjs`
+- `node tmp\choice-badge-raster-hover-state-audit.mjs`
+- `node tmp\route-node-raster-hover-state-audit.mjs`
+- `node tmp\ui-raster-hover-audit.mjs`
+- `node tmp\ui-raster-down-audit.mjs`
+- `npm.cmd run check`
+- `git diff --check`
+
+Current status: `Needs user review`
+
+Completion level: `Partially complete`
+
+This checkpoint extends the keyboard-confirm material feedback pass to the choice-card and route-node screens without adding a new visual language. Reward Enter/confirm briefly shows the first reward card's existing concept choice badge pressed state. Event Enter/confirm briefly shows the first affordable event choice's existing concept choice badge pressed state. Dungeon Enter/confirm briefly shows the existing concept route-node pressed state on the primary confirm target. All then run the existing confirm behavior.
+
+This is not final focus/selected approval. Reward/Event/Dungeon now have first keyboard-confirm raster feedback evidence, but broader keyboard focus, selected state art, disabled-state breadth, mobile/responsive review, dynamic labels/tooltips, user acceptance, and final concept-match approval remain unfinished.
+
+## Combat Boss Keyboard Action Raster Feedback Checkpoint
+
+Date: 2026-06-08
+
+Evidence:
+
+- `src/phaser/scenes/CombatScene.ts`
+- `src/phaser/scenes/BossScene.ts`
+- `tmp/combat-boss-keyboard-action-raster-state-audit.mjs`
+- `tmp/ui-quality/keyboard-actions/combat-keyboard-card-down-v1-1920.png`
+- `tmp/ui-quality/keyboard-actions/combat-keyboard-end-turn-down-v1-1920.png`
+- `tmp/ui-quality/keyboard-actions/boss-keyboard-card-down-v1-1920.png`
+- `tmp/ui-quality/keyboard-actions/boss-keyboard-end-turn-down-v1-1920.png`
+- `tmp/ui-quality/combat-raster-card-hover-state-v1-1920.png`
+- `tmp/ui-quality/combat-raster-end-turn-hover-state-v1-1920.png`
+- `tmp/ui-quality/boss-raster-card-hover-state-v1-1920.png`
+- `tmp/ui-quality/boss-raster-end-turn-hover-state-v1-1920.png`
+- Combat/Boss keyboard-action audit verifies exactly one expected local raster down image, no Phaser text, and no visible rectangles above the raster underlay for `Digit1` card use and `KeyE` end turn
+- `node tmp\combat-boss-keyboard-action-raster-state-audit.mjs`
+- `node tmp\combat-raster-hover-state-audit.mjs`
+- `node tmp\boss-raster-hover-state-audit.mjs`
+- `node tmp\ui-raster-hover-audit.mjs`
+- `node tmp\ui-raster-down-audit.mjs`
+- `node tmp\keyboard-confirm-raster-state-audit.mjs`
+- `npm.cmd run check`
+- `git diff --check`
+
+Current status: `Needs user review`
+
+Completion level: `Partially complete`
+
+This checkpoint extends keyboard material feedback to the action-heavy combat screens. Combat `Digit1` and `KeyE` now briefly show the existing `ui_hover_gold_seal_concept` down state on the card or end-turn target before the existing action runs. Boss `Digit1` and `KeyE` do the same with `ui_hover_boss_skull_stamp_concept`.
+
+This is not final combat focus/selected approval. Combat/Boss now have first keyboard-action raster feedback evidence for the audited card and end-turn controls, but broader selected/focus state art, disabled-state breadth, mobile/responsive review, dynamic labels/tooltips, user acceptance, and final concept-match approval remain unfinished.
+
+## Settings Keyboard Cancel Raster Feedback Checkpoint
+
+Date: 2026-06-08
+
+Evidence:
+
+- `src/phaser/scenes/SettingsScene.ts`
+- `tmp/settings-keyboard-cancel-raster-state-audit.mjs`
+- `tmp/ui-quality/keyboard-actions/settings-keyboard-cancel-down-v1-1920.png`
+- Settings keyboard-cancel audit verifies exactly one `ui_down_settings_return_button_concept` image, no Phaser text, and no visible rectangle overlays above the raster underlay while `Escape` is held
+- The same audit verifies the unchanged flow returns to `TownScene` after the short down-state frame
+- `node tmp\settings-keyboard-cancel-raster-state-audit.mjs`
+- `node tmp\settings-raster-pressed-coverage-audit.mjs`
+- `node tmp\settings-raster-hover-coverage-audit.mjs`
+- `node tmp\ui-raster-hover-audit.mjs`
+- `node tmp\ui-raster-down-audit.mjs`
+- `node tmp\keyboard-confirm-raster-state-audit.mjs`
+- `node tmp\combat-boss-keyboard-action-raster-state-audit.mjs`
+- `npm.cmd run check`
+- `git diff --check`
+
+Current status: `Needs user review`
+
+Completion level: `Partially complete`
+
+This checkpoint does not add new Settings behavior. Settings had no existing Enter/confirm action, so the pass only gives the existing `Escape`/cancel return path the same button-specific raster material response as the pointer path.
+
+This is not final Settings keyboard/focus approval. Settings now has first keyboard-cancel raster feedback evidence, but full keyboard navigation, selected/focus state art, disabled-state breadth, mobile/responsive review, dynamic labels/tooltips, user acceptance, and final concept-match approval remain unfinished.
+
+## Settings Keyboard Focus Raster Feedback Checkpoint
+
+Date: 2026-06-08
+
+Evidence:
+
+- `src/phaser/view/sceneShell.ts`
+- `src/phaser/scenes/SettingsScene.ts`
+- `tmp/settings-keyboard-focus-raster-state-audit.mjs`
+- `tmp/ui-quality/settings-keyboard-focus/volume-master-focus-v1-1920.png`
+- `tmp/ui-quality/settings-keyboard-focus/display-mode-focus-v1-1920.png`
+- `tmp/ui-quality/settings-keyboard-focus/reset-save-focus-v1-1920.png`
+- `tmp/ui-quality/settings-keyboard-focus/return-town-focus-v1-1920.png`
+- `tmp/ui-quality/settings-keyboard-focus/volume-master-keyboard-activate-down-v1-1920.png`
+- Settings keyboard-focus audit verifies exactly one expected Settings-specific hover image, no Phaser text, and no visible rectangle overlays for all ten audited Settings controls
+- Settings keyboard-focus audit verifies Enter on volume-master shows `ui_down_settings_volume_master_concept`, updates `volumeMaster` to `0.9`, and restores focus after Settings restarts
+- `node tmp\settings-keyboard-focus-raster-state-audit.mjs`
+- `node tmp\settings-raster-hover-coverage-audit.mjs`
+- `node tmp\settings-raster-pressed-coverage-audit.mjs`
+- `node tmp\settings-keyboard-cancel-raster-state-audit.mjs`
+- `node tmp\ui-raster-hover-audit.mjs`
+- `node tmp\ui-raster-down-audit.mjs`
+- `npm.cmd run check`
+- `git diff --check`
+
+Current status: `Needs user review`
+
+Completion level: `Partially complete`
+
+This checkpoint reuses existing Settings-specific concept bitmap state art for keyboard focus and activation. It does not add a procedural focus ring, vector outline, text label, or alternate visual direction.
+
+This is not final focus/selected approval. Settings now has first keyboard navigation/focus evidence across its ten audited controls, but the broader UI still needs selected/focus language review, broad disabled coverage, mobile/responsive review, dynamic labels/tooltips, user acceptance, and final concept-match approval.
+
+## Combat Boss Cost-Disabled Card Raster Checkpoint
+
+Date: 2026-06-08
+
+Evidence:
+
+- `src/simulation/systems/combat/combatSystem.ts`
+- `src/phaser/scenes/CombatScene.ts`
+- `src/phaser/scenes/BossScene.ts`
+- `tmp/combat-boss-disabled-raster-state-audit.mjs`
+- `tmp/ui-quality/disabled/combat-disabled-card-v1-1920.png`
+- `tmp/ui-quality/disabled/boss-disabled-card-v1-1920.png`
+- Combat/Boss disabled-card audit verifies energy-0 costed cards show `ui_disabled_lock_stamp_concept`, have no local hover/down image leakage, no Phaser text, and no visible rectangle overlays above the raster underlay
+- The same audit verifies pointer click and `Digit1` do not change phase, hand, energy, or log for disabled card actions
+- `node tmp\combat-boss-disabled-raster-state-audit.mjs`
+- `npx.cmd tsc --noEmit`
+- `node tmp\combat-raster-hover-state-audit.mjs`
+- `node tmp\boss-raster-hover-state-audit.mjs`
+- `node tmp\combat-boss-keyboard-action-raster-state-audit.mjs`
+- `node tmp\ui-disabled-raster-audit.mjs`
+- `node tmp\ui-raster-hover-audit.mjs`
+- `node tmp\ui-raster-down-audit.mjs`
+- `npm.cmd run check`
+- `git diff --check`
+
+Current status: `Needs user review`
+
+Completion level: `Partially complete`
+
+This checkpoint expands disabled-state coverage using an existing concept-derived bitmap family. Combat and Boss cost-disabled cards now show the same lock-stamp material already used for Event unaffordable choices instead of showing playable hover/down feedback. The eligibility check uses the same effective-cost path as card play, including rune cost modification, next-card discount/penalty, and passive cost adjustment.
+
+This is not broad disabled approval. Combat/Boss now have first cost-disabled card evidence, but disabled coverage across all scenes/controls, final selected/focus language, mobile/responsive review, dynamic labels/tooltips, user acceptance, and final concept-match approval remain unfinished.
+
+## Broad Phaser Smoke Gate Restored Checkpoint
+
+Date: 2026-06-08
+
+Evidence:
+
+- `tools/phaser-smoke-test.mjs`
+- Top-level smoke steps now log `START`, `OK <ms>`, and `FAIL <ms>`
+- `PHASER_SMOKE_ONLY` allows targeted reruns such as `checkReleasePassiveBatch`
+- Release passive subcases now log their active label before opening the page
+- Repeated combat-key passive cases now wait for real debug-state advancement instead of assuming a fixed key interval
+- Debug-value wait failures now include the current debug value, phase, hand, and log
+- Targeted passive batch passed with `Phaser smoke OK`
+- Full `node tmp\run-phaser-smoke-with-vite.mjs` passed with `Phaser smoke OK`
+- Full smoke evidence includes `checkFullInputCoverage OK`, `checkUiSkinStates OK`, `checkReleasePassiveBatch OK`, `checkCoreRunLoop OK`, `checkSceneFlowAndRuneEffect OK`, and `checkBossResultFlow OK`
+- `npm.cmd run check`
+- `git diff --check`
+
+Current status: `Passing regression gate`
+
+Completion level: `Verification restored`
+
+This checkpoint restores the broad browser smoke gate after the previous timeout. The root cause was not a new visual art pass; it was stale smoke timing and a fragile repeated-key passive test after keyboard raster down feedback intentionally delayed action execution. The smoke now waits for real state changes when validating repeated combat card plays.
+
+This is not final UI approval. The full smoke passing proves the current browser flow and audited UI-state paths are not failing at this gate, but final selected/focus language, broader disabled coverage, WorldMap recomposition, mobile/responsive review, dynamic labels/tooltips, user acceptance, and final concept-match approval remain unfinished.
+
+## Reward Event Keyboard Focus Raster Feedback Checkpoint
+
+Date: 2026-06-08
+
+Evidence:
+
+- `src/phaser/scenes/RewardScene.ts`
+- `src/phaser/scenes/EventScene.ts`
+- `tmp/reward-event-keyboard-focus-raster-state-audit.mjs`
+- `tmp/ui-quality/keyboard-focus/reward-choice-2-focus-v1-1920.png`
+- `tmp/ui-quality/keyboard-focus/reward-choice-2-keyboard-activate-down-v1-1920.png`
+- `tmp/ui-quality/keyboard-focus/event-choice-2-focus-v1-1920.png`
+- `tmp/ui-quality/keyboard-focus/event-choice-2-keyboard-activate-down-v1-1920.png`
+- Reward/Event keyboard-focus audit verifies second-choice focus uses exactly one `ui_hover_choice_badge_concept` image at the expected second-card badge coordinate, no Phaser text, and no visible rectangle overlays above the raster underlay
+- Reward/Event keyboard-focus audit verifies Enter on that focus shows the same badge at pressed size and runs the focused second choice, not the first/default confirm target
+- `node tmp\reward-event-keyboard-focus-raster-state-audit.mjs`
+- `node tmp\keyboard-confirm-raster-state-audit.mjs`
+- `node tmp\choice-badge-raster-hover-state-audit.mjs`
+- `node tmp\ui-raster-down-audit.mjs`
+- `npx.cmd tsc --noEmit`
+- `npm.cmd run check`
+- `git diff --check`
+- Full `node tmp\run-phaser-smoke-with-vite.mjs` passed with `Phaser smoke OK`
+
+Current status: `Needs user review`
+
+Completion level: `Partially complete`
+
+This checkpoint extends focus/selected evidence on Reward and Event by reusing their existing concept badge bitmap family. It does not add a procedural focus ring, vector outline, text label, or alternate art direction.
+
+This is not final selected/focus approval. Reward/Event now have first directional keyboard choice-focus and focused activation evidence, but Dungeon/Town/RuneBench/Result broader focus, Combat/Boss selected focus, WorldMap recomposition, broad disabled coverage, mobile/responsive review, dynamic labels/tooltips, user acceptance, and final concept-match approval remain unfinished.
+
+## Utility Keyboard Focus Raster Feedback Checkpoint
+
+Date: 2026-06-08
+
+Evidence:
+
+- `src/phaser/scenes/TownScene.ts`
+- `src/phaser/scenes/RuneBenchScene.ts`
+- `src/phaser/scenes/ResultScene.ts`
+- `tmp/utility-keyboard-focus-raster-state-audit.mjs`
+- `tmp/ui-quality/utility-keyboard-focus/town-expedition-focus-v1-1920.png`
+- `tmp/ui-quality/utility-keyboard-focus/town-toolbar-settings-focus-v1-1920.png`
+- `tmp/ui-quality/utility-keyboard-focus/town-toolbar-reset-focus-v1-1920.png`
+- `tmp/ui-quality/utility-keyboard-focus/town-toolbar-settings-keyboard-activate-down-v1-1920.png`
+- `tmp/ui-quality/utility-keyboard-focus/runebench-action-rail-focus-v1-1920.png`
+- `tmp/ui-quality/utility-keyboard-focus/runebench-confirm-button-focus-v1-1920.png`
+- `tmp/ui-quality/utility-keyboard-focus/runebench-confirm-button-keyboard-activate-down-v1-1920.png`
+- `tmp/ui-quality/utility-keyboard-focus/result-action-card-focus-v1-1920.png`
+- `tmp/ui-quality/utility-keyboard-focus/result-return-button-focus-v1-1920.png`
+- `tmp/ui-quality/utility-keyboard-focus/result-return-button-keyboard-activate-down-v1-1920.png`
+- Utility keyboard-focus audit verifies focus id, expected texture key, position, size, no Phaser text, and no visible rectangle overlays for Town expedition, Town lower settings, Town lower reset, RuneBench action rail, RuneBench lower confirm, Result action card, and Result lower return
+- Utility keyboard-focus audit verifies focused activation down states for Town lower settings, RuneBench lower confirm, and Result lower return
+- `node tmp\utility-keyboard-focus-raster-state-audit.mjs`
+- `node tmp\keyboard-confirm-raster-state-audit.mjs`
+- `node tmp\town-raster-toolbar-state-audit.mjs`
+- `node tmp\runebench-result-lower-button-state-audit.mjs`
+- `node tmp\ui-raster-hover-audit.mjs`
+- `node tmp\ui-raster-down-audit.mjs`
+- `npx.cmd tsc --noEmit`
+- `npm.cmd run check`
+- `git diff --check`
+- Full `node tmp\run-phaser-smoke-with-vite.mjs` passed with `Phaser smoke OK`
+
+Current status: `Needs user review`
+
+Completion level: `Partially complete`
+
+This checkpoint extends utility-screen focus/selected evidence by reusing existing concept bitmap state art. Town focuses only the visible expedition, lower settings/gear, and lower reset/backpack controls; the ambiguous central legacy reset/settings hit targets remain click-only behavior surfaces without keyboard focus.
+
+This is not final selected/focus approval. Town/RuneBench/Result now have first utility keyboard-focus and focused activation evidence, but Dungeon broader focus, Combat/Boss selected focus, WorldMap recomposition, broad disabled coverage, mobile/responsive review, dynamic labels/tooltips, user acceptance, and final concept-match approval remain unfinished.
+
+## WorldMap Stage-5 Neutralized Underlay Checkpoint
+
+Date: 2026-06-11
+
+Evidence:
+
+- `tools/extract-ui-state-assets.mjs`
+- `assets/source/ui/world_map_raster_underlay_concept_v001.png`
+- `public/assets/runtime/ui/world_map_raster_underlay_concept_v001.png`
+- `tmp/ui-worldmap-action-hit-target-audit.mjs`
+- `tmp/ui-quality/worldmap/crops/worldmap-stage4-5-underlay-after-stage5-neutral-v2.png`
+- `tmp/ui-quality/worldmap/worldmap-progress-current-stage4-v1-1920.png`
+- WorldMap neutralized-underlay samples now include corrected source-coordinate samples for `stage5body`, `stage5lowerSeal`, and `stage5route`
+- WorldMap neutralized-underlay samples now also include `stage4topMarkerScar` and `stage4statusScar` so the old baked stage-4 current-state silhouette is checked more directly
+- `node tmp\ui-worldmap-action-hit-target-audit.mjs`
+- `node tmp\route-node-raster-hover-state-audit.mjs`
+- `npm.cmd run check`
+- `git diff --check`
+- Full `node tmp\run-phaser-smoke-with-vite.mjs` passed with `Phaser smoke OK`
+
+Current status: `Needs user review`
+
+Completion level: `Partially complete`
+
+This checkpoint improves WorldMap runtime-state truth by reducing the baked blue/cyan active-state read around stage 5 and the 4-to-5 route in the neutralized raster underlay. A later same-day pass also reduces the baked stage-4 current-marker and lower current-status scars that were still visible in non-stage-4 runtime states. The correction uses the original concept source and does not add Phaser vector overlays, a new marker style, or a procedural focus ring.
+
+This is not final WorldMap recomposition. Stage 5 is quieter in the stage-4 current-state screenshot and the old stage-4 current-state silhouette is less dominant in other runtime states, but later stage body variants, lower-node shape recomposition, dynamic labels/tooltips, mobile/responsive review, user acceptance, and final concept-match approval remain unfinished.
+
+## WorldMap Current-Frame Overlay Checkpoint
+
+Date: 2026-06-11
+
+Evidence:
+
+- `assets/source/ui/ui_current_stage_frame_concept_v001.png`
+- `public/assets/runtime/ui/ui_current_stage_frame_concept_v001.png`
+- `tools/extract-ui-state-assets.mjs`
+- `tools/generate-dev-runtime-assets.mjs`
+- `src/data/assetManifest.slice.v1.json`
+- `docs/asset-manifest.slice.v1.json`
+- `src/data/releaseCatalogAdapter.ts`
+- `src/phaser/scenes/WorldMapScene.ts`
+- `tmp/ui-worldmap-action-hit-target-audit.mjs`
+- `tmp/ui-quality/worldmap/worldmap-state-overlays-v1-1920.png`
+- `tmp/ui-quality/worldmap/worldmap-progress-current-stage4-v1-1920.png`
+- `tmp/ui-quality/worldmap/worldmap-progress-current-stage9-v1-1920.png`
+- `tmp/ui-quality/worldmap/worldmap-keyboard-stage-select-v1-1920.png`
+- WorldMap audit verifies `visibleCurrentFrameImages=1` and `frameAtCurrentStage=true` for default, progressed, late-lock, and keyboard-selected states
+- WorldMap audit verifies no Phaser text and no visible rectangle overlays above the raster underlay in the checked states
+- Route-node hover audit verifies WorldMap still uses the cleaned `ui_current_stage_halo_concept` hover family and Dungeon still uses `ui_hover_route_node_concept`
+- `node tmp\ui-worldmap-action-hit-target-audit.mjs`
+- `node tmp\route-node-raster-hover-state-audit.mjs`
+- `npm.cmd run check`
+- `git diff --check`
+- Full `node tmp\run-phaser-smoke-with-vite.mjs` passed with `Phaser smoke OK`
+
+Current status: `Needs user review`
+
+Completion level: `Partially complete`
+
+This checkpoint adds a conservative current-frame overlay to the runtime WorldMap current node. The overlay is source-derived from the original WorldMap concept and masked so it does not carry the baked stage-4 number, top marker, lower status badge, route fragments, or parchment background as a copied screenshot piece.
+
+This is not final WorldMap current-node body recomposition. The frame improves runtime current-state separation, but the full current/completed/locked body variant set, later node variants, lower-node shape recomposition, dynamic labels/tooltips, mobile/responsive review, user acceptance, and final concept-match approval remain unfinished.
+
+## WorldMap Completed-Frame Overlay Checkpoint
+
+Date: 2026-06-11
+
+Evidence:
+
+- `assets/source/ui/ui_completed_stage_frame_concept_v001.png`
+- `public/assets/runtime/ui/ui_completed_stage_frame_concept_v001.png`
+- `tools/extract-ui-state-assets.mjs`
+- `tools/generate-dev-runtime-assets.mjs`
+- `src/data/assetManifest.slice.v1.json`
+- `docs/asset-manifest.slice.v1.json`
+- `src/data/releaseCatalogAdapter.ts`
+- `src/phaser/scenes/WorldMapScene.ts`
+- `tmp/ui-worldmap-action-hit-target-audit.mjs`
+- `tmp/ui-quality/worldmap/worldmap-state-overlays-v1-1920.png`
+- `tmp/ui-quality/worldmap/worldmap-progress-current-stage4-v1-1920.png`
+- `tmp/ui-quality/worldmap/worldmap-progress-current-stage9-v1-1920.png`
+- WorldMap audit verifies `visibleCompletedFrames` equals expected completed nodes for default, progressed, and late-lock states
+- WorldMap audit verifies completed frame placement, display size, alpha, and no completed frame on the runtime current node
+- WorldMap audit verifies no Phaser text and no visible rectangle overlays above the raster underlay in the checked states
+- `node tmp\ui-worldmap-action-hit-target-audit.mjs`
+- `node tmp\route-node-raster-hover-state-audit.mjs`
+- `npm.cmd run check`
+- `git diff --check`
+- Full `node tmp\run-phaser-smoke-with-vite.mjs` passed with `Phaser smoke OK`
+
+Current status: `Needs user review`
+
+Completion level: `Partially complete`
+
+This checkpoint adds a conservative completed-frame overlay to completed WorldMap nodes. The overlay is source-derived from the original completed node concept and masked so it does not carry the source node's baked number, check mark, route fragments, or surrounding background as a copied screenshot piece. The existing completed badge remains the check-mark owner.
+
+This is not final WorldMap completed-node body recomposition. The frame improves completed-state material separation, but the full current/completed/locked body variant set, later node variants, lower-node shape recomposition, dynamic labels/tooltips, mobile/responsive review, user acceptance, and final concept-match approval remain unfinished.
+
+## WorldMap Locked-Frame Overlay Checkpoint
+
+Date: 2026-06-11
+
+Evidence:
+
+- `assets/source/ui/ui_locked_stage_frame_concept_v001.png`
+- `public/assets/runtime/ui/ui_locked_stage_frame_concept_v001.png`
+- `tools/extract-ui-state-assets.mjs`
+- `tools/generate-dev-runtime-assets.mjs`
+- `src/data/assetManifest.slice.v1.json`
+- `docs/asset-manifest.slice.v1.json`
+- `src/data/releaseCatalogAdapter.ts`
+- `src/phaser/scenes/WorldMapScene.ts`
+- `tmp/ui-worldmap-action-hit-target-audit.mjs`
+- `tmp/ui-quality/worldmap/worldmap-state-overlays-v1-1920.png`
+- `tmp/ui-quality/worldmap/worldmap-progress-current-stage4-v1-1920.png`
+- `tmp/ui-quality/worldmap/worldmap-progress-current-stage9-v1-1920.png`
+- WorldMap audit verifies `visibleLockedFrames` equals expected red locked nodes for default, progressed, and late-lock states
+- WorldMap audit verifies locked frame placement, display size, alpha, and no locked frame on the runtime current node
+- WorldMap audit verifies no Phaser text and no visible rectangle overlays above the raster underlay in the checked states
+- `node tmp\ui-worldmap-action-hit-target-audit.mjs`
+- `node tmp\route-node-raster-hover-state-audit.mjs`
+- `npm.cmd run check`
+- `git diff --check`
+- Full `node tmp\run-phaser-smoke-with-vite.mjs` passed with `Phaser smoke OK`
+
+Current status: `Needs user review`
+
+Completion level: `Partially complete`
+
+This checkpoint adds a conservative locked-frame overlay to upper red locked WorldMap nodes. The overlay is source-derived from the original locked node concept and masked so it does not carry the source node's baked number, lock center, route fragments, or surrounding background as a copied screenshot piece. The existing locked badge remains the lock-symbol owner.
+
+This is not final WorldMap locked-node body recomposition. The frame improves locked-state material separation, but the full current/completed/locked body variant set, later node variants, lower-node shape recomposition, dynamic labels/tooltips, mobile/responsive review, user acceptance, and final concept-match approval remain unfinished.
+
+## WorldMap Body-Wash Overlay Checkpoint
+
+Date: 2026-06-11
+
+Evidence:
+
+- `assets/source/ui/ui_current_stage_body_wash_concept_v001.png`
+- `assets/source/ui/ui_completed_stage_body_wash_concept_v001.png`
+- `assets/source/ui/ui_locked_stage_body_wash_concept_v001.png`
+- `public/assets/runtime/ui/ui_current_stage_body_wash_concept_v001.png`
+- `public/assets/runtime/ui/ui_completed_stage_body_wash_concept_v001.png`
+- `public/assets/runtime/ui/ui_locked_stage_body_wash_concept_v001.png`
+- `tools/extract-ui-state-assets.mjs`
+- `tools/generate-dev-runtime-assets.mjs`
+- `src/data/assetManifest.slice.v1.json`
+- `docs/asset-manifest.slice.v1.json`
+- `src/data/releaseCatalogAdapter.ts`
+- `src/phaser/scenes/WorldMapScene.ts`
+- `tmp/ui-worldmap-action-hit-target-audit.mjs`
+- `tmp/ui-quality/worldmap/worldmap-state-overlays-v1-1920.png`
+- `tmp/ui-quality/worldmap/worldmap-progress-current-stage4-v1-1920.png`
+- `tmp/ui-quality/worldmap/worldmap-progress-current-stage9-v1-1920.png`
+- WorldMap audit verifies current body-wash count, placement, display size, alpha, and selected-stage placement
+- WorldMap audit verifies completed body-wash count, placement, display size, alpha, and no completed body on the runtime current node
+- WorldMap audit verifies locked body-wash count, placement, display size, alpha, and no locked body on the runtime current node
+- WorldMap audit verifies no Phaser text and no visible rectangle overlays above the raster underlay in the checked states
+- `node tmp\ui-worldmap-action-hit-target-audit.mjs`
+- `node tmp\route-node-raster-hover-state-audit.mjs`
+- `npm.cmd run check`
+- `git diff --check`
+- Full `node tmp\run-phaser-smoke-with-vite.mjs` passed with `Phaser smoke OK`
+
+Current status: `Needs user review`
+
+Completion level: `Partially complete`
+
+This checkpoint adds conservative body-wash overlays to current, completed, and upper red locked WorldMap nodes. The overlays are source-derived from the original concept and masked so they do not carry source numbers, check/lock/status centers, route fragments, or surrounding background as copied screenshot pieces. Existing frame, badge, marker, and status assets still own the stronger state symbols.
+
+This is not final WorldMap body recomposition. The washes improve material separation, especially on the runtime current node, but the full current/completed/locked body variant set, later node variants, lower-node shape recomposition, dynamic labels/tooltips, mobile/responsive review, user acceptance, and final concept-match approval remain unfinished.
+
+## WorldMap Sealed Body/Frame Overlay Checkpoint
+
+Date: 2026-06-11
+
+Evidence:
+
+- `assets/source/ui/ui_sealed_stage_body_wash_concept_v001.png`
+- `assets/source/ui/ui_sealed_stage_frame_concept_v001.png`
+- `public/assets/runtime/ui/ui_sealed_stage_body_wash_concept_v001.png`
+- `public/assets/runtime/ui/ui_sealed_stage_frame_concept_v001.png`
+- `tools/extract-ui-state-assets.mjs`
+- `tools/generate-dev-runtime-assets.mjs`
+- `src/data/assetManifest.slice.v1.json`
+- `docs/asset-manifest.slice.v1.json`
+- `src/data/releaseCatalogAdapter.ts`
+- `src/phaser/scenes/WorldMapScene.ts`
+- `tmp/ui-worldmap-action-hit-target-audit.mjs`
+- `tmp/ui-quality/worldmap/worldmap-state-overlays-v1-1920.png`
+- `tmp/ui-quality/worldmap/worldmap-progress-current-stage4-v1-1920.png`
+- `tmp/ui-quality/worldmap/worldmap-progress-current-stage9-v1-1920.png`
+- WorldMap audit verifies sealed body/frame/badge count, placement, display size, alpha, zero-count late states, and no sealed body/frame on the runtime current node
+- WorldMap audit verifies no Phaser text and no visible rectangle overlays above the raster underlay in the checked states
+- `node tmp\ui-worldmap-action-hit-target-audit.mjs`
+- `node tmp\route-node-raster-hover-state-audit.mjs`
+- `npm.cmd run check`
+- `git diff --check`
+- Full `node tmp\run-phaser-smoke-with-vite.mjs` passed with `Phaser smoke OK`
+
+Current status: `Needs user review`
+
+Completion level: `Partially complete`
+
+This checkpoint adds conservative sealed body/frame overlays to the single next lower/mid locked WorldMap node. The overlays are source-derived from gray node material and masked so they do not carry source numbers, route fragments, or surrounding background as copied screenshot pieces. The existing sealed badge remains the strongest state symbol.
+
+This is not final sealed-node recomposition. The sealed stack is no longer badge-only, but the full current/completed/locked/sealed body variant set, later node variants, lower-node shape recomposition, dynamic labels/tooltips, mobile/responsive review, user acceptance, and final concept-match approval remain unfinished.
+
+## WorldMap Dormant Lower/Mid Locked-Node Checkpoint
+
+Date: 2026-06-11
+
+Evidence:
+
+- `assets/source/ui/ui_dormant_stage_body_wash_concept_v001.png`
+- `assets/source/ui/ui_dormant_stage_frame_concept_v001.png`
+- `public/assets/runtime/ui/ui_dormant_stage_body_wash_concept_v001.png`
+- `public/assets/runtime/ui/ui_dormant_stage_frame_concept_v001.png`
+- `tools/extract-ui-state-assets.mjs`
+- `tools/generate-dev-runtime-assets.mjs`
+- `src/data/assetManifest.slice.v1.json`
+- `docs/asset-manifest.slice.v1.json`
+- `src/data/releaseCatalogAdapter.ts`
+- `src/phaser/scenes/WorldMapScene.ts`
+- `tmp/ui-worldmap-action-hit-target-audit.mjs`
+- `tmp/ui-quality/worldmap/worldmap-state-overlays-v1-1920.png`
+- `tmp/ui-quality/worldmap/worldmap-progress-current-stage4-v1-1920.png`
+- `tmp/ui-quality/worldmap/worldmap-progress-current-stage9-v1-1920.png`
+- WorldMap audit verifies dormant body/frame count, placement, display size, alpha, zero-count late states, and no dormant body/frame on the runtime current or keyboard-selected node.
+- WorldMap audit verifies no Phaser text and no visible rectangle overlays above the raster underlay in the checked states.
+- `node tmp\ui-worldmap-action-hit-target-audit.mjs`
+- `node tmp\route-node-raster-hover-state-audit.mjs`
+- `npm.cmd run check`
+- `git diff --check`
+- Full `node tmp\run-phaser-smoke-with-vite.mjs` passed with `Phaser smoke OK`
+
+Current status: `Needs user review`
+
+Completion level: `Partially complete`
+
+This checkpoint adds conservative dormant body/frame overlays to lower/mid locked WorldMap nodes that are not the single next sealed node and are not upper red locked nodes. The overlays are source-derived from gray node material and masked so they do not carry source numbers, route fragments, or surrounding background as copied screenshot pieces.
+
+This is not final dormant-node recomposition. The dormant stack reduces reliance on muted baked underlay material for stages 4-9, but full current/completed/locked/sealed/dormant body variants, later node variants, lower-node shape recomposition, dynamic labels/tooltips, mobile/responsive review, user acceptance, and final concept-match approval remain unfinished.
+
+## WorldMap Route-Progress Bead Checkpoint
+
+Date: 2026-06-11
+
+Evidence:
+
+- `assets/source/ui/ui_world_map_route_progress_bead_concept_v001.png`
+- `public/assets/runtime/ui/ui_world_map_route_progress_bead_concept_v001.png`
+- `tools/extract-ui-state-assets.mjs`
+- `tools/generate-dev-runtime-assets.mjs`
+- `src/data/assetManifest.slice.v1.json`
+- `docs/asset-manifest.slice.v1.json`
+- `src/data/releaseCatalogAdapter.ts`
+- `src/phaser/scenes/WorldMapScene.ts`
+- `tmp/ui-worldmap-action-hit-target-audit.mjs`
+- `tmp/ui-quality/worldmap/worldmap-state-overlays-v1-1920.png`
+- `tmp/ui-quality/worldmap/worldmap-progress-current-stage4-v1-1920.png`
+- `tmp/ui-quality/worldmap/worldmap-progress-current-stage9-v1-1920.png`
+- WorldMap audit verifies route-progress bead count, placement, display size, alpha, and style for default, progressed, late-progress, and keyboard-selected states.
+- Keyboard-selected WorldMap state verifies `visibleRouteBeads=0`, so selection movement does not falsely show progressed route material.
+- WorldMap audit still verifies no Phaser text and no visible rectangle overlays above the raster underlay in the checked states.
+- `node tmp\ui-worldmap-action-hit-target-audit.mjs`
+- `node tmp\route-node-raster-hover-state-audit.mjs`
+- `npm.cmd run check`
+- `git diff --check`
+- Full `node tmp\run-phaser-smoke-with-vite.mjs` passed with `Phaser smoke OK`
+
+Current status: `Needs user review`
+
+Completion level: `Partially complete`
+
+This checkpoint adds a conservative route-progress bead overlay to completed/progressed WorldMap route segments. The asset is source-derived from the original concept's cyan route material and rendered additively as small runtime beads, reducing reliance on only the baked underlay route cues.
+
+This is not final route recomposition. The beads improve runtime route-state evidence, but full dynamic route-state material, later route variants, lower-node shape recomposition, dynamic labels/tooltips, mobile/responsive review, user acceptance, and final concept-match approval remain unfinished.
+
+## WorldMap Route-Progress Thread Checkpoint
+
+Date: 2026-06-13
+
+Evidence:
+
+- `assets/source/ui/ui_world_map_route_progress_thread_concept_v001.png`
+- `public/assets/runtime/ui/ui_world_map_route_progress_thread_concept_v001.png`
+- `tools/extract-ui-state-assets.mjs`
+- `tools/generate-dev-runtime-assets.mjs`
+- `src/data/assetManifest.slice.v1.json`
+- `docs/asset-manifest.slice.v1.json`
+- `src/data/releaseCatalogAdapter.ts`
+- `src/phaser/scenes/WorldMapScene.ts`
+- `tmp/ui-worldmap-action-hit-target-audit.mjs`
+- `tmp/ui-quality/worldmap/worldmap-state-overlays-v1-1920.png`
+- `tmp/ui-quality/worldmap/worldmap-progress-current-stage4-v1-1920.png`
+- `tmp/ui-quality/worldmap/worldmap-progress-current-stage9-v1-1920.png`
+- WorldMap audit verifies route-progress thread count, placement, display size, alpha, and style for default, progressed, late-progress, and keyboard-selected states.
+- Keyboard-selected WorldMap state verifies `visibleRouteThreads=0` and `visibleRouteBeads=0`, so selection movement does not falsely show progressed route material.
+- WorldMap audit still verifies no Phaser text and no visible rectangle overlays above the raster underlay in the checked states.
+- `node tmp\ui-worldmap-action-hit-target-audit.mjs`
+- `node tmp\route-node-raster-hover-state-audit.mjs`
+- `npm.cmd run check`
+- `git diff --check`
+- Full `node tmp\run-phaser-smoke-with-vite.mjs` passed with `Phaser smoke OK`
+
+Current status: `Needs user review`
+
+Completion level: `Partially complete`
+
+This checkpoint adds a conservative route-progress thread overlay below the existing route-progress beads on completed/progressed WorldMap route segments. The asset is source-derived from the original concept's cyan route material and rendered additively as a quiet connective layer, reducing reliance on isolated beads only.
+
+This is not final route recomposition. The thread improves runtime route-state evidence, but full dynamic route-state material, later route variants, lower-node shape recomposition, visible tooltip/readability zones, mobile/responsive review, user acceptance, and final concept-match approval remain unfinished.
+
+## WorldMap Route-Progress Current-Leg Variant Checkpoint
+
+Date: 2026-06-13
+
+Evidence:
+
+- `assets/source/ui/ui_world_map_route_progress_current_thread_concept_v001.png`
+- `assets/source/ui/ui_world_map_route_progress_current_bead_concept_v001.png`
+- `public/assets/runtime/ui/ui_world_map_route_progress_current_thread_concept_v001.png`
+- `public/assets/runtime/ui/ui_world_map_route_progress_current_bead_concept_v001.png`
+- `tools/extract-ui-state-assets.mjs`
+- `tools/generate-dev-runtime-assets.mjs`
+- `src/data/assetManifest.slice.v1.json`
+- `docs/asset-manifest.slice.v1.json`
+- `src/data/releaseCatalogAdapter.ts`
+- `src/phaser/scenes/WorldMapScene.ts`
+- `tmp/ui-worldmap-action-hit-target-audit.mjs`
+- `tmp/ui-quality/worldmap/worldmap-state-overlays-v1-1920.png`
+- `tmp/ui-quality/worldmap/worldmap-progress-current-stage4-v1-1920.png`
+- `tmp/ui-quality/worldmap/worldmap-progress-current-stage9-v1-1920.png`
+- WorldMap audit verifies base/current route-progress texture-family choice separately from total route-progress count.
+- Default state reported `visibleRouteBaseThreads=0`, `visibleRouteCurrentThreads=1`, `visibleRouteBaseBeads=0`, and `visibleRouteCurrentBeads=2`.
+- Stage-4 progress reported `visibleRouteBaseThreads=2`, `visibleRouteCurrentThreads=1`, `visibleRouteBaseBeads=3`, and `visibleRouteCurrentBeads=1`.
+- Stage-9 late progress reported `visibleRouteBaseThreads=7`, `visibleRouteCurrentThreads=1`, `visibleRouteBaseBeads=11`, and `visibleRouteCurrentBeads=1`.
+- Keyboard-selected WorldMap state still verifies `visibleRouteThreads=0` and `visibleRouteBeads=0`, so selection movement does not falsely show progressed route material.
+- `node tools\extract-ui-state-assets.mjs`
+- `npm.cmd run assets:generate:dev`
+- `node tmp\ui-worldmap-action-hit-target-audit.mjs`
+- `node tmp\route-node-raster-hover-state-audit.mjs`
+- `npm.cmd run check`
+- `git diff --check`
+- Targeted smoke passed with `$env:PHASER_SMOKE_ONLY='checkViewScreenshots,checkReleaseStageRouteBatch'; node tmp\run-phaser-smoke-with-vite.mjs` ending in `Phaser smoke OK`.
+- A broad smoke attempt logged every smoke step through `checkBossResultFlow OK`, but the wrapper process did not exit before the 600s command timeout. Treat the targeted smoke plus WorldMap audits as the verified gate for this checkpoint, and rerun broad smoke on the next continuation if needed.
+
+Current status: `Needs user review`
+
+Completion level: `Partially complete`
+
+This checkpoint splits the final/current route leg from earlier completed route legs. The current leg now uses separate source-derived thread and bead variants so the active path into the current stage can read brighter without changing the earlier completed route material.
+
+This is still not final route recomposition. It improves route-state texture-family evidence, but the route is still a conservative overlay system rather than a complete dynamic route material set. Full route recomposition, lower-node silhouette recomposition, visible tooltip/readability zones, mobile/responsive review, user acceptance, and final concept-match approval remain unfinished.
+
+## WorldMap Late Current-Node Stack Variant Checkpoint
+
+Date: 2026-06-13
+
+Evidence:
+
+- `assets/source/ui/ui_current_stage_late_body_wash_concept_v001.png`
+- `assets/source/ui/ui_current_stage_late_frame_concept_v001.png`
+- `public/assets/runtime/ui/ui_current_stage_late_body_wash_concept_v001.png`
+- `public/assets/runtime/ui/ui_current_stage_late_frame_concept_v001.png`
+- `tools/extract-ui-state-assets.mjs`
+- `tools/generate-dev-runtime-assets.mjs`
+- `src/data/assetManifest.slice.v1.json`
+- `docs/asset-manifest.slice.v1.json`
+- `src/data/releaseCatalogAdapter.ts`
+- `src/phaser/scenes/WorldMapScene.ts`
+- `tmp/ui-worldmap-action-hit-target-audit.mjs`
+- `tmp/ui-quality/worldmap/worldmap-state-overlays-v1-1920.png`
+- `tmp/ui-quality/worldmap/worldmap-progress-current-stage4-v1-1920.png`
+- `tmp/ui-quality/worldmap/worldmap-progress-current-stage9-v1-1920.png`
+- WorldMap audit verifies base/late current body and frame texture-family choice separately from total current-node count.
+- Default and stage-4-progress states reported `visibleCurrentBaseBodyImages=1`, `visibleCurrentLateBodyImages=0`, `visibleCurrentBaseFrameImages=1`, and `visibleCurrentLateFrameImages=0`.
+- Stage-9 late progress reported `visibleCurrentBaseBodyImages=0`, `visibleCurrentLateBodyImages=1`, `visibleCurrentBaseFrameImages=0`, and `visibleCurrentLateFrameImages=1`.
+- Keyboard-selected state still reported one base current body/frame and zero late current body/frame after selecting the lower completed node.
+- `node tools\extract-ui-state-assets.mjs`
+- `npm.cmd run assets:generate:dev`
+- `node tmp\ui-worldmap-action-hit-target-audit.mjs`
+- `node tmp\route-node-raster-hover-state-audit.mjs`
+- `npm.cmd run check`
+- `git diff --check`
+- Targeted smoke passed with `$env:PHASER_SMOKE_ONLY='checkViewScreenshots,checkReleaseStageRouteBatch'; node tmp\run-phaser-smoke-with-vite.mjs` ending in `Phaser smoke OK`.
+
+Current status: `Needs user review`
+
+Completion level: `Partially complete`
+
+This checkpoint splits the current-node body/frame stack so late current WorldMap nodes no longer reuse the exact same current body/frame texture family used by lower and stage-4 current states. The new late current body/frame assets are source-derived from the original current-node crop, but processed as quieter variants for later route nodes.
+
+This is still not final current-node recomposition. It improves one current-node stage-family gap, but the WorldMap still needs stronger stage-specific body/frame variants, lower-node silhouette recomposition, complete route-state material, visible tooltip/readability zones, mobile/responsive review, user acceptance, and final concept-match approval.
+
+## WorldMap Mid Dormant-Node Stack Variant Checkpoint
+
+Date: 2026-06-13
+
+Evidence:
+
+- `assets/source/ui/ui_dormant_stage_mid_body_wash_concept_v001.png`
+- `assets/source/ui/ui_dormant_stage_mid_frame_concept_v001.png`
+- `public/assets/runtime/ui/ui_dormant_stage_mid_body_wash_concept_v001.png`
+- `public/assets/runtime/ui/ui_dormant_stage_mid_frame_concept_v001.png`
+- `tools/extract-ui-state-assets.mjs`
+- `tools/generate-dev-runtime-assets.mjs`
+- `src/data/assetManifest.slice.v1.json`
+- `docs/asset-manifest.slice.v1.json`
+- `src/data/releaseCatalogAdapter.ts`
+- `src/phaser/scenes/WorldMapScene.ts`
+- `tmp/ui-worldmap-action-hit-target-audit.mjs`
+- `tmp/ui-quality/worldmap/worldmap-state-overlays-v1-1920.png`
+- `tmp/ui-quality/worldmap/worldmap-progress-current-stage4-v1-1920.png`
+- `tmp/ui-quality/worldmap/worldmap-progress-current-stage9-v1-1920.png`
+- WorldMap audit verifies lower/base dormant and mid dormant body/frame texture-family choice separately from total dormant count.
+- Default state reported `visibleDormantBaseBodies=2`, `visibleDormantMidBodies=4`, `visibleDormantBaseFrames=2`, and `visibleDormantMidFrames=4`.
+- Stage-4 progress reported `visibleDormantBaseBodies=0`, `visibleDormantMidBodies=4`, `visibleDormantBaseFrames=0`, and `visibleDormantMidFrames=4`.
+- Stage-9 late progress reported zero dormant base/mid bodies and frames, so the mid dormant stack does not leak into late completed/current states.
+- `node tools\extract-ui-state-assets.mjs`
+- `npm.cmd run assets:generate:dev`
+- `node tmp\ui-worldmap-action-hit-target-audit.mjs`
+- `node tmp\route-node-raster-hover-state-audit.mjs`
+- `npm.cmd run check`
+- `git diff --check`
+- Targeted smoke passed with `$env:PHASER_SMOKE_ONLY='checkViewScreenshots,checkReleaseStageRouteBatch'; node tmp\run-phaser-smoke-with-vite.mjs` ending in `Phaser smoke OK`.
+
+Current status: `Needs user review`
+
+Completion level: `Partially complete`
+
+This checkpoint splits the lower/mid dormant locked-node stack. Lower dormant nodes still use `ui_dormant_stage_body_wash_concept` / `ui_dormant_stage_frame_concept`, while mid dormant nodes use quieter `ui_dormant_stage_mid_body_wash_concept` / `ui_dormant_stage_mid_frame_concept` assets.
+
+This is still not final dormant-node recomposition. It improves one lower/mid locked-node stage-family gap, but WorldMap still needs stronger stage-specific current/completed/locked/sealed/dormant body/frame variants, lower-node silhouette recomposition, complete route-state material, visible tooltip/readability zones, mobile/responsive review, user acceptance, and final concept-match approval.
+
+## WorldMap Far Red Locked-Node Stack Variant Checkpoint
+
+Date: 2026-06-13
+
+Evidence:
+
+- `assets/source/ui/ui_locked_stage_far_body_wash_concept_v001.png`
+- `assets/source/ui/ui_locked_stage_far_frame_concept_v001.png`
+- `public/assets/runtime/ui/ui_locked_stage_far_body_wash_concept_v001.png`
+- `public/assets/runtime/ui/ui_locked_stage_far_frame_concept_v001.png`
+- `tools/extract-ui-state-assets.mjs`
+- `tools/generate-dev-runtime-assets.mjs`
+- `src/data/assetManifest.slice.v1.json`
+- `docs/asset-manifest.slice.v1.json`
+- `src/data/releaseCatalogAdapter.ts`
+- `src/phaser/scenes/WorldMapScene.ts`
+- `tmp/ui-worldmap-action-hit-target-audit.mjs`
+- `tmp/ui-quality/worldmap/worldmap-state-overlays-v1-1920.png`
+- `tmp/ui-quality/worldmap/worldmap-progress-current-stage4-v1-1920.png`
+- `tmp/ui-quality/worldmap/worldmap-progress-current-stage9-v1-1920.png`
+- WorldMap audit verifies next red locked and far red locked body/frame texture-family choice separately from total locked-node count.
+- Default state reported `visibleLockedNextBodies=0`, `visibleLockedFarBodies=6`, `visibleLockedNextFrames=0`, and `visibleLockedFarFrames=6`.
+- Stage-4 progress reported `visibleLockedNextBodies=0`, `visibleLockedFarBodies=6`, `visibleLockedNextFrames=0`, and `visibleLockedFarFrames=6`.
+- Stage-9 late progress reported `visibleLockedNextBodies=1`, `visibleLockedFarBodies=5`, `visibleLockedNextFrames=1`, and `visibleLockedFarFrames=5`.
+- `node tools\extract-ui-state-assets.mjs`
+- `npm.cmd run assets:generate:dev`
+- `node tmp\ui-worldmap-action-hit-target-audit.mjs`
+- `node tmp\route-node-raster-hover-state-audit.mjs`
+- `npm.cmd run check`
+- `git diff --check`
+- Targeted smoke passed with `$env:PHASER_SMOKE_ONLY='checkViewScreenshots,checkReleaseStageRouteBatch'; node tmp\run-phaser-smoke-with-vite.mjs` ending in `Phaser smoke OK`.
+
+Current status: `Needs user review`
+
+Completion level: `Partially complete`
+
+This checkpoint splits the upper red locked-node body/frame stack. The first/next red lock still uses `ui_locked_stage_body_wash_concept` / `ui_locked_stage_frame_concept`, while farther red locks use quieter `ui_locked_stage_far_body_wash_concept` / `ui_locked_stage_far_frame_concept` assets.
+
+This is still not final locked-node recomposition. It improves one upper red locked-node stage-family gap, but WorldMap still needs stronger stage-specific current/completed/locked/sealed/dormant body/frame variants, lower-node silhouette recomposition, complete route-state material, visible tooltip/readability zones, mobile/responsive review, user acceptance, and final concept-match approval.
+
+## WorldMap Late Completed Badge Variant Checkpoint
+
+Date: 2026-06-13
+
+Evidence:
+
+- `assets/source/ui/ui_completed_stage_late_badge_concept_v001.png`
+- `public/assets/runtime/ui/ui_completed_stage_late_badge_concept_v001.png`
+- `tools/extract-ui-state-assets.mjs`
+- `tools/generate-dev-runtime-assets.mjs`
+- `src/data/assetManifest.slice.v1.json`
+- `docs/asset-manifest.slice.v1.json`
+- `src/data/releaseCatalogAdapter.ts`
+- `src/phaser/scenes/WorldMapScene.ts`
+- `tmp/ui-worldmap-action-hit-target-audit.mjs`
+- `tmp/ui-quality/worldmap/worldmap-progress-current-stage9-v1-1920.png`
+- Visual inspection of `ui_completed_stage_badge_concept_v001.png`, `ui_completed_stage_late_badge_concept_v001.png`, and the late-progress WorldMap screenshot.
+- WorldMap audit verifies lower 1-3 completed nodes still use `ui_completed_stage_badge_concept`, while completed nodes after that group use `ui_completed_stage_late_badge_concept`.
+- Late-progress audit reported `visibleCompletedBaseBadges=3`, `expectedCompletedBaseBadges=3`, `visibleCompletedLateBadges=5`, and `expectedCompletedLateBadges=5`.
+- Default/progressed audits reported `visibleCompletedLateBadges=0`, so the late badge does not replace the lower completed-read.
+- Keyboard-selected WorldMap state still verifies the selected current node has no completed badge/body/frame overlap.
+- `node tools\extract-ui-state-assets.mjs`
+- `npm.cmd run assets:generate:dev`
+- `node tmp\ui-worldmap-action-hit-target-audit.mjs`
+- `node tmp\route-node-raster-hover-state-audit.mjs`
+- `npm.cmd run check`
+- Full `node tmp\run-phaser-smoke-with-vite.mjs` passed with `Phaser smoke OK`
+
+Current status: `Needs user review`
+
+Completion level: `Partially complete`
+
+This checkpoint splits the completed check treatment so mid/late completed WorldMap nodes no longer reuse the exact lower 1-3 completed badge texture. The new late badge is still source-derived from the original WorldMap concept, but the extraction uses a narrower, quieter completed variant so late-route completion reads less like a large lower-node sticker.
+
+This is not final completed-node recomposition. It improves one later-node variant gap, but full stage-family body/frame variants, lower-node silhouette recomposition, complete route-state material, visible tooltip/readability zones, mobile/responsive review, user acceptance, and final concept-match approval remain unfinished.
+
+## WorldMap Late Completed Stack Variant Checkpoint
+
+Date: 2026-06-13
+
+Evidence:
+
+- `assets/source/ui/ui_completed_stage_late_body_wash_concept_v001.png`
+- `assets/source/ui/ui_completed_stage_late_frame_concept_v001.png`
+- `public/assets/runtime/ui/ui_completed_stage_late_body_wash_concept_v001.png`
+- `public/assets/runtime/ui/ui_completed_stage_late_frame_concept_v001.png`
+- `tools/extract-ui-state-assets.mjs`
+- `tools/generate-dev-runtime-assets.mjs`
+- `src/data/assetManifest.slice.v1.json`
+- `docs/asset-manifest.slice.v1.json`
+- `src/data/releaseCatalogAdapter.ts`
+- `src/phaser/scenes/WorldMapScene.ts`
+- `tmp/ui-worldmap-action-hit-target-audit.mjs`
+- `tmp/ui-quality/worldmap/worldmap-progress-current-stage9-v1-1920.png`
+- Visual inspection of base/late completed body/frame PNGs plus the late-progress WorldMap screenshot.
+- WorldMap audit verifies completed body/frame texture-family choice separately from completed badge choice.
+- Late-progress audit reported `visibleCompletedBaseBodies=3`, `expectedCompletedBaseBodies=3`, `visibleCompletedLateBodies=5`, `expectedCompletedLateBodies=5`, `visibleCompletedBaseFrames=3`, `expectedCompletedBaseFrames=3`, `visibleCompletedLateFrames=5`, and `expectedCompletedLateFrames=5`.
+- Default/progressed audits reported `visibleCompletedLateBodies=0` and `visibleCompletedLateFrames=0`, so the late body/frame stack does not replace the lower completed-read.
+- Keyboard-selected WorldMap state still verifies the selected current node has no completed badge/body/frame overlap.
+- `node tools\extract-ui-state-assets.mjs`
+- `npm.cmd run assets:generate:dev`
+- `node tmp\ui-worldmap-action-hit-target-audit.mjs`
+- `node tmp\route-node-raster-hover-state-audit.mjs`
+- `npm.cmd run check`
+- Full `node tmp\run-phaser-smoke-with-vite.mjs` passed with `Phaser smoke OK`
+
+Current status: `Needs user review`
+
+Completion level: `Partially complete`
+
+This checkpoint extends the late completed-node split from the badge into the body/frame stack. Completed stages after the lower 1-3 group now use quieter source-derived body-wash and frame variants instead of only shrinking the same lower completed-node stack.
+
+This is still not final completed-node recomposition. It improves the later completed-node family, but full stage-specific body/frame variants, lower-node silhouette recomposition, complete route-state material, visible tooltip/readability zones, mobile/responsive review, user acceptance, and final concept-match approval remain unfinished.
+
+## Hidden Dynamic Accessibility-Label Checkpoint
+
+Date: 2026-06-13
+
+Evidence:
+
+- `src/ui/overlays/accessibilityOverlay.ts`
+- `src/ui/overlays/debugOverlay.ts`
+- `src/styles/phaser-shell.css`
+- `tools/ui-accessibility-overlay-audit.mjs`
+- `npx.cmd tsc --noEmit`
+- `node tools\ui-accessibility-overlay-audit.mjs`
+- `node tmp\route-node-raster-hover-state-audit.mjs`
+- `node tmp\ui-worldmap-action-hit-target-audit.mjs`
+- `npm.cmd run check`
+- `git diff --check`
+- Full `node tmp\run-phaser-smoke-with-vite.mjs` passed with `Phaser smoke OK`
+
+Current status: `Needs user review`
+
+Completion level: `Partially complete`
+
+This checkpoint adds a first dynamic accessibility-label strategy outside the baked raster concept layer. It creates a visually hidden `#game-accessibility-summary` with `role="status"`, `aria-live="polite"`, and `aria-atomic="true"`, then synchronizes the Phaser canvas `role="img"` / `aria-label` with the same scene-specific summary.
+
+The audit verifies Town, WorldMap, Dungeon, Combat, Reward, Event, RuneBench, Boss, Result, and Settings each expose the hidden summary/canvas label with a 1x1 hidden box. The summary is derived from `BootContext`, so it can describe the current scene, stage, room, player/combat, reward, event, rune, result, or settings state without adding visible Phaser text to concept screenshots. Route-node hover, WorldMap action/state audit, `npm.cmd run check`, `git diff --check`, and the full broad Phaser smoke passed after this hidden-label pass.
+
+This is not final dynamic readability approval. Hidden labels reduce the accessibility-safe text gap, but visible safe tooltip zones, gameplay-critical dynamic readability at 1920/1280/mobile sizes, user acceptance, and final concept-match approval remain unfinished.
+
+## Raster Responsive Sanity Checkpoint
+
+Date: 2026-06-13
+
+Evidence:
+
+- `tools/ui-responsive-raster-audit.mjs`
+- `tmp/ui-quality/responsive/town-desktop-1920.png`
+- `tmp/ui-quality/responsive/worldmap-desktop-1920.png`
+- `tmp/ui-quality/responsive/combat-desktop-1280.png`
+- `tmp/ui-quality/responsive/worldmap-mobile-390x844.png`
+- `tmp/ui-quality/responsive/settings-mobile-390x844.png`
+- `node tools\ui-responsive-raster-audit.mjs`
+
+Current status: `Needs user review`
+
+Completion level: `Partially complete`
+
+This checkpoint adds automated responsive sanity evidence for the ten primary raster scenes at 1920x1080, 1280x720, and 390x844 portrait. The audit verifies that each scene loads its raster underlay, the Phaser canvas fits the viewport using the expected 16:9 `FIT` size, hidden accessibility labels stay hidden, the canvas has a synchronized `aria-label`, and no visible Phaser text or rectangle overlays leak above the raster underlays.
+
+The audit passed for all 30 scene/viewport combinations. At 1920x1080 and 1280x720 the canvas fills the viewport. At 390x844 portrait the canvas renders safely at `390x219`; screenshot review confirms it is not clipped, but it is heavily letterboxed.
+
+This is not final mobile/responsive approval. It reduces the unverified responsive-safety gap, but portrait mobile framing/orientation treatment, visible tooltip/readability zones, user acceptance, and final concept-match approval remain unfinished.
+
+## Visible Readability Tooltip Checkpoint
+
+Date: 2026-06-14
+
+Evidence:
+
+- `src/ui/overlays/readabilityOverlay.ts`
+- `src/phaser/view/sceneShell.ts`
+- `src/styles/phaser-shell.css`
+- `src/phaser/scenes/TownScene.ts`
+- `src/phaser/scenes/WorldMapScene.ts`
+- `src/phaser/scenes/DungeonScene.ts`
+- `src/phaser/scenes/CombatScene.ts`
+- `src/phaser/scenes/RewardScene.ts`
+- `src/phaser/scenes/EventScene.ts`
+- `src/phaser/scenes/RuneBenchScene.ts`
+- `src/phaser/scenes/BossScene.ts`
+- `src/phaser/scenes/ResultScene.ts`
+- `src/phaser/scenes/SettingsScene.ts`
+- `tools/ui-readability-tooltip-audit.mjs`
+- `tmp/ui-quality/readability-tooltips/town-tooltip-v1-1920.png`
+- `tmp/ui-quality/readability-tooltips/worldmap-tooltip-v1-1920.png`
+- `tmp/ui-quality/readability-tooltips/combat-tooltip-v1-1920.png`
+- `tmp/ui-quality/readability-tooltips/settings-tooltip-v1-1920.png`
+- `tmp/ui-quality/readability-tooltips/worldmap-tooltip-v1-desktop-1280.png`
+- `tmp/ui-quality/readability-tooltips/worldmap-tooltip-v1-mobile-390x844.png`
+- `tmp/ui-quality/readability-tooltips/combat-tooltip-v1-mobile-390x844.png`
+- `tmp/ui-quality/readability-tooltips/settings-tooltip-v1-mobile-390x844.png`
+- Visual inspection of Combat and Settings tooltip screenshots.
+- Visual inspection of mobile WorldMap, Combat, and Settings tooltip screenshots.
+- `node tools\ui-readability-tooltip-audit.mjs` across 1920x1080, 1280x720, and 390x844 portrait.
+- `node tools\ui-accessibility-overlay-audit.mjs`
+- `node tools\ui-responsive-raster-audit.mjs`
+- `node tmp\ui-worldmap-action-hit-target-audit.mjs`
+- `node tmp\route-node-raster-hover-state-audit.mjs`
+- `npx.cmd tsc --noEmit`
+- `git diff --check`
+- Targeted `$env:PHASER_SMOKE_ONLY='checkViewScreenshots,checkClickableControls,checkFullInputCoverage,checkUiSkinStates'; node tmp\run-phaser-smoke-with-vite.mjs` passed with `Phaser smoke OK`.
+
+Current status: `Needs user review`
+
+Completion level: `Partially complete`
+
+This checkpoint adds the first visible dynamic readability layer for the raster concept screens. `#game-readability-tooltip` is a DOM overlay positioned against the Phaser canvas using the same 1920x1080 virtual coordinate system as the raster hit targets. It uses `role="tooltip"`, `aria-live="polite"`, clamps within the canvas/viewport, and is hidden by default so text does not leak into normal concept screenshots.
+
+The audit verifies representative hover/focus tooltips for Town, WorldMap, Dungeon, Combat, Reward, Event, RuneBench, Boss, Result, and Settings at 1920x1080, 1280x720, and 390x844 portrait. It checks title/body content, size, viewport/canvas bounds, z-index, pointer-events, canvas accessibility attributes, and screenshot capture. On narrow portrait letterboxed screens, the tooltip is now placed in the unused letterbox area instead of over the 16:9 playfield, and the audit requires those mobile tooltips not to overlap the canvas. This moves the UI beyond hidden-only accessibility labels, but it is not final readability approval.
+
+Remaining scope: broader gameplay-critical text decisions, disabled-state explanations, selected/focus tooltip consistency, full mobile framing/orientation review beyond tooltip placement, user acceptance, and final concept-match approval.
+
+## Disabled Explanation Tooltip Checkpoint
+
+Date: 2026-06-14
+
+Evidence:
+
+- `src/phaser/view/sceneShell.ts`
+- `src/phaser/scenes/EventScene.ts`
+- `src/phaser/scenes/CombatScene.ts`
+- `src/phaser/scenes/BossScene.ts`
+- `tmp/ui-disabled-raster-audit.mjs`
+- `tmp/combat-boss-disabled-raster-state-audit.mjs`
+- `tmp/ui-quality/disabled/event-disabled-tooltip-v1-1920.png`
+- `tmp/ui-quality/disabled/combat-disabled-card-tooltip-v1-1920.png`
+- `tmp/ui-quality/disabled/boss-disabled-card-tooltip-v1-1920.png`
+- Visual inspection of Event, Combat, and Boss disabled tooltip screenshots.
+- `node tmp\ui-disabled-raster-audit.mjs`
+- `node tmp\combat-boss-disabled-raster-state-audit.mjs`
+- `node tools\ui-readability-tooltip-audit.mjs`
+- `node tools\ui-accessibility-overlay-audit.mjs`
+- `npm.cmd run check`
+- Targeted `$env:PHASER_SMOKE_ONLY='checkViewScreenshots,checkClickableControls,checkFullInputCoverage,checkUiSkinStates'; node tmp\run-phaser-smoke-with-vite.mjs` passed with `Phaser smoke OK`.
+
+Current status: `Needs user review`
+
+Completion level: `Partially complete`
+
+This checkpoint adds visible explanations to already-audited locked controls without adding new vector overlays or making disabled controls actionable. `renderRasterDisabledHitTarget` now supports the same DOM tooltip metadata as hover targets while keeping the non-hand-cursor inert hit target. Event unaffordable choices explain missing HP/gold conditions, and Combat/Boss cost-disabled cards explain current energy versus required energy using `getCombatCardCostAtIndex`, the same adjusted-cost path as gameplay.
+
+The audits verify the danger-tone tooltip, role/aria behavior, viewport/canvas bounds, no visible Phaser text/vector leakage, and unchanged blocked click/keyboard behavior. This improves disabled readability, but it is not broad disabled approval across every possible control.
+
+Remaining scope: broader disabled-state breadth, broader selected/focus approval beyond the representative focus-tooltip audit, full mobile framing/orientation review, user acceptance, and final concept-match approval.
+
+## Keyboard Focus Tooltip Checkpoint
+
+Date: 2026-06-14
+
+Evidence:
+
+- `tools/ui-keyboard-focus-tooltip-audit.mjs`
+- `tmp/ui-quality/focus-tooltips/town-focus-tooltip-v1-1920.png`
+- `tmp/ui-quality/focus-tooltips/dungeon-focus-tooltip-v1-1920.png`
+- `tmp/ui-quality/focus-tooltips/combat-focus-tooltip-v1-1920.png`
+- `tmp/ui-quality/focus-tooltips/reward-focus-tooltip-v1-1920.png`
+- `tmp/ui-quality/focus-tooltips/event-focus-tooltip-v1-desktop-1280.png`
+- `tmp/ui-quality/focus-tooltips/boss-focus-tooltip-v1-mobile-390x844.png`
+- `tmp/ui-quality/focus-tooltips/settings-focus-tooltip-v1-mobile-390x844.png`
+- `node tools\ui-keyboard-focus-tooltip-audit.mjs`
+- `node tools\ui-readability-tooltip-audit.mjs`
+- `node tools\ui-accessibility-overlay-audit.mjs`
+- `npx.cmd tsc --noEmit`
+- `git diff --check`
+- `npm.cmd run check`
+- Targeted `$env:PHASER_SMOKE_ONLY='checkViewScreenshots,checkClickableControls,checkFullInputCoverage,checkUiSkinStates'; node tmp\run-phaser-smoke-with-vite.mjs` passed with `Phaser smoke OK`.
+
+Current status: `Needs user review`
+
+Completion level: `Partially complete`
+
+This checkpoint verifies that representative keyboard focus paths trigger the same visible DOM readability tooltip layer as pointer hover. The audit covers Town, Dungeon, Combat, Reward, Event, RuneBench, Boss, Result, and Settings at 1920x1080, 1280x720, and 390x844. It checks the expected focus registry value, tooltip role/aria attributes, scene/tone metadata, title/body length, safe desktop canvas placement, safe mobile letterbox placement, pointer-events, z-index, canvas role, and canvas `aria-label`.
+
+This closes the representative selected/focus tooltip-consistency gap for the audited controls. It does not finish broader keyboard/focus approval because WorldMap stage selection follows a separate map-selection path, unaudited controls may still need focus/readability review, and user acceptance is still missing.
+
+Remaining scope: broader gameplay-critical readable text, full selected/focus approval across every relevant control, broader disabled-state breadth, full mobile framing/orientation review, user acceptance, and final concept-match approval.
+
+## WorldMap Locked Node Tooltip Checkpoint
+
+Date: 2026-06-14
+
+Evidence:
+
+- `src/phaser/view/sceneShell.ts`
+- `src/phaser/scenes/WorldMapScene.ts`
+- `tools/ui-worldmap-locked-tooltip-audit.mjs`
+- `tmp/ui-quality/worldmap-locked-tooltips/sealed-next-locked-tooltip-v1-1920.png`
+- `tmp/ui-quality/worldmap-locked-tooltips/dormant-mid-locked-tooltip-v1-1920.png`
+- `tmp/ui-quality/worldmap-locked-tooltips/red-far-locked-tooltip-v1-1920.png`
+- `tmp/ui-quality/worldmap-locked-tooltips/red-next-locked-tooltip-v1-mobile-390x844.png`
+- `tmp/ui-quality/worldmap-locked-tooltips/red-boss-locked-tooltip-v1-1920.png`
+- `tmp/ui-quality/worldmap-locked-tooltips/red-boss-locked-tooltip-v1-mobile-390x844.png`
+- `node tools\ui-worldmap-locked-tooltip-audit.mjs`
+- `node tmp\ui-worldmap-action-hit-target-audit.mjs`
+- `node tools\ui-readability-tooltip-audit.mjs`
+- `node tools\ui-keyboard-focus-tooltip-audit.mjs`
+- `node tools\ui-accessibility-overlay-audit.mjs`
+- `npx.cmd tsc --noEmit`
+- `git diff --check`
+- `npm.cmd run check`
+- Targeted `$env:PHASER_SMOKE_ONLY='checkViewScreenshots,checkClickableControls,checkFullInputCoverage,checkUiSkinStates'; node tmp\run-phaser-smoke-with-vite.mjs` passed with `Phaser smoke OK`.
+
+Current status: `Needs user review`
+
+Completion level: `Partially complete`
+
+This checkpoint extends disabled/readability coverage to WorldMap locked nodes. `renderRasterDisabledHitTarget` can now run as a tooltip-only hit target with `disabledKey: false`, so WorldMap can expose readable explanations over already-rendered locked/sealed/dormant node art without adding an extra generic lock stamp. The tooltip stays danger-toned, role/aria-backed, non-clickable, and safe in desktop canvas or mobile letterbox placement.
+
+The audit covers sealed-next, dormant-mid, far red locked, next red locked, and boss red locked states at 1920x1080, 1280x720, and 390x844. It verifies the scene remains `WorldMapScene`, the current stage is unchanged after click, the target stage remains locked, no default disabled stamp becomes visible, tooltip title/body/tone/role/aria are correct, and canvas/accessibility metadata remains intact. The boss case seeds `stage_dream_arcade` as the first boss-sized locked node and verifies `꿈빛 오락실 · 잠김` with `firstLockedIndex=13`.
+
+Remaining scope: full WorldMap node and route recomposition, broader disabled-state breadth outside the audited paths, full selected/focus approval, full mobile framing/orientation review, user acceptance, and final concept-match approval.
+
+## WorldMap Keyboard Selection Tooltip Checkpoint
+
+Date: 2026-06-14
+
+Evidence:
+
+- `src/phaser/view/sceneShell.ts`
+- `src/phaser/scenes/WorldMapScene.ts`
+- `tools/ui-worldmap-keyboard-tooltip-audit.mjs`
+- `tmp/ui-quality/worldmap-keyboard-tooltips/lower-left-keyboard-tooltip-v1-1920.png`
+- `tmp/ui-quality/worldmap-keyboard-tooltips/late-right-keyboard-tooltip-v1-1920.png`
+- `tmp/ui-quality/worldmap-keyboard-tooltips/lower-left-keyboard-tooltip-v1-mobile-390x844.png`
+- `tmp/ui-quality/worldmap-keyboard-tooltips/late-right-keyboard-tooltip-v1-mobile-390x844.png`
+- `node tools\ui-worldmap-keyboard-tooltip-audit.mjs`
+- `node tmp\ui-worldmap-action-hit-target-audit.mjs`
+- `node tools\ui-worldmap-locked-tooltip-audit.mjs`
+- `node tools\ui-readability-tooltip-audit.mjs`
+- `node tools\ui-keyboard-focus-tooltip-audit.mjs`
+- `node tools\ui-accessibility-overlay-audit.mjs`
+- `npx.cmd tsc --noEmit`
+- `git diff --check`
+- `npm.cmd run check`
+- Targeted `$env:PHASER_SMOKE_ONLY='checkViewScreenshots,checkClickableControls,checkFullInputCoverage,checkUiSkinStates'; node tmp\run-phaser-smoke-with-vite.mjs` passed with `Phaser smoke OK`.
+
+Current status: `Needs user review`
+
+Completion level: `Partially complete`
+
+This checkpoint connects WorldMap direction-key stage selection to the visible DOM readability layer. The implementation uses `showRasterReadabilityTooltip` so keyboard selection can show readable copy for the selected stage without enabling an extra hover bitmap. The existing selected/current marker, body, frame, status, and halo stack remains the visual state language.
+
+The audit covers a lower-left selection to `stage_sunny_gate` and a late-right selection to `stage_prism_school` at 1920x1080, 1280x720, and 390x844. It verifies the selected stage becomes current, the tooltip title/body/tone/role/aria are correct, mobile placement remains outside the canvas, there is exactly one current halo, and no visible Phaser text/vector leak appears above the raster underlay.
+
+Remaining scope: full selected/focus approval across unaudited paths, full WorldMap node and route recomposition, broader disabled-state breadth outside the audited paths, full mobile framing/orientation review, user acceptance, and final concept-match approval.
+
+## Mobile Portrait Framing Cue Checkpoint
+
+Date: 2026-06-14
+
+Evidence:
+
+- `src/ui/overlays/mobileFramingOverlay.ts`
+- `src/ui/overlays/debugOverlay.ts`
+- `src/ui/overlays/readabilityOverlay.ts`
+- `src/styles/phaser-shell.css`
+- `tools/ui-mobile-framing-audit.mjs`
+- `tmp/ui-quality/mobile-framing/worldmap-framing-v1-mobile-390x844.png`
+- `tmp/ui-quality/mobile-framing/combat-framing-v1-mobile-390x844.png`
+- `tmp/ui-quality/mobile-framing/settings-framing-v1-mobile-390x844.png`
+- `tmp/ui-quality/mobile-framing/combat-tooltip-suppresses-framing-v1-mobile-390x844.png`
+- `node tools\ui-mobile-framing-audit.mjs`
+- `node tools\ui-responsive-raster-audit.mjs`
+- `node tools\ui-readability-tooltip-audit.mjs`
+- `node tools\ui-accessibility-overlay-audit.mjs`
+- `node tools\ui-keyboard-focus-tooltip-audit.mjs`
+- `npx.cmd tsc --noEmit`
+- `git diff --check`
+- `npm.cmd run check`
+- Targeted `$env:PHASER_SMOKE_ONLY='checkViewScreenshots,checkClickableControls,checkFullInputCoverage,checkUiSkinStates'; node tmp\run-phaser-smoke-with-vite.mjs` passed with `Phaser smoke OK`.
+
+Current status: `Needs user review`
+
+Completion level: `95% candidate, not final`
+
+This checkpoint adds the first deliberate mobile portrait framing treatment for the current Phaser FIT layout. In 390x844 portrait, the 16:9 canvas remains `390x219`, but a DOM cue now appears in the unused letterbox area instead of covering the playfield. It is hidden on 1920x1080, 1280x720, and 844x390 landscape, and it uses `pointer-events: none` so it cannot block play.
+
+The readability tooltip layer has priority. When a detailed tooltip appears, the framing cue is immediately suppressed and marked `aria-hidden=true`; the mobile framing audit verifies this with the Combat tooltip case.
+
+Remaining scope: full mobile UX approval across real devices/browsers, broader gameplay-critical readable text, full selected/focus approval across unaudited paths, broader disabled-state breadth, full WorldMap node and route recomposition, user acceptance, and final concept-match approval.
+
+## WorldMap Locked Future Route Checkpoint
+
+Date: 2026-06-14
+
+Evidence:
+
+- `src/phaser/scenes/WorldMapScene.ts`
+- `tools/extract-ui-state-assets.mjs`
+- `tools/generate-dev-runtime-assets.mjs`
+- `src/data/assetManifest.slice.v1.json`
+- `src/data/releaseCatalogAdapter.ts`
+- `assets/source/ui/ui_world_map_route_locked_thread_concept_v001.png`
+- `assets/source/ui/ui_world_map_route_locked_bead_concept_v001.png`
+- `public/assets/runtime/ui/ui_world_map_route_locked_thread_concept_v001.png`
+- `public/assets/runtime/ui/ui_world_map_route_locked_bead_concept_v001.png`
+- `tmp/ui-worldmap-action-hit-target-audit.mjs`
+- `tmp/ui-quality/worldmap/worldmap-state-overlays-v1-1920.png`
+- `tmp/ui-quality/worldmap/worldmap-progress-current-stage4-v1-1920.png`
+- `tmp/ui-quality/worldmap/worldmap-progress-current-stage9-v1-1920.png`
+- `node tmp\ui-worldmap-action-hit-target-audit.mjs`
+- `node tmp\route-node-raster-hover-state-audit.mjs`
+- `node tools\ui-worldmap-keyboard-tooltip-audit.mjs`
+- `node tools\ui-worldmap-locked-tooltip-audit.mjs`
+- `npm.cmd run assets:audit:strict`
+- `npx.cmd tsc --noEmit`
+- `git diff --check`
+- `npm.cmd run check`
+- Targeted `$env:PHASER_SMOKE_ONLY='checkViewScreenshots,checkClickableControls,checkFullInputCoverage,checkUiSkinStates'; node tmp\run-phaser-smoke-with-vite.mjs` passed with `Phaser smoke OK`.
+
+Current status: `Needs user review`
+
+Completion level: `95% candidate, not final`
+
+This checkpoint splits WorldMap route state into three visible runtime material families: completed route, brighter current/final route, and muted locked/future route. The new locked route thread and bead assets are source-derived from the WorldMap route crop, processed as gray locked material, and rendered only on forward route segments whose destination stage is still locked.
+
+The WorldMap action audit now verifies locked route thread/bead counts and placements in default, stage-4-progress, and stage-9-progress states, while keyboard-selected state verifies zero locked route overlays so selected-stage evidence stays focused on the marker/tooltip stack.
+
+Remaining scope: full WorldMap node/body and route recomposition, lower-node silhouette replacement beyond neutralized underlay samples, broader disabled/focus/readability coverage, user acceptance, and final concept-match approval.
+
+## WorldMap Lower Node Body Checkpoint
+
+Date: 2026-06-14
+
+Evidence:
+
+- `src/phaser/scenes/WorldMapScene.ts`
+- `tools/extract-ui-state-assets.mjs`
+- `tools/generate-dev-runtime-assets.mjs`
+- `src/data/assetManifest.slice.v1.json`
+- `src/data/releaseCatalogAdapter.ts`
+- `assets/source/ui/ui_world_map_lower_node_body_concept_v001.png`
+- `public/assets/runtime/ui/ui_world_map_lower_node_body_concept_v001.png`
+- `tmp/ui-worldmap-action-hit-target-audit.mjs`
+- `tmp/ui-quality/worldmap/worldmap-state-overlays-v1-1920.png`
+- `tmp/ui-quality/worldmap/worldmap-progress-current-stage4-v1-1920.png`
+- `tmp/ui-quality/worldmap/worldmap-progress-current-stage9-v1-1920.png`
+- `node tmp\ui-worldmap-action-hit-target-audit.mjs`
+- `node tmp\route-node-raster-hover-state-audit.mjs`
+- `node tools\ui-worldmap-keyboard-tooltip-audit.mjs`
+- `node tools\ui-worldmap-locked-tooltip-audit.mjs`
+- `npm.cmd run assets:audit:strict`
+- `npx.cmd tsc --noEmit`
+- `git diff --check`
+- `npm.cmd run check`
+- Targeted `$env:PHASER_SMOKE_ONLY='checkViewScreenshots,checkClickableControls,checkFullInputCoverage,checkUiSkinStates'; node tmp\run-phaser-smoke-with-vite.mjs` passed with `Phaser smoke OK`.
+
+Current status: `Needs user review`
+
+Completion level: `95% candidate, not final`
+
+This checkpoint adds a first neutral lower-node body layer for the WorldMap's lower 1-5 node family. The source asset comes from the lower completed-node concept crop, but the extraction flattens the baked number area and cuts the completed check badge so the common body does not carry source-specific state into current, completed, sealed, or dormant runtime states.
+
+`WorldMapScene` renders the layer at low depth after the underlay and below runtime route overlays plus state body/frame/badge stacks. The WorldMap action audit now verifies `visibleLowerNodeBodies=5` and `expectedLowerNodeBodies=5` in default, stage-4-progress, and stage-9-progress states, including placement, size, and alpha checks.
+
+Remaining scope: this improves lower-node silhouette recomposition, but it is still not full WorldMap node/body recomposition. Stronger stage-specific current/completed/locked/sealed/dormant body variants, broader disabled/focus/readability coverage, user acceptance, and final concept-match approval remain.
+
+## WorldMap Lower Node Frame Checkpoint
+
+Date: 2026-06-14
+
+Evidence:
+
+- `src/phaser/scenes/WorldMapScene.ts`
+- `tools/extract-ui-state-assets.mjs`
+- `tools/generate-dev-runtime-assets.mjs`
+- `src/data/assetManifest.slice.v1.json`
+- `docs/asset-manifest.slice.v1.json`
+- `src/data/releaseCatalogAdapter.ts`
+- `assets/source/ui/ui_world_map_lower_node_frame_concept_v001.png`
+- `public/assets/runtime/ui/ui_world_map_lower_node_frame_concept_v001.png`
+- `tmp/ui-worldmap-action-hit-target-audit.mjs`
+- `tmp/ui-quality/worldmap/worldmap-state-overlays-v1-1920.png`
+- `tmp/ui-quality/worldmap/worldmap-progress-current-stage4-v1-1920.png`
+- `tmp/ui-quality/worldmap/worldmap-progress-current-stage9-v1-1920.png`
+- `node tmp\ui-worldmap-action-hit-target-audit.mjs`
+- `node tmp\route-node-raster-hover-state-audit.mjs`
+- `node tools\ui-worldmap-keyboard-tooltip-audit.mjs`
+- `node tools\ui-worldmap-locked-tooltip-audit.mjs`
+- `npm.cmd run assets:audit:strict`
+- `npx.cmd tsc --noEmit`
+- `git diff --check`
+- `npm.cmd run check`
+- Targeted `$env:PHASER_SMOKE_ONLY='checkViewScreenshots,checkClickableControls,checkFullInputCoverage,checkUiSkinStates'; node tmp\run-phaser-smoke-with-vite.mjs` passed with `Phaser smoke OK`.
+
+Current status: `Needs user review`
+
+Completion level: `95% candidate, not final`
+
+This checkpoint adds a warm lower-node frame layer for the WorldMap's lower 1-5 node family. The source asset comes from the same lower completed-node concept crop as the neutral body, but it is processed as a number/check-free rim. The extraction mirrors the cleaner left-side rim to avoid dragging right-side route fragments into the reusable runtime frame.
+
+`WorldMapScene` renders the frame above the neutral lower-node body and below route overlays plus runtime state stacks. The WorldMap action audit now verifies `visibleLowerNodeFrames=5` and `expectedLowerNodeFrames=5` in default, stage-4-progress, and stage-9-progress states, including placement, size, and alpha checks.
+
+Remaining scope: this improves lower-node silhouette depth, but it is still not full WorldMap node/body recomposition. Stronger stage-specific current/completed/locked/sealed/dormant body variants, broader disabled/focus/readability coverage, user acceptance, and final concept-match approval remain.
+
+## WorldMap Mid Sealed Node Checkpoint
+
+Date: 2026-06-14
+
+Evidence:
+
+- `src/phaser/scenes/WorldMapScene.ts`
+- `tools/extract-ui-state-assets.mjs`
+- `tools/generate-dev-runtime-assets.mjs`
+- `src/data/assetManifest.slice.v1.json`
+- `docs/asset-manifest.slice.v1.json`
+- `src/data/releaseCatalogAdapter.ts`
+- `assets/source/ui/ui_sealed_stage_mid_body_wash_concept_v001.png`
+- `assets/source/ui/ui_sealed_stage_mid_frame_concept_v001.png`
+- `public/assets/runtime/ui/ui_sealed_stage_mid_body_wash_concept_v001.png`
+- `public/assets/runtime/ui/ui_sealed_stage_mid_frame_concept_v001.png`
+- `tmp/ui-worldmap-action-hit-target-audit.mjs`
+- `tmp/ui-quality/worldmap/worldmap-progress-mid-sealed-stage6-v1-1920.png`
+- `node tmp\ui-worldmap-action-hit-target-audit.mjs`
+- `node tmp\route-node-raster-hover-state-audit.mjs`
+- `node tools\ui-worldmap-keyboard-tooltip-audit.mjs`
+- `node tools\ui-worldmap-locked-tooltip-audit.mjs`
+- `npm.cmd run assets:audit:strict`
+- `npx.cmd tsc --noEmit`
+- `npm.cmd run check`
+- Targeted `$env:PHASER_SMOKE_ONLY='checkViewScreenshots,checkClickableControls,checkFullInputCoverage,checkUiSkinStates'; node tmp\run-phaser-smoke-with-vite.mjs` passed with `Phaser smoke OK`.
+
+Current status: `Needs user review`
+
+Completion level: `95% candidate, not final`
+
+This checkpoint splits the first locked sealed-node material into lower/base and mid-route texture families. The new mid sealed body/frame assets reuse the gray sealed source crop with quieter `sealedMid` processing, keeping the transferable material number-safe and seal-center-safe while avoiding the stronger lower sealed stack on mid-route nodes.
+
+`WorldMapScene` keeps the base sealed body/frame for first locked lower nodes and uses the mid sealed body/frame for first locked sealed nodes after the lower 1-5 family. The WorldMap action audit now includes a stage-6/current, stage-7 first-locked evidence case and verifies `visibleSealedMidBodies=1` / `visibleSealedMidFrames=1`, while the earlier lower sealed states continue to verify base sealed 1 / mid sealed 0.
+
+Remaining scope: this improves one sealed-node stage-family gap, but it is still not full WorldMap node/body recomposition. Stronger stage-specific current/completed/locked/sealed/dormant body variants, broader disabled/focus/readability coverage, user acceptance, and final concept-match approval remain.
+
+## 2026-06-14 WorldMap Boss Red Locked-Node Variant Checkpoint
+
+Status: `Needs user review`
+
+Completion level: `95% candidate, not final`
+
+Evidence:
+
+- `assets/source/ui/ui_locked_stage_boss_body_wash_concept_v001.png`
+- `assets/source/ui/ui_locked_stage_boss_frame_concept_v001.png`
+- `public/assets/runtime/ui/ui_locked_stage_boss_body_wash_concept_v001.png`
+- `public/assets/runtime/ui/ui_locked_stage_boss_frame_concept_v001.png`
+- `tmp/ui-quality/worldmap/worldmap-state-overlays-v1-1920.png`
+- `tmp/ui-quality/worldmap/worldmap-progress-current-stage9-v1-1920.png`
+- `tmp/ui-quality/worldmap-locked-tooltips/red-boss-locked-tooltip-v1-1920.png`
+- `tmp/ui-quality/worldmap-locked-tooltips/red-boss-locked-tooltip-v1-mobile-390x844.png`
+- `node tmp\ui-worldmap-action-hit-target-audit.mjs`
+- `node tools\ui-worldmap-keyboard-tooltip-audit.mjs`
+- `node tools\ui-worldmap-locked-tooltip-audit.mjs`
+- `node tmp\route-node-raster-hover-state-audit.mjs`
+- `npm.cmd run assets:audit:strict`
+- `npx.cmd tsc --noEmit`
+- `npm.cmd run check`
+- `git diff --check`
+- Targeted `$env:PHASER_SMOKE_ONLY='checkViewScreenshots,checkClickableControls,checkFullInputCoverage,checkUiSkinStates'; node tmp\run-phaser-smoke-with-vite.mjs` passed with `Phaser smoke OK`.
+
+This checkpoint splits upper red locked-node body/frame material into next/base, far non-boss, and boss-sized texture families. The new boss body/frame assets are extracted from the actual upper boss red-lock crop with number/lock/route/background-safe masking.
+
+`WorldMapScene` uses the boss locked family for stage indexes 13+ when available, while the first/next non-boss red lock keeps the base family and other non-boss red locks keep the far family. The WorldMap action audit now verifies default, stage-4-progress, and mid-sealed states as 0 next + 4 far + 2 boss locked bodies/frames, and late-progress as 1 next + 3 far + 2 boss locked bodies/frames.
+
+Remaining scope: this improves one upper locked-node stage-family gap, but it is still not full WorldMap node/body recomposition. Stronger stage-specific current/completed/locked/sealed/dormant body variants, broader disabled/focus/readability coverage, user acceptance, and final concept-match approval remain.
+
+Follow-up evidence: `tools/ui-worldmap-locked-tooltip-audit.mjs` now includes `red-boss`, so the new boss locked family has locked-condition tooltip proof in addition to body/frame visual proof. The boss tooltip audit passes at 1920x1080, 1280x720, and 390x844 with `stage_dream_arcade`, `꿈빛 오락실 · 잠김`, unchanged current stage, no default disabled stamp, and safe mobile letterbox placement.
+
+## 2026-06-14 WorldMap Boss Keyboard Tooltip Checkpoint
+
+Status: `Needs user review`
+
+Completion level: `95% candidate, not final`
+
+Evidence:
+
+- `tools/ui-worldmap-keyboard-tooltip-audit.mjs`
+- `tmp/ui-quality/worldmap-keyboard-tooltips/boss-up-keyboard-tooltip-v1-1920.png`
+- `tmp/ui-quality/worldmap-keyboard-tooltips/boss-up-keyboard-tooltip-v1-desktop-1280.png`
+- `tmp/ui-quality/worldmap-keyboard-tooltips/boss-up-keyboard-tooltip-v1-mobile-390x844.png`
+- `node tools\ui-worldmap-keyboard-tooltip-audit.mjs`
+- `npx.cmd tsc --noEmit`
+- `git diff --check`
+- `npm.cmd run check`
+- Targeted `$env:PHASER_SMOKE_ONLY='checkViewScreenshots,checkClickableControls,checkFullInputCoverage,checkUiSkinStates'; node tmp\run-phaser-smoke-with-vite.mjs` passed with `Phaser smoke OK`.
+
+This checkpoint extends WorldMap keyboard-selected stage tooltip evidence to the upper boss route. The new `boss-up` audit case seeds the upper route, presses `ArrowUp`, selects `stage_dream_arcade`, and verifies the choice-tone DOM tooltip without adding another hover image or visible Phaser text/vector overlay.
+
+The audit now covers lower-left, late-right, and boss-up keyboard-selected stage paths across 1920x1080, 1280x720, and 390x844. A later strengthening pass verifies the full selected/current stack for all three paths: one current marker, one current halo, one current body, one current frame, one current status badge, correct base/late current material choice, safe desktop/mobile tooltip placement, canvas accessibility metadata, no visible text/vector leak above the raster underlay, no conflicting completed/locked/sealed/dormant overlays on the selected node, and a `flow:stage_select:<stageId>` log entry.
+
+Remaining scope: this improves selected-stage readability and selected/current-state evidence for the main WorldMap route families, but it is still not full selected/focus approval or full WorldMap node/body recomposition. Broader disabled/focus/readability coverage, user acceptance, and final concept-match approval remain.
+
+## 2026-06-14 WorldMap Open Node Tooltip Checkpoint
+
+Status: `Needs user review`
+
+Completion level: `95% candidate, not final`
+
+Evidence:
+
+- `tools/ui-worldmap-open-node-tooltip-audit.mjs`
+- `tmp/ui-quality/worldmap-open-node-tooltips/boss-open-open-node-tooltip-v1-1920.png`
+- `tmp/ui-quality/worldmap-open-node-tooltips/boss-open-open-node-tooltip-v1-desktop-1280.png`
+- `tmp/ui-quality/worldmap-open-node-tooltips/boss-open-open-node-tooltip-v1-mobile-390x844.png`
+- `node tools\ui-worldmap-open-node-tooltip-audit.mjs`
+- `node tools\ui-worldmap-keyboard-tooltip-audit.mjs`
+- `node tools\ui-worldmap-locked-tooltip-audit.mjs`
+- `npx.cmd tsc --noEmit`
+- `git diff --check`
+- `npm.cmd run check`
+- Targeted `$env:PHASER_SMOKE_ONLY='checkViewScreenshots,checkClickableControls,checkFullInputCoverage,checkUiSkinStates'; node tmp\run-phaser-smoke-with-vite.mjs` passed with `Phaser smoke OK`.
+
+This checkpoint adds route-family evidence for pointer hover/click on unlocked WorldMap stage nodes. The new audit covers lower-open, mid-open, and boss-open nodes across 1920x1080, 1280x720, and 390x844. Each case verifies choice-tone tooltip content, exactly two visible halo images during hover, the original current marker/body/frame/status stack staying anchored to the current node, correct base/late current material choice, target completed body/frame/badge stack retention, no conflicting current-node or target-node state overlays, no visible Phaser text/vector leak, safe desktop/mobile placement, and click selection into the hovered stage.
+
+Remaining scope: this improves open-node pointer readability evidence, but it is still not full selected/focus approval or full WorldMap node/body recomposition. Broader disabled/focus/readability coverage, user acceptance, and final concept-match approval remain.
+
+## 2026-06-14 WorldMap Open Node Down-State Checkpoint
+
+Status: `Needs user review`
+
+Completion level: `95% candidate, not final`
+
+Evidence:
+
+- `tools/ui-worldmap-open-node-down-audit.mjs`
+- `tmp/ui-quality/worldmap-open-node-down/boss-open-open-node-down-v1-1920.png`
+- `tmp/ui-quality/worldmap-open-node-down/boss-open-open-node-down-v1-desktop-1280.png`
+- `tmp/ui-quality/worldmap-open-node-down/boss-open-open-node-down-v1-mobile-390x844.png`
+- `node tools\ui-worldmap-open-node-down-audit.mjs`
+- `node tools\ui-worldmap-open-node-tooltip-audit.mjs`
+- `node tools\ui-worldmap-keyboard-tooltip-audit.mjs`
+- `npx.cmd tsc --noEmit`
+- `git diff --check`
+- `npm.cmd run check`
+- Targeted `$env:PHASER_SMOKE_ONLY='checkViewScreenshots,checkClickableControls,checkFullInputCoverage,checkUiSkinStates'; node tmp\run-phaser-smoke-with-vite.mjs` passed with `Phaser smoke OK`.
+
+This checkpoint adds route-family evidence for pointer-down/pressed state on unlocked WorldMap stage nodes. The new audit covers lower-open, mid-open, and boss-open nodes across 1920x1080, 1280x720, and 390x844. Each case verifies the expected pressed-size halo dimensions and alpha, retained choice-tone tooltip content, the original current marker/body/frame/status stack staying anchored to the current node, correct base/late current material choice, target completed body/frame/badge stack retention, no conflicting current-node or target-node state overlays, no visible Phaser text/vector leak, safe desktop/mobile placement, and pointer-up selection into the pressed stage.
+
+Remaining scope: this improves open-node pressed/down evidence, but it is still not full selected/focus approval or full WorldMap node/body recomposition. Broader disabled/focus/readability coverage, user acceptance, and final concept-match approval remain.
+
+## 2026-06-14 WorldMap Open Target-Stack Checkpoint
+
+Status: `Needs user review`
+
+Completion level: `95% candidate, not final`
+
+Evidence:
+
+- `tools/ui-worldmap-open-node-tooltip-audit.mjs`
+- `tools/ui-worldmap-open-node-down-audit.mjs`
+- `tmp/ui-quality/worldmap-open-node-tooltips/lower-open-open-node-tooltip-v1-1920.png`
+- `tmp/ui-quality/worldmap-open-node-tooltips/mid-open-open-node-tooltip-v1-1920.png`
+- `tmp/ui-quality/worldmap-open-node-tooltips/boss-open-open-node-tooltip-v1-1920.png`
+- `tmp/ui-quality/worldmap-open-node-down/lower-open-open-node-down-v1-1920.png`
+- `tmp/ui-quality/worldmap-open-node-down/mid-open-open-node-down-v1-1920.png`
+- `tmp/ui-quality/worldmap-open-node-down/boss-open-open-node-down-v1-1920.png`
+- `node tools\ui-worldmap-open-node-tooltip-audit.mjs`
+- `node tools\ui-worldmap-open-node-down-audit.mjs`
+- `node tools\ui-worldmap-open-node-selection-audit.mjs`
+- `node tools\ui-worldmap-keyboard-tooltip-audit.mjs`
+- `node tools\ui-worldmap-locked-tooltip-audit.mjs`
+- `npx.cmd tsc --noEmit`
+- `git diff --check`
+- `npm.cmd run check`
+- Targeted `$env:PHASER_SMOKE_ONLY='checkViewScreenshots,checkClickableControls,checkFullInputCoverage,checkUiSkinStates'; node tmp\run-phaser-smoke-with-vite.mjs` passed with `Phaser smoke OK`.
+
+This checkpoint strengthens open-node hover/down evidence by verifying the target node's own completed stack, not only the temporary halo or the original current stack. The strengthened audits cover lower-open, mid-open, and boss-open nodes across 1920x1080, 1280x720, and 390x844. Lower-open verifies the `completed-base` body/frame/badge family, while mid-open and boss-open verify the `completed-late` body/frame/badge family. Each case also verifies no current marker/body/frame/status stack and no locked/sealed/dormant stack appears on the hovered or pressed target.
+
+Remaining scope: this improves open-node target-state evidence, but it is still not full selected/focus approval or full WorldMap node/body recomposition. Broader disabled/focus/readability coverage, user acceptance, and final concept-match approval remain.
+
+## 2026-06-14 WorldMap Open Node Selection-State Checkpoint
+
+Status: `Needs user review`
+
+Completion level: `95% candidate, not final`
+
+Evidence:
+
+- `tools/ui-worldmap-open-node-selection-audit.mjs`
+- `tmp/ui-quality/worldmap-open-node-selection/boss-open-open-node-selection-v1-1920.png`
+- `tmp/ui-quality/worldmap-open-node-selection/boss-open-open-node-selection-v1-desktop-1280.png`
+- `tmp/ui-quality/worldmap-open-node-selection/boss-open-open-node-selection-v1-mobile-390x844.png`
+- `node tools\ui-worldmap-open-node-selection-audit.mjs`
+- `node tools\ui-worldmap-open-node-tooltip-audit.mjs`
+- `node tools\ui-worldmap-open-node-down-audit.mjs`
+- `node tools\ui-worldmap-keyboard-tooltip-audit.mjs`
+- `npx.cmd tsc --noEmit`
+- `git diff --check`
+- `npm.cmd run check`
+- Targeted `$env:PHASER_SMOKE_ONLY='checkViewScreenshots,checkClickableControls,checkFullInputCoverage,checkUiSkinStates'; node tmp\run-phaser-smoke-with-vite.mjs` passed with `Phaser smoke OK`.
+
+This checkpoint adds route-family evidence for post-click selected/current state on unlocked WorldMap stage nodes. The new audit covers lower-open, mid-open, and boss-open nodes across 1920x1080, 1280x720, and 390x844. Each case clicks the target node, waits for `context.run.stageId` to become the clicked stage, moves the pointer away, then verifies the current marker, halo, body, frame, and status badge are anchored to the selected node. It also verifies base current material for the lower node, late current material for mid/boss nodes, no conflicting completed/locked/sealed/dormant overlays on the selected node, no visible Phaser text/vector leak, no stale tooltip, and a `flow:stage_select:<stageId>` log entry.
+
+Remaining scope: this improves open-node click selection evidence, but it is still not full selected/focus approval or full WorldMap node/body recomposition. Broader disabled/focus/readability coverage, user acceptance, and final concept-match approval remain.
+
+## 2026-06-14 WorldMap Locked Node Current-Stack Checkpoint
+
+Status: `Needs user review`
+
+Completion level: `95% candidate, not final`
+
+Evidence:
+
+- `tools/ui-worldmap-locked-tooltip-audit.mjs`
+- `tmp/ui-quality/worldmap-locked-tooltips/red-boss-locked-tooltip-v1-1920.png`
+- `tmp/ui-quality/worldmap-locked-tooltips/red-boss-locked-tooltip-v1-desktop-1280.png`
+- `tmp/ui-quality/worldmap-locked-tooltips/red-boss-locked-tooltip-v1-mobile-390x844.png`
+- `node tools\ui-worldmap-locked-tooltip-audit.mjs`
+- `node tools\ui-worldmap-keyboard-tooltip-audit.mjs`
+- `node tools\ui-worldmap-open-node-tooltip-audit.mjs`
+- `node tools\ui-worldmap-open-node-down-audit.mjs`
+- `node tools\ui-worldmap-open-node-selection-audit.mjs`
+- `npx.cmd tsc --noEmit`
+- `git diff --check`
+- `npm.cmd run check`
+- Targeted `$env:PHASER_SMOKE_ONLY='checkViewScreenshots,checkClickableControls,checkFullInputCoverage,checkUiSkinStates'; node tmp\run-phaser-smoke-with-vite.mjs` passed with `Phaser smoke OK`.
+
+This checkpoint strengthens disabled locked-node evidence for WorldMap. The locked-node audit now covers sealed-next, dormant-mid, red-far, red-next, and red-boss locked nodes across 1920x1080, 1280x720, and 390x844, and verifies both hover and click.
+
+Each case keeps `context.run.stageId` unchanged and verifies the original current marker, halo, body, frame, and status badge stay anchored to the current node. The audit also checks correct base/late current material choice, no conflicting completed/locked/sealed/dormant overlays on the current node, no visible Phaser text/vector leak, continued danger-tone tooltip content, no generic disabled stamp, and safe desktop/mobile placement.
+
+A later strengthening pass also verifies the hovered/clicked locked target's own state family during the same audit. Sealed-next reports `sealed-base`, dormant-mid reports `dormant-mid`, red-far reports `red-far`, red-next reports `red-next`, and red-boss reports `red-boss`, with body/frame/badge placement and style checks and no current/completed/wrong locked-state overlays on the target.
+
+Remaining scope: this improves locked-node disabled/readability and current-stack stability evidence, but it is still not full disabled/focus approval or full WorldMap node/body recomposition. Broader disabled/focus/readability coverage, user acceptance, and final concept-match approval remain.
+
+## 2026-06-14 WorldMap Route-Interaction Checkpoint
+
+Status: `Needs user review`
+
+Completion level: `95% candidate, not final`
+
+Evidence:
+
+- `tools/ui-worldmap-route-interaction-audit.mjs`
+- `tmp/ui-quality/worldmap-route-interactions/lower-open-route-hover-v1-1920.png`
+- `tmp/ui-quality/worldmap-route-interactions/lower-open-route-down-v1-1920.png`
+- `tmp/ui-quality/worldmap-route-interactions/mid-open-route-down-v1-1920.png`
+- `tmp/ui-quality/worldmap-route-interactions/boss-open-route-down-v1-1920.png`
+- `tmp/ui-quality/worldmap-route-interactions/sealed-next-route-locked-click-v1-1920.png`
+- `tmp/ui-quality/worldmap-route-interactions/red-next-route-locked-click-v1-1920.png`
+- `tmp/ui-quality/worldmap-route-interactions/red-boss-route-locked-click-v1-1920.png`
+- `node tools\ui-worldmap-route-interaction-audit.mjs`
+- `node tools\ui-worldmap-open-node-tooltip-audit.mjs`
+- `node tools\ui-worldmap-open-node-down-audit.mjs`
+- `node tools\ui-worldmap-open-node-selection-audit.mjs`
+- `node tools\ui-worldmap-keyboard-tooltip-audit.mjs`
+- `node tools\ui-worldmap-locked-tooltip-audit.mjs`
+- `npx.cmd tsc --noEmit`
+- `git diff --check`
+- `npm.cmd run check`
+- Targeted `$env:PHASER_SMOKE_ONLY='checkViewScreenshots,checkClickableControls,checkFullInputCoverage,checkUiSkinStates'; node tmp\run-phaser-smoke-with-vite.mjs` passed with `Phaser smoke OK`.
+
+This checkpoint proves that the first completed/current/locked route material survives node interaction states. The route-interaction audit covers open lower/mid/boss hover and down states plus locked sealed/dormant/red/boss hover and click states across 1920x1080, 1280x720, and 390x844. It verifies base completed route threads/beads, current/final route threads/beads, and muted locked/future route threads/beads by count, placement, display size, alpha, and rotation. It also verifies the old `ui_hover_route_node_concept` route-hover image count stays zero.
+
+Remaining scope: this improves route-state stability evidence during interaction, but it is still not full route recomposition or full WorldMap node/body recomposition. Broader disabled/focus/readability coverage, user acceptance, and final concept-match approval remain.
+
+## 2026-06-14 WorldMap Selection Route-Stack Checkpoint
+
+Status: `Needs user review`
+
+Completion level: `95% candidate, not final`
+
+Evidence:
+
+- `tools/ui-worldmap-open-node-selection-audit.mjs`
+- `tmp/ui-quality/worldmap-open-node-selection/lower-open-open-node-selection-v1-1920.png`
+- `tmp/ui-quality/worldmap-open-node-selection/mid-open-open-node-selection-v1-1920.png`
+- `tmp/ui-quality/worldmap-open-node-selection/boss-open-open-node-selection-v1-1920.png`
+- `node tools\ui-worldmap-open-node-selection-audit.mjs`
+- `node tools\ui-worldmap-route-interaction-audit.mjs`
+- `node tools\ui-worldmap-open-node-tooltip-audit.mjs`
+- `node tools\ui-worldmap-open-node-down-audit.mjs`
+- `node tools\ui-worldmap-keyboard-tooltip-audit.mjs`
+- `node tools\ui-worldmap-locked-tooltip-audit.mjs`
+- `npx.cmd tsc --noEmit`
+- `git diff --check`
+- `npm.cmd run check`
+- Targeted `$env:PHASER_SMOKE_ONLY='checkViewScreenshots,checkClickableControls,checkFullInputCoverage,checkUiSkinStates'; node tmp\run-phaser-smoke-with-vite.mjs` passed with `Phaser smoke OK`.
+
+This checkpoint strengthens post-click selected/current evidence by verifying route-stack recomposition after the clicked WorldMap node becomes the current stage. The strengthened selection audit covers lower-open, mid-open, and boss-open clicks across 1920x1080, 1280x720, and 390x844. It verifies the selected/current marker, halo, body, frame, and status stack on the clicked node, then verifies base completed route threads/beads, current/final route threads/beads, and muted locked/future route threads/beads by count, placement, display size, alpha, and rotation. It also verifies the old `ui_hover_route_node_concept` route-hover image count remains zero.
+
+Representative route recomposition counts now pass after selection:
+
+- lower-open: base/current routes `0/0`, locked threads `7/7`, locked beads `9/9`.
+- mid-open: base threads `6/6`, current threads `1/1`, base beads `10/10`, current beads `1/1`, locked threads `3/3`, locked beads `4/4`.
+- boss-open: base threads `10/10`, current threads `1/1`, base beads `17/17`, current beads `2/2`, locked threads `0/0`, locked beads `1/1`.
+
+Remaining scope: this improves post-click route recomposition evidence, but it is still not final route recomposition approval or full WorldMap node/body recomposition. Broader disabled/focus/readability coverage, user acceptance, and final concept-match approval remain.
+
+## 2026-06-14 WorldMap Keyboard Route-Suppression Checkpoint
+
+Status: `Needs user review`
+
+Completion level: `95% candidate, not final`
+
+Evidence:
+
+- `tools/ui-worldmap-keyboard-tooltip-audit.mjs`
+- `tmp/ui-quality/worldmap-keyboard-tooltips/lower-left-keyboard-tooltip-v1-1920.png`
+- `tmp/ui-quality/worldmap-keyboard-tooltips/late-right-keyboard-tooltip-v1-1920.png`
+- `tmp/ui-quality/worldmap-keyboard-tooltips/boss-up-keyboard-tooltip-v1-1920.png`
+- `node tools\ui-worldmap-keyboard-tooltip-audit.mjs`
+- `node tools\ui-worldmap-open-node-selection-audit.mjs`
+- `node tools\ui-worldmap-route-interaction-audit.mjs`
+- `npx.cmd tsc --noEmit`
+- `git diff --check`
+- `npm.cmd run check`
+- Targeted `$env:PHASER_SMOKE_ONLY='checkViewScreenshots,checkClickableControls,checkFullInputCoverage,checkUiSkinStates'; node tmp\run-phaser-smoke-with-vite.mjs` passed with `Phaser smoke OK`.
+
+This checkpoint strengthens WorldMap keyboard-selected route policy evidence. The keyboard tooltip audit already covers lower-left, late-right, and boss-up direction-key selection across 1920x1080, 1280x720, and 390x844, including selected/current marker, halo, body, frame, status badge, tooltip placement, no conflicting selected-node state overlays, no visible Phaser text/vector leak, and `flow:stage_select:<stageId>` logging.
+
+It now also verifies that all route overlay families remain suppressed while the keyboard-selected tooltip state is active: base completed route threads/beads, current/final route threads/beads, muted locked/future route threads/beads, and old `ui_hover_route_node_concept` route-hover images all report 0 for lower-left, late-right, and boss-up in all three viewports.
+
+Remaining scope: this improves keyboard selected-state route-policy evidence, but it is still not final selected/focus approval or full WorldMap route recomposition. Broader disabled/focus/readability coverage, user acceptance, and final concept-match approval remain.
+
+## 2026-06-14 Latest Full Broad Smoke Checkpoint
+
+Status: `Regression gate passed`
+
+Completion level: `95% candidate, not final`
+
+Evidence:
+
+- Latest verified code commit before this documentation checkpoint: `586c1fb Audit WorldMap keyboard routes`
+- `tmp/phaser-smoke-progress-latest-586c1fb-full.log`
+- Full `node tmp\run-phaser-smoke-with-vite.mjs`
+- No `PHASER_SMOKE_ONLY` filter
+- Result: `Phaser smoke OK`
+
+The latest full broad smoke passed Town, Combat, and Boss page checks; view screenshots; clickable controls; full input coverage; Settings surface; UI skin states; save/reload; production save reset; combat actions; release catalog mode; release gem/rune effects; release enemy intent batch; release stage route batch; release event batch; release passive batch; core run loop; scene flow plus rune effect; and boss result flow.
+
+Remaining scope: this is strong latest regression evidence for the active 95% candidate, not final UI approval. User acceptance, final concept-match approval, release-readiness, and broader non-audited selected/focus/readability/mobile review remain open.
+
+## 2026-06-14 Latest Responsive/Readability Audit Checkpoint
+
+Status: `Responsive/readability gates passed`
+
+Completion level: `95% candidate, not final`
+
+Evidence:
+
+- Latest verified HEAD before this documentation checkpoint: `b71ac4e Document latest broad smoke`
+- `node tools\ui-responsive-raster-audit.mjs`
+- `node tools\ui-readability-tooltip-audit.mjs`
+- `node tools\ui-mobile-framing-audit.mjs`
+- `node tools\ui-accessibility-overlay-audit.mjs`
+- Result: all four audits passed
+
+The latest responsive raster audit passed Town, WorldMap, Dungeon, Combat, Reward, Event, RuneBench, Boss, Result, and Settings at 1920x1080, 1280x720, and 390x844 portrait. The readability tooltip audit passed the same ten scenes and viewport set with visible DOM tooltip screenshots. The mobile framing audit passed portrait, desktop, 1280 desktop, and mobile landscape cases for all ten scenes, including tooltip suppression on Combat mobile. The accessibility overlay audit passed all ten scenes with hidden 1x1 status summaries and synchronized canvas labels.
+
+Remaining scope: this reconfirms the current responsive/readability/mobile/accessibility evidence on latest HEAD, but it is not final mobile UX approval, final UI approval, user acceptance, or release-ready proof.
+
+## 2026-06-14 Broader Keyboard Focus Tooltip Checkpoint
+
+Status: `Broader focus/readability gate passed`
+
+Completion level: `95% candidate, not final`
+
+Evidence:
+
+- `tools/ui-keyboard-focus-tooltip-audit.mjs` now covers 27 keyboard-focus tooltip targets instead of one representative target per scene.
+- `node tools\ui-keyboard-focus-tooltip-audit.mjs`
+- `git diff --check`
+- `npm.cmd run check`
+- Result: all listed checks passed.
+
+The expanded keyboard-focus tooltip audit now covers 81 viewport/case combinations: 27 focus targets at 1920x1080, 1280x720, and 390x844 portrait. Covered targets are Town expedition/settings/reset, Dungeon room/confirm, Combat card/end turn, Reward first/second choice, Event first/second choice, RuneBench action/confirm, Boss card/end turn, Result action/return, and all ten Settings controls. Each case verifies the DOM readability tooltip is visible after keyboard focus, has tooltip role/aria metadata, retains the expected scene and focus registry value, stays within the safe desktop canvas or mobile letterbox placement policy, keeps pointer-events disabled, and preserves canvas accessibility labeling.
+
+Remaining scope: this materially broadens focus/readability evidence, but it is not final full keyboard/focus approval. WorldMap has its own separate map-selection evidence, broader gameplay-critical readable text review is still open, user acceptance is missing, and the UI is not release-ready.
+
+## 2026-06-14 Disabled Readability Audit Checkpoint
+
+Status: `Broader disabled/readability gate passed`
+
+Completion level: `95% candidate, not final`
+
+Evidence:
+
+- Added `tools/ui-disabled-readability-audit.mjs`.
+- `node tools\ui-disabled-readability-audit.mjs`
+- `node tools\ui-worldmap-locked-tooltip-audit.mjs`
+- `git diff --check`
+- `npm.cmd run check`
+- Result: all listed checks passed.
+
+The new disabled-readability audit verifies Event unaffordable choice, Combat cost-disabled card, and Boss cost-disabled card at 1920x1080, 1280x720, and 390x844 portrait. It checks that disabled bitmap lock art is visible, hover/down affordance does not leak, the danger-tone DOM readability tooltip appears with role/aria metadata, tooltip placement is safe in desktop canvas or mobile letterbox space, no Phaser text/vector overlay leaks above the raster underlay, and blocked pointer/keyboard actions do not change phase, hand, energy, log, or event choice state.
+
+The same checkpoint reran the WorldMap locked tooltip audit. That continues to verify sealed-next, dormant-mid, red-far, red-next, and red-boss locked-node families across 1920x1080, 1280x720, and 390x844, including unchanged current stage, target state-family retention, no generic disabled stamp, and safe tooltip placement.
+
+Remaining scope: this makes disabled/readability evidence broader and more reproducible, but it is not full disabled approval across every possible control. User acceptance, final concept-match approval, final mobile UX approval, and release-ready UI remain open.
+
+## 2026-06-14 Mobile Landscape Readability Checkpoint
+
+Status: `Mobile landscape responsive/readability gate passed`
+
+Completion level: `95% candidate, not final`
+
+Evidence:
+
+- Expanded `tools/ui-readability-tooltip-audit.mjs` with `mobile-landscape-844x390`.
+- Expanded `tools/ui-responsive-raster-audit.mjs` with `mobile-landscape-844x390`.
+- `node tools\ui-readability-tooltip-audit.mjs`
+- `node tools\ui-responsive-raster-audit.mjs`
+- `node tools\ui-mobile-framing-audit.mjs`
+- `git diff --check`
+- `npm.cmd run check`
+- Result: all listed checks passed.
+
+The readability-tooltip and responsive-raster audits now cover 40 scene/viewport combinations each: Town, WorldMap, Dungeon, Combat, Reward, Event, RuneBench, Boss, Result, and Settings at 1920x1080, 1280x720, 390x844 portrait, and 844x390 landscape. The 844x390 cases keep the 16:9 Phaser FIT canvas framed as `693x390`, retain safe tooltip placement, and avoid visible Phaser text/vector leaks above the raster underlays.
+
+The mobile framing audit was rerun on the same checkpoint. It still shows the framing cue in 390x844 portrait letterbox space, keeps the cue hidden on desktop and 844x390 landscape, and preserves tooltip priority by suppressing the cue while the Combat readability tooltip is visible.
+
+Representative evidence:
+
+- `tmp/ui-quality/readability-tooltips/worldmap-tooltip-v1-mobile-landscape-844x390.png`
+- `tmp/ui-quality/readability-tooltips/combat-tooltip-v1-mobile-landscape-844x390.png`
+- `tmp/ui-quality/readability-tooltips/settings-tooltip-v1-mobile-landscape-844x390.png`
+- `tmp/ui-quality/responsive/settings-mobile-landscape-844x390.png`
+- `tmp/ui-quality/mobile-framing/worldmap-framing-v1-mobile-landscape-844x390.png`
+
+Remaining scope: this strengthens mobile landscape responsive/readability evidence, but it is not final mobile UX approval, user acceptance, final concept-match approval, or release-ready proof.
+
+## 2026-06-14 Mobile Landscape Focus And Disabled Checkpoint
+
+Status: `Mobile landscape focus/disabled gate passed`
+
+Completion level: `95% candidate, not final`
+
+Evidence:
+
+- Expanded `tools/ui-keyboard-focus-tooltip-audit.mjs` with `mobile-landscape-844x390`.
+- Expanded `tools/ui-disabled-readability-audit.mjs` with `mobile-landscape-844x390`.
+- Expanded `tools/ui-worldmap-locked-tooltip-audit.mjs` with `mobile-landscape-844x390`.
+- `node tools\ui-keyboard-focus-tooltip-audit.mjs`
+- `node tools\ui-disabled-readability-audit.mjs`
+- `node tools\ui-worldmap-locked-tooltip-audit.mjs`
+- Result: all listed checks passed.
+
+The expanded keyboard-focus tooltip audit now covers 108 viewport/case combinations: 27 focus targets at 1920x1080, 1280x720, 390x844 portrait, and 844x390 landscape. The new landscape cases verify the same DOM readability tooltip role/aria behavior, focus registry state, pointer-events policy, canvas accessibility label retention, and safe in-canvas placement as the existing desktop cases.
+
+The disabled-readability audit now covers 12 cases: Event unaffordable choice, Combat cost-disabled card, and Boss cost-disabled card at the same four viewports. It continues to verify visible disabled lock art, danger-tone tooltip metadata, no Phaser text/vector leak, and unchanged blocked pointer/keyboard behavior.
+
+The WorldMap locked tooltip audit now covers 20 cases: sealed-next, dormant-mid, red-far, red-next, and red-boss locked-node families at the same four viewports. It continues to verify unchanged current stage, retained original current marker/halo/body/frame/status stack, correct target state-family body/frame/badge, no generic disabled stamp, and safe tooltip placement.
+
+Representative evidence:
+
+- `tmp/ui-quality/focus-tooltips/combat-end-turn-focus-tooltip-v1-mobile-landscape-844x390.png`
+- `tmp/ui-quality/focus-tooltips/settings-return-town-focus-tooltip-v1-mobile-landscape-844x390.png`
+- `tmp/ui-quality/disabled-readability/combat-disabled-card-tooltip-v1-mobile-landscape-844x390.png`
+- `tmp/ui-quality/disabled-readability/boss-disabled-card-tooltip-v1-mobile-landscape-844x390.png`
+- `tmp/ui-quality/worldmap-locked-tooltips/red-boss-locked-tooltip-v1-mobile-landscape-844x390.png`
+
+Remaining scope: this strengthens mobile landscape focus/disabled/readability evidence, but it is not final full focus approval, full disabled approval, final mobile UX approval, user acceptance, or release-ready proof.
+
+## 2026-06-14 Mobile Landscape WorldMap Interaction Checkpoint
+
+Status: `Mobile landscape WorldMap interaction gate passed`
+
+Completion level: `95% candidate, not final`
+
+Evidence:
+
+- Expanded `tools/ui-worldmap-open-node-tooltip-audit.mjs` with `mobile-landscape-844x390`.
+- Expanded `tools/ui-worldmap-open-node-down-audit.mjs` with `mobile-landscape-844x390`.
+- Expanded `tools/ui-worldmap-open-node-selection-audit.mjs` with `mobile-landscape-844x390`.
+- Expanded `tools/ui-worldmap-route-interaction-audit.mjs` with `mobile-landscape-844x390`.
+- Expanded `tools/ui-worldmap-keyboard-tooltip-audit.mjs` with `mobile-landscape-844x390`.
+- `node tools\ui-worldmap-open-node-tooltip-audit.mjs`
+- `node tools\ui-worldmap-open-node-down-audit.mjs`
+- `node tools\ui-worldmap-open-node-selection-audit.mjs`
+- `node tools\ui-worldmap-route-interaction-audit.mjs`
+- `node tools\ui-worldmap-keyboard-tooltip-audit.mjs`
+- `git diff --check`
+- `npm.cmd run check`
+- Result: all listed checks passed.
+
+The open-node tooltip, open-node down, open-node selection, and keyboard-selected tooltip audits now cover 12 viewport/case combinations each: lower/mid/boss route families at 1920x1080, 1280x720, 390x844 portrait, and 844x390 landscape. These continue to verify current marker/body/frame/status retention or movement, target completed-family retention, no conflicting state overlays, safe tooltip placement where relevant, and route suppression or recomposition policy where relevant.
+
+The route-interaction audit now covers 64 cases: open hover/down and locked hover/click across lower/mid/boss open targets plus sealed-next, dormant-mid, red-far, red-next, and red-boss locked targets at the same four viewports. It continues to verify base/current/locked route thread and bead counts, placement/style invariants, and no old route-hover image.
+
+Representative evidence:
+
+- `tmp/ui-quality/worldmap-open-node-tooltips/boss-open-open-node-tooltip-v1-mobile-landscape-844x390.png`
+- `tmp/ui-quality/worldmap-open-node-down/boss-open-open-node-down-v1-mobile-landscape-844x390.png`
+- `tmp/ui-quality/worldmap-open-node-selection/boss-open-open-node-selection-v1-mobile-landscape-844x390.png`
+- `tmp/ui-quality/worldmap-keyboard-tooltips/boss-up-keyboard-tooltip-v1-mobile-landscape-844x390.png`
+
+Remaining scope: this strengthens mobile landscape WorldMap interaction evidence, but it is not final WorldMap node/body/route recomposition approval, final selected/focus approval, user acceptance, or release-ready proof.
+
+## 2026-06-14 Mobile Landscape Accessibility Overlay Checkpoint
+
+Status: `Mobile landscape accessibility overlay gate passed`
+
+Completion level: `95% candidate, not final`
+
+Evidence:
+
+- Expanded `tools/ui-accessibility-overlay-audit.mjs` from one 1280x720 pass to four viewports.
+- `node tools\ui-accessibility-overlay-audit.mjs`
+- `git diff --check`
+- `npm.cmd run check`
+- Result: all listed checks passed.
+
+The accessibility overlay audit now covers 40 scene/viewport combinations: Town, WorldMap, Dungeon, Combat, Reward, Event, RuneBench, Boss, Result, and Settings at 1920x1080, 1280x720, 390x844 portrait, and 844x390 landscape. Each case verifies the hidden `#game-accessibility-summary`, `role=status`, `aria-live=polite`, `aria-atomic=true`, synchronized canvas `role=img` and `aria-label`, hidden 1x1 box, fixed positioning, and clipped visibility.
+
+Remaining scope: this strengthens hidden accessibility-label evidence across desktop/mobile portrait/mobile landscape, but it is not final visible readability approval, final accessibility acceptance, user acceptance, or release-ready proof.
+
+## 2026-06-14 Latest HEAD Broad Smoke Checkpoint
+
+Status: `Latest full broad smoke passed`
+
+Completion level: `95% candidate, not final`
+
+Evidence:
+
+- Latest verified HEAD before this documentation checkpoint: `5e588d5 Audit landscape accessibility overlay`
+- `tmp/phaser-smoke-progress-latest-5e588d5-full.log`
+- `$env:PHASER_SMOKE_PROGRESS='1'; $env:PHASER_SMOKE_PROGRESS_FILE='tmp/phaser-smoke-progress-latest-5e588d5-full.log'; Remove-Item Env:PHASER_SMOKE_ONLY -ErrorAction SilentlyContinue; node tmp\run-phaser-smoke-with-vite.mjs`
+- `git diff --check`
+- `npm.cmd run check`
+- Result: all listed checks passed.
+
+The latest full broad smoke passed Town, Combat, and Boss page checks; view screenshots; clickable controls; full input coverage; Settings surface; UI skin states; save/reload; production save reset; combat actions; release catalog mode; release gem/rune effects; release enemy intent batch; release stage route batch; release event batch; release passive batch; core run loop; scene flow plus rune effect; and boss result flow. The wrapper ended with `Phaser smoke OK`.
+
+Remaining scope: this is strong latest HEAD regression evidence for the active 95% candidate, not final UI approval. User acceptance, final concept-match approval, release-readiness, and broader non-audited review remain open.
+
+## Current Remaining Raster-Quality Scope
+
+Status: `Not complete`
+
+The active goal still remains open. The immediate first-view raster concept-underlay pass is now applied across the primary concept screens, but this is not a completion claim. Remaining gaps are:
+
+- Component-state art and broad card/relic/arcana art coverage remain candidate-level.
+- Combat, Boss, WorldMap, Dungeon, Reward, Event, Town, RuneBench, and Result now have first bitmap hover-state passes on representative controls; Settings has full current-control hover coverage for its ten major raster hit targets.
+- All ten primary raster concept screens now have a bitmap pressed/down-state candidate on their audited hit targets, and those audited targets now use control-family concept bitmaps instead of the shared pressed-stamp fallback. This is still not final screen-specific pressed art across the full UI.
+- Settings now has full current-control hover coverage and pressed coverage for its ten major raster hit targets. Return-to-town, reset-save, reset-defaults, volume sliders, display-mode, large-text, reduced-motion, and space-confirm are anchored to their visible concept controls with button/panel/row-specific hover/down art. Its existing `Escape`/cancel return path now has first keyboard-cancel raster feedback evidence, and its ten audited controls now have first keyboard navigation/focus and Enter activation evidence using the same concept bitmap state art. Final selected, disabled, and dynamic readability states still need a full per-control pass.
+- Town, RuneBench, and Result audited representative utility controls now use screen-specific hover/down raster art instead of the shared action-seal family. Town's lower backpack/reset and gear/settings toolbar controls, RuneBench's lower confirm button, and Result's lower return button also have dedicated hover/down evidence. Town/RuneBench/Result keyboard confirm now has first raster down-state evidence, and their visible utility controls now have first keyboard focus/focused-activation evidence. The ambiguous central Town legacy reset/settings coordinates keep click behavior without shared seal feedback or keyboard focus. Town legacy UX decisions and selected/focus/disabled states still need deeper review.
+- Reward/Event choice cards and Dungeon confirm route node now have first keyboard-confirm raster feedback evidence using their existing local state families. Reward highlights the first reward card badge, Event highlights the first affordable choice badge, and Dungeon highlights the primary route-node confirm surface before the existing confirm flow advances. Reward/Event now also have first directional choice-focus evidence: arrow keys can focus selectable card choices with the same concept badge family, and Enter activates the focused second choice in the audit. This is still not broad selected/focus coverage for all screens.
+- Combat/Boss now have first keyboard-action raster feedback evidence using their existing local state families. Combat highlights the audited card and end-turn controls with `ui_hover_gold_seal_concept`; Boss highlights the audited card and end-turn controls with `ui_hover_boss_skull_stamp_concept`. Combat/Boss cost-disabled cards now also show `ui_disabled_lock_stamp_concept` and block pointer/keyboard activation in the audited energy-0 state. This is still not broad selected/focus or disabled coverage for those screens.
+- Event now has a visible bitmap disabled-state candidate for the release unaffordable choice, and Combat/Boss have cost-disabled card candidates. These are now verified by `tools/ui-disabled-readability-audit.mjs` across 1920x1080, 1280x720, and 390x844 with danger-tone tooltips and blocked pointer/keyboard behavior; disabled coverage is still not broad across every scene/control.
+- WorldMap no longer has the hidden center confirm target; primary action is now verified on the visible bottom-right play button, that button has first-pass hover/down art cropped from the original WorldMap concept, the current stage now has a runtime-driven marker plus cleaned concept-derived current halo plus first current body-wash/frame overlays plus lower current-status badge, node hover uses the cleaned halo instead of a detached route token, arrow keys can select the nearest unlocked node in the pressed map direction, and completed/locked/sealed/dormant stages now have first-pass runtime raster state material. Direction-key stage selection now also shows the selected stage's DOM readability tooltip without adding a second hover image, with lower-left, late-right, and boss-up paths audited for full selected/current marker, halo, body, frame, status, base/late family choice, conflicting-overlay absence, and route overlay suppression while the keyboard-selected tooltip is active; open stage-node pointer hover/click now has lower-open, mid-open, and boss-open tooltip evidence with the original current marker/body/frame/status stack retained and the target completed base/late body/frame/badge stack verified; the same lower/mid/boss open nodes now have pressed/down halo evidence with the original current stack retained and the target completed base/late stack verified; post-click selection now has lower/mid/boss evidence that the current marker, halo, body, frame, and status stack moves to the clicked node with the correct base/late current family and no conflicting state overlays, and now also verifies that the base/current/locked route thread and bead stacks recompute after `context.run.stageId` changes; locked-node hover/click now has sealed-next, dormant-mid, red-far, red-next, and red-boss evidence that the original current marker, halo, body, frame, and status stack remains stable while the locked target stays blocked; and the same locked-node audit now verifies the target node keeps its correct sealed/dormant/red-far/red-next/red-boss body/frame/badge family without current/completed/wrong locked-state overlays. Open-stage tooltip bodies include status plus room count. Completed stages now also have first conservative completed body-wash/frame overlays under the check badge, upper red locked stages now have first conservative locked body-wash/frame overlays under the lock badge, the next lower/mid sealed node now has first conservative sealed body-wash/frame overlays under the sealed badge, and non-next lower/mid locked nodes now have first conservative dormant body/frame overlays. Locked/sealed/dormant nodes also now have tooltip-only disabled hit targets that explain unlock conditions without adding a generic extra lock stamp or changing the current stage. The runtime underlay now neutralizes the strongest baked 1-3 completed checks, lower 1-5 node body colors, stage-4 cyan state colors, the main remaining stage-4 and 4-to-5 route remnants, sampled old red lock centers, and the old stage-4 current-marker/status scars. The lower 1-5 family also now has `ui_world_map_lower_node_body_concept` plus `ui_world_map_lower_node_frame_concept`, number/check-free neutral source-derived body and warm rim layers that sit below route overlays and state stacks. The 2026-06-11 pass corrected the stage-5 sample locations and further reduced the stage-5 plate/lower-seal/route active-state read; a later same-day pass further reduced the old stage-4 current-state silhouette in non-stage-4 states; the current-frame pass adds one masked, number-safe source-derived current-frame overlay; the completed-frame pass adds one masked, check-safe completed-frame overlay; the locked-frame pass adds one masked, lock-safe red/gold overlay; the body-wash pass adds first masked current/completed/locked material overlays below those frame/badge stacks; the sealed pass adds first masked gray body/frame material below the sealed badge; the dormant pass adds first masked gray body/frame material for non-next lower/mid locked nodes. Red-lock placement is source-aligned for stages 10-15, completed stages after the lower 1-3 group now use quieter `ui_completed_stage_late_body_wash_concept`, `ui_completed_stage_late_frame_concept`, and `ui_completed_stage_late_badge_concept` assets instead of reusing the lower completed stack, late current stages now use quieter `ui_current_stage_late_body_wash_concept` and `ui_current_stage_late_frame_concept` assets instead of reusing the lower/stage-4 current stack, mid sealed nodes now use quieter `ui_sealed_stage_mid_body_wash_concept` and `ui_sealed_stage_mid_frame_concept` assets instead of reusing the lower sealed stack, mid dormant locked nodes now use quieter `ui_dormant_stage_mid_body_wash_concept` and `ui_dormant_stage_mid_frame_concept` assets instead of reusing the lower dormant stack, far red locked nodes now use quieter `ui_locked_stage_far_body_wash_concept` and `ui_locked_stage_far_frame_concept` assets while the first red lock keeps the stronger base red lock stack, and boss-sized upper red locks now use `ui_locked_stage_boss_body_wash_concept` and `ui_locked_stage_boss_frame_concept` instead of sharing the non-boss far locked family. Late-route completed checks are smaller, stage 6/7 completed badges sit closer to their node bases, stage 8 is treated as a quieter route-point marker, and gray seals now emphasize only the next lower/mid locked node. This is still not full current/selected/completed/locked/sealed/dormant-state recomposition: baked route/node geometry remains, lower-node baked silhouettes are reduced but not fully stage-specific, later stage variants are still incomplete beyond the first late current/completed, mid sealed, mid dormant, and far/boss red locked splits, broader body variants are not complete, and broader keyboard focus, visible tooltip/readability zones, mobile/responsive review, and user acceptance remain unfinished.
+- The same WorldMap path now has first source-derived `ui_world_map_route_progress_bead_concept` and `ui_world_map_route_progress_thread_concept` overlays on progressed route segments, brighter `ui_world_map_route_progress_current_bead_concept` and `ui_world_map_route_progress_current_thread_concept` variants for the final/current leg, and muted `ui_world_map_route_locked_bead_concept` and `ui_world_map_route_locked_thread_concept` variants for locked/future route segments. They are verified in default, stage-4-progress, stage-9-progress, during open-node hover/down plus locked-node hover/click interactions, after lower/mid/boss open-node click selection recomposes the current stage, and as intentionally suppressed during lower/mid/boss keyboard-selected tooltip states, but they are still conservative route-state layers rather than a full dynamic route recomposition system.
+- Combat and Boss now have concept-source-derived raster effect candidates on their raster paths. The Boss stage cue was corrected from a shield-like source to a component-sheet gold starburst source, but effect timing, target-specific placement across all effects, animation readability, and final Boss phase/effect communication are still not final.
+- The current textless raster-only checkpoints now have a first hidden dynamic accessibility-label pass across ten primary scenes and four viewports, a first automated responsive sanity pass, a representative visible readability-tooltip pass across ten primary raster scenes with 1920/1280/mobile portrait/mobile landscape evidence, official disabled-readability audits for Event/Combat/Boss across desktop/mobile portrait/mobile landscape, broadened keyboard-focus tooltip evidence across 27 focus paths and four viewports, WorldMap locked-node explanation/current-stack/target-stack tooltips across sealed/dormant/red locked families and four viewports, WorldMap keyboard-selected stage tooltip/current-state/route-suppression evidence including the boss-up route and four viewport coverage, WorldMap open-node pointer tooltip/down evidence with current-stack and target completed-stack retention across lower/mid/boss route families and four viewports, WorldMap route-interaction evidence across open and locked route families and four viewports, WorldMap open-node post-click selected/current-state evidence plus route-stack recomposition evidence across lower/mid/boss route families and four viewports, a first mobile portrait framing cue, and a latest responsive/readability/mobile/accessibility audit rerun on current HEAD. The mobile portrait tooltip and framing cue now use letterbox space instead of covering the canvas, the cue suppresses itself while detailed tooltips are visible, and the accessibility/responsive/readability/focus/disabled/WorldMap interaction gates now include 844x390 landscape. The screens still rely heavily on baked concept information and need broader gameplay-critical readable text review, broader disabled-state breadth beyond audited families, full selected/focus approval beyond audited paths, final mobile UX review, user acceptance, and final concept-match approval.
+- Raster hover/down feedback is no longer universally invisible: all 10 primary raster concept screens have extracted bitmap hover-state candidates on representative controls and a pressed/down-state candidate on audited controls. The audited pressed states now avoid the shared fallback stamp, WorldMap open lower/mid/boss stage nodes have pressed-size halo evidence, Event has a first disabled lock candidate, Combat/Boss have first cost-disabled card lock candidates, Settings has first keyboard-cancel plus keyboard-focus feedback on its audited controls, Reward/Event have first keyboard choice-focus evidence, and Town/RuneBench/Result have first utility keyboard-focus evidence. Final matching-quality selected, broad disabled, focus, deeper per-control pressed, and screen-specific state coverage is still missing.
+- The full UI skin is now a 95% candidate for the active concept-art UI goal, but it has no user acceptance yet and is not release-ready.
+- `npm.cmd run check` still reports the existing Vite large JS chunk warning, so performance remains tracked separately as `Needs verification`.
+- Broad Phaser smoke now passes on latest `5e588d5 Audit landscape accessibility overlay` with no `PHASER_SMOKE_ONLY` filter, ending in `Phaser smoke OK` after all logged substeps through `checkBossResultFlow OK`. The latest responsive/readability/mobile/accessibility rerun also passes on the current 95% candidate checkpoints, including 1920, 1280, 390x844 portrait, and 844x390 landscape responsive screenshots, tooltip placement, mobile framing cue behavior, and hidden accessibility overlays. The latest accessibility overlay audit passes 40 scene/viewport cases across the same four viewport sizes. The latest broadened keyboard-focus tooltip audit passes 108 focus-tooltip cases across 27 targets and four viewports. The latest disabled-readability audit passes Event/Combat/Boss disabled cases across the same four viewport sizes, and the WorldMap locked-node tooltip audit passes 20 locked-tooltip cases across the same four viewport sizes. The latest WorldMap open-node tooltip/down/selection and keyboard-tooltip audits pass 12 cases each across the same four viewport sizes, and the latest WorldMap route-interaction audit passes 64 cases across the same four viewport sizes. The latest route current-leg, route interaction-stack, selection route-stack, keyboard route-suppression, late current-node, mid dormant-node, far red locked-node, mid sealed-node, boss red locked-node, boss keyboard-selected tooltip/current-state, locked-node tooltip/current-stack/target-stack, open-node pointer tooltip/current-stack/target-stack, open-node down-state/current-stack/target-stack, open-node selection-state, visible readability-tooltip, responsive tooltip placement, disabled explanation-tooltip, keyboard focus-tooltip, WorldMap locked-node tooltip, and WorldMap keyboard-selection tooltip passes passed their dedicated audits, `git diff --check`, `npm.cmd run check`, and targeted smoke gates. These remain regression/safety gates rather than evidence of final UI approval.
+
+## 2026-06-14 Settings Preferences Overlay Checkpoint
+
+Status: `Settings accessibility preference propagation gate passed`
+
+Completion level: `95% candidate, not final`
+
+Evidence:
+
+- `src/phaser/view/sceneShell.ts` now synchronizes saved `largeText` / `reducedMotion` values into the DOM readability tooltip and mobile framing cue preferences.
+- `src/ui/overlays/readabilityOverlay.ts` and `src/ui/overlays/mobileFramingOverlay.ts` now expose those preferences as data attributes and adjust sizing/motion behavior.
+- `src/styles/phaser-shell.css` applies larger typography and no-transition states for the DOM tooltip/cue.
+- Added `tools/ui-settings-preferences-overlay-audit.mjs`.
+- `node tools\ui-settings-preferences-overlay-audit.mjs`
+- `node tools\ui-readability-tooltip-audit.mjs`
+- `node tools\ui-mobile-framing-audit.mjs`
+- Full broad smoke with progress log `tmp/phaser-smoke-progress-settings-preferences-overlay-full.log`
+- `git diff --check`
+- `npm.cmd run check`
+- Result: all listed checks passed.
+
+The new audit verifies the actual Settings controls toggle and persist large text plus reduced motion. The Settings keyboard-focus tooltip then reports `data-large-text="true"` and `data-reduced-motion="true"`, larger DOM typography, and `transitionProperty=none`; the persisted Town mobile framing cue verifies the same preferences at 390x844 portrait.
+
+Remaining scope: this improves one previously open accessibility/readability behavior with runtime evidence. It does not replace final visible readability approval, full selected/focus approval, broad disabled approval, final mobile UX approval, user acceptance, or release-readiness.

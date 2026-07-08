@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080">
+  <defs>
+    <linearGradient id="paper" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0" stop-color="#fff8e8"/>
+      <stop offset="1" stop-color="#ead7ac"/>
+    </linearGradient>
+    <linearGradient id="ribbon" x1="0" x2="1" y1="0" y2="0">
+      <stop offset="0" stop-color="#8e3e3a"/>
+      <stop offset="0.55" stop-color="#bd6757"/>
+      <stop offset="1" stop-color="#8e3e3a"/>
+    </linearGradient>
+    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="8" stdDeviation="8" flood-color="#2a1d14" flood-opacity="0.24"/>
+    </filter>
+  </defs>
+  <rect width="1920" height="1080" fill="#f8efd8"/>
+  <g id="combat-stage-frame" filter="url(#softShadow)">
+    <rect x="230" y="205" width="1460" height="650" rx="10" fill="url(#paper)" stroke="#6a523f" stroke-width="7"/>
+    <path d="M365 210 C520 5 1400 5 1555 210" fill="none" stroke="#32415a" stroke-width="20" opacity="0.5"/>
+    <ellipse cx="960" cy="520" rx="495" ry="180" fill="#2f6b68" opacity="0.16"/>
+    <ellipse cx="960" cy="585" rx="370" ry="120" fill="#f5c26b" opacity="0.12"/>
+  </g>
+  <g id="combat-title-ribbon">
+    <path d="M500 244 H1420 V320 H500 Z" fill="url(#ribbon)" stroke="#d7b66f" stroke-width="4"/>
+    <path d="M500 244 L410 282 L500 320 Z" fill="#a5483f" stroke="#d7b66f" stroke-width="4"/>
+    <path d="M1420 244 L1510 282 L1420 320 Z" fill="#a5483f" stroke="#d7b66f" stroke-width="4"/>
+  </g>
+  <g id="compact-player-panel">
+    <rect x="115" y="453" width="470" height="190" rx="8" fill="url(#paper)" stroke="#5f4938" stroke-width="6"/>
+    <circle cx="145" cy="482" r="11" fill="#f5c26b" stroke="#5f4938" stroke-width="5"/>
+    <circle cx="555" cy="482" r="11" fill="#f5c26b" stroke="#5f4938" stroke-width="5"/>
+    <circle cx="145" cy="614" r="11" fill="#f5c26b" stroke="#5f4938" stroke-width="5"/>
+    <circle cx="555" cy="614" r="11" fill="#f5c26b" stroke="#5f4938" stroke-width="5"/>
+  </g>
+  <g id="compact-route-strip">
+    <rect x="640" y="309" width="640" height="106" rx="8" fill="url(#paper)" stroke="#5f4938" stroke-width="6" opacity="0.9"/>
+    <circle cx="760" cy="366" r="28" fill="#4f9b75" stroke="#f5c26b" stroke-width="5"/>
+    <circle cx="865" cy="366" r="28" fill="#b98c34" stroke="#fff8e8" stroke-width="3"/>
+    <circle cx="970" cy="366" r="28" fill="#6c8fd6" stroke="#fff8e8" stroke-width="3"/>
+    <circle cx="1075" cy="366" r="28" fill="#4f9b75" stroke="#fff8e8" stroke-width="3"/>
+    <circle cx="1180" cy="366" r="28" fill="#ce5869" stroke="#fff8e8" stroke-width="3"/>
+  </g>
+  <g id="playfield-safe-zone">
+    <rect x="350" y="590" width="1220" height="120" fill="#a5483f" opacity="0.08" stroke="#c6a65e" stroke-width="2"/>
+    <rect x="330" y="899" width="1260" height="58" fill="#fff1d0" opacity="0.62" stroke="#c6a65e" stroke-width="2"/>
+  </g>
+  <g id="enemy-intent-panel">
+    <rect x="1170" y="420" width="420" height="250" rx="8" fill="url(#paper)" stroke="#8f5b42" stroke-width="6"/>
+    <circle cx="1530" cy="505" r="58" fill="#fff1d0" stroke="#8f5b42" stroke-width="3"/>
+    <rect x="1365" y="587" width="210" height="58" rx="8" fill="#32415a" stroke="#f5c26b" stroke-width="5"/>
+  </g>
+  <g id="hand-shelf">
+    <rect x="330" y="899" width="1260" height="58" fill="#fff1d0" opacity="0.62" stroke="#c6a65e" stroke-width="2"/>
+    <rect x="335" y="650" width="190" height="278" rx="8" fill="#fff8e8" stroke="#8e3e3a" stroke-width="7"/>
+    <rect x="565" y="650" width="190" height="278" rx="8" fill="#fff8e8" stroke="#2d5c78" stroke-width="7"/>
+    <rect x="795" y="650" width="190" height="278" rx="8" fill="#fff8e8" stroke="#554b8a" stroke-width="7"/>
+    <rect x="1025" y="650" width="190" height="278" rx="8" fill="#fff8e8" stroke="#8e3e3a" stroke-width="7"/>
+    <rect x="1255" y="650" width="190" height="278" rx="8" fill="#fff8e8" stroke="#8e3e3a" stroke-width="7"/>
+  </g>
+</svg>

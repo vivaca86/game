@@ -1,0 +1,41 @@
+{
+  "language": "ko",
+  "visibleLanguage": "한글",
+  "workingTitle": "햇살 미로단",
+  "visualDirection": {
+    "tone": "밝은 파스텔 판타지",
+    "monsterShape": "둥글고 귀여운 마스코트형 실루엣",
+    "cardFrame": "두꺼운 둥근 프레임과 큰 일러스트 창",
+    "palette": [
+      "아이보리",
+      "파스텔 라벤더",
+      "하늘색",
+      "민트",
+      "복숭아색",
+      "산호색"
+    ]
+  },
+  "targets": {
+    "cards": 113,
+    "gems": 58,
+    "characters": 23,
+    "stages": 15,
+    "relics": 16,
+    "arcanas": 12,
+    "events": 10,
+    "achievements": 161
+  },
+  "currentCounts": {
+    "cards": 113,
+    "gems": 58,
+    "characters": 23,
+    "stages": 15,
+    "relics": 16,
+    "arcanas": 12,
+    "events": 10,
+    "achievements": 161
+  },
+  "supportingCounts": {
+    "enemies": 60
+  }
+}

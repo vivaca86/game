@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-label="Dungeon UI source components v001">
+  <rect width="1600" height="900" fill="#f8efd8"/>
+  <rect x="76" y="88" width="1448" height="724" fill="#fff8e8" opacity="0.54" stroke="#b98c34" stroke-width="6"/>
+  <path d="M120 450 L260 186 L314 714 L106 760 Z" fill="#5d8d86" opacity="0.24" stroke="#3f6f68" stroke-width="6"/>
+  <path d="M1480 450 L1340 186 L1286 714 L1494 760 Z" fill="#6c8fd6" opacity="0.24" stroke="#4c659d" stroke-width="6"/>
+  <g id="title-ribbon">
+    <rect x="470" y="54" width="660" height="110" rx="16" fill="#fff8e8" stroke="#5c4a3d" stroke-width="8"/>
+    <rect x="496" y="74" width="608" height="70" fill="#fff6df" stroke="#c6a65e" stroke-width="3"/>
+    <circle cx="504" cy="109" r="15" fill="#c6a65e"/>
+    <circle cx="1096" cy="109" r="15" fill="#c6a65e"/>
+    <text x="800" y="104" text-anchor="middle" font-family="Arial" font-size="34" font-weight="700" fill="#1e2a3e">Dungeon view title ribbon</text>
+    <text x="800" y="136" text-anchor="middle" font-family="Arial" font-size="18" fill="#805845">stage name / room count</text>
+  </g>
+  <g id="left-ledger">
+    <rect x="140" y="270" width="400" height="500" rx="14" fill="#fff8e8" stroke="#5c4a3d" stroke-width="8"/>
+    <text x="184" y="326" font-family="Arial" font-size="28" font-weight="700" fill="#32415a">exploration ledger</text>
+    <rect x="184" y="386" width="306" height="48" rx="6" fill="#fff6df" stroke="#c6a65e" stroke-width="4"/>
+    <rect x="184" y="454" width="306" height="48" rx="6" fill="#fff6df" stroke="#c6a65e" stroke-width="4"/>
+    <rect x="184" y="522" width="306" height="48" rx="6" fill="#fff6df" stroke="#c6a65e" stroke-width="4"/>
+    <rect x="184" y="590" width="306" height="48" rx="6" fill="#fff6df" stroke="#c6a65e" stroke-width="4"/>
+    <rect x="184" y="670" width="306" height="74" fill="#fff6df" opacity="0.72" stroke="#c6a65e" stroke-width="3"/>
+  </g>
+  <g id="corridor-stage">
+    <rect x="562" y="270" width="690" height="500" rx="14" fill="#fff8e8" stroke="#5c4a3d" stroke-width="8"/>
+    <polygon points="600,660 1214,660 1084,390 730,390" fill="#32415a" opacity="0.12" stroke="#8d6a2a" stroke-width="6"/>
+    <polygon points="650,538 800,430 748,704 586,724" fill="#6c8fd6" opacity="0.25" stroke="#4c659d" stroke-width="5"/>
+    <polygon points="1162,538 1012,430 1064,704 1226,724" fill="#5d8d86" opacity="0.25" stroke="#3f6f68" stroke-width="5"/>
+    <rect x="796" y="444" width="300" height="220" rx="8" fill="#fff2d6" stroke="#8d6a2a" stroke-width="7"/>
+    <rect x="856" y="490" width="180" height="118" rx="8" fill="#5d8d86" stroke="#fff3b0" stroke-width="5"/>
+    <rect x="726" y="675" width="440" height="58" fill="#fff6df" opacity="0.72" stroke="#c6a65e" stroke-width="3"/>
+  </g>
+  <g id="right-route-ledger">
+    <rect x="1266" y="270" width="294" height="500" rx="14" fill="#fff8e8" stroke="#5c4a3d" stroke-width="8"/>
+    <text x="1306" y="326" font-family="Arial" font-size="28" font-weight="700" fill="#32415a">route ledger</text>
+    <line x1="1324" y1="388" x2="1324" y2="700" stroke="#8d6a2a" stroke-width="5" opacity="0.45"/>
+    <circle cx="1324" cy="404" r="22" fill="#5d8d86" stroke="#fff3b0" stroke-width="5"/>
+    <circle cx="1324" cy="462" r="18" fill="#c6a65e" stroke="#fff" stroke-width="3"/>
+    <circle cx="1324" cy="520" r="18" fill="#6c8fd6" stroke="#fff" stroke-width="3"/>
+    <circle cx="1324" cy="578" r="18" fill="#ce5869" stroke="#fff" stroke-width="3"/>
+    <circle cx="1324" cy="636" r="18" fill="#b98c34" stroke="#fff" stroke-width="3"/>
+    <circle cx="1324" cy="694" r="18" fill="#9ec3b8" stroke="#fff" stroke-width="3"/>
+    <rect x="1300" y="704" width="220" height="58" fill="#fff6df" opacity="0.72" stroke="#c6a65e" stroke-width="3"/>
+  </g>
+  <g id="primary-action">
+    <rect x="820" y="455" width="290" height="58" rx="10" fill="#32415a" stroke="#f5c26b" stroke-width="5"/>
+    <text x="965" y="493" text-anchor="middle" font-family="Arial" font-size="26" font-weight="700" fill="#fff5d7">enter room button</text>
+  </g>
+</svg>
