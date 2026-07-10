@@ -2582,3 +2582,29 @@ The user supplied a refreshed screenshot without additional text. It is treated 
 ### Status
 
 - `In progress`: authorization is confirmed; remote mutation and verification follow this entry.
+
+## 2026-07-11T07:39:52+09:00 — Entry 61 — GitHub folder replacement executed and verified
+
+### Work performed
+
+- Cloned `vivaca86/game` branch `main` into a unique sparse-checkout directory inside the workspace.
+- Replaced only the checkout's `taskbar-cat-hero/` directory with the current local project.
+- Copied 316 included files. Deliberately excluded `tmp/`, every `__pycache__/` directory, and `*.pyc` files.
+- Created ordinary commit `5ead033515758e92d7453a53c9efa3dde1668b8d` (`Replace taskbar-cat-hero with current local project`).
+- Pushed `main` normally from previous remote head `0c11e7f7bf3115d1f3d003b1277c684a5439d4d9`; no force push or history rewrite was used.
+
+### Verification performed
+
+- Project test suite: 42 passed, 0 failed via `node --test tests\\*.test.js`.
+- Staging audit: 278 changed paths, all under `taskbar-cat-hero/`; zero out-of-scope staged paths.
+- Remote API audit after push: remote HEAD exactly matched `5ead033515758e92d7453a53c9efa3dde1668b8d`; recursive tree was not truncated; target contained 316 blob files.
+- Compared the parent and pushed root trees after excluding `taskbar-cat-hero`: zero unrelated top-level changes.
+- Raw local byte total exceeded the GitHub blob total by 8,295 bytes because Git normalized text line endings. This was not assumed away: all 316 local files were hashed again using Git's clean filters and compared with the committed tree. Result: zero SHA mismatches, zero missing files, and zero extra remote files.
+
+### Remaining synchronization step
+
+- This completion record was written after the main replacement commit, so it will be published in one final log-only commit and the resulting remote HEAD will be checked again.
+
+### Status
+
+- `Partially complete`: the requested folder replacement itself is pushed and content-verified; only this final audit-log synchronization remains.
