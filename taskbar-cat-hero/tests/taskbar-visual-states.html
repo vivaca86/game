@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Taskbar Cat Visual State Harness</title>
+    <link rel="stylesheet" href="../taskbar-companion.css?v=14" />
+    <style>
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        padding: 34px;
+        min-height: 100vh;
+        color: #f6ead6;
+        font-family: "Malgun Gothic", "Segoe UI", sans-serif;
+        background: linear-gradient(180deg, #163e5d, #081722);
+      }
+      h1 { margin: 0 0 8px; font-size: 22px; }
+      body > p { margin: 0 0 24px; color: #bcd1df; font-size: 13px; }
+      .state-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(190px, 1fr));
+        gap: 18px;
+      }
+      .state-card {
+        min-height: 180px;
+        padding: 14px 16px 0;
+        border: 1px solid rgba(255,255,255,.15);
+        border-radius: 16px;
+        background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(0,0,0,.08));
+        overflow: hidden;
+      }
+      .state-card h2 { margin: 0; font-size: 14px; }
+      .state-card p { margin: 4px 0 2px; color: #bcd1df; font-size: 11px; }
+      .state-stage {
+        position: relative;
+        height: 132px;
+        margin: 0 -16px;
+        border-bottom: 42px solid rgba(8, 17, 26, .96);
+      }
+      .state-stage::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 41px;
+        border-top: 1px solid rgba(255,255,255,.16);
+      }
+      .state-card .taskbar-companion {
+        left: 50%;
+        bottom: 35px;
+        transform: translateX(-50%);
+      }
+    </style>
+  </head>
+  <body>
+    <h1>작업표시줄 고양이 상태 검증</h1>
+    <p>입력이 없으면 반죽을 멈춘 112px awake-idle과 입력 작업·졸기·깨기 차이를 비교합니다.</p>
+    <main class="state-grid" id="stateGrid"></main>
+    <script>
+      const states = [
+        ["Alert idle", "45초까지 꼬리·깜빡임·한쪽 귀", "alert-idle", "none", "idle-alert", "full", "none"],
+        ["Pointer attention", "클릭·휠에 1.2초 주의", "alert-idle", "idle-attention", "idle-attention", "full", "input"],
+        ["Curious idle", "45초~3분, 기본은 조용한 idle", "curious-idle", "none", "idle-alert", "full", "none"],
+        ["Dough sniff", "curious 구간의 3초 희귀 행동", "curious-idle", "idle-sniff", "idle-sniff", "full", "ambient"],
+        ["Sleepy idle", "3~5분 긴 눈감기와 작은 고개 하강", "sleepy-idle", "none", "idle-sleepy", "full", "none"],
+        ["Doze", "5분 후 관절형 꾸벅꾸벅", "doze", "none", "doze-loop", "full", "none"],
+        ["Wake", "첫 입력에 1초 화들짝", "return", "wake-startle", "wake-startle", "full", "wake"],
+        ["Normal key", "입력 후 1.2초 반죽 작업", "work", "key-left", "ambient-v4", "full", "input"],
+        ["Fast typing", "고대비 대각선·접점 충격", "work", "typing-fast", "typing-fast", "full", "input"],
+        ["Typing overdrive", "당황 표정·땀·강한 충격", "work", "typing-overdrive", "typing-overdrive", "full", "input"],
+        ["Motion off", "접근성 정지 중립", "alert-idle", "none", "neutral", "off", "none"]
+      ];
+
+      const grid = document.querySelector("#stateGrid");
+      states.forEach(([title, description, ambient, reaction, pose, motion, source]) => {
+        const card = document.createElement("article");
+        card.className = "state-card";
+        card.innerHTML = `
+          <h2>${title}</h2><p>${description}</p>
+          <div class="state-stage">
+            <div class="taskbar-companion" data-ambient="${ambient}" data-reaction="${reaction}" data-reaction-source="${source}" data-pose="${pose}" data-motion="${motion}">
+              <span class="taskbar-cat-visual">
+                <span class="taskbar-cat-reaction-motion"><span class="taskbar-cat-ambient-motion"><span class="taskbar-cat-pose"></span></span></span>
+                <span class="taskbar-cat-fx">
+                  <i class="taskbar-cat-key-flash taskbar-cat-key-flash--left"></i>
+                  <i class="taskbar-cat-key-flash taskbar-cat-key-flash--right"></i>
+                  <i class="taskbar-cat-gesture-fx"></i>
+                  <span class="taskbar-cat-doze-fx">Z<small>z</small></span>
+                </span>
+              </span>
+            </div>
+          </div>`;
+        grid.appendChild(card);
+      });
+    </script>
+  </body>
+</html>

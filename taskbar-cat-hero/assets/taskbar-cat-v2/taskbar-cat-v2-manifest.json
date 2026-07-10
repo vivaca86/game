@@ -1,0 +1,442 @@
+{
+  "schemaVersion": 1,
+  "id": "taskbar-chef-cat-v2",
+  "status": "generated-prototype; IP-holder and shipping approval required",
+  "createdOn": "2026-07-10",
+  "generator": {
+    "mode": "OpenAI built-in imagegen",
+    "transparentBackgroundMethod": "flat magenta chroma key, official local soft matte, two-pixel spatial refinement, then visible-key pixel cleanup",
+    "registrationMethod": "integer pixel translation only; no scaling, repainting, or lossy recompression",
+    "pillowVersion": "12.3.0"
+  },
+  "sources": {
+    "referenceImage": "assets/concept/widget-chef-cat-generated-cook-v31-16.png",
+    "referenceSha256": "3b7dca1f10c849b5fe3c13b7b0863667a7b140af7d31a6b666835c89bd7abeb3",
+    "baseGenerationImage": "taskbar-cat-v2-chroma-atlas.png",
+    "baseGenerationSha256": "7d6ac550770e9617fd07ea6f969939ad34dccb899920e9ad5914b20f795e67a6",
+    "anatomyCorrectionImage": "taskbar-cat-v2-chroma-corrected-atlas.png",
+    "anatomyCorrectionSha256": "3a81d13774912d721e03ae7d9585045fedd361d40f040f6721b0176d49559183",
+    "toolSupportCorrectionImage": "taskbar-cat-v2-chroma-support-corrected-atlas.png",
+    "toolSupportCorrectionSha256": "1a26c2c25467dc4b446ccf3c04599bf179fde5d87645f78748d9c69638276317",
+    "composedChromaImage": "taskbar-cat-v2-chroma-final-atlas.png",
+    "composedChromaSha256": "0931a8b8256efa4596fb6429f5feda83914a252b86677027b211cfa1847643a0",
+    "helperRawImage": "taskbar-cat-v2-alpha-helper-final.png",
+    "helperRawSha256": "db66aeb6db3023e7f93fcfe9a9a80683f19cf07073decb4da5e3f24254cfb6d9",
+    "alphaUnregisteredImage": "taskbar-cat-v2-alpha-unregistered.png",
+    "alphaUnregisteredSha256": "3095c52e8de664d71ccd0fafee39fff5f18affe512f7cdb5a6636bfee17a1230",
+    "provenanceDocument": "PROVENANCE.md",
+    "provenanceSha256": "3a6155db82fc7fb3aa08f3b75d6e8178dac1123e9b041e9dcc0a8ab21a562d6e"
+  },
+  "atlas": {
+    "image": "taskbar-cat-v2-atlas.png",
+    "sha256": "afd748baac6d7c7ba1e28620270cc2d96025d8da9afa3b637042e3f02913476f",
+    "width": 1536,
+    "height": 1024,
+    "columns": 3,
+    "rows": 2,
+    "frameWidth": 512,
+    "frameHeight": 512,
+    "spacing": 0,
+    "padding": 0
+  },
+  "display": {
+    "frameWidth": 128,
+    "frameHeight": 128,
+    "scale": 0.25,
+    "filter": "bilinear/auto"
+  },
+  "pivot": {
+    "sourcePixelsTopLeft": {
+      "x": 256,
+      "y": 472
+    },
+    "normalizedTopLeft": {
+      "x": 0.5,
+      "y": 0.921875
+    },
+    "normalizedUnity": {
+      "x": 0.5,
+      "y": 0.078125
+    }
+  },
+  "frames": [
+    {
+      "id": "neutral",
+      "index": 0,
+      "column": 0,
+      "row": 0,
+      "registrationOffset": {
+        "x": -20,
+        "y": 10
+      },
+      "sourceMetrics": {
+        "bounds": [
+          122,
+          30,
+          400,
+          463
+        ],
+        "centroid": {
+          "x": 275.41909685257457,
+          "y": 259.29080638870784
+        },
+        "lowerBodyCentroid": {
+          "x": 275.5923783976273,
+          "y": 385.8039576841427
+        },
+        "upperBodyCentroid": {
+          "x": 276.0101620423724,
+          "y": 159.41411725631727
+        },
+        "baselineY": 462,
+        "visiblePixels": 84793,
+        "magentaFringePixels": 0
+      },
+      "registeredMetrics": {
+        "bounds": [
+          102,
+          40,
+          380,
+          473
+        ],
+        "centroid": {
+          "x": 255.41909685257457,
+          "y": 269.29080638870784
+        },
+        "lowerBodyCentroid": {
+          "x": 255.69839053537973,
+          "y": 390.34104405685093
+        },
+        "upperBodyCentroid": {
+          "x": 258.4811213135109,
+          "y": 163.88564929831958
+        },
+        "baselineY": 472,
+        "visiblePixels": 84793,
+        "magentaFringePixels": 0
+      }
+    },
+    {
+      "id": "key-left",
+      "index": 1,
+      "column": 1,
+      "row": 0,
+      "registrationOffset": {
+        "x": 12,
+        "y": 10
+      },
+      "sourceMetrics": {
+        "bounds": [
+          115,
+          30,
+          368,
+          463
+        ],
+        "centroid": {
+          "x": 246.90874750410396,
+          "y": 260.08578977821105
+        },
+        "lowerBodyCentroid": {
+          "x": 240.7502239845027,
+          "y": 384.9955550525482
+        },
+        "upperBodyCentroid": {
+          "x": 248.87303995404474,
+          "y": 156.2600938601565
+        },
+        "baselineY": 462,
+        "visiblePixels": 82098,
+        "magentaFringePixels": 0
+      },
+      "registeredMetrics": {
+        "bounds": [
+          127,
+          40,
+          380,
+          473
+        ],
+        "centroid": {
+          "x": 258.908747504104,
+          "y": 270.08578977821105
+        },
+        "lowerBodyCentroid": {
+          "x": 253.5754612497145,
+          "y": 390.0427963249031
+        },
+        "upperBodyCentroid": {
+          "x": 260.6302266892493,
+          "y": 162.3737589807218
+        },
+        "baselineY": 472,
+        "visiblePixels": 82098,
+        "magentaFringePixels": 0
+      }
+    },
+    {
+      "id": "key-right",
+      "index": 2,
+      "column": 2,
+      "row": 0,
+      "registrationOffset": {
+        "x": 46,
+        "y": 9
+      },
+      "sourceMetrics": {
+        "bounds": [
+          58,
+          30,
+          333,
+          464
+        ],
+        "centroid": {
+          "x": 209.91523134808284,
+          "y": 258.8053036128603
+        },
+        "lowerBodyCentroid": {
+          "x": 209.33962450312197,
+          "y": 386.8165229933757
+        },
+        "upperBodyCentroid": {
+          "x": 218.0459475968656,
+          "y": 155.818394514039
+        },
+        "baselineY": 463,
+        "visiblePixels": 83799,
+        "magentaFringePixels": 0
+      },
+      "registeredMetrics": {
+        "bounds": [
+          104,
+          39,
+          379,
+          473
+        ],
+        "centroid": {
+          "x": 255.91523134808284,
+          "y": 267.8053036128603
+        },
+        "lowerBodyCentroid": {
+          "x": 255.08214992801786,
+          "y": 391.0262605134841
+        },
+        "upperBodyCentroid": {
+          "x": 259.72803568191074,
+          "y": 163.61633450360267
+        },
+        "baselineY": 472,
+        "visiblePixels": 83799,
+        "magentaFringePixels": 0
+      }
+    },
+    {
+      "id": "blink",
+      "index": 3,
+      "column": 0,
+      "row": 1,
+      "registrationOffset": {
+        "x": -19,
+        "y": 14
+      },
+      "sourceMetrics": {
+        "bounds": [
+          121,
+          26,
+          400,
+          459
+        ],
+        "centroid": {
+          "x": 274.4185942573684,
+          "y": 255.01151670389945
+        },
+        "lowerBodyCentroid": {
+          "x": 274.6139148103814,
+          "y": 383.9574166107849
+        },
+        "upperBodyCentroid": {
+          "x": 274.56587128057726,
+          "y": 157.54640233280986
+        },
+        "baselineY": 458,
+        "visiblePixels": 84991,
+        "magentaFringePixels": 0
+      },
+      "registeredMetrics": {
+        "bounds": [
+          102,
+          40,
+          381,
+          473
+        ],
+        "centroid": {
+          "x": 255.41859425736837,
+          "y": 269.0115167038994
+        },
+        "lowerBodyCentroid": {
+          "x": 255.7630543308581,
+          "y": 390.2340132267325
+        },
+        "upperBodyCentroid": {
+          "x": 258.38172056506244,
+          "y": 163.63288887356583
+        },
+        "baselineY": 472,
+        "visiblePixels": 84991,
+        "magentaFringePixels": 0
+      }
+    },
+    {
+      "id": "happy-click",
+      "index": 4,
+      "column": 1,
+      "row": 1,
+      "registrationOffset": {
+        "x": 13,
+        "y": 14
+      },
+      "sourceMetrics": {
+        "bounds": [
+          89,
+          26,
+          368,
+          459
+        ],
+        "centroid": {
+          "x": 242.38616397821204,
+          "y": 255.0674688521258
+        },
+        "lowerBodyCentroid": {
+          "x": 242.60961332159155,
+          "y": 383.9738829696512
+        },
+        "upperBodyCentroid": {
+          "x": 246.12367618913615,
+          "y": 155.51154397818786
+        },
+        "baselineY": 458,
+        "visiblePixels": 84974,
+        "magentaFringePixels": 0
+      },
+      "registeredMetrics": {
+        "bounds": [
+          102,
+          40,
+          381,
+          473
+        ],
+        "centroid": {
+          "x": 255.38616397821204,
+          "y": 269.06746885212584
+        },
+        "lowerBodyCentroid": {
+          "x": 255.76371588051964,
+          "y": 390.25790337473694
+        },
+        "upperBodyCentroid": {
+          "x": 258.3026339039517,
+          "y": 163.67873379288866
+        },
+        "baselineY": 472,
+        "visiblePixels": 84974,
+        "magentaFringePixels": 0
+      }
+    },
+    {
+      "id": "doze",
+      "index": 5,
+      "column": 2,
+      "row": 1,
+      "registrationOffset": {
+        "x": 43,
+        "y": 14
+      },
+      "sourceMetrics": {
+        "bounds": [
+          59,
+          42,
+          338,
+          459
+        ],
+        "centroid": {
+          "x": 212.03426807909122,
+          "y": 262.56154721051524
+        },
+        "lowerBodyCentroid": {
+          "x": 212.70563267923728,
+          "y": 384.0303374403487
+        },
+        "upperBodyCentroid": {
+          "x": 219.4943063678154,
+          "y": 163.54502527089994
+        },
+        "baselineY": 458,
+        "visiblePixels": 82640,
+        "magentaFringePixels": 0
+      },
+      "registeredMetrics": {
+        "bounds": [
+          102,
+          56,
+          381,
+          473
+        ],
+        "centroid": {
+          "x": 255.03426807909122,
+          "y": 276.56154721051524
+        },
+        "lowerBodyCentroid": {
+          "x": 255.8593862257533,
+          "y": 390.32321246393934
+        },
+        "upperBodyCentroid": {
+          "x": 257.45845911900665,
+          "y": 172.9897130701057
+        },
+        "baselineY": 472,
+        "visiblePixels": 82640,
+        "magentaFringePixels": 0
+      }
+    }
+  ],
+  "runtime": {
+    "aliases": {
+      "click": "happy-click",
+      "ready": "happy-click"
+    },
+    "wheelSequence": [
+      "key-left",
+      "key-right",
+      "key-left",
+      "neutral"
+    ],
+    "idleSequence": [
+      "neutral",
+      "blink",
+      "neutral"
+    ],
+    "bodyLoop": false
+  },
+  "quality": {
+    "lowerBodyCenterSpreadSourcePx": 2.2839249760388043,
+    "lowerBodyCenterSpreadDisplayPx": 0.5709812440097011,
+    "fullCenterSpreadSourcePx": 3.8744794250127654,
+    "fullCenterSpreadDisplayPx": 0.9686198562531914,
+    "upperBodyCenterSpreadSourcePx": 2.327592785297611,
+    "upperBodyCenterSpreadDisplayPx": 0.5818981963244028,
+    "baselineRangeSourcePx": 0,
+    "bboxLeftSpreadSourcePx": 25,
+    "bboxRightSpreadSourcePx": 2,
+    "stableBBoxLeftSpreadSourcePx": 0,
+    "stableBBoxRightSpreadSourcePx": 1,
+    "magentaFringePixels": 0
+  },
+  "unityImport": {
+    "textureType": "Sprite (2D and UI)",
+    "spriteMode": "Multiple",
+    "meshType": "Full Rect",
+    "filterMode": "Bilinear",
+    "compression": "None",
+    "mipMaps": false,
+    "allowRotation": false,
+    "tightPacking": false
+  }
+}

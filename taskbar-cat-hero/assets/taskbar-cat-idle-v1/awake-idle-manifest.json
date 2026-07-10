@@ -1,0 +1,123 @@
+{
+  "status": "awake idle candidate; user final-speed review required",
+  "source_v3_manifest_sha256": "68692a3dcbd2389476de291306265b38da072bcba6996c675d1ba64520c85dfe",
+  "source_canvas_px": 1254,
+  "runtime_canvas_px": 128,
+  "display_size_px": 112,
+  "neutral_source": {
+    "path": "C:/Users/i/Documents/New project/taskbar-cat-hero/assets/taskbar-cat-cutout-rig-v3/chef-cat-transparent-neutral-open-eyes.png",
+    "sha256": "5ac0cffea0fd560a386b5b511dc67d03ddfdf051647abe93bb29014ce1eda2a9"
+  },
+  "timeline_ms": {
+    "work_hold_after_keyboard": 1200,
+    "alert_idle_until": 45000,
+    "curious_idle_until": 180000,
+    "sleepy_idle_until": 300000,
+    "doze_after": 300000
+  },
+  "rare_sniff": {
+    "only_in_state": "curious-idle",
+    "interval_sequence_ms": [
+      18000,
+      26000,
+      22000
+    ],
+    "duration_ms": 3000,
+    "queues_or_overlaps": false,
+    "semantic_cues": [
+      "near-vertical head approach",
+      "two nose-local squash pulses",
+      "one short dough-to-nose scent curl per pulse"
+    ],
+    "speech_bubble_fx": false
+  },
+  "modes": {
+    "alert": {
+      "frame_count": 100,
+      "frame_duration_ms": 80,
+      "duration_ms": 8000,
+      "first_last_frames_identical": true,
+      "fixed_dough_root_max_changed_pixels": 0,
+      "max_visible_green_dominant_pixels": 0,
+      "transparent_corners": true,
+      "runtime_sha256": "e797e82a13358e57aff682b62bd57e3d105730a279338931c6473f3ea0a259bf",
+      "decoded_frame_count": 100,
+      "decoded_duration_ms": 8000
+    },
+    "attention": {
+      "frame_count": 24,
+      "frame_duration_ms": 50,
+      "duration_ms": 1200,
+      "first_last_frames_identical": true,
+      "fixed_dough_root_max_changed_pixels": 0,
+      "max_visible_green_dominant_pixels": 0,
+      "transparent_corners": true,
+      "runtime_sha256": "9d1eab71e43488ba6ebbeffa55b835b804810ad75abad5c75d6f9303719509c1",
+      "decoded_frame_count": 22,
+      "decoded_duration_ms": 1200
+    },
+    "sniff": {
+      "frame_count": 60,
+      "frame_duration_ms": 50,
+      "duration_ms": 3000,
+      "first_last_frames_identical": true,
+      "fixed_dough_root_max_changed_pixels": 0,
+      "max_visible_green_dominant_pixels": 0,
+      "transparent_corners": true,
+      "decoded_frame_count": 60,
+      "decoded_duration_ms": 3000,
+      "runtime_sha256": "eda608432abcd062201bc0483ab209d2b4b2d2da5ffb85499dece7f01371f797"
+    },
+    "sleepy": {
+      "frame_count": 100,
+      "frame_duration_ms": 80,
+      "duration_ms": 8000,
+      "first_last_frames_identical": true,
+      "fixed_dough_root_max_changed_pixels": 0,
+      "max_visible_green_dominant_pixels": 0,
+      "transparent_corners": true,
+      "runtime_sha256": "4360c3448a42f25a74041176e9b9f41d83107c81a77019585e7ba8048e4cad59",
+      "decoded_frame_count": 100,
+      "decoded_duration_ms": 8000
+    }
+  },
+  "outputs": {
+    "alert_128_webp": {
+      "path": "C:/Users/i/Documents/New project/taskbar-cat-hero/assets/taskbar-cat-idle-v1/chef-cat-idle-alert-128.webp",
+      "sha256": "e797e82a13358e57aff682b62bd57e3d105730a279338931c6473f3ea0a259bf"
+    },
+    "attention_128_webp": {
+      "path": "C:/Users/i/Documents/New project/taskbar-cat-hero/assets/taskbar-cat-idle-v1/chef-cat-idle-attention-128.webp",
+      "sha256": "9d1eab71e43488ba6ebbeffa55b835b804810ad75abad5c75d6f9303719509c1"
+    },
+    "sniff_128_webp": {
+      "path": "C:/Users/i/Documents/New project/taskbar-cat-hero/assets/taskbar-cat-idle-v1/chef-cat-idle-sniff-128.webp",
+      "sha256": "eda608432abcd062201bc0483ab209d2b4b2d2da5ffb85499dece7f01371f797"
+    },
+    "sleepy_128_webp": {
+      "path": "C:/Users/i/Documents/New project/taskbar-cat-hero/assets/taskbar-cat-idle-v1/chef-cat-idle-sleepy-128.webp",
+      "sha256": "4360c3448a42f25a74041176e9b9f41d83107c81a77019585e7ba8048e4cad59"
+    },
+    "light_dark_112_qa": {
+      "path": "C:/Users/i/Documents/New project/taskbar-cat-hero/assets/taskbar-cat-idle-v1/qa/awake-idle-light-dark-112.png",
+      "sha256": "8440214a696992a2ae5bd68fbd7882109a30a6ed845b907c4c5bbcb1a38a619d"
+    }
+  },
+  "fixed_dough_root_box_source_pixels": [
+    350,
+    1020,
+    960,
+    1254
+  ],
+  "unity_handoff": {
+    "root_motion": false,
+    "keyboard_starts_kneading": true,
+    "pointer_starts_kneading": false,
+    "pointer_reaction": "idle-attention one-shot",
+    "ambient_event_policy": "replace-current; never queue; disabled outside curious-idle"
+  },
+  "limitations": [
+    "Browser file-page final-speed playback still requires user review.",
+    "Windows global input and Unity Animator/C# adapters are not implemented here."
+  ]
+}

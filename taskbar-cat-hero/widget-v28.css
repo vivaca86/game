@@ -1,4 +1,8 @@
-/* Taskbar widget final override: fixed frame, animated parts only. */
+/*
+ * Legacy taskbar experiments (v28-v31), retained only as a visual reference.
+ * The runtime no longer loads this cascade; current behavior lives in
+ * taskbar-companion.css. Do not re-enable this file to work around new styles.
+ */
 button.tiny-widget {
   width: 184px !important;
   height: 78px !important;

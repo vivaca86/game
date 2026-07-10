@@ -1,0 +1,19 @@
+{
+  "fps": 20,
+  "frame_count": 20,
+  "frame_duration_ms": 50,
+  "duration_ms": 1000,
+  "cycles": 3,
+  "contacts_per_second": 6,
+  "first_last_frames_identical": true,
+  "fixed_dough_root_max_changed_pixels": 0,
+  "max_visible_green_dominant_pixels": 0,
+  "transparent_corner_alpha": [
+    0,
+    0,
+    0,
+    0
+  ],
+  "runtime_sha256": "16dbf8bf994d1fbeee15129225b0b032e3b16b5f4f8fb9e8cfccc9f377e3015f",
+  "checker_sha256": "89c8d20bce3e1adb50578919106634ee60c9079f0918bde293c7ce05fc6ca43a"
+}

@@ -1,0 +1,181 @@
+{
+  "status": "brisk grouped ambient knead proof; user approval required",
+  "source_v3_manifest_sha256": "68692a3dcbd2389476de291306265b38da072bcba6996c675d1ba64520c85dfe",
+  "frame_count": 120,
+  "duration_seconds": 6,
+  "fps": 20,
+  "frame_duration_ms": 50,
+  "knead_duration_seconds": 0.46,
+  "knead_events": [
+    {
+      "side": "viewer-left",
+      "start_seconds": 0.25
+    },
+    {
+      "side": "viewer-right",
+      "start_seconds": 0.7
+    },
+    {
+      "side": "viewer-left",
+      "start_seconds": 1.15
+    },
+    {
+      "side": "viewer-right",
+      "start_seconds": 1.6
+    },
+    {
+      "side": "viewer-left",
+      "start_seconds": 2.05
+    },
+    {
+      "side": "viewer-right",
+      "start_seconds": 3.1
+    },
+    {
+      "side": "viewer-left",
+      "start_seconds": 3.55
+    },
+    {
+      "side": "viewer-right",
+      "start_seconds": 4.0
+    },
+    {
+      "side": "viewer-left",
+      "start_seconds": 4.45
+    },
+    {
+      "side": "viewer-right",
+      "start_seconds": 4.9
+    }
+  ],
+  "knead_groups": [
+    {
+      "start_seconds": 0.25,
+      "beat_count": 5,
+      "beat_interval_seconds": 0.45
+    },
+    {
+      "start_seconds": 3.1,
+      "beat_count": 5,
+      "beat_interval_seconds": 0.45
+    }
+  ],
+  "blink_windows_seconds": [
+    [
+      2.58,
+      2.72
+    ]
+  ],
+  "ear_recovery_events": [
+    {
+      "side": "viewer-left",
+      "start_seconds": 2.76
+    },
+    {
+      "side": "viewer-right",
+      "start_seconds": 5.46
+    }
+  ],
+  "tail_sway": {
+    "period_seconds": 3.0,
+    "amplitude_degrees": 13.0
+  },
+  "cat_mesh_deformation_layers": [],
+  "keyboard_or_runtime_integration": false,
+  "transparent_corner_alpha": [
+    0,
+    0,
+    0,
+    0
+  ],
+  "max_visible_green_dominant_pixels": 0,
+  "first_last_frames_identical": true,
+  "fixed_dough_root_max_changed_pixels": 0,
+  "fixed_dough_root_box_source_pixels": [
+    350,
+    1090,
+    1010,
+    1140
+  ],
+  "layer_sources": {
+    "base": {
+      "path": "C:/Users/i/Documents/New project/taskbar-cat-hero/assets/taskbar-cat-cutout-rig-v3/layers/base-transparent.png",
+      "sha256": "cb04380718c0fa8031965156dfe34dafe37b3038a75cd3262d03dee95401f4a2"
+    },
+    "head_core": {
+      "path": "C:/Users/i/Documents/New project/taskbar-cat-hero/assets/taskbar-cat-cutout-rig-v3/layers/head-core.png",
+      "sha256": "21ddc4a176c428f3048142f487969e274db2356d7550e9da1b077ceb0ac4d02e"
+    },
+    "left_ear": {
+      "path": "C:/Users/i/Documents/New project/taskbar-cat-hero/assets/taskbar-cat-cutout-rig-v3/layers/left-ear.png",
+      "sha256": "5db64881bcfa6ce23aed0dd8310e453b75bd11b43e31c53dd1a3367b20125b71"
+    },
+    "right_ear": {
+      "path": "C:/Users/i/Documents/New project/taskbar-cat-hero/assets/taskbar-cat-cutout-rig-v3/layers/right-ear.png",
+      "sha256": "e927cc43f69e147696366d7fc8ec19a2dcc344f997bcfc4f0f8a62cae7d68acd"
+    },
+    "hat_crown": {
+      "path": "C:/Users/i/Documents/New project/taskbar-cat-hero/assets/taskbar-cat-cutout-rig-v3/layers/hat-crown.png",
+      "sha256": "cfe824519231531ee58fa218986d81cbafa1d3c4a033252ddee49d370b439c09"
+    },
+    "upper_arm": {
+      "path": "C:/Users/i/Documents/New project/taskbar-cat-hero/assets/taskbar-cat-cutout-rig-v3/layers/upper-arm.png",
+      "sha256": "3c73613cef2ce93b55c48a26ebfa02702b9294004bfb04bcc295d2a327209c6e"
+    },
+    "forearm_paw": {
+      "path": "C:/Users/i/Documents/New project/taskbar-cat-hero/assets/taskbar-cat-cutout-rig-v3/layers/forearm-paw.png",
+      "sha256": "bae69e80847044cc917a8ec2ab1894f4fc1835bedf69e20b3a016d34ab17483d"
+    },
+    "right_upper_arm": {
+      "path": "C:/Users/i/Documents/New project/taskbar-cat-hero/assets/taskbar-cat-cutout-rig-v3/layers/right-upper-arm.png",
+      "sha256": "dee5fdd6ce65968e0b4a169d6960f3de0944a68b92c3d6e35ca3ac7e91ac3059"
+    },
+    "right_forearm_paw": {
+      "path": "C:/Users/i/Documents/New project/taskbar-cat-hero/assets/taskbar-cat-cutout-rig-v3/layers/right-forearm-paw.png",
+      "sha256": "d99ae29e064a2d470ff549d75445541aee9ab034244638b7b3b63726d1d298dc"
+    },
+    "tail": {
+      "path": "C:/Users/i/Documents/New project/taskbar-cat-hero/assets/taskbar-cat-cutout-rig-v3/layers/tail.png",
+      "sha256": "2c52615fe17e759b7c201fdd93723d7bc5b52f41d38d1bbc8898b505243df0d5"
+    },
+    "open_eyes": {
+      "path": "C:/Users/i/Documents/New project/taskbar-cat-hero/assets/taskbar-cat-cutout-rig-v3/layers/open-eyes.png",
+      "sha256": "0f053d744ac8323b24a49b63213f4f8742937c43c1a507acae8849620b5cc293"
+    }
+  },
+  "outputs": {
+    "neutral": {
+      "path": "C:/Users/i/Documents/New project/taskbar-cat-hero/assets/taskbar-cat-cutout-rig-v5-proof/chef-cat-transparent-neutral-open-eyes.png",
+      "sha256": "5ac0cffea0fd560a386b5b511dc67d03ddfdf051647abe93bb29014ce1eda2a9"
+    },
+    "motion_128_webp": {
+      "path": "C:/Users/i/Documents/New project/taskbar-cat-hero/assets/taskbar-cat-cutout-rig-v5-proof/chef-cat-fast-knead-motion-128.webp",
+      "sha256": "61a0a4bb25059ecb749e069e991b3fc853e2bccdf835c3c5e913502688661024"
+    },
+    "motion_384_webp": {
+      "path": "C:/Users/i/Documents/New project/taskbar-cat-hero/assets/taskbar-cat-cutout-rig-v5-proof/qa/chef-cat-fast-knead-motion-384.webp",
+      "sha256": "364617eac7692efea0bbc7260bc560c9cd25d771ba4e4d4890d51c26dcc46247"
+    },
+    "motion_128_apng": {
+      "path": "C:/Users/i/Documents/New project/taskbar-cat-hero/assets/taskbar-cat-cutout-rig-v5-proof/qa/chef-cat-fast-knead-motion-128.png",
+      "sha256": "fc033612e06f77f0c1d33b8ffd9333f216c639fb45727f104cb82558a6164814"
+    },
+    "checker_motion_384_gif": {
+      "path": "C:/Users/i/Documents/New project/taskbar-cat-hero/assets/taskbar-cat-cutout-rig-v5-proof/qa/chef-cat-fast-knead-checker-384.gif",
+      "sha256": "7fc26ec377da47b1f3a23f3d14fd8384ba157474c4944a7e00d4d453d5acf2ae"
+    },
+    "contact_sheet": {
+      "path": "C:/Users/i/Documents/New project/taskbar-cat-hero/assets/taskbar-cat-cutout-rig-v5-proof/qa/fast-knead-contact-sheet.png",
+      "sha256": "2ff14de787bccb71bf5e41578b4ec09267f12c0c9a4f632b88f1b30de1f4e9dc"
+    },
+    "background_qa": {
+      "path": "C:/Users/i/Documents/New project/taskbar-cat-hero/assets/taskbar-cat-cutout-rig-v5-proof/qa/neutral-light-dark-checker.png",
+      "sha256": "ba96ab68e2abf61d71bac184be3cc2f4710834db5be8c282c77dabbf64676a99"
+    }
+  },
+  "limitations": [
+    "Typing-speed and keyboard-triggered motion are intentionally deferred.",
+    "HTML/runtime files are unchanged.",
+    "User final-speed approval is required before this cadence becomes the ambient production state."
+  ]
+}

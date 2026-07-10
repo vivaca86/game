@@ -1,0 +1,215 @@
+{
+  "version": 1,
+  "sources": {
+    "dispatch-map-master.png": "53264e306dfb8d3c7ef6970e92a25d4bf41efba70255c17126eb0655cc5ee179",
+    "object-icons-master.png": "1c90fdb64dcff06cb68785ff5037760c9aaac904efb80366144ea34a08044cdd",
+    "party-portraits-master.png": "73ecc482af837de9bdc12bb6c6b05d711f0f53c3de7114d2d64426b0078e18aa",
+    "production-strip-master.png": "2fe831fe74025e1ceb7f337de304a8f7ecc4d83c5576ba043abe08e444ffeb42",
+    "restaurant-scene-master.png": "9d04004776100c552381d4d0c043a8db2cc8d328d8d42e6d8dab1f26e30fb2f0"
+  },
+  "runtime_assets": [
+    {
+      "path": "assets/menu-v1/chef-card.png",
+      "width": 512,
+      "height": 512,
+      "sha256": "0a062a9c92bd13618fab05ca9d4b8f04de6ff6f9912a4b308168eb53855488ab"
+    },
+    {
+      "path": "assets/menu-v1/dispatch-map.png",
+      "width": 1320,
+      "height": 418,
+      "sha256": "26bc2a6a00883ee618ba912c123373bef22e8ee0a67f7a7c0600b83061a2207f"
+    },
+    {
+      "path": "assets/menu-v1/icons/apron.png",
+      "width": 256,
+      "height": 320,
+      "sha256": "4431fee159209be21bda2c54e1921f0ecbbd1d55cceadc3fca5cc6f4e2e59145"
+    },
+    {
+      "path": "assets/menu-v1/icons/bag.png",
+      "width": 256,
+      "height": 320,
+      "sha256": "795c2bc1585deab58d0781e3014deee1f66d187ea8562714fcf993577ea0acd3"
+    },
+    {
+      "path": "assets/menu-v1/icons/book.png",
+      "width": 256,
+      "height": 320,
+      "sha256": "8a7d20753456347fcde6547ba511c5dded8cacfd7575be85ba80fdf80e1624e2"
+    },
+    {
+      "path": "assets/menu-v1/icons/bread.png",
+      "width": 256,
+      "height": 320,
+      "sha256": "e3f10fefcb43a0342915b65ff033d032c2e2c2514b2105257a87964c18590a3e"
+    },
+    {
+      "path": "assets/menu-v1/icons/cake.png",
+      "width": 256,
+      "height": 320,
+      "sha256": "5076583b0bba7cdd7a3e4ccb364bf42c563e7555622167b8acfa5314196a2dd6"
+    },
+    {
+      "path": "assets/menu-v1/icons/carrot.png",
+      "width": 256,
+      "height": 320,
+      "sha256": "1d3e05d7c638610d43891873519973a8f12e8300cfa70d7e3d5db8c6aa18dd52"
+    },
+    {
+      "path": "assets/menu-v1/icons/chair.png",
+      "width": 256,
+      "height": 320,
+      "sha256": "fb0fb23e181445e15d3e1dada38880e2e539ecdfd6dbff40c62895fc801a7369"
+    },
+    {
+      "path": "assets/menu-v1/icons/cheese.png",
+      "width": 256,
+      "height": 320,
+      "sha256": "a86bea107ea84a31df5f8a66806a5ec3a47bc7e206baedfc19031d575340e963"
+    },
+    {
+      "path": "assets/menu-v1/icons/coat.png",
+      "width": 256,
+      "height": 320,
+      "sha256": "bae69aab6404da528a970f3988861fc66b1ad816c2e56d3be88be68b2ad22f24"
+    },
+    {
+      "path": "assets/menu-v1/icons/egg.png",
+      "width": 256,
+      "height": 320,
+      "sha256": "6d852a82bfba10a02541f97d98c95767b1bd6e00e1b202d24da93e11f54588bf"
+    },
+    {
+      "path": "assets/menu-v1/icons/gift.png",
+      "width": 256,
+      "height": 320,
+      "sha256": "5aa159816d4291d68c82e0cc0aa7bf0baff62ce765af735505d15d9c901528d1"
+    },
+    {
+      "path": "assets/menu-v1/icons/juice.png",
+      "width": 256,
+      "height": 320,
+      "sha256": "34e58599f4172e21b25e607b314a25db7064c4370f23907779c827efee43523b"
+    },
+    {
+      "path": "assets/menu-v1/icons/milk.png",
+      "width": 256,
+      "height": 320,
+      "sha256": "294721ab95dc27649205cf5aea637bfeeb1dada904516b844b9d167264a2621f"
+    },
+    {
+      "path": "assets/menu-v1/icons/pasta.png",
+      "width": 256,
+      "height": 320,
+      "sha256": "8bee53bfbadb31487dd6b51121af36d4fdfc650fef5faf3dc0cf81d3b43ac057"
+    },
+    {
+      "path": "assets/menu-v1/icons/pot.png",
+      "width": 256,
+      "height": 320,
+      "sha256": "e5476b99760c0a44a977528f9cb1d95cf87d2b6629d736ee595ffc571b346198"
+    },
+    {
+      "path": "assets/menu-v1/icons/roller.png",
+      "width": 256,
+      "height": 320,
+      "sha256": "b8e989358695312619d44bb94ccc2b04cd316699ae1e49ee5e9672d37de7101e"
+    },
+    {
+      "path": "assets/menu-v1/icons/spatula.png",
+      "width": 256,
+      "height": 320,
+      "sha256": "6ab89c9376746a99d5bd80775ba6dd8d5dd74c989b4cfea75741b443a85f4c83"
+    },
+    {
+      "path": "assets/menu-v1/icons/stew.png",
+      "width": 256,
+      "height": 320,
+      "sha256": "1490e7822f0b348656a2b14e232c5352c8658b7935963384c2a3c13d1787b223"
+    },
+    {
+      "path": "assets/menu-v1/icons/tomato.png",
+      "width": 256,
+      "height": 320,
+      "sha256": "372812dca664e7ea563392d11f5bec750a8f0bb77064f4a289d5dff2074956b2"
+    },
+    {
+      "path": "assets/menu-v1/icons/wheat.png",
+      "width": 256,
+      "height": 320,
+      "sha256": "0a7becde50b143a9109b3b55a232853ac62d9dd4ebf1755050d0001b86fb4f43"
+    },
+    {
+      "path": "assets/menu-v1/portraits/calico.png",
+      "width": 512,
+      "height": 512,
+      "sha256": "978c673ff3a6ebe018687527b652bce65821c36834f3b2f6d1718a421c3e1b0b"
+    },
+    {
+      "path": "assets/menu-v1/portraits/gray.png",
+      "width": 512,
+      "height": 512,
+      "sha256": "4241fcaaf492244a2ceb5ecf8c3cfbfc4c5b5c9c3ecaaad2bd9e6dd7a177e607"
+    },
+    {
+      "path": "assets/menu-v1/portraits/marmalade.png",
+      "width": 512,
+      "height": 512,
+      "sha256": "23eb50655c49f5a5efb2d0c95296cd8c1a38328d908de320411b76ad82f90197"
+    },
+    {
+      "path": "assets/menu-v1/portraits/momo.png",
+      "width": 512,
+      "height": 512,
+      "sha256": "0a062a9c92bd13618fab05ca9d4b8f04de6ff6f9912a4b308168eb53855488ab"
+    },
+    {
+      "path": "assets/menu-v1/production/bakery.png",
+      "width": 512,
+      "height": 512,
+      "sha256": "156eb5a16dc612b9664a1183381d789a3e77bd9bd58be4a4c9fbe313eaf31c81"
+    },
+    {
+      "path": "assets/menu-v1/production/field.png",
+      "width": 512,
+      "height": 512,
+      "sha256": "61828c816573c82926622f691035b54c296e65c31d45c7ba2e274699cddf28e9"
+    },
+    {
+      "path": "assets/menu-v1/production/greenhouse.png",
+      "width": 512,
+      "height": 512,
+      "sha256": "f6c57fdb775114216d1e737ffd1535cda66114fa456c907de78ba429e8e9502e"
+    },
+    {
+      "path": "assets/menu-v1/production/truck.png",
+      "width": 512,
+      "height": 512,
+      "sha256": "1137db5e549afec561ffbd2867f3bb603f478cbed69df3d3814c11f29b1edfb8"
+    },
+    {
+      "path": "assets/menu-v1/production/village.png",
+      "width": 512,
+      "height": 512,
+      "sha256": "5c7d2532e34aaee6d8bb1566faccb90da0558e9c88a7a3a752660fee01cf47b7"
+    },
+    {
+      "path": "assets/menu-v1/restaurant-scene.png",
+      "width": 1300,
+      "height": 810,
+      "sha256": "4353407240612c80c4dcbedcf2c6c42436abd482432fcab8e5cf5cfa37d99316"
+    }
+  ],
+  "project_vector_assets": [
+    {
+      "path": "assets/menu-v1/ui-symbols.svg",
+      "sha256": "d3300244d7a1c614f348e7a70f2f2fc6fc1d27d5974c99f4bf6b585bc18c5b63"
+    },
+    {
+      "path": "assets/menu-v1/recipe-paper.svg",
+      "sha256": "910a2920c1b7a75b357dcfe3096408b029a39bb80a7a590c33a6b61bd264ac20"
+    }
+  ],
+  "unity_note": "Import generated masters and reproduce these crop rectangles in a SpriteAtlas; runtime PNGs are prototype derivatives."
+}

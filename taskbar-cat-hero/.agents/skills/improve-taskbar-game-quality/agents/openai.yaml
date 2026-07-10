@@ -1,0 +1,4 @@
+interface:
+  display_name: "Taskbar Game Quality Loop"
+  short_description: "Learn from feedback and improve taskbar game quality"
+  default_prompt: "Use $improve-taskbar-game-quality to plan, create, validate, and learn from this taskbar-game art or interaction task."

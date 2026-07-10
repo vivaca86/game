@@ -1,0 +1,74 @@
+{
+  "status": "articulated cutout proof; user approval required",
+  "source_sha256": "ec112924e2f6c9daa8988e68319ad05ee0c8d615459738a0b89be246c4f03704",
+  "clean_plate_sha256": "b778ff6bddf8b158c56c28ac149b0a75f2aba28f7a5cf14b3265a9028dbfb3ac",
+  "size": [
+    1254,
+    1254
+  ],
+  "fps": 12,
+  "duration_seconds": 6,
+  "frame_count": 72,
+  "rigid_layers": [
+    "head_core",
+    "left_ear",
+    "hat_crown",
+    "upper_arm",
+    "forearm_paw"
+  ],
+  "soft_mesh_deformation_layers": [],
+  "pivots_source_pixels": {
+    "neck": [
+      650,
+      735
+    ],
+    "viewer_left_shoulder": [
+      418,
+      770
+    ],
+    "viewer_left_elbow": [
+      485,
+      875
+    ],
+    "viewer_left_ear_base": [
+      402,
+      458
+    ],
+    "hat_crown_base": [
+      602,
+      269
+    ]
+  },
+  "neutral_reconstruction_changed_pixels": 0,
+  "neutral_reconstruction_difference_bbox": null,
+  "fixed_lower_counter_max_changed_pixels": 0,
+  "first_last_frames_identical": true,
+  "outputs": {
+    "proof_128": {
+      "path": "C:/Users/i/Documents/New project/taskbar-cat-hero/assets/taskbar-cat-cutout-rig-v1/qa/cutout-rig-proof-128.gif",
+      "sha256": "2de1d2a49e7429ae23ab54adc234ff7150080f1ea03b69f51c97928e7bffc537"
+    },
+    "proof_384": {
+      "path": "C:/Users/i/Documents/New project/taskbar-cat-hero/assets/taskbar-cat-cutout-rig-v1/qa/cutout-rig-proof-384.gif",
+      "sha256": "4c072131d16f84b15d46941a56c6babff62384c83b6c3b3e3a0772e30cc27288"
+    },
+    "proof_384_lossless": {
+      "path": "C:/Users/i/Documents/New project/taskbar-cat-hero/assets/taskbar-cat-cutout-rig-v1/qa/cutout-rig-proof-384-lossless.webp",
+      "sha256": "91f26279a4cb80c8de6f31ba966233f0a6266cb1fde6c506e29c45058f96b13d"
+    },
+    "contact_sheet": {
+      "path": "C:/Users/i/Documents/New project/taskbar-cat-hero/assets/taskbar-cat-cutout-rig-v1/qa/cutout-rig-contact-sheet.png",
+      "sha256": "3a1c6a7308068bcddd4b367984ad031e5777e362708644d177c81f2a5244f098"
+    },
+    "neutral_reconstruction": {
+      "path": "C:/Users/i/Documents/New project/taskbar-cat-hero/assets/taskbar-cat-cutout-rig-v1/qa/cutout-neutral-reconstruction.png",
+      "sha256": "920d15dd971d1275a163d484e8a1afa1855a7c5406821002c43126a734693967"
+    }
+  },
+  "limitations": [
+    "The generated clean plate is used only under removed head/arm regions.",
+    "The proof has one viewer-left work beat and is not connected to runtime input.",
+    "The cream background remains; production transparency and Unity import are deferred.",
+    "User final-speed visual approval is required before adding the opposite arm or runtime states."
+  ]
+}

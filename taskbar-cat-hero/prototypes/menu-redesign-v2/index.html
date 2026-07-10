@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Taskbar Cat — 관리창 UX 방향 v2</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <main class="review-shell">
+    <header class="review-head">
+      <div>
+        <span class="eyebrow">40분 UX 방향 패스 · 구조 프로토타입</span>
+        <h1>관리창을 열면, 10초 안에 다음 일을 정한다</h1>
+      </div>
+      <div class="direction-switch" role="tablist" aria-label="와이어프레임 방향 선택">
+        <button class="direction-button is-active" data-direction="a" role="tab" aria-selected="true">A · 고양이 홈</button>
+        <button class="direction-button" data-direction="b" role="tab" aria-selected="false">B · 하루 계획표</button>
+        <button class="direction-button" data-direction="c" role="tab" aria-selected="false">C · 식당 공간</button>
+      </div>
+    </header>
+
+    <section class="direction-panel is-active" data-panel="a" aria-label="추천안 고양이 중심 홈">
+      <div class="prototype-window">
+        <header class="game-header">
+          <div class="brand-lockup">
+            <span class="brand-mark" aria-hidden="true">T</span>
+            <div><b>오늘의 냥식당</b><small>7일차 · 맑음</small></div>
+          </div>
+          <div class="resource-cluster" aria-label="주요 자원">
+            <span><i class="token token-coin"></i><b>2,274</b></span>
+            <span><i class="token token-gem"></i><b>8</b></span>
+            <span><i class="token token-energy"></i><b>50</b><small>/50</small></span>
+          </div>
+          <button class="round-control" aria-label="창 닫기">×</button>
+        </header>
+
+        <div class="game-body">
+          <nav class="main-nav" aria-label="관리창 주요 메뉴">
+            <button class="nav-item is-active" data-view="today">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11.5 12 5l8 6.5v7.3a1.2 1.2 0 0 1-1.2 1.2H5.2A1.2 1.2 0 0 1 4 18.8Z"/><path d="M9 20v-6h6v6"/></svg>
+              <span>오늘</span>
+            </button>
+            <button class="nav-item" data-view="kitchen">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 12h12v7H6z"/><path d="M8 12V8a4 4 0 0 1 8 0v4M4 12h16"/></svg>
+              <span>주방</span>
+            </button>
+            <button class="nav-item" data-view="farm">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20V9"/><path d="M12 12c-4 0-6-2-6-6 4 0 6 2 6 6ZM12 16c4 0 6-2 6-6-4 0-6 2-6 6Z"/></svg>
+              <span>농장</span>
+            </button>
+            <button class="nav-item" data-view="cat">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m7 9-1-5 4 3a8 8 0 0 1 4 0l4-3-1 5a7 7 0 1 1-10 0Z"/><path d="M9 13h.01M15 13h.01M10 16c1.2 1 2.8 1 4 0"/></svg>
+              <span>고양이</span>
+            </button>
+          </nav>
+
+          <section class="view is-active" data-view-panel="today">
+            <div class="today-layout">
+              <section class="cat-stage" aria-label="현재 작업표시줄 고양이 상태">
+                <div class="stage-copy">
+                  <span class="state-kicker">지금 작업표시줄에서는</span>
+                  <h2>모모가 반죽을 쉬고 있어요</h2>
+                  <p>다음 요리를 정하면 데스크톱에서도 그 준비를 시작합니다.</p>
+                </div>
+                <img src="../../assets/taskbar-cat-cutout-rig-v4/chef-cat-transparent-neutral-open-eyes.png" alt="한 덩이 반죽 앞에 있는 요리사 고양이 모모" />
+                <div class="taskbar-result">
+                  <span class="pulse-dot"></span>
+                  <div><small>작업표시줄 반영</small><b id="taskbarResult">차분한 대기 모션</b></div>
+                </div>
+              </section>
+
+              <aside class="action-column">
+                <article class="next-action-card">
+                  <header>
+                    <span class="paper-tab">다음에 할 일</span>
+                    <span class="time-chip">약 4분</span>
+                  </header>
+                  <h3 id="actionTitle">토마토 스튜 준비</h3>
+                  <p id="actionDescription">보유 재료로 바로 시작할 수 있어요. 선택하면 모모가 반죽 대신 냄비를 살핍니다.</p>
+                  <div class="ingredient-pills" aria-label="필요 재료">
+                    <span><i class="ingredient tomato"></i>토마토 1/1</span>
+                    <span><i class="ingredient milk"></i>우유 1/1</span>
+                  </div>
+                  <button class="primary-action" id="startAction">이 요리 시작하기 <span>→</span></button>
+                  <button class="text-action" id="changeAction">다른 요리 고르기</button>
+                </article>
+
+                <article class="ready-card">
+                  <div class="ready-seal">2</div>
+                  <div><small>지금 확인할 것</small><b>밀밭과 온실 수확 가능</b></div>
+                  <button data-view-jump="farm">보러 가기</button>
+                </article>
+
+                <article class="relationship-card">
+                  <div class="cat-token">모</div>
+                  <div><small>모모와의 오늘</small><b>기분 좋음 · 애정 68</b></div>
+                  <span class="mood-stamp">♪</span>
+                </article>
+              </aside>
+            </div>
+
+            <section class="day-chain" aria-label="오늘의 게임 흐름">
+              <div class="chain-title"><small>오늘의 흐름</small><b>수확 → 요리 → 작업표시줄 변화</b></div>
+              <button class="chain-step is-ready" data-view-jump="farm"><span>1</span><div><small>농장</small><b>재료 2곳 준비</b></div><em>수확 가능</em></button>
+              <span class="chain-arrow">›</span>
+              <button class="chain-step is-current"><span>2</span><div><small>주방</small><b>다음 요리 선택</b></div><em>지금 할 일</em></button>
+              <span class="chain-arrow">›</span>
+              <div class="chain-step"><span>3</span><div><small>데스크톱</small><b>고양이 행동 변경</b></div><em>선택 결과</em></div>
+            </section>
+          </section>
+
+          <section class="view section-placeholder" data-view-panel="kitchen">
+            <span class="section-number">02</span><div><small>주방 화면 구조</small><h2>레시피 한 개를 고르고, 필요한 재료와 결과를 비교한다</h2><p>현재 패스에서는 홈으로부터의 진입 목적과 반환 결과만 정의했습니다. 다음 구현 단위입니다.</p></div>
+          </section>
+          <section class="view section-placeholder" data-view-panel="farm">
+            <span class="section-number">03</span><div><small>농장 화면 구조</small><h2>완료된 곳부터 수확하고, 다음 생산 한 개를 배치한다</h2><p>모든 시설에 막대를 반복하지 않고 `준비됨`, `남은 시간`, `비어 있음`의 세 상태로 구분합니다.</p></div>
+          </section>
+          <section class="view section-placeholder" data-view-panel="cat">
+            <span class="section-number">04</span><div><small>고양이 화면 구조</small><h2>관계와 의상을 고르면 작업표시줄 모습이 바뀐다</h2><p>스탯을 나열하기보다 표정·의상·행동의 실제 변화를 먼저 보여 줍니다.</p></div>
+          </section>
+        </div>
+      </div>
+
+      <footer class="direction-note">
+        <div><b>추천 이유</b><p>고양이의 존재감과 관리 게임의 다음 행동을 한 화면에서 연결합니다.</p></div>
+        <div><b>의도적으로 뺀 것</b><p>모든 레시피·시설·장비의 동시 노출, 장식용 진행바, 반복되는 동일 버튼.</p></div>
+        <div><b>다음 아트</b><p>홈 배경 1장, 역할별 아이콘 세트, 준비/선택/잠김 컨트롤 스킨.</p></div>
+      </footer>
+    </section>
+
+    <section class="direction-panel" data-panel="b" aria-label="와이어프레임 B 하루 계획표">
+      <div class="wireframe-window">
+        <header><b>B · 하루 계획표</b><span>관리 흐름 우선</span></header>
+        <div class="planner-grid">
+          <aside><strong>오늘</strong><span>주방</span><span>농장</span><span>고양이</span></aside>
+          <main>
+            <div class="planner-head"><div class="wire-cat">CAT</div><div><small>오늘의 목표</small><h2>토마토 스튜 3그릇</h2><p>보상: 코인 180 · 애정 4</p></div></div>
+            <div class="timeline">
+              <article class="done"><i>1</i><b>밀밭 수확</b><span>완료</span></article>
+              <article class="active"><i>2</i><b>온실 수확</b><span>지금</span></article>
+              <article><i>3</i><b>스튜 조리</b><span>3회</span></article>
+              <article><i>4</i><b>모모 서빙</b><span>결과</span></article>
+            </div>
+          </main>
+        </div>
+      </div>
+      <footer class="wire-note"><b>장점</b> 관리 순서가 가장 명확함 <span>·</span> <b>위험</b> 고양이가 임무 아이콘으로 축소될 수 있음</footer>
+    </section>
+
+    <section class="direction-panel" data-panel="c" aria-label="와이어프레임 C 식당 공간">
+      <div class="wireframe-window room-direction">
+        <header><b>C · 식당 공간</b><span>장소 몰입 우선</span></header>
+        <div class="room-wire">
+          <button class="hotspot kitchen-spot"><i>1</i><b>주방</b><span>요리 1개 진행</span></button>
+          <button class="hotspot farm-spot"><i>2</i><b>뒷마당</b><span>수확 2곳</span></button>
+          <button class="hotspot cat-spot"><i>3</i><b>모모</b><span>기분 좋음</span></button>
+          <div class="room-cat">CAT</div>
+          <div class="room-counter"></div>
+        </div>
+      </div>
+      <footer class="wire-note"><b>장점</b> IP 세계와 장소성이 가장 강함 <span>·</span> <b>위험</b> 고품질 공간 아트와 상태별 레이어 비용이 큼</footer>
+    </section>
+  </main>
+
+  <div class="prototype-toast" id="prototypeToast" role="status" aria-live="polite"></div>
+  <script src="./prototype.js"></script>
+</body>
+</html>

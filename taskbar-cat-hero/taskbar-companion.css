@@ -1,0 +1,345 @@
+/*
+ * Taskbar companion presentation.
+ *
+ * The browser preview uses the verified v4 ambient loop plus separate fast and
+ * overdrive typing WebPs.  Paused/reduced states use the preserved high-
+ * resolution neutral. Unity must recreate the same timelines from the v3 RGBA
+ * layers and pivots rather than importing animated WebP as the art master.
+ */
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.taskbar-companion {
+  --taskbar-cat-neutral-image: url("./assets/taskbar-cat-cutout-rig-v4/chef-cat-transparent-neutral-open-eyes.png");
+  --taskbar-cat-motion-image: url("./assets/taskbar-cat-cutout-rig-v4/chef-cat-fast-knead-motion-128.webp");
+  --taskbar-cat-typing-fast-image: url("./assets/taskbar-cat-typing-v1/chef-cat-typing-fast-128.webp");
+  --taskbar-cat-typing-overdrive-image: url("./assets/taskbar-cat-typing-v1/chef-cat-typing-overdrive-128.webp");
+  --taskbar-cat-idle-alert-image: url("./assets/taskbar-cat-idle-v1/chef-cat-idle-alert-128.webp");
+  --taskbar-cat-idle-attention-image: url("./assets/taskbar-cat-idle-v1/chef-cat-idle-attention-128.webp");
+  --taskbar-cat-idle-sniff-image: url("./assets/taskbar-cat-idle-v1/chef-cat-idle-sniff-128.webp");
+  --taskbar-cat-idle-sleepy-image: url("./assets/taskbar-cat-idle-v1/chef-cat-idle-sleepy-128.webp");
+  --taskbar-cat-doze-image: url("./assets/taskbar-cat-rest-v1/chef-cat-doze-128.webp");
+  --taskbar-cat-wake-image: url("./assets/taskbar-cat-rest-v1/chef-cat-wake-startle-128.webp");
+  position: absolute;
+  left: 50%;
+  bottom: 60px;
+  z-index: 4;
+  width: 112px;
+  height: 112px;
+  transform: translateX(-50%);
+  opacity: 1;
+  transition: opacity 160ms ease;
+  pointer-events: none;
+  isolation: isolate;
+}
+
+/* Browser adapter for the saved normalized position. Unity should apply the
+   equivalent top-left position to its native overlay window/work area. */
+.taskbar-companion[data-positioned="true"] {
+  left: var(--taskbar-cat-x);
+  top: var(--taskbar-cat-y);
+  bottom: auto;
+  transform: none;
+}
+
+.taskbar-cat-hit-target {
+  position: absolute;
+  left: 17px;
+  top: 6px;
+  z-index: 5;
+  width: 80px;
+  height: 101px;
+  padding: 0;
+  border: 0;
+  border-radius: 44% 44% 25% 25%;
+  clip-path: polygon(18% 2%, 72% 2%, 92% 24%, 84% 47%, 100% 65%, 96% 96%, 6% 96%, 2% 66%, 13% 43%, 7% 22%);
+  background: transparent;
+  box-shadow: none;
+  pointer-events: auto;
+  touch-action: none;
+  cursor: grab;
+  user-select: none;
+}
+
+.taskbar-companion[data-dragging="true"] .taskbar-cat-hit-target {
+  cursor: grabbing;
+}
+
+.taskbar-cat-hit-target:focus {
+  outline: 0;
+}
+
+.taskbar-cat-visual {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 128px;
+  height: 128px;
+  transform: scale(0.875);
+  transform-origin: left bottom;
+  pointer-events: none;
+  filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.36)) drop-shadow(0 0 1.5px rgba(255, 247, 222, 0.72));
+}
+
+.taskbar-cat-visual::after {
+  content: "";
+  position: absolute;
+  left: 27px;
+  bottom: 5px;
+  z-index: -1;
+  width: 78px;
+  height: 8px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(10, 5, 3, 0.34), rgba(10, 5, 3, 0.12) 56%, transparent 75%);
+  filter: blur(1.3px);
+}
+
+.taskbar-cat-reaction-motion,
+.taskbar-cat-ambient-motion,
+.taskbar-cat-pose {
+  position: absolute;
+  inset: 0;
+  width: 128px;
+  height: 128px;
+  transform-origin: 50% 92%;
+  animation: none;
+  transform: none;
+}
+
+.taskbar-cat-ambient-motion {
+  transform: none;
+}
+
+.taskbar-cat-pose {
+  z-index: 1;
+  background-image: var(--taskbar-cat-neutral-image);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 128px 128px;
+  image-rendering: auto;
+  animation: none;
+  transition: none;
+  transform: none;
+}
+
+/* Each intensity owns one self-contained registered loop. Runtime changes the
+   pose attribute only when the tier changes so dense keys cannot keep seeking
+   an animated WebP back to frame zero. */
+.taskbar-companion[data-pose="ambient-v4"] .taskbar-cat-pose {
+  background-image: var(--taskbar-cat-motion-image);
+}
+
+.taskbar-companion[data-pose="typing-fast"] .taskbar-cat-pose {
+  background-image: var(--taskbar-cat-typing-fast-image);
+}
+
+.taskbar-companion[data-pose="typing-overdrive"] .taskbar-cat-pose {
+  background-image: var(--taskbar-cat-typing-overdrive-image);
+}
+
+.taskbar-companion[data-pose="idle-alert"] .taskbar-cat-pose {
+  background-image: var(--taskbar-cat-idle-alert-image);
+}
+
+.taskbar-companion[data-pose="idle-attention"] .taskbar-cat-pose {
+  background-image: var(--taskbar-cat-idle-attention-image);
+}
+
+.taskbar-companion[data-pose="idle-sniff"] .taskbar-cat-pose {
+  background-image: var(--taskbar-cat-idle-sniff-image);
+}
+
+.taskbar-companion[data-pose="idle-sleepy"] .taskbar-cat-pose {
+  background-image: var(--taskbar-cat-idle-sleepy-image);
+}
+
+.taskbar-companion[data-pose="doze-loop"] .taskbar-cat-pose {
+  background-image: var(--taskbar-cat-doze-image);
+}
+
+.taskbar-companion[data-pose="wake-startle"] .taskbar-cat-pose {
+  background-image: var(--taskbar-cat-wake-image);
+}
+
+/* Animated image playback cannot be paused through animation-play-state.
+   Swap to the static neutral whenever the management panel owns attention. */
+.taskbar-companion[data-panel="open"] .taskbar-cat-pose {
+  background-image: var(--taskbar-cat-neutral-image);
+}
+
+.taskbar-cat-fx,
+.taskbar-cat-key-flash,
+.taskbar-cat-gesture-fx,
+.taskbar-cat-doze-fx {
+  position: absolute;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.taskbar-cat-fx {
+  inset: 0;
+  width: 128px;
+  height: 128px;
+}
+
+.taskbar-cat-key-flash {
+  --puff-opacity: 0.68;
+  --puff-scale: 0.9;
+  top: 93px;
+  width: 13px;
+  height: 7px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 249, 224, 0.96);
+  opacity: 0;
+  box-shadow:
+    -5px 2px 0 -1px rgba(255, 245, 214, 0.9),
+    5px 1px 0 -1px rgba(255, 250, 230, 0.82),
+    0 0 5px rgba(255, 235, 181, 0.72);
+}
+
+.taskbar-cat-key-flash--left { left: 43px; }
+.taskbar-cat-key-flash--right { left: 78px; }
+
+.taskbar-companion[data-reaction-source="input"] .taskbar-cat-key-flash {
+  --puff-opacity: 1;
+  --puff-scale: 1.18;
+}
+
+.taskbar-companion[data-reaction="key-left"] .taskbar-cat-key-flash--left,
+.taskbar-companion[data-reaction="key-right"] .taskbar-cat-key-flash--right {
+  animation: taskbarCatFlourPuff 220ms ease-out;
+}
+
+@keyframes taskbarCatFlourPuff {
+  0% { opacity: 0; transform: translateY(2px) scale(0.45); }
+  38% { opacity: var(--puff-opacity); transform: translateY(0) scale(var(--puff-scale)); }
+  100% { opacity: 0; transform: translateY(-5px) scale(calc(var(--puff-scale) + 0.22)); }
+}
+
+.taskbar-cat-gesture-fx {
+  left: 101px;
+  top: 42px;
+  min-width: 18px;
+  height: 18px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: #fff8d8;
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 900;
+  line-height: 1;
+  opacity: 0;
+  text-shadow: 0 1px 2px rgba(80, 42, 18, 0.72);
+}
+
+.taskbar-cat-gesture-fx::before {
+  content: "!";
+}
+
+.taskbar-companion[data-reaction="wake-startle"] .taskbar-cat-gesture-fx {
+  color: #f3fdff;
+  text-shadow:
+    0 1px 0 #28758a,
+    0 0 5px rgba(125, 229, 246, 0.9),
+    0 2px 3px rgba(60, 32, 18, 0.62);
+  animation: taskbarCatWakePop 1000ms ease-out;
+}
+
+@keyframes taskbarCatWakePop {
+  0%, 7% { opacity: 0; transform: translate(-4px, 5px) scale(0.35) rotate(-18deg); }
+  18% { opacity: 1; transform: translate(0, -3px) scale(1.35) rotate(7deg); }
+  38% { opacity: 0.9; transform: translate(1px, -1px) scale(1) rotate(-2deg); }
+  72%, 100% { opacity: 0; transform: translate(2px, -8px) scale(0.78) rotate(0); }
+}
+
+.taskbar-cat-doze-fx {
+  left: 98px;
+  top: 22px;
+  color: #fff8df;
+  font-family: "Segoe UI", sans-serif;
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: -1px;
+  opacity: 0;
+  text-shadow: 0 1px 3px rgba(45, 34, 22, 0.82);
+}
+
+.taskbar-cat-doze-fx small {
+  position: relative;
+  top: -7px;
+  margin-left: 1px;
+  font-size: 9px;
+}
+
+.taskbar-companion[data-ambient="doze"] .taskbar-cat-doze-fx {
+  animation: taskbarCatDozeZ 1800ms ease-in-out infinite;
+}
+
+@keyframes taskbarCatDozeZ {
+  0% { opacity: 0; transform: translate(-2px, 5px) scale(0.72); }
+  28%, 62% { opacity: 0.78; transform: translate(0, 0) scale(1); }
+  100% { opacity: 0; transform: translate(4px, -8px) scale(1.08); }
+}
+
+.taskbar-cat-hit-target:focus-visible ~ .taskbar-cat-visual {
+  filter: drop-shadow(0 0 2px #fff) drop-shadow(0 0 6px #f6bd4c) drop-shadow(0 2px 2px rgba(0, 0, 0, 0.36));
+}
+
+.taskbar-companion[data-motion="reduced"] .taskbar-cat-pose,
+.taskbar-companion[data-motion="reduced"] .taskbar-cat-reaction-motion,
+.taskbar-companion[data-motion="reduced"] .taskbar-cat-ambient-motion,
+.taskbar-companion[data-motion="reduced"] .taskbar-cat-key-flash,
+.taskbar-companion[data-motion="reduced"] .taskbar-cat-gesture-fx,
+.taskbar-companion[data-motion="reduced"] .taskbar-cat-doze-fx {
+  animation: none;
+  transition: none;
+}
+
+.taskbar-companion[data-motion="reduced"] .taskbar-cat-pose {
+  background-image: var(--taskbar-cat-neutral-image);
+}
+
+.taskbar-companion[data-motion="off"] .taskbar-cat-pose,
+.taskbar-companion[data-motion="off"] .taskbar-cat-reaction-motion,
+.taskbar-companion[data-motion="off"] .taskbar-cat-ambient-motion,
+.taskbar-companion[data-motion="off"] .taskbar-cat-key-flash,
+.taskbar-companion[data-motion="off"] .taskbar-cat-gesture-fx,
+.taskbar-companion[data-motion="off"] .taskbar-cat-doze-fx {
+  animation: none;
+  transition: none;
+}
+
+.taskbar-companion[data-motion="off"] .taskbar-cat-pose {
+  background-image: var(--taskbar-cat-neutral-image);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .taskbar-companion[data-motion] .taskbar-cat-pose,
+  .taskbar-companion[data-motion] .taskbar-cat-reaction-motion,
+  .taskbar-companion[data-motion] .taskbar-cat-ambient-motion,
+  .taskbar-companion[data-motion] .taskbar-cat-key-flash,
+  .taskbar-companion[data-motion] .taskbar-cat-gesture-fx,
+  .taskbar-companion[data-motion] .taskbar-cat-doze-fx {
+    animation: none;
+    transition: none;
+  }
+
+  .taskbar-companion[data-motion] .taskbar-cat-pose {
+    background-image: var(--taskbar-cat-neutral-image);
+    background-position: center;
+    transform: none;
+  }
+
+}

@@ -1,0 +1,194 @@
+{
+  "status": "typing intensity motion candidate; user final-speed review required",
+  "source_v3_manifest_sha256": "68692a3dcbd2389476de291306265b38da072bcba6996c675d1ba64520c85dfe",
+  "panic_source": {
+    "path": "C:/Users/i/Documents/New project/taskbar-cat-hero/assets/taskbar-cat-typing-v1/sources/chef-cat-panic-face-v1.png",
+    "sha256": "c5936cbfd0cdc3f7b83067f8bfd33890962c831ffff9e6d036a64c069da6e2d3",
+    "usage": "eyes, brows, and mouth only through three declared feathered masks"
+  },
+  "declared_face_masks_source_pixels": [
+    [
+      490,
+      480,
+      622,
+      660
+    ],
+    [
+      694,
+      470,
+      826,
+      648
+    ],
+    [
+      604,
+      632,
+      744,
+      718
+    ]
+  ],
+  "sweat": {
+    "count": 3,
+    "implementation": "deterministic separate RGBA overlay"
+  },
+  "speed_fx": {
+    "viewer_left_axis": "upper-left to lower-right; downward press",
+    "viewer_right_axis": "upper-right to lower-left; downward press",
+    "horizontal_streaks_allowed": false,
+    "contrast_palette": "teal diagonal motion streaks; warm flour-white burst with cocoa outline",
+    "fast_burst": "one 21.4px comic impact crown plus four flour clouds and seven airborne particles per paw strike",
+    "overdrive_burst": "one 27.7px double impact crown plus nine flour clouds and fourteen airborne particles per paw strike",
+    "burst_is_layered_behind_paw": true,
+    "burst_clouds_are_union_silhouette": true
+  },
+  "motion_readability": {
+    "display_size_px": 112,
+    "fast_forearm_contact_translate_source_px": 35.2,
+    "fast_forearm_contact_translate_display_px": 3.14,
+    "overdrive_forearm_contact_translate_source_px": 35.2,
+    "overdrive_forearm_contact_translate_display_px": 3.14,
+    "dough_response_is_local_above_fixed_root": true,
+    "overdrive_uses_extra_penetration": false
+  },
+  "modes": {
+    "fast": {
+      "fps": 20,
+      "frame_count": 20,
+      "frame_duration_ms": 50,
+      "duration_ms": 1000,
+      "cycles": 3,
+      "contacts_per_second": 6,
+      "first_last_frames_identical": true,
+      "fixed_dough_root_max_changed_pixels": 0,
+      "max_visible_green_dominant_pixels": 0,
+      "transparent_corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "runtime_sha256": "16dbf8bf994d1fbeee15129225b0b032e3b16b5f4f8fb9e8cfccc9f377e3015f",
+      "checker_sha256": "89c8d20bce3e1adb50578919106634ee60c9079f0918bde293c7ce05fc6ca43a"
+    },
+    "overdrive": {
+      "fps": 25,
+      "frame_count": 25,
+      "frame_duration_ms": 40,
+      "duration_ms": 1000,
+      "cycles": 4,
+      "contacts_per_second": 8,
+      "first_last_frames_identical": true,
+      "fixed_dough_root_max_changed_pixels": 0,
+      "max_visible_green_dominant_pixels": 0,
+      "transparent_corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "runtime_sha256": "08678c4b0903a74ac84a0d2d4e249313d8ffffc923f19796966a1bfa95565a64",
+      "checker_sha256": "dabf8a937e018e9f0168590a47162427605118ae75dabbd5bfcc5defacfa2e6e"
+    }
+  },
+  "runtime_intensity_contract": {
+    "anonymous_window_ms": 800,
+    "fast_min_pulses": 4,
+    "overdrive_min_pulses": 8,
+    "normal_hold_ms": 220,
+    "fast_hold_ms": 620,
+    "overdrive_hold_ms": 780,
+    "input_changes_rewards_or_duration": false,
+    "input_content_persisted": false,
+    "replace_current_no_queue": true
+  },
+  "fixed_dough_root_box_source_pixels": [
+    350,
+    1090,
+    1010,
+    1140
+  ],
+  "layer_sources": {
+    "base": {
+      "path": "C:/Users/i/Documents/New project/taskbar-cat-hero/assets/taskbar-cat-cutout-rig-v3/layers/base-transparent.png",
+      "sha256": "cb04380718c0fa8031965156dfe34dafe37b3038a75cd3262d03dee95401f4a2"
+    },
+    "head_core": {
+      "path": "C:/Users/i/Documents/New project/taskbar-cat-hero/assets/taskbar-cat-cutout-rig-v3/layers/head-core.png",
+      "sha256": "21ddc4a176c428f3048142f487969e274db2356d7550e9da1b077ceb0ac4d02e"
+    },
+    "left_ear": {
+      "path": "C:/Users/i/Documents/New project/taskbar-cat-hero/assets/taskbar-cat-cutout-rig-v3/layers/left-ear.png",
+      "sha256": "5db64881bcfa6ce23aed0dd8310e453b75bd11b43e31c53dd1a3367b20125b71"
+    },
+    "right_ear": {
+      "path": "C:/Users/i/Documents/New project/taskbar-cat-hero/assets/taskbar-cat-cutout-rig-v3/layers/right-ear.png",
+      "sha256": "e927cc43f69e147696366d7fc8ec19a2dcc344f997bcfc4f0f8a62cae7d68acd"
+    },
+    "hat_crown": {
+      "path": "C:/Users/i/Documents/New project/taskbar-cat-hero/assets/taskbar-cat-cutout-rig-v3/layers/hat-crown.png",
+      "sha256": "cfe824519231531ee58fa218986d81cbafa1d3c4a033252ddee49d370b439c09"
+    },
+    "upper_arm": {
+      "path": "C:/Users/i/Documents/New project/taskbar-cat-hero/assets/taskbar-cat-cutout-rig-v3/layers/upper-arm.png",
+      "sha256": "3c73613cef2ce93b55c48a26ebfa02702b9294004bfb04bcc295d2a327209c6e"
+    },
+    "forearm_paw": {
+      "path": "C:/Users/i/Documents/New project/taskbar-cat-hero/assets/taskbar-cat-cutout-rig-v3/layers/forearm-paw.png",
+      "sha256": "bae69e80847044cc917a8ec2ab1894f4fc1835bedf69e20b3a016d34ab17483d"
+    },
+    "right_upper_arm": {
+      "path": "C:/Users/i/Documents/New project/taskbar-cat-hero/assets/taskbar-cat-cutout-rig-v3/layers/right-upper-arm.png",
+      "sha256": "dee5fdd6ce65968e0b4a169d6960f3de0944a68b92c3d6e35ca3ac7e91ac3059"
+    },
+    "right_forearm_paw": {
+      "path": "C:/Users/i/Documents/New project/taskbar-cat-hero/assets/taskbar-cat-cutout-rig-v3/layers/right-forearm-paw.png",
+      "sha256": "d99ae29e064a2d470ff549d75445541aee9ab034244638b7b3b63726d1d298dc"
+    },
+    "tail": {
+      "path": "C:/Users/i/Documents/New project/taskbar-cat-hero/assets/taskbar-cat-cutout-rig-v3/layers/tail.png",
+      "sha256": "2c52615fe17e759b7c201fdd93723d7bc5b52f41d38d1bbc8898b505243df0d5"
+    },
+    "open_eyes": {
+      "path": "C:/Users/i/Documents/New project/taskbar-cat-hero/assets/taskbar-cat-cutout-rig-v3/layers/open-eyes.png",
+      "sha256": "0f053d744ac8323b24a49b63213f4f8742937c43c1a507acae8849620b5cc293"
+    }
+  },
+  "outputs": {
+    "fast_128_webp": {
+      "path": "C:/Users/i/Documents/New project/taskbar-cat-hero/assets/taskbar-cat-typing-v1/chef-cat-typing-fast-128.webp",
+      "sha256": "16dbf8bf994d1fbeee15129225b0b032e3b16b5f4f8fb9e8cfccc9f377e3015f"
+    },
+    "fast_checker_256_gif": {
+      "path": "C:/Users/i/Documents/New project/taskbar-cat-hero/assets/taskbar-cat-typing-v1/qa/chef-cat-typing-fast-checker-256.gif",
+      "sha256": "89c8d20bce3e1adb50578919106634ee60c9079f0918bde293c7ce05fc6ca43a"
+    },
+    "overdrive_128_webp": {
+      "path": "C:/Users/i/Documents/New project/taskbar-cat-hero/assets/taskbar-cat-typing-v1/chef-cat-typing-overdrive-128.webp",
+      "sha256": "08678c4b0903a74ac84a0d2d4e249313d8ffffc923f19796966a1bfa95565a64"
+    },
+    "overdrive_checker_256_gif": {
+      "path": "C:/Users/i/Documents/New project/taskbar-cat-hero/assets/taskbar-cat-typing-v1/qa/chef-cat-typing-overdrive-checker-256.gif",
+      "sha256": "dabf8a937e018e9f0168590a47162427605118ae75dabbd5bfcc5defacfa2e6e"
+    },
+    "contact_sheet": {
+      "path": "C:/Users/i/Documents/New project/taskbar-cat-hero/assets/taskbar-cat-typing-v1/qa/typing-tier-contact-sheet.png",
+      "sha256": "05bba49f32fdcdd2247463415d50aedafc56ada959cda981f43937b7a7b62c50"
+    },
+    "light_dark_sheet": {
+      "path": "C:/Users/i/Documents/New project/taskbar-cat-hero/assets/taskbar-cat-typing-v1/qa/typing-tier-light-dark.png",
+      "sha256": "553cee37b926b131ef6a4c89198d37f93b261c5d12bad451600e835e73b851e1"
+    },
+    "panic_face_overlay": {
+      "path": "C:/Users/i/Documents/New project/taskbar-cat-hero/assets/taskbar-cat-typing-v1/layers/panic-face-overlay.png",
+      "sha256": "04bfee0bad8290f13c34a0c2dd6c5bf974f9173f6c4841a8513893a19925594b"
+    },
+    "panic_sweat_overlay": {
+      "path": "C:/Users/i/Documents/New project/taskbar-cat-hero/assets/taskbar-cat-typing-v1/layers/panic-sweat-overlay.png",
+      "sha256": "ee44b8b93734704d05f0e5e40fe8cf2438b073dc1f8ad3cc4a2ed3e3f5050cb8"
+    }
+  },
+  "limitations": [
+    "Browser file-page continuous playback still requires user review.",
+    "Windows global input and Unity Animator/C# adapters are not implemented here.",
+    "The panic source is prototype/IP-holder review material, not a Steam shipping-rights approval."
+  ]
+}

@@ -1,0 +1,52 @@
+{
+  "status": "motion proof; user approval required",
+  "source": "C:/Users/i/Documents/New project/taskbar-cat-hero/assets/taskbar-cat-living-v1/sources/chef-cat-v9-living-neutral-preview.png",
+  "source_sha256": "ec112924e2f6c9daa8988e68319ad05ee0c8d615459738a0b89be246c4f03704",
+  "source_size": [
+    1254,
+    1254
+  ],
+  "fps": 12,
+  "duration_seconds": 10,
+  "frame_count": 120,
+  "gif_frame_duration_pattern_ms": [
+    80,
+    80,
+    90
+  ],
+  "press_side": "viewer-left only",
+  "press_start_seconds": 4.0,
+  "press_duration_seconds": 0.9,
+  "idle_ear_flick": {
+    "side": "viewer-left",
+    "start_seconds": 2.05,
+    "duration_seconds": 0.52
+  },
+  "hat_follow_delay_ms": 75,
+  "root_lock_y_normalized": 0.905,
+  "root_changed_frames": 0,
+  "loop_seam_rgb_absolute_difference_at_128": 0,
+  "outputs": {
+    "proof_128": {
+      "path": "C:/Users/i/Documents/New project/taskbar-cat-hero/assets/taskbar-cat-living-v1/qa/living-neutral-motion-proof-128.gif",
+      "sha256": "15216aab9d466dda64c31beb76bcf647ff729c7f573c69a2282391cf6985cbf1"
+    },
+    "review_384": {
+      "path": "C:/Users/i/Documents/New project/taskbar-cat-hero/assets/taskbar-cat-living-v1/qa/living-neutral-motion-proof-384-review.gif",
+      "sha256": "fcb1afd787ca5b1e1a2ca83620ad84f3aae7f45b67fba58f452765e9c511a01f"
+    },
+    "review_384_lossless_webp": {
+      "path": "C:/Users/i/Documents/New project/taskbar-cat-hero/assets/taskbar-cat-living-v1/qa/living-neutral-motion-proof-384-review-lossless.webp",
+      "sha256": "000ea0f0710cb75e3329a6078ccebd79c2eec9e7754860cb1ca35fb09396de38"
+    },
+    "contact_sheet": {
+      "path": "C:/Users/i/Documents/New project/taskbar-cat-hero/assets/taskbar-cat-living-v1/qa/living-neutral-motion-contact-sheet.png",
+      "sha256": "71d2ec0d59dc689d8927be10ed2f9424edaa0863a18ff3c841353af1f472480f"
+    }
+  },
+  "limitations": [
+    "Cream background is preserved; transparency and production layer separation are not attempted.",
+    "Motion is a deterministic mesh proof from one approved still, not the final Unity bone/layer rig.",
+    "Only one viewer-left press is included; opposite-hand work and runtime input mapping are deferred."
+  ]
+}

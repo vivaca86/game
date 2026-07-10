@@ -1,0 +1,73 @@
+{
+  "status": "articulated rest/wake candidate; user final-speed review required",
+  "display_size_px": 112,
+  "source_canvas_px": 1254,
+  "source_v3_manifest_sha256": "68692a3dcbd2389476de291306265b38da072bcba6996c675d1ba64520c85dfe",
+  "neutral_source": {
+    "path": "C:/Users/i/Documents/New project/taskbar-cat-hero/assets/taskbar-cat-cutout-rig-v3/chef-cat-transparent-neutral-open-eyes.png",
+    "sha256": "5ac0cffea0fd560a386b5b511dc67d03ddfdf051647abe93bb29014ce1eda2a9"
+  },
+  "motion": {
+    "doze": {
+      "frame_count": 80,
+      "duration_ms": 4000,
+      "first_last_frames_identical": true,
+      "fixed_dough_root_max_changed_pixels": 0,
+      "transparent_corners": true
+    },
+    "wake_startle": {
+      "frame_count": 20,
+      "duration_ms": 1000,
+      "starts_from_deep_doze": true,
+      "ends_exact_approved_neutral": true,
+      "fixed_dough_root_max_changed_pixels": 0,
+      "transparent_corners": true
+    }
+  },
+  "pivots_source_pixels": {
+    "neck": [
+      650,
+      735
+    ],
+    "left_ear": [
+      402,
+      458
+    ],
+    "right_ear": [
+      778,
+      365
+    ],
+    "hat_crown": [
+      602,
+      269
+    ],
+    "tail": [
+      345,
+      910
+    ]
+  },
+  "outputs": {
+    "doze_128_webp": {
+      "path": "C:/Users/i/Documents/New project/taskbar-cat-hero/assets/taskbar-cat-rest-v1/chef-cat-doze-128.webp",
+      "sha256": "5a48415867e6c8f23e2235f60126daa0e657044c8d75951cde2255f98ebfc39b"
+    },
+    "wake_startle_128_webp": {
+      "path": "C:/Users/i/Documents/New project/taskbar-cat-hero/assets/taskbar-cat-rest-v1/chef-cat-wake-startle-128.webp",
+      "sha256": "a7b740c19b4eaa1771f7e2eb16bb634e23bdaddf55d0f177a286958fcccb8ba4"
+    },
+    "light_dark_qa": {
+      "path": "C:/Users/i/Documents/New project/taskbar-cat-hero/assets/taskbar-cat-rest-v1/qa/rest-motion-light-dark.png",
+      "sha256": "1c6544fd33c1fdbd368d7933ded1a0b703ed1c65e60d407b657a9a324fa0bee4"
+    }
+  },
+  "unity_handoff": {
+    "doze_state": "loop after 300 seconds without anonymous activity pulses",
+    "wake_state": "one-shot 1,000ms transition with priority over the first resumed input pulse",
+    "return_state": "exact approved neutral, then normal kneading state",
+    "root_motion": false
+  },
+  "limitations": [
+    "Browser file-page final-speed playback still requires user review.",
+    "Windows global input and Unity Animator/C# adapters are not implemented here."
+  ]
+}

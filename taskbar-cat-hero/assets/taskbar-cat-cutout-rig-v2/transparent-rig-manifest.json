@@ -1,0 +1,95 @@
+{
+  "status": "transparent articulated proof; user approval required",
+  "source_sha256": "ec112924e2f6c9daa8988e68319ad05ee0c8d615459738a0b89be246c4f03704",
+  "alpha_subject_sha256": "c5819b6742ad3de7394f14bb57b461fcb61744a090b798903a0effd12e298b85",
+  "alpha_clean_base_sha256": "47b661bcbc9f5146fe2198a3da3f3edd630b6e241407fc8904ad83306fe701ce",
+  "frame_count": 72,
+  "duration_seconds": 6,
+  "average_fps": 12,
+  "moving_layers": [
+    "head_core",
+    "left_ear",
+    "right_ear",
+    "hat_crown",
+    "upper_arm",
+    "forearm_paw",
+    "tail"
+  ],
+  "cat_mesh_deformation_layers": [],
+  "ear_events": [
+    {
+      "side": "viewer-left",
+      "start_seconds": 1.15,
+      "duration_seconds": 0.48
+    },
+    {
+      "side": "viewer-right",
+      "start_seconds": 4.45,
+      "duration_seconds": 0.48
+    }
+  ],
+  "tail_sway": {
+    "period_seconds": 3.0,
+    "amplitude_degrees": 4.2,
+    "pivot_source_pixels": [
+      345,
+      910
+    ]
+  },
+  "transparent_corner_alpha": [
+    0,
+    0,
+    0,
+    0
+  ],
+  "neutral_alpha_bbox": [
+    242,
+    68,
+    1007,
+    1119
+  ],
+  "max_visible_green_dominant_pixels": 0,
+  "first_last_frames_identical": true,
+  "fixed_dough_root_max_changed_pixels": 0,
+  "fixed_dough_root_box_source_pixels": [
+    350,
+    1090,
+    1010,
+    1140
+  ],
+  "outputs": {
+    "neutral": {
+      "path": "C:/Users/i/Documents/New project/taskbar-cat-hero/assets/taskbar-cat-cutout-rig-v2/chef-cat-transparent-neutral.png",
+      "sha256": "44604056bce611a505ccb7741970c6f403b68d05f0c5f2ad96383240acabc17e"
+    },
+    "motion_128_webp": {
+      "path": "C:/Users/i/Documents/New project/taskbar-cat-hero/assets/taskbar-cat-cutout-rig-v2/chef-cat-transparent-motion-128.webp",
+      "sha256": "ff09e1a626474d594075e0dfa34ca2efc202f249f5b6a700fbc0922fe82fa99a"
+    },
+    "motion_384_webp": {
+      "path": "C:/Users/i/Documents/New project/taskbar-cat-hero/assets/taskbar-cat-cutout-rig-v2/qa/chef-cat-transparent-motion-384.webp",
+      "sha256": "75a6bb8eac9a938ceed7bd6b78dce9fccdaed51df045fb807373f3c05cf68b1c"
+    },
+    "motion_128_apng": {
+      "path": "C:/Users/i/Documents/New project/taskbar-cat-hero/assets/taskbar-cat-cutout-rig-v2/qa/chef-cat-transparent-motion-128.png",
+      "sha256": "a6328b18e85550df9b7117fa7146bcf2050b055b80d64aab2ed7cd7686ca351b"
+    },
+    "checker_motion_384_gif": {
+      "path": "C:/Users/i/Documents/New project/taskbar-cat-hero/assets/taskbar-cat-cutout-rig-v2/qa/chef-cat-checker-motion-384.gif",
+      "sha256": "2c9a8a678ece03e78fd3d8b3b87e265c54e35835a18ea780e2ffb3ff10ffe51b"
+    },
+    "contact_sheet": {
+      "path": "C:/Users/i/Documents/New project/taskbar-cat-hero/assets/taskbar-cat-cutout-rig-v2/qa/transparent-motion-contact-sheet.png",
+      "sha256": "e96c1f45357f3587951b0740ce793629d6b9e0980b3a681de14768387598fc80"
+    },
+    "background_qa": {
+      "path": "C:/Users/i/Documents/New project/taskbar-cat-hero/assets/taskbar-cat-cutout-rig-v2/qa/neutral-light-dark-checker.png",
+      "sha256": "8583dda0b9d0ab2cc7a270dcb12dd586410047afd3049a91cd451138c43e5303"
+    }
+  },
+  "limitations": [
+    "The main output removes both cream background and wooden counter; the source images remain preserved.",
+    "The proof is not connected to the current HTML/runtime.",
+    "User final-speed approval is required before adding the opposite working arm or input states."
+  ]
+}

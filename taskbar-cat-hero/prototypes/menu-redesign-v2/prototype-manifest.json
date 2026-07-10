@@ -1,0 +1,43 @@
+{
+  "status": "prototype_not_production_approved",
+  "character_anchor": {
+    "path": "assets/taskbar-cat-cutout-rig-v4/chef-cat-transparent-neutral-open-eyes.png",
+    "sha256": "5ac0cffea0fd560a386b5b511dc67d03ddfdf051647abe93bb29014ce1eda2a9",
+    "disposition": "user_selected_style_derivative_prototype_anchor"
+  },
+  "rejected_menu_v1_raster_references": 0,
+  "outputs": [
+    {
+      "path": "prototypes/menu-redesign-v2/qa/control-state-sheet-1280x520.png",
+      "size": [
+        1280,
+        520
+      ],
+      "sha256": "4a9a6db5bc40cc7aba9fae84cc08c57f4995c91cba75914df2fef69178499088"
+    },
+    {
+      "path": "prototypes/menu-redesign-v2/qa/direction-a-cat-home-1280x720.png",
+      "size": [
+        1280,
+        720
+      ],
+      "sha256": "72b70576384e435c321966ecbd9a3b0c331c2cee60bd7621740e889a871d951e"
+    },
+    {
+      "path": "prototypes/menu-redesign-v2/qa/direction-b-day-planner-1280x720.png",
+      "size": [
+        1280,
+        720
+      ],
+      "sha256": "474aaabe4ac2bf411ba5b9a637677f5a4d6c2ac47e54d859048057ba942eb8dd"
+    },
+    {
+      "path": "prototypes/menu-redesign-v2/qa/direction-c-restaurant-room-1280x720.png",
+      "size": [
+        1280,
+        720
+      ],
+      "sha256": "21607a13f69b231d5eac2dcee152c9fca2d66089f24fb920ae186b8abc3b681d"
+    }
+  ]
+}

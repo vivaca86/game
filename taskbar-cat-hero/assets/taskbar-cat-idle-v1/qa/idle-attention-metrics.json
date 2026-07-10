@@ -1,0 +1,12 @@
+{
+  "frame_count": 24,
+  "frame_duration_ms": 50,
+  "duration_ms": 1200,
+  "first_last_frames_identical": true,
+  "fixed_dough_root_max_changed_pixels": 0,
+  "max_visible_green_dominant_pixels": 0,
+  "transparent_corners": true,
+  "runtime_sha256": "9d1eab71e43488ba6ebbeffa55b835b804810ad75abad5c75d6f9303719509c1",
+  "decoded_frame_count": 22,
+  "decoded_duration_ms": 1200
+}

@@ -1,0 +1,215 @@
+{
+  "schemaVersion": 1,
+  "id": "taskbar-baker-cat-one-dough-v2",
+  "status": "generated prototype; user continuous-play and IP-holder approval required",
+  "createdOn": "2026-07-10",
+  "generator": {
+    "mode": "OpenAI built-in imagegen plus deterministic masked composition",
+    "pillowVersion": "12.3.0",
+    "runtimeCellDerivation": "1254px approval masters to 512px cells with premultiplied-alpha Lanczos; masters preserved"
+  },
+  "sources": {
+    "neutral": {
+      "file": "baker-cat-one-dough-neutral-alpha-refined.png",
+      "sha256": "0552ce49c004dbbcb4dd97fd87732916b909ad9ec108301949addc389ce97d4d"
+    },
+    "key-left": {
+      "file": "baker-cat-one-dough-press-left-alpha-refined.png",
+      "sha256": "53f433d636ab8a40b10d4d1bfe88e7f621dc50b9579eea984ff6621b9729bc32"
+    },
+    "key-right": {
+      "file": "baker-cat-one-dough-press-right-alpha-refined.png",
+      "sha256": "b0c31f3b45745691db9bdfa9d46f37756076e398d08bc6e9a876d2d2c61f8186"
+    },
+    "blink": {
+      "file": "baker-cat-one-dough-blink-alpha-refined.png",
+      "sha256": "c81f179e7759e8f211361b36c05e97977d626480f5047f12e18d37ccdc89d7cd"
+    }
+  },
+  "atlas": {
+    "image": "taskbar-cat-baker-v2-atlas.png",
+    "sha256": "a651b8e1295d127355e6214b50ba4ad6157a3018636f335a2d5b5a3651cc4ce6",
+    "width": 1024,
+    "height": 1024,
+    "columns": 2,
+    "rows": 2,
+    "frameWidth": 512,
+    "frameHeight": 512,
+    "padding": 0,
+    "spacing": 0
+  },
+  "display": {
+    "frameWidth": 128,
+    "frameHeight": 128,
+    "scale": 0.25
+  },
+  "frames": [
+    {
+      "id": "neutral",
+      "index": 0,
+      "registrationOffset": {
+        "x": 0,
+        "y": 0
+      },
+      "mask": null,
+      "changedPixelsFullSource": 0,
+      "changedOutsideMaskPixels": 0
+    },
+    {
+      "id": "key-left",
+      "index": 1,
+      "registrationOffset": {
+        "x": 0,
+        "y": -1
+      },
+      "mask": {
+        "regions": [
+          [
+            150,
+            650,
+            525,
+            1090
+          ],
+          [
+            55,
+            900,
+            740,
+            1215
+          ]
+        ],
+        "featherRadiusSourcePx": 10
+      },
+      "changedPixelsFullSource": 236766,
+      "changedOutsideMaskPixels": 0
+    },
+    {
+      "id": "key-right",
+      "index": 2,
+      "registrationOffset": {
+        "x": 0,
+        "y": -2
+      },
+      "mask": {
+        "regions": [
+          [
+            729,
+            650,
+            1104,
+            1110
+          ],
+          [
+            514,
+            900,
+            1199,
+            1215
+          ]
+        ],
+        "featherRadiusSourcePx": 10
+      },
+      "changedPixelsFullSource": 238735,
+      "changedOutsideMaskPixels": 0
+    },
+    {
+      "id": "blink",
+      "index": 3,
+      "registrationOffset": {
+        "x": 0,
+        "y": -1
+      },
+      "mask": {
+        "regions": [
+          [
+            455,
+            370,
+            590,
+            530
+          ],
+          [
+            664,
+            370,
+            799,
+            530
+          ]
+        ],
+        "featherRadiusSourcePx": 10
+      },
+      "changedPixelsFullSource": 44613,
+      "changedOutsideMaskPixels": 0
+    }
+  ],
+  "quality": {
+    "runtimeAlphaBounds": [
+      [
+        0,
+        17,
+        512,
+        512
+      ],
+      [
+        0,
+        17,
+        512,
+        512
+      ],
+      [
+        0,
+        17,
+        512,
+        512
+      ],
+      [
+        0,
+        17,
+        512,
+        512
+      ]
+    ],
+    "baselineRangeRuntimePx": 0,
+    "lowerCenterSpreadRuntimePx": 2.073542141783207,
+    "lowerCenterSpreadDisplayPx": 0.5183855354458018,
+    "visibleGreenPixels": 0,
+    "outsideMaskChangedPixels": 0
+  },
+  "runtime": {
+    "frameOrder": [
+      "neutral",
+      "key-left",
+      "key-right",
+      "blink"
+    ],
+    "keyHoldMs": 165,
+    "blinkHoldMs": 170,
+    "pointerHoldMs": 165,
+    "pointerCooldownMs": 140,
+    "pointerReaction": [
+      "alternating-key-side",
+      "neutral"
+    ],
+    "ambientWorkBeatIntervalMs": [
+      3800,
+      5800
+    ],
+    "ambientWorkBeatHoldMs": 165,
+    "bodyLoop": false
+  },
+  "unityImport": {
+    "textureType": "Sprite (2D and UI)",
+    "spriteMode": "Multiple",
+    "grid": {
+      "columns": 2,
+      "rows": 2,
+      "cellWidth": 512,
+      "cellHeight": 512
+    },
+    "meshType": "Full Rect",
+    "filterMode": "Bilinear",
+    "compression": "None",
+    "mipMaps": false,
+    "allowRotation": false,
+    "tightPacking": false,
+    "pivotNormalizedUnity": {
+      "x": 0.5,
+      "y": 0.0
+    }
+  }
+}

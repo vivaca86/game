@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Menu Redesign v2 — Control States</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body class="control-lab">
+  <main class="control-sheet">
+    <header><div><span class="eyebrow">VISUAL SYSTEM v0.1</span><h1>게임 컨트롤 상태표</h1></div><span class="state-chip is-running">구조 프로토타입</span></header>
+    <section class="control-sheet-grid">
+      <article class="control-sample"><small>DEFAULT</small><button class="primary-action">요리 시작하기 <span>→</span></button></article>
+      <article class="control-sample"><small>HOVER</small><button class="primary-action is-hover">요리 시작하기 <span>→</span></button></article>
+      <article class="control-sample"><small>FOCUS</small><button class="primary-action focus-simulation">요리 시작하기 <span>→</span></button></article>
+      <article class="control-sample"><small>PRESSED</small><button class="primary-action is-pressed">요리 시작하기 <span>→</span></button></article>
+      <article class="control-sample"><small>DISABLED</small><button class="primary-action is-disabled" disabled>재료가 부족해요</button></article>
+      <article class="control-sample"><small>READY / CLAIM</small><button class="primary-action is-ready">수확물 받기</button></article>
+      <article class="control-sample"><small>SELECTED NAV</small><div class="selection-sample"><button class="nav-item is-active"><span>오늘</span></button><span class="state-chip">선택됨</span></div></article>
+      <article class="control-sample"><small>PRODUCTION STATES</small><div><span class="state-chip is-ready">준비됨</span> <span class="state-chip is-running">03:42</span> <span class="state-chip is-empty">비어 있음</span></div></article>
+    </section>
+  </main>
+</body>
+</html>

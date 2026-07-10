@@ -1,0 +1,115 @@
+{
+  "status": "two-hand transparent articulated proof; user approval required",
+  "source_sha256": "ec112924e2f6c9daa8988e68319ad05ee0c8d615459738a0b89be246c4f03704",
+  "both_arms_clean_chroma_sha256": "4c106af37f6992c8b6ae0ca6c5832ad95accc3895a1cf8b0c2b7fc33da52ee5b",
+  "both_arms_clean_alpha_sha256": "c0c338eb6d90e0144ef5de4b1322b51fc34508fc6aaca560d26baea359315394",
+  "open_eyes_source_sha256": "6d0c3ae11f48b2469a141234f7e9237161edebabd4bf8973441b1f9a3134759b",
+  "frame_count": 72,
+  "duration_seconds": 6,
+  "average_fps": 12,
+  "moving_layers": [
+    "head_core",
+    "left_ear",
+    "right_ear",
+    "hat_crown",
+    "upper_arm",
+    "forearm_paw",
+    "right_upper_arm",
+    "right_forearm_paw",
+    "tail",
+    "open_eyes"
+  ],
+  "cat_mesh_deformation_layers": [],
+  "knead_events": [
+    {
+      "side": "viewer-left",
+      "start_seconds": 1.3,
+      "duration_seconds": 0.94
+    },
+    {
+      "side": "viewer-right",
+      "start_seconds": 3.22,
+      "duration_seconds": 0.94
+    }
+  ],
+  "blink_windows_seconds": [
+    [
+      2.5,
+      2.68
+    ],
+    [
+      5.22,
+      5.38
+    ]
+  ],
+  "ear_flaps": {
+    "viewer_left": {
+      "primary_degrees": 8.0,
+      "rebound_degrees": -4.2
+    },
+    "viewer_right": {
+      "primary_degrees": -8.0,
+      "rebound_degrees": 4.2
+    }
+  },
+  "tail_sway": {
+    "period_seconds": 3.0,
+    "amplitude_degrees": 13.0,
+    "pivot_source_pixels": [
+      345,
+      910
+    ],
+    "estimated_peak_to_peak_tip_travel_source_pixels": 47.95,
+    "estimated_peak_to_peak_tip_travel_128_pixels": 4.89
+  },
+  "transparent_corner_alpha": [
+    0,
+    0,
+    0,
+    0
+  ],
+  "max_visible_green_dominant_pixels": 0,
+  "first_last_frames_identical": true,
+  "fixed_dough_root_max_changed_pixels": 0,
+  "fixed_dough_root_box_source_pixels": [
+    350,
+    1090,
+    1010,
+    1140
+  ],
+  "outputs": {
+    "neutral": {
+      "path": "C:/Users/i/Documents/New project/taskbar-cat-hero/assets/taskbar-cat-cutout-rig-v3/chef-cat-transparent-neutral-open-eyes.png",
+      "sha256": "5ac0cffea0fd560a386b5b511dc67d03ddfdf051647abe93bb29014ce1eda2a9"
+    },
+    "motion_128_webp": {
+      "path": "C:/Users/i/Documents/New project/taskbar-cat-hero/assets/taskbar-cat-cutout-rig-v3/chef-cat-transparent-motion-128.webp",
+      "sha256": "d1145def1e06f0f65b16f364c469039bb22fa703e2bb3aef13e6543653ced281"
+    },
+    "motion_384_webp": {
+      "path": "C:/Users/i/Documents/New project/taskbar-cat-hero/assets/taskbar-cat-cutout-rig-v3/qa/chef-cat-transparent-motion-384.webp",
+      "sha256": "3da12842165c462c6acb446e49bde6bef6b621b66b4eca3aba89b2374d3cd1da"
+    },
+    "motion_128_apng": {
+      "path": "C:/Users/i/Documents/New project/taskbar-cat-hero/assets/taskbar-cat-cutout-rig-v3/qa/chef-cat-transparent-motion-128.png",
+      "sha256": "9f96b53686327b9e8c4acff5181b47752dffae4a12b9262cbc419befb688f3f8"
+    },
+    "checker_motion_384_gif": {
+      "path": "C:/Users/i/Documents/New project/taskbar-cat-hero/assets/taskbar-cat-cutout-rig-v3/qa/chef-cat-checker-motion-384.gif",
+      "sha256": "cc8c417c7ceb5ecb5839487137e893cdc07f865d52cdb6926eb7734e66dbe4f9"
+    },
+    "contact_sheet": {
+      "path": "C:/Users/i/Documents/New project/taskbar-cat-hero/assets/taskbar-cat-cutout-rig-v3/qa/transparent-motion-contact-sheet.png",
+      "sha256": "856bdb78151cb3d3124d4d4492f39053f7dd65cf6382834df9cbf29f2bde3f19"
+    },
+    "background_qa": {
+      "path": "C:/Users/i/Documents/New project/taskbar-cat-hero/assets/taskbar-cat-cutout-rig-v3/qa/neutral-light-dark-checker.png",
+      "sha256": "ba96ab68e2abf61d71bac184be3cc2f4710834db5be8c282c77dabbf64676a99"
+    }
+  },
+  "limitations": [
+    "This proof is not connected to the HTML/runtime.",
+    "Generated pixels are limited to the hidden viewer-right-arm clean plate and tiny open-eye patches.",
+    "User visual approval is required before these timings become a production state."
+  ]
+}
