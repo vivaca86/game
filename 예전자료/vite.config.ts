@@ -1,12 +1,7 @@
 import { defineConfig } from "vite";
 
 export default defineConfig({
-  server: {
-    host: "127.0.0.1",
-    port: 5173
-  },
-  preview: {
-    host: "127.0.0.1",
-    port: 4173
-  }
+  // Packaged Electron builds load dist/index.html through file://, so emitted
+  // script and stylesheet URLs must be relative instead of /assets/... .
+  base: "./"
 });
