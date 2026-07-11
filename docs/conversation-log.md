@@ -2922,3 +2922,17 @@ The user supplied a refreshed screenshot without additional text. It is treated 
 ### Status
 
 - `In progress`: stage the complete intended move, commit, push `main`, then verify the remote tree and GitHub Pages live result.
+
+### Publish progress and Pages trigger diagnosis
+
+- Created commit `f38cfcc8d343f64ed12857b69403c459ce5dfc7b` (`Promote taskbar cat to repository root`) after verifying all 1,420 prior files map to the intended staged paths; only the conversation log and rebuilt standalone output had intentional blob changes.
+- Pushed that commit normally to `origin/main`; local and remote HEAD matched exactly.
+- The initial commit attempt failed because this fresh clone had no Git author identity. Reused the repository's verified latest author identity `jin <vivaca86@gmail.com>` in repository-local Git config only; global Git config was not changed.
+- The moved root `.gitignore` initially caused 392 archived files to be ignored at their new paths. Forced staging of the user-authorized archive restored all files; the final staged index contained exactly 1,420 files and zero missing mappings.
+- GitHub did not create a Pages workflow run after the push. A legacy Pages build POST was attempted once and rejected with HTTP 403 because the repository is configured for workflow-based Pages, not legacy builds.
+- The repository has no committed Pages workflow, so the configured workflow-based site has no trigger for the new root application.
+- Added `.github/workflows/deploy-pages.yml` using the current GitHub-documented static Pages flow and staging only the active taskbar site files plus `assets/`, excluding the large `예전자료/` archive from the deployment artifact.
+
+### Updated status
+
+- `In progress`: validate and push the Pages workflow, monitor its run, and inspect the live site before final completion.
