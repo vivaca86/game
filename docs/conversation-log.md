@@ -2936,3 +2936,27 @@ The user supplied a refreshed screenshot without additional text. It is treated 
 ### Updated status
 
 - `In progress`: validate and push the Pages workflow, monitor its run, and inspect the live site before final completion.
+
+### Pages workflow publication and live verification
+
+- Installed `PyYAML==6.0.3` in the current user's Python environment to run the repository-recorded YAML validation route. It is not a repository or game-runtime dependency and changed no project dependency file.
+- Validated `.github/workflows/deploy-pages.yml` as YAML, verified all staged site inputs, and estimated a 235,605,858-byte deployment artifact.
+- Re-ran the deterministic standalone `--check`; 44 embedded assets and all v31, baker-v2, cutout-v4, typing, rest, and idle quality gates passed.
+- Created and normally pushed commit `f6bd9389ac6ddeefd2be07451c5c9c9f8a6853f1` (`Deploy taskbar cat with GitHub Pages`) to `origin/main`.
+- GitHub Actions run `29149165075` completed successfully: build 29 seconds, deploy 14 seconds. Deployment record `5402879533` points to the exact commit `f6bd9389ac6ddeefd2be07451c5c9c9f8a6853f1`.
+- The Actions runner emitted non-blocking notices that several official Pages actions still target deprecated Node.js 20 and were forced to run on Node.js 24. Both jobs succeeded; this is upstream action metadata, not a project runtime failure.
+- Opened `https://vivaca86.github.io/game/` with a cache-busting query in the in-app Browser. The live title is now `Taskbar Cat Restaurant Hero`, and the page rendered the taskbar cat above the desktop taskbar scene.
+- Confirmed the default pose loads `assets/taskbar-cat-idle-v1/chef-cat-idle-alert-128.webp` from the live origin.
+- Sent a real key input to the deployed page and confirmed transition to `ambient=work`, `pose=ambient-v4`, and `assets/taskbar-cat-cutout-rig-v4/chef-cat-fast-knead-motion-128.webp`.
+- Sent rapid input and confirmed transition to `pose=typing-fast` with `assets/taskbar-cat-typing-v1/chef-cat-typing-fast-128.webp`.
+- After input ended, confirmed return to `ambient=alert-idle`, `pose=idle-alert`, `reaction=none`, and the idle-alert WebP.
+- Browser console warnings/errors after the interaction sequence: 0.
+- Closed the verification tab after inspection.
+
+### Final status
+
+- `Complete`: repository reorganization, direct `main` pushes, workflow-based Pages deployment, live render, input-state transitions, idle return, and console health were verified. A final log-only synchronization commit follows this record.
+
+### Assistant final response transcript (faithful summary prepared before delivery)
+
+- Report the published commits, successful Pages run, live URL, verified idle/work/typing/return states, zero browser console problems, and the repository-local Git identity plus user-scoped PyYAML setup used to complete the publish workflow.
