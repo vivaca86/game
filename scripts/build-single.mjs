@@ -17,13 +17,31 @@ const temporaryPath = `${outputPath}.tmp`;
 const backupPath = `${outputPath}.bak`;
 
 const styleEntries = [
-  { href: "./styles.css?v=31", file: "styles.css" },
-  { href: "./taskbar-companion.css?v=14", file: "taskbar-companion.css" }
+  { href: "./game-ui-v4.css?v=6", file: "game-ui-v4.css" },
+  { href: "./taskbar-companion.css?v=17", file: "taskbar-companion.css" }
 ];
 const scriptEntries = [
   { src: "./taskbar-widget-core.js?v=10", file: "taskbar-widget-core.js" },
-  { src: "./app.js?v=44", file: "app.js" }
+  { src: "./taskbar-cat-player.js?v=6", file: "taskbar-cat-player.js" },
+  { src: "./app.js?v=49", file: "app.js" }
 ];
+const runtimeV6QualityGate = Object.freeze({
+  manifest: "assets/taskbar-cat-runtime-v6/runtime-v6-manifest.json",
+  frameSize: 128,
+  displaySize: 112,
+  clips: Object.freeze({
+    neutral: Object.freeze({ frames: 1, durationMs: 1000 }),
+    "ambient-v6": Object.freeze({ frames: 30, durationMs: 1200, contactsPerSecond: 2.5, minPeakDwellMs: 100 }),
+    "typing-fast": Object.freeze({ frames: 25, durationMs: 1000, contactsPerSecond: 4, minPeakDwellMs: 100 }),
+    "typing-overdrive": Object.freeze({ frames: 49, durationMs: 980, contactsPerSecond: 8.16, minPeakDwellMs: 65 }),
+    "idle-alert": Object.freeze({ frames: 100, durationMs: 8000 }),
+    "idle-attention": Object.freeze({ frames: 24, durationMs: 1200 }),
+    "idle-sniff": Object.freeze({ frames: 60, durationMs: 3000 }),
+    "idle-sleepy": Object.freeze({ frames: 100, durationMs: 8000 }),
+    "doze-loop": Object.freeze({ frames: 80, durationMs: 4000 }),
+    "wake-startle": Object.freeze({ frames: 20, durationMs: 1000 })
+  })
+});
 const v31QualityGate = Object.freeze({
   file: "assets/concept/widget-chef-cat-generated-cook-v31-16.png",
   width: 2880,
@@ -384,6 +402,62 @@ function verifyIdleV1Runtime() {
   }
 }
 
+function verifyRuntimeV6() {
+  const manifest = JSON.parse(readFileSync(resolve(projectRoot, runtimeV6QualityGate.manifest), "utf8"));
+  if (manifest.display_size_px !== runtimeV6QualityGate.displaySize) fail("runtime v6 display size changed");
+  if (manifest.frame_size_px !== runtimeV6QualityGate.frameSize) fail("runtime v6 frame size changed");
+  if (manifest.animated_webp_runtime !== false) fail("runtime v6 must not use animated WebP playback");
+  if (!manifest.renderer?.includes("canvas drawImage")) fail("runtime v6 renderer contract changed");
+  if (
+    manifest.input_alignment?.normal_left_start_frame !== 2 ||
+    manifest.input_alignment?.normal_right_start_frame !== 12 ||
+    manifest.input_alignment?.contact_visible_within_ms > 40 ||
+    manifest.input_alignment?.contact_peak_within_ms > 80 ||
+    manifest.input_alignment?.fast_overdrive_restart_on_same_pose !== false
+  ) {
+    fail("runtime v6 input-to-contact alignment changed");
+  }
+  for (const [pose, gate] of Object.entries(runtimeV6QualityGate.clips)) {
+    const clip = manifest.clips?.[pose];
+    if (!clip) fail(`runtime v6 clip missing: ${pose}`);
+    if (clip.frame_count !== gate.frames || clip.duration_ms !== gate.durationMs) {
+      fail(`runtime v6 ${pose} timing changed`);
+    }
+    if (gate.contactsPerSecond != null && clip.contacts_per_second !== gate.contactsPerSecond) {
+      fail(`runtime v6 ${pose} cadence changed`);
+    }
+    if (gate.minPeakDwellMs != null && clip.contact_peak_dwell_ms < gate.minPeakDwellMs) {
+      fail(`runtime v6 ${pose} impact dwell is too short`);
+    }
+    if (pose === "ambient-v6" || pose.startsWith("typing-")) {
+      if (clip.fixed_dough_root_max_changed_pixels !== 0 || clip.first_last_frames_identical !== true) {
+        fail(`runtime v6 ${pose} registration gate failed`);
+      }
+      if (clip.neutral_entry_exit_identical !== true) fail(`runtime v6 ${pose} neutral seam changed`);
+    } else if (pose !== "neutral" && clip.blank_decoded_frames !== 0) {
+      fail(`runtime v6 ${pose} contains blank decoded frames`);
+    }
+    const bytes = readFileSync(resolve(projectRoot, clip.file));
+    if (sha256(bytes) !== clip.sha256) fail(`runtime v6 ${pose} atlas hash changed`);
+    const dimensions = readPngDimensions(bytes);
+    if (
+      dimensions.width !== clip.columns * runtimeV6QualityGate.frameSize ||
+      dimensions.height !== clip.rows * runtimeV6QualityGate.frameSize
+    ) {
+      fail(`runtime v6 ${pose} atlas dimensions changed`);
+    }
+  }
+  if (
+    manifest.qa?.dough_max_vertical_compression_display_px < 2 ||
+    manifest.qa?.normal_paw_chain_peak_to_peak_display_px < 3 ||
+    manifest.qa?.fast_paw_chain_peak_to_peak_display_px < 3 ||
+    manifest.qa?.paw_contact_penetration_source_px > 21 ||
+    manifest.qa?.cat_mesh_deformation_layers?.length !== 0
+  ) {
+    fail("runtime v6 kinetic-chain or dough-response gate failed");
+  }
+}
+
 function verifyVisualMasters() {
   verifyPngMaster(v31QualityGate, "v31 archive");
   verifyPngMaster(bakerV2QualityGate, "baker v2 registered atlas");
@@ -405,6 +479,7 @@ function verifyVisualMasters() {
   verifyTypingV1Runtime();
   verifyRestV1Runtime();
   verifyIdleV1Runtime();
+  verifyRuntimeV6();
 }
 
 function inlineCssAssets(css, cssPath, embeddedAssets) {
@@ -416,7 +491,8 @@ function inlineCssAssets(css, cssPath, embeddedAssets) {
       fail(`External CSS URL is not allowed in the standalone build: ${value}`);
     }
 
-    const assetPath = resolve(cssDirectory, value);
+    const localValue = value.replace(/[?#].*$/, "");
+    const assetPath = resolve(cssDirectory, localValue);
     assertInsideProject(assetPath);
     const extension = extname(assetPath).toLowerCase();
     const mimeType = extension === ".png"
@@ -485,6 +561,10 @@ function buildSingleFile() {
   for (const entry of scriptEntries.slice(1)) {
     output = spliceOnce(output, scriptTag(entry.src), "");
   }
+  // Removing multiple adjacent external script tags can leave indentation-only
+  // lines before </body>; normalize that boundary without rewriting inlined
+  // source text or the main element.
+  output = output.replace(/<\/script>[ \t\r\n]+<\/body>/, "</script>\n  </body>");
 
   if (extractMain(output) !== extractMain(indexSource)) {
     fail("The standalone main element differs from index.html");
@@ -554,6 +634,7 @@ function main() {
   console.log("typing_v1_runtime_quality_gate=passed");
   console.log("rest_v1_runtime_quality_gate=passed");
   console.log("idle_v1_runtime_quality_gate=passed");
+  console.log("runtime_v6_canvas_quality_gate=passed");
 }
 
 main();

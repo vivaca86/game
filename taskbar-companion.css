@@ -1,10 +1,9 @@
 /*
  * Taskbar companion presentation.
  *
- * The browser preview uses the verified v4 ambient loop plus separate fast and
- * overdrive typing WebPs.  Paused/reduced states use the preserved high-
- * resolution neutral. Unity must recreate the same timelines from the v3 RGBA
- * layers and pivots rather than importing animated WebP as the art master.
+ * The browser preview uses deterministic complete PNG atlas frames drawn by
+ * taskbar-cat-player.js. Unity should recreate the same clip metadata through
+ * SpriteAtlas + AnimationClip rather than importing the browser canvas code.
  */
 
 .sr-only {
@@ -20,16 +19,16 @@
 }
 
 .taskbar-companion {
-  --taskbar-cat-neutral-image: url("./assets/taskbar-cat-cutout-rig-v4/chef-cat-transparent-neutral-open-eyes.png");
-  --taskbar-cat-motion-image: url("./assets/taskbar-cat-cutout-rig-v4/chef-cat-fast-knead-motion-128.webp");
-  --taskbar-cat-typing-fast-image: url("./assets/taskbar-cat-typing-v1/chef-cat-typing-fast-128.webp");
-  --taskbar-cat-typing-overdrive-image: url("./assets/taskbar-cat-typing-v1/chef-cat-typing-overdrive-128.webp");
-  --taskbar-cat-idle-alert-image: url("./assets/taskbar-cat-idle-v1/chef-cat-idle-alert-128.webp");
-  --taskbar-cat-idle-attention-image: url("./assets/taskbar-cat-idle-v1/chef-cat-idle-attention-128.webp");
-  --taskbar-cat-idle-sniff-image: url("./assets/taskbar-cat-idle-v1/chef-cat-idle-sniff-128.webp");
-  --taskbar-cat-idle-sleepy-image: url("./assets/taskbar-cat-idle-v1/chef-cat-idle-sleepy-128.webp");
-  --taskbar-cat-doze-image: url("./assets/taskbar-cat-rest-v1/chef-cat-doze-128.webp");
-  --taskbar-cat-wake-image: url("./assets/taskbar-cat-rest-v1/chef-cat-wake-startle-128.webp");
+  --taskbar-cat-neutral-atlas: url("./assets/taskbar-cat-runtime-v6/neutral-atlas.png");
+  --taskbar-cat-work-atlas: url("./assets/taskbar-cat-runtime-v6/ambient-v6-atlas.png?v=17");
+  --taskbar-cat-typing-fast-atlas: url("./assets/taskbar-cat-runtime-v6/typing-fast-atlas.png?v=17");
+  --taskbar-cat-typing-overdrive-atlas: url("./assets/taskbar-cat-runtime-v6/typing-overdrive-atlas.png?v=17");
+  --taskbar-cat-idle-alert-atlas: url("./assets/taskbar-cat-runtime-v6/idle-alert-atlas.png");
+  --taskbar-cat-idle-attention-atlas: url("./assets/taskbar-cat-runtime-v6/idle-attention-atlas.png");
+  --taskbar-cat-idle-sniff-atlas: url("./assets/taskbar-cat-runtime-v6/idle-sniff-atlas.png");
+  --taskbar-cat-idle-sleepy-atlas: url("./assets/taskbar-cat-runtime-v6/idle-sleepy-atlas.png");
+  --taskbar-cat-doze-atlas: url("./assets/taskbar-cat-runtime-v6/doze-loop-atlas.png");
+  --taskbar-cat-wake-atlas: url("./assets/taskbar-cat-runtime-v6/wake-startle-atlas.png");
   position: absolute;
   left: 50%;
   bottom: 60px;
@@ -122,7 +121,11 @@
 
 .taskbar-cat-pose {
   z-index: 1;
-  background-image: var(--taskbar-cat-neutral-image);
+  display: block;
+  padding: 0;
+  border: 0;
+  background-color: transparent;
+  background-image: var(--taskbar-cat-neutral-atlas);
   background-repeat: no-repeat;
   background-position: center;
   background-size: 128px 128px;
@@ -132,49 +135,8 @@
   transform: none;
 }
 
-/* Each intensity owns one self-contained registered loop. Runtime changes the
-   pose attribute only when the tier changes so dense keys cannot keep seeking
-   an animated WebP back to frame zero. */
-.taskbar-companion[data-pose="ambient-v4"] .taskbar-cat-pose {
-  background-image: var(--taskbar-cat-motion-image);
-}
-
-.taskbar-companion[data-pose="typing-fast"] .taskbar-cat-pose {
-  background-image: var(--taskbar-cat-typing-fast-image);
-}
-
-.taskbar-companion[data-pose="typing-overdrive"] .taskbar-cat-pose {
-  background-image: var(--taskbar-cat-typing-overdrive-image);
-}
-
-.taskbar-companion[data-pose="idle-alert"] .taskbar-cat-pose {
-  background-image: var(--taskbar-cat-idle-alert-image);
-}
-
-.taskbar-companion[data-pose="idle-attention"] .taskbar-cat-pose {
-  background-image: var(--taskbar-cat-idle-attention-image);
-}
-
-.taskbar-companion[data-pose="idle-sniff"] .taskbar-cat-pose {
-  background-image: var(--taskbar-cat-idle-sniff-image);
-}
-
-.taskbar-companion[data-pose="idle-sleepy"] .taskbar-cat-pose {
-  background-image: var(--taskbar-cat-idle-sleepy-image);
-}
-
-.taskbar-companion[data-pose="doze-loop"] .taskbar-cat-pose {
-  background-image: var(--taskbar-cat-doze-image);
-}
-
-.taskbar-companion[data-pose="wake-startle"] .taskbar-cat-pose {
-  background-image: var(--taskbar-cat-wake-image);
-}
-
-/* Animated image playback cannot be paused through animation-play-state.
-   Swap to the static neutral whenever the management panel owns attention. */
-.taskbar-companion[data-panel="open"] .taskbar-cat-pose {
-  background-image: var(--taskbar-cat-neutral-image);
+.taskbar-cat-pose[data-renderer-ready="true"] {
+  background-image: none;
 }
 
 .taskbar-cat-fx,
@@ -308,7 +270,7 @@
 }
 
 .taskbar-companion[data-motion="reduced"] .taskbar-cat-pose {
-  background-image: var(--taskbar-cat-neutral-image);
+  background-image: var(--taskbar-cat-neutral-atlas);
 }
 
 .taskbar-companion[data-motion="off"] .taskbar-cat-pose,
@@ -322,7 +284,7 @@
 }
 
 .taskbar-companion[data-motion="off"] .taskbar-cat-pose {
-  background-image: var(--taskbar-cat-neutral-image);
+  background-image: var(--taskbar-cat-neutral-atlas);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -337,7 +299,7 @@
   }
 
   .taskbar-companion[data-motion] .taskbar-cat-pose {
-    background-image: var(--taskbar-cat-neutral-image);
+    background-image: var(--taskbar-cat-neutral-atlas);
     background-position: center;
     transform: none;
   }

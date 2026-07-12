@@ -32,7 +32,7 @@
   const TYPING_INTENSITY_LEVELS = Object.freeze(["normal", "fast", "overdrive"]);
   const TYPING_PULSE_THRESHOLDS = Object.freeze({ fast: 4, overdrive: 8 });
   const TASKBAR_POSE_IDS = Object.freeze([
-    "ambient-v4",
+    "ambient-v6",
     "typing-fast",
     "typing-overdrive",
     "idle-alert",
@@ -229,7 +229,7 @@
     if (reaction === "typing-fast") return "typing-fast";
     if (reaction === "idle-attention") return "idle-attention";
     if (reaction === "idle-sniff") return "idle-sniff";
-    if (ambientState === "work") return "ambient-v4";
+    if (ambientState === "work") return "ambient-v6";
     if (ambientState === "doze") return "doze-loop";
     if (ambientState === "sleepy-idle") return "idle-sleepy";
     return "idle-alert";

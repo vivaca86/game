@@ -4,104 +4,100 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Taskbar Cat Restaurant Hero</title>
-    <link rel="stylesheet" href="./styles.css?v=31" />
-    <link rel="stylesheet" href="./taskbar-companion.css?v=14" />
+    <link rel="icon" href="data:," />
+    <link rel="stylesheet" href="./game-ui-v4.css?v=6" />
+    <link rel="stylesheet" href="./taskbar-companion.css?v=17" />
   </head>
   <body>
     <main class="desktop" aria-label="Taskbar Cat Restaurant Hero">
-      <section class="game-panel" id="gamePanel" aria-label="확장 관리창">
-        <header class="topbar">
-          <nav class="tabs" aria-label="게임 메뉴">
-            <button class="tab active" data-view="cat" aria-label="고양이"><span class="ui-symbol ui-symbol--paw"></span></button>
-            <button class="tab" data-view="kitchen" aria-label="주방"><span class="ui-symbol ui-symbol--chef"></span></button>
-            <button class="tab" data-view="recipe" aria-label="레시피"><span class="ui-symbol ui-symbol--utensil"></span></button>
-            <button class="tab" data-view="farm" aria-label="생산"><span class="ui-symbol ui-symbol--sprout"></span></button>
-            <button class="tab" data-view="dispatch" aria-label="파견"><span class="ui-symbol ui-symbol--cottage"></span></button>
-            <button class="tab" data-view="collection" aria-label="컬렉션"><span class="ui-symbol ui-symbol--star"></span></button>
-          </nav>
-          <div class="resources" aria-live="polite">
-            <span><i class="ui-symbol ui-symbol--heart"></i><b id="heartValue">0</b></span>
-            <span><i class="ui-symbol ui-symbol--coin"></i><b id="coinValue">0</b></span>
-            <span><i class="ui-symbol ui-symbol--gem"></i><b id="gemValue">0</b></span>
-            <span><i class="ui-symbol ui-symbol--bolt"></i><b id="energyValue">0</b>/50</span>
-            <span><i class="ui-symbol ui-symbol--cat"></i><b id="catValue">1</b>/40</span>
+      <section class="game-panel collapsed" id="gamePanel" aria-label="모모의 작은 식당 관리창" aria-hidden="true" inert>
+        <header class="game-header">
+          <div class="brand-lockup">
+            <span class="brand-cat" aria-hidden="true"></span>
+            <div><small>TODAY'S RESTAURANT</small><b>모모의 작은 식당</b></div>
           </div>
+
+          <div class="resources" aria-live="polite" aria-label="주요 자원">
+            <span class="resource resource--heart"><i aria-hidden="true"></i><b id="heartValue">0</b></span>
+            <span class="resource resource--coin"><i aria-hidden="true"></i><b id="coinValue">0</b></span>
+            <span class="resource resource--gem"><i aria-hidden="true"></i><b id="gemValue">0</b></span>
+            <span class="resource resource--energy"><i aria-hidden="true"></i><b id="energyValue">0</b><small>/50</small></span>
+            <span class="resource resource--cat"><i aria-hidden="true"></i><b id="catValue">1</b></span>
+          </div>
+
           <div class="window-actions">
-            <button id="saveButton" aria-label="저장"><span class="ui-symbol ui-symbol--save"></span></button>
-            <button id="resetButton" aria-label="초기화"><span class="ui-symbol ui-symbol--reset"></span></button>
-            <button id="collapseButton" aria-label="접기"><span class="ui-symbol ui-symbol--close"></span></button>
+            <button id="saveButton" type="button">저장</button>
+            <button id="resetButton" type="button">초기화</button>
+            <button class="window-close" id="collapseButton" type="button" aria-label="관리창 닫기">×</button>
           </div>
         </header>
 
-        <div class="panel-grid">
-          <aside class="cat-panel card" aria-label="고양이 상태">
-            <div class="gear-column left">
-              <button class="gear selected" data-gear="spatula" aria-label="뒤집개"><span class="menu-icon menu-icon--spatula"></span><small>Lv.<b id="gear-spatula">1</b></small></button>
-              <button class="gear" data-gear="coat" aria-label="요리사 코트"><span class="menu-icon menu-icon--coat"></span><small>Lv.<b id="gear-coat">1</b></small></button>
-              <button class="gear" data-gear="bag" aria-label="가방"><span class="menu-icon menu-icon--bag"></span><small>Lv.<b id="gear-bag">1</b></small></button>
-            </div>
-            <div class="cat-card">
-              <div class="stars" id="catStars">★★★☆☆</div>
-              <div class="big-cat chef" aria-hidden="true">
-                <div class="cat-ear left"></div>
-                <div class="cat-ear right"></div>
-                <div class="cat-face">
-                  <span class="eye left"></span>
-                  <span class="eye right"></span>
-                  <span class="mouth"></span>
-                </div>
-                <div class="chef-hat"></div>
-                <div class="scarf"></div>
-                <div class="spatula"></div>
+        <div class="management-v4-shell">
+          <section class="restaurant-board" aria-label="현재 식당 풍경">
+            <div class="restaurant-scene">
+              <div class="scene-ribbon"><span></span><b id="sceneStatusTitle">영업 중 · 주문 3건</b><small id="sceneStatusCopy">말풍선 주문을 확인해 주세요</small></div>
+              <div class="scene-life" id="sceneLife" aria-label="식당 손님 주문과 기분">
+                <span class="scene-customer scene-customer--a" data-scene-customer="0" data-phase="present" data-kind="order">
+                  <span class="scene-bubble"><i class="scene-bubble-art"></i></span>
+                  <span class="scene-customer-body"><i class="scene-customer-art scene-customer-art--gray"></i></span>
+                </span>
+                <span class="scene-customer scene-customer--b" data-scene-customer="1" data-phase="present" data-kind="order">
+                  <span class="scene-bubble"><i class="scene-bubble-art"></i></span>
+                  <span class="scene-customer-body"><i class="scene-customer-art scene-customer-art--orange"></i></span>
+                </span>
+                <span class="scene-customer scene-customer--c" data-scene-customer="2" data-phase="empty" data-kind="order" aria-hidden="true">
+                  <span class="scene-bubble"><i class="scene-bubble-art"></i></span>
+                  <span class="scene-customer-body"><i class="scene-customer-art scene-customer-art--tuxedo"></i></span>
+                </span>
               </div>
+              <div class="taskbar-result"><span></span><div><small>작업표시줄의 모모</small><b id="taskbarResult">차분한 대기 모션</b></div></div>
             </div>
-            <div class="gear-column right">
-              <button class="gear" data-gear="pan" aria-label="냄비"><span class="menu-icon menu-icon--pot"></span><small>Lv.<b id="gear-pan">1</b></small></button>
-              <button class="gear" data-gear="apron" aria-label="앞치마"><span class="menu-icon menu-icon--apron"></span><small>Lv.<b id="gear-apron">1</b></small></button>
-              <button class="gear" data-gear="recipeBook" aria-label="레시피 북"><span class="menu-icon menu-icon--book"></span><small>Lv.<b id="gear-recipeBook">1</b></small></button>
-            </div>
-            <div class="stat-list">
-              <div class="stat"><span class="ui-symbol ui-symbol--heart"></span><div><i id="affectionBar"></i></div><b id="affectionText">0</b></div>
-              <div class="stat"><span class="ui-symbol ui-symbol--bolt"></span><div><i id="energyBar"></i></div><b id="focusText">0</b></div>
-              <div class="stat"><span class="ui-symbol ui-symbol--star"></span><div><i id="skillBar"></i></div><b id="skillText">0</b></div>
-            </div>
-            <div class="party-list" id="partyList" aria-label="고양이 파티"></div>
-          </aside>
 
-          <section class="restaurant card" aria-label="식당">
-            <div class="room">
-              <div class="activity-note" id="activityNote">냄비를 젓는 중...</div>
-            </div>
-            <div class="scene-actions">
-              <button id="cookButton"><span class="menu-icon menu-icon--stew"></span>요리</button>
-              <button id="decorateButton"><span class="menu-icon menu-icon--chair"></span>배치</button>
-              <button id="collectButton"><span class="ui-symbol ui-symbol--sprout"></span>수확</button>
-            </div>
+            <nav class="scene-actions" aria-label="식당 관리 행동">
+              <button class="scene-action scene-action--kitchen is-active" type="button" data-view-jump="kitchen">
+                <span>주방</span><small>레시피 고르기</small>
+              </button>
+              <button class="scene-action scene-action--decorate" id="decorateButton" type="button">
+                <span>꾸미기</span><small>식당 등급 올리기</small>
+              </button>
+              <button class="scene-action scene-action--farm" id="collectButton" type="button">
+                <span>농장</span><small>준비된 재료 받기</small>
+              </button>
+            </nav>
           </section>
 
-          <aside class="recipe-panel card" aria-label="레시피와 재료">
-            <div class="recipe-tabs">
-              <button class="active" aria-label="요리"><span class="ui-symbol ui-symbol--chef"></span></button>
-              <button aria-label="냄비"><span class="menu-icon menu-icon--pot"></span></button>
-              <button aria-label="디저트"><span class="menu-icon menu-icon--cake"></span></button>
-              <button aria-label="재료"><span class="ui-symbol ui-symbol--sprout"></span></button>
-              <button aria-label="선물"><span class="menu-icon menu-icon--gift"></span></button>
-            </div>
+          <aside class="recipe-board" aria-label="오늘의 레시피">
+            <header class="recipe-board__header">
+              <div><small>오늘의 메뉴판</small><h1>무엇을 만들까요?</h1></div>
+              <span>OPEN</span>
+            </header>
+
             <div class="recipe-grid" id="recipeGrid"></div>
-            <div class="ingredient-row" id="ingredientRow"></div>
-            <button class="upgrade-button" id="upgradeSelected">UP</button>
-          </aside>
 
-          <section class="production card" aria-label="생산과 파견">
-            <div class="production-list" id="productionList"></div>
-            <div class="route-map">
-              <button class="node active" data-dispatch="garden" aria-label="허브 정원"><span class="ui-symbol ui-symbol--cat"></span></button>
-              <button class="node locked" data-dispatch="market" aria-label="시장 잠김"><span class="ui-symbol ui-symbol--lock"></span></button>
-              <button class="node locked" data-dispatch="harbor" aria-label="항구 잠김"><span class="ui-symbol ui-symbol--lock"></span></button>
-              <button class="node final" data-dispatch="festival" aria-label="축제"><span class="ui-symbol ui-symbol--heart"></span></button>
-            </div>
-          </section>
+            <article class="recipe-focus">
+              <div class="focus-title">
+                <span class="focus-icon focus-icon--stew" id="selectedRecipeIcon" aria-hidden="true"></span>
+                <div><small id="selectedRecipeLevel">Lv.1 레시피</small><h2 id="selectedRecipeName">스튜</h2></div>
+                <span class="ready-tag">READY</span>
+              </div>
+              <p id="selectedRecipeStatus">재료와 에너지가 준비되었어요.</p>
+              <div class="requirement-list" id="recipeRequirementList" aria-label="필요 재료"></div>
+              <div class="result-note"><small>완성 보상</small><b id="selectedRecipeResult">코인과 하트</b></div>
+              <button class="primary-action" id="cookButton" type="button"><span>요리 시작</span><small>모모에게 부탁하기</small></button>
+              <button class="secondary-action" id="upgradeSelected" type="button">레시피 성장</button>
+            </article>
+          </aside>
         </div>
+
+        <section class="runtime-support" aria-hidden="true">
+          <h2 id="todayRecipeName">스튜</h2><p id="todayRecipeCopy"></p><div id="todayRequirementList"></div><button id="todayPrimary" type="button"></button>
+          <span id="readyCount">0</span><span id="readySummary"></span><span id="todayAffection">0</span><span id="chainFarmLabel"></span>
+          <div id="ingredientRow"></div><div id="productionList"></div><div id="partyList"></div><span id="catStars"></span>
+          <i id="affectionBar"></i><span id="affectionText"></span><i id="energyBar"></i><span id="focusText"></span><i id="skillBar"></i><span id="skillText"></span>
+          <i id="gear-spatula">1</i><i id="gear-coat">1</i><i id="gear-bag">1</i><i id="gear-pan">1</i><i id="gear-apron">1</i><i id="gear-recipeBook">1</i>
+          <button class="gear" type="button" data-gear="spatula"></button><button class="gear" type="button" data-gear="coat"></button><button class="gear" type="button" data-gear="bag"></button><button class="gear" type="button" data-gear="pan"></button><button class="gear" type="button" data-gear="apron"></button><button class="gear" type="button" data-gear="recipeBook"></button>
+          <button class="node active" type="button" data-dispatch="garden"></button><button class="node locked" type="button" data-dispatch="market"></button><button class="node locked" type="button" data-dispatch="harbor"></button><button class="node final" type="button" data-dispatch="festival"></button>
+        </section>
       </section>
 
       <aside
@@ -126,7 +122,7 @@
         <span class="taskbar-cat-visual" aria-hidden="true">
           <span class="taskbar-cat-reaction-motion">
             <span class="taskbar-cat-ambient-motion">
-              <span class="taskbar-cat-pose"></span>
+              <canvas class="taskbar-cat-pose" id="taskbarCatCanvas" width="128" height="128"></canvas>
             </span>
           </span>
           <span class="taskbar-cat-fx">
@@ -139,16 +135,11 @@
       </aside>
 
       <footer class="os-taskbar" aria-hidden="true">
-        <span class="os-icon"></span>
-        <span class="os-search"></span>
-        <span class="app-icon folder"></span>
-        <span class="app-icon browser"></span>
-        <span class="app-icon mail"></span>
-        <span class="app-icon active-cat"></span>
-        <span class="tray">⌃  ▢  )))  ▱  ◔</span>
+        <span class="os-icon"></span><span class="os-search"></span><span class="app-icon folder"></span><span class="app-icon browser"></span><span class="app-icon mail"></span><span class="app-icon active-cat"></span><span class="tray">숨김 아이콘 · 네트워크 · 소리</span>
       </footer>
     </main>
     <script src="./taskbar-widget-core.js?v=10"></script>
-    <script src="./app.js?v=44"></script>
+    <script src="./taskbar-cat-player.js?v=6"></script>
+    <script src="./app.js?v=49"></script>
   </body>
 </html>

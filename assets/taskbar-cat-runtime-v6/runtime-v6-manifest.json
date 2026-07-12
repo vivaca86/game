@@ -1,0 +1,168 @@
+{
+  "status": "deterministic canvas atlas runtime candidate; user live approval required",
+  "display_size_px": 112,
+  "frame_size_px": 128,
+  "renderer": "canvas drawImage from complete lossless PNG atlas frames",
+  "animated_webp_runtime": false,
+  "input_alignment": {
+    "normal_left_start_frame": 2,
+    "normal_right_start_frame": 12,
+    "normal_frame_duration_ms": 40,
+    "contact_visible_within_ms": 40,
+    "contact_peak_within_ms": 80,
+    "normal_restart_policy": "fresh reaction token only",
+    "fast_overdrive_restart_on_same_pose": false
+  },
+  "fixed_dough_root_box_source_pixels": [
+    350,
+    1090,
+    1010,
+    1140
+  ],
+  "clips": {
+    "ambient-v6": {
+      "file": "assets/taskbar-cat-runtime-v6/ambient-v6-atlas.png",
+      "sha256": "91e9e9925c503b97a5d56b19c2f9b1ed0b3706aa727ab91c4540bec7b1996577",
+      "frame_count": 30,
+      "frame_duration_ms": 40,
+      "duration_ms": 1200,
+      "columns": 6,
+      "rows": 5,
+      "loop": true,
+      "contacts_per_second": 2.5,
+      "contact_peak_dwell_ms": 136,
+      "fixed_dough_root_max_changed_pixels": 0,
+      "first_last_frames_identical": true,
+      "neutral_entry_exit_identical": true
+    },
+    "typing-fast": {
+      "file": "assets/taskbar-cat-runtime-v6/typing-fast-atlas.png",
+      "sha256": "8f2cd463c1ff2732584ac939cf34075e50c0eeb828ada3254c7dc14d56e8cc0b",
+      "frame_count": 25,
+      "frame_duration_ms": 40,
+      "duration_ms": 1000,
+      "columns": 5,
+      "rows": 5,
+      "loop": true,
+      "contacts_per_second": 4.0,
+      "contact_peak_dwell_ms": 145,
+      "fixed_dough_root_max_changed_pixels": 0,
+      "first_last_frames_identical": true,
+      "neutral_entry_exit_identical": true
+    },
+    "typing-overdrive": {
+      "file": "assets/taskbar-cat-runtime-v6/typing-overdrive-atlas.png",
+      "sha256": "9c0f2bc6eff2816863bb6b680955c71a4fca0ea91e742b8ae059b40fc8444836",
+      "frame_count": 49,
+      "frame_duration_ms": 20,
+      "duration_ms": 980,
+      "columns": 7,
+      "rows": 7,
+      "loop": true,
+      "contacts_per_second": 8.16,
+      "contact_peak_dwell_ms": 71,
+      "fixed_dough_root_max_changed_pixels": 0,
+      "first_last_frames_identical": true,
+      "neutral_entry_exit_identical": true
+    },
+    "neutral": {
+      "file": "assets/taskbar-cat-runtime-v6/neutral-atlas.png",
+      "sha256": "112d7875b27a8660932bc05f0f6c2ca094adbe4d960269462da6fc6afb901249",
+      "frame_count": 1,
+      "frame_duration_ms": 1000,
+      "duration_ms": 1000,
+      "columns": 1,
+      "rows": 1,
+      "loop": false
+    },
+    "idle-alert": {
+      "file": "assets/taskbar-cat-runtime-v6/idle-alert-atlas.png",
+      "sha256": "ad9c3e38c678de92cc5fce953f925b3a5df501c1009ec89f0d45702a08c5529e",
+      "frame_count": 100,
+      "frame_duration_ms": 80,
+      "duration_ms": 8000,
+      "columns": 10,
+      "rows": 10,
+      "loop": true,
+      "blank_decoded_frames": 0
+    },
+    "idle-attention": {
+      "file": "assets/taskbar-cat-runtime-v6/idle-attention-atlas.png",
+      "sha256": "47447b26578dd1a069c0232542121f05a0f98fa18cd7ef28ed346d968e1b9e18",
+      "frame_count": 24,
+      "frame_duration_ms": 50,
+      "duration_ms": 1200,
+      "columns": 5,
+      "rows": 5,
+      "loop": false,
+      "blank_decoded_frames": 0
+    },
+    "idle-sniff": {
+      "file": "assets/taskbar-cat-runtime-v6/idle-sniff-atlas.png",
+      "sha256": "5112a743c25ed190ebdd101e92d0e3e748a63ca945cba6a4f74010c453dd7620",
+      "frame_count": 60,
+      "frame_duration_ms": 50,
+      "duration_ms": 3000,
+      "columns": 8,
+      "rows": 8,
+      "loop": false,
+      "blank_decoded_frames": 0
+    },
+    "idle-sleepy": {
+      "file": "assets/taskbar-cat-runtime-v6/idle-sleepy-atlas.png",
+      "sha256": "a8c3985dab6ff8508d8975c8d06baaf6e824ed590077b42c6308ab56972b643b",
+      "frame_count": 100,
+      "frame_duration_ms": 80,
+      "duration_ms": 8000,
+      "columns": 10,
+      "rows": 10,
+      "loop": true,
+      "blank_decoded_frames": 0
+    },
+    "doze-loop": {
+      "file": "assets/taskbar-cat-runtime-v6/doze-loop-atlas.png",
+      "sha256": "115b65ec5a58a95d94789064a2008626ae2d3079278fc1a34376379fa8d204e8",
+      "frame_count": 80,
+      "frame_duration_ms": 50,
+      "duration_ms": 4000,
+      "columns": 9,
+      "rows": 9,
+      "loop": true,
+      "blank_decoded_frames": 0
+    },
+    "wake-startle": {
+      "file": "assets/taskbar-cat-runtime-v6/wake-startle-atlas.png",
+      "sha256": "6e730bc3d8853bad76ca379523ab80435b7932d066fcde96ceace888a394faa8",
+      "frame_count": 20,
+      "frame_duration_ms": 50,
+      "duration_ms": 1000,
+      "columns": 5,
+      "rows": 4,
+      "loop": false,
+      "blank_decoded_frames": 0
+    }
+  },
+  "qa": {
+    "contact_sheet": "assets/taskbar-cat-runtime-v6/qa/runtime-v6-contact-sheet.png",
+    "contact_sheet_sha256": "79da4be385c7027fe363feac8219bb37f3bd3e4b3eb6e4b9af130b385bb4f449",
+    "current_final_size_sheet": "assets/taskbar-cat-runtime-v6/qa/runtime-v6-final-size-light-dark.png",
+    "current_final_size_sheet_sha256": "8b6954a759cc13174a286de97cdafd686368be8d6eccbc3d2c53cac41f1fa7b0",
+    "dough_max_vertical_compression_source_px": 27.0,
+    "dough_max_vertical_compression_display_px": 2.41,
+    "normal_paw_chain_peak_to_peak_display_px": 4.47,
+    "fast_paw_chain_peak_to_peak_display_px": 4.47,
+    "paw_contact_penetration_source_px": 21.0,
+    "source_layers": "assets/taskbar-cat-cutout-rig-v3/layers",
+    "cat_mesh_deformation_layers": [],
+    "soft_mesh_deformation_layers": [
+      "dough contact field above fixed root"
+    ]
+  },
+  "live_verification": {
+    "status": "pending after current motion retune",
+    "prior_sheet": "assets/taskbar-cat-runtime-v6/qa/live-msedge-final-size-sheet.png",
+    "prior_sheet_sha256": "b4e225c184a7a02f95888df109451783111885f655d84b2d029ed2fe43988457",
+    "prior_sheet_matches_current_atlas_hashes": false,
+    "user_visual_approval": false
+  }
+}

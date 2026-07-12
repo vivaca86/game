@@ -780,3 +780,308 @@ Codex가 실제로 본 것은 생성된 소스/디코딩 프레임, checker 접�
 다음 수정 전 필요한 근거는 사용자가 빠르게 타이핑하는 2~3초 화면 녹화 또는 GIF다. 그 캡처에서 접촉 피크의 실제 보이는 프레임 수, 손/반죽/밀가루 동기화, fast와 overdrive 구분을 확인한 뒤 dwell·불투명도·발생 빈도를 조정한다. 추가 자료 없이 다시 크기·입자 수·손 이동을 추측해 키우는 경로는 중단한다.
 
 현재 상태는 **Cannot judge completion / current live visibility rejected**다. 구현 파일과 자동 테스트는 유지되지만 타격감 요구는 충족됐다고 말할 수 없다.
+
+## 29. 2026-07-11 animated WebP 소실·저가독성 반죽의 v6 복구
+
+### 실패 증상과 분리 진단
+
+- 실배포의 CSS animated-WebP 배경은 인앱 브라우저 연속 캡처에서 캐릭터가 통째로 빠지는 구간을 반복했다.
+- Pillow 12.3.0으로 alert 100, v4 120, typing-fast 20프레임을 전부 디코딩했지만 빈 알파 프레임은 0이었다. 저장 자산 자체의 빈 프레임은 원인이 아니었다.
+- v4는 머리 0.08도·앞발 약 1px 표시 이동, 고정 반죽으로 인해 접촉이 읽히지 않았다. typing 1,000ms 자산은 620/780ms hold로 조기 종료되고 6/8 contacts/s라 피크 노출도 짧았다.
+
+### 복구 경로
+
+- animated WebP를 표시 런타임에서 제거하고 모든 상태를 완전한 128px PNG atlas 프레임으로 변환했다.
+- `taskbar-cat-player.js`가 state machine의 pose를 받아 canvas의 정확한 프레임을 그리며, 같은 pose의 추가 입력은 재시작하지 않고 현재 클립을 계속 재생한다.
+- v6는 기존 v3 강체 레이어를 재사용한다. 고양이는 메시 변형하지 않고, 반죽 접촉 영역만 local remap한 뒤 고정 루트 박스를 원본으로 복원한다.
+- 깊게 관통시키는 경로가 루트 269픽셀 위반으로 즉시 실패해, 앞발을 먼저 들어 올린 뒤 v5 안전 깊이로 누르는 lift-to-press 궤적으로 변경했다.
+- fast/overdrive는 4/5.88 contacts/s와 145/99ms 피크 dwell을 사용하며, 높은 단계는 추가 관통 대신 FX·표정으로 강화한다.
+
+### 재생기 실패와 최종 우회
+
+- 첫 canvas 플레이어는 매 프레임 `clearRect` 후 `drawImage`를 호출했다. Microsoft Edge 실제 캡처에서 1장이 상단이 지워진 중간 상태로 기록됐다.
+- 별도 clear를 제거하고 `globalCompositeOperation="copy"` 상태의 전체 128px `drawImage` 한 번으로 투명/가시 픽셀을 함께 교체했다.
+- 수정 후 Edge의 20개 연속 idle 캡처와 19개 work/fast/overdrive 캡처에서 빈/부분 프레임 0, 밝은 캐릭터 픽셀 최소 3,385, 콘솔 오류·경고 0을 확인했다.
+
+### 판정
+
+- 기술적 재생 연속성, 운동 사슬, 반죽 재질 반응, 빠른 입력 피크 노출은 로컬 검증을 통과했다.
+- 실제 크기 시트: `assets/taskbar-cat-runtime-v6/qa/live-msedge-final-size-sheet.png`.
+- 현재 상태는 **Partially complete**다. 로컬 구현과 에이전트 검증은 끝났지만 사용자의 연속 재생 승인과 원격 배포는 수행되지 않았다.
+
+## 30. 2026-07-11 v6 운동 사슬·샘플링·일반 입력 동기화 재조정
+
+사용자는 에이전트 기준 9점 이상이 될 때까지 계속 개선하라고 지시했다. 직전 v6는 소실 결함과 정적 반죽을 해결했지만, 에이전트의 112px 재검토에서 몸통/어깨 질량이 여전히 약하고 normal 접촉이 작으며 fast/overdrive가 효과·표정에 기대는 비중이 남아 6.5–7점으로 판정됐다.
+
+### 관찰과 원인 분리
+
+- 관찰: fast/overdrive 정지 아틀라스에는 접촉 그림이 있지만 준비 자세가 매 타격마다 같은 강도로 보이지 않았다.
+- 재현된 기계 원인: 이전 fast 20프레임/4접촉과 overdrive 30프레임/6접촉은 접촉당 약 5샘플뿐이었다. high-speed anticipation 구간이 event phase 0–0.24이므로 일부 타격은 완전한 lift 프레임을 건너뛰고 준비와 접촉이 섞인 프레임부터 시작했다.
+- 관찰: 모자·귀·꼬리 보조동작이 접촉과 같은 프레임에 반복돼 주동작의 힘 순서를 흐릴 수 있었다.
+- 관찰: `key-left/key-right`가 모두 `ambient-v6` 포즈로 해석되고 플레이어는 같은 포즈를 재시작하지 않으므로 두 번째 일반 키부터 입력 순간과 손 접촉 박자가 어긋날 수 있었다.
+
+### bounded correction
+
+- normal 30×40ms, fast 25×40ms, overdrive 36×28ms/5접촉으로 재샘플링했다. fast 네 이벤트의 최대 anticipation은 모두 0.984, overdrive 다섯 이벤트는 모두 0.89다.
+- rigid head/upper-arm/forearm 계층의 anticipation lift와 contact dip을 키우고 반대 손에 작은 counter-lift를 추가했다. 고양이 rigid part에는 메시 변형을 사용하지 않았다.
+- 112px designed paw lift-to-press는 4.47px, 반죽 soft compression은 2.41px다. contact penetration은 기존 안전 상한 21 source px이고 fixed root 변화는 0이다.
+- 모자 크라운만 한 프레임 지연시키고 첫/끝은 지연을 제거해 공통 중립과 정확히 일치시켰다. 귀는 clip-level envelope로 한 번만 반응하고 fast/overdrive 꼬리는 7°/9°로 낮췄다.
+- normal에 절제된 dough pressure arc를 추가했다. fast/overdrive 속도선은 anticipation에 집중하고 contact에서는 감쇠한다. overdrive는 neutral face로 진입·종료한다.
+- canvas player는 새 `reactionId`가 들어온 normal 키만 viewer-left frame 2 또는 viewer-right frame 12로 정렬한다. 접촉은 40ms 안에 보이고 80ms 안에 피크에 도달한다. fast/overdrive는 재시작하지 않는 replace-current 계약을 유지한다.
+- normal 접촉에는 작은 cocoa-edged flour pinch를 추가해 fast/overdrive보다 훨씬 낮은 강도로 접촉 시점을 표시한다.
+
+### 검증과 제한
+
+- 세 작업 클립 모두 first=last=registered neutral, fixed dough root 변화 0, nonblank PNG atlas다.
+- current 112px light/dark 시트: `assets/taskbar-cat-runtime-v6/qa/runtime-v6-final-size-light-dark.png`.
+- Node 43/43, JS/Python syntax, standalone write/check, 44 embedded asset round trips passed. Single HTML은 16,497,043 bytes, SHA-256 `24b028f475dcb44fe773b926bd9dcbf33638bb20fa5303320dc91b1b48762ebf`다.
+- 현재 in-app Browser의 `file:` 보안 거부는 우회를 금지하므로 이전 Microsoft Edge 시트를 현 atlas의 라이브 증거로 재사용하지 않았다. manifest는 그 시트를 `prior_sheet_matches_current_atlas_hashes=false`로 명시한다.
+- 현재 상태는 **Implemented, not verified**다. 정적/수치/자동 게이트는 9점 목표에 맞게 개선됐지만, 현재 atlas의 실제 속도 연속 재생과 사용자의 시각 판정이 남아 있다. 승인 전에는 이 샘플링 교정을 보편 skill 규칙으로 승격하지 않는다.
+
+## 31. 2026-07-11 9점 목표 blocked audit
+
+9점 목표의 마지막 게이트는 최신 atlas의 실제 속도 연속 재생이다. 같은 `file:` 제어 거부가 원래 목표 턴과 두 번의 자동 연속 진행 턴에서 총 세 번 연속 같은 blocker로 유지됐다. 현재 보안 응답은 localhost, alternate browser surface, raw command와 indirect execution까지 금지하므로 이전 Edge/Playwright 경로를 되살리는 것은 검증이 아니라 정책 우회가 된다.
+
+현재 직접 증명된 범위는 다음과 같다.
+
+- 112px 정적 light/dark에서 normal 작은 pinch, fast/overdrive 단계 차이, panic face와 공통 neutral을 확인했다.
+- normal 4.47px lift-to-press, dough 2.41px compression, 21 source px penetration cap, fixed root 0, all work clip entry/exit=neutral을 manifest/build gate로 확인했다.
+- fresh normal input은 frames 2/12에서 시작해 visible contact ≤40ms, peak ≤80ms이며, fast/overdrive same-pose restart는 false다.
+- standalone 16,497,043 bytes / SHA-256 `24b028f475dcb44fe773b926bd9dcbf33638bb20fa5303320dc91b1b48762ebf`, embedded 44 assets, Node 43/43와 `git diff --check`를 다시 통과했다.
+
+그러나 이 증거는 current hash의 최종 속도 perceived weight, 연속 transition, capture flicker 부재를 직접 증명하지 않는다. 추가 정적 조정은 원인 없는 추측 반복이므로 중단한다. 사용자의 3–5초 현재 빌드 화면 녹화/GIF 또는 별도의 commit/push/deploy 승인으로 현 해시를 지원되는 실주소에 올리는 것이 정확한 unblock이다. 현재 목표는 **Blocked**이고 구현은 **Implemented, not verified**다.
+
+## 32. 2026-07-11 모자 등록과 overdrive 재설계
+
+사용자의 실제 재생 피드백이 이전 blocked audit에 없던 새 증거를 제공했다. `모자가 이상하다`는 관찰은 크라운 전체에 적용한 한 프레임 지연과 일치했고, `빨리 칠 때 우다다다 느낌이 아니다`는 관찰은 1.008초에 5접촉뿐인 이전 cadence와 일치했다.
+
+- 실패 원인 제거: 크라운의 지연된 머리 변환을 제거하고 현재 머리 변환에 정확히 결합했다. 별도 움직임은 크라운 자체 피벗에서 0.5도 미만으로 제한했다.
+- cadence 재설계: 49×20ms, 8접촉, 980ms, 8.16 contacts/s. 각 접촉은 6프레임 구간을 사용하고 계산된 peak dwell은 71ms다.
+- 계층 분리: 머리는 8회 큰 bob을 반복하지 않고 클립 전체 braced envelope와 작은 좌우 bias만 사용한다. 팔·앞발·반죽은 여덟 타를 모두 유지한다.
+- FX 분리: 교대 타격의 효과를 1.0/0.58로 배치해 연속 흰 구름을 피한다. 추가 관통은 없으며 21 source px cap과 fixed root 0을 유지한다.
+- 검증: current 112px light/dark/contact sheet, common neutral seam, nonblank atlas, Node 43/43, standalone 44 assets write/check, JS/Python syntax, `git diff --check` 통과.
+- standalone: 16,733,538 bytes, SHA-256 `2646e483d3dd6def47f0b818d239c02800e293cc856150b0d8800d2cf55f0ecb`.
+
+현재 구현은 **Implemented, not verified**다. 사용자의 실제 재생 피드백에 따른 구조 수정은 완료했지만, 수정된 파일의 새로고침 후 판정은 아직 없다. 원격 변경은 수행하지 않았다.
+
+## 33. 2026-07-12 거절된 관리창 카드 격자의 런타임 교체
+
+사용자는 고양이 클릭으로 열리는 기존 관리창을 `UI가 개판`이라고 판정했다. 이 신호는 앞선 menu-v1의 basic presentation/UI·UX 거절을 다시 확인하며, 같은 화면을 crop·간격·아이콘 크기로 보정하는 경로는 사용하지 않았다.
+
+### 제거한 실패 구조
+
+- 고양이·식당·레시피·생산·파견을 한 화면에 같은 무게로 노출하는 3열 카드 격자.
+- 서로 다른 역할에 같은 menu-v1 래스터 파일과 불투명 매트를 반복하는 조합.
+- 실제 의미 없이 모든 카드에 붙은 진행 막대와 동일한 웹형 버튼.
+- 6개의 전역 시스템 탭과 작은 레벨·아이콘이 동시에 경쟁하는 상단 툴바.
+
+### 채택한 복구 구조
+
+- 추천 A안의 목적과 흐름을 실제 도메인 상태에 연결해 `오늘 / 주방 / 농장 / 고양이` 네 뷰로 분리했다.
+- 오늘 화면에 승인 방향 고양이 원화, 다음 행동 하나, 준비 알림, 작업표시줄 결과를 집중했다.
+- 레시피 선택, 생산 상태, 파견, 관계·장비를 각 문맥 화면으로 이동하고 실제 상태·보상·행동만 표시했다.
+- menu-v1 래스터 자산은 삭제하지 않고 reference/rejected evidence로 보존하되 presentation runtime과 단일 빌드에서 제거했다.
+- 창 열림 중 고양이 토글은 오른쪽 아래 임시 도킹으로 이동해 첫 내비게이션을 가리던 결함을 구조적으로 피했다.
+
+정적·기계 검증은 Node 43/43, JS 문법, 단일 HTML의 10개 자산 round trip, 활성 menu-v1 참조 0, `git diff --check`를 통과했다. 실제 DOM 합성 화면은 기록된 `file:` 제어 제한 때문에 우회하지 않았으므로 현재 상태는 **Implemented, not verified**다. 이번 작업은 기존 품질 스킬의 `보존 ≠ 런타임 유지`, `정보 구조 먼저`, `전체 화면 두 번 검수` 규칙을 적용한 사례이며 새 보편 규칙은 추가하지 않았다.
+
+## 34. 2026-07-12 정보구조는 나아졌지만 웹으로 읽힌 v2
+
+사용자는 통합된 v2를 실제로 보고 `디자인이 있는데 너무 웹`, `게임 UI가 아니다`라고 판정했다. 이는 색·버튼 상태·반응형 결함이 아니라 presentation grammar 전체의 실패다.
+
+### 왜 웹으로 읽혔는가
+
+- 좌측 세로 내비게이션, 상단 자원 칩, 우측 행동 카드, 반복되는 흰 표면이 웹 대시보드의 영역 분할을 그대로 사용했다.
+- 화면 목적과 한 행동은 명확해졌지만, 플레이어가 식당 장소의 물건을 다룬다는 공간성·세계성·장난감 같은 조작감이 없었다.
+- 코드 기반 선 아이콘은 일관됐지만 얇고 규격화돼 모바일 게임의 메달·배지·오브젝트보다 웹 앱 아이콘으로 읽혔다.
+- `웹 컨트롤에 게임색 적용`을 `게임 UI`로 잘못 확장 해석했다.
+
+### v3 복구
+
+- A안의 정보구조는 유지하되 C안의 장소성을 혼합했다. 오늘은 식당 방, 주방은 펼친 요리책과 조리대, 농장은 시설 플롯과 지도, 고양이는 거울·옷장 방이 된다.
+- 전역 내비게이션을 하단 나무 도크와 메달 아이콘으로 교체했다.
+- 주 행동은 입체 게임 버튼, 다음 행동은 양피지, 준비 상태는 리본/느낌표, 생산은 플롯과 실제 타이머 다이얼로 표현한다.
+- 굵은 갈색 외곽선, 3~6px 하드 섀도, 작은 회전, 목재·종이·풀·타일 질감으로 브라우저 표면이 아니라 동일한 2D 게임 세계의 물체처럼 보이도록 했다.
+- v2 CSS는 삭제하지 않고 거절 증거로 남겼으며 활성 런타임과 단일 빌드에서 제외했다.
+
+자동 게이트는 Node 43/43, 활성 거절 참조 0, 단일 HTML 5,871,386 bytes/10 assets/SHA-256 `08a3038ed0692ec1c51413b8c9a71683a59b02061ad0bba188e8524737c54ff1`, `git diff --check`를 통과했다. 실제 합성 화면의 게임성은 사용자 새로고침 판정이 필요하므로 상태는 **Implemented, not verified**다. 기존 품질 스킬에는 이미 `generic web-like rounded controls`, `screen visual hierarchy`, `game-specific visual language` 게이트가 있어 새 규칙을 추가하지 않고 이번 실패 증거만 기록했다.
+
+## 35. 2026-07-12 v3 확대 증거 — CSS 게임 스킨은 고품질 게임 UI가 아님
+
+사용자는 v3를 실제 화면에서 본 뒤 화면 크기, 개별 아이콘, 전체 품질, 콘셉트 모두를 거절했다. 증거 크롭은 `C:/Users/vivac/AppData/Local/Temp/codex-clipboard-437417a2-6062-40d2-96b5-747f84d371c1.png`(68×73)이며 하단 홈 아이콘 하나를 보여 준다.
+
+### 관찰
+
+- 약 24px의 얇은 집 선 아이콘이 30px 원형 프레임 안에 있고, 다시 두꺼운 둥근 탭 안에 들어간다. 테두리는 세 겹이지만 아이콘의 형태·채색·재질·세계관 정보는 빈약하다.
+- 고양이 원화는 굵은 갈색 외곽과 따뜻한 2D 모바일게임 채색인데, UI 아이콘은 단색 브라우저용 line icon처럼 보여 한 아트 패밀리가 아니다.
+- 패널은 1280×720 기준 약 1248×634로 사실상 전체 화면을 덮는다. 확장 관리창이 taskbar companion과 공존하는 인상보다 별도 웹앱이 열린 인상을 강화한다.
+- 식당 방, 양피지, 목재 도크, 책, 농장 플롯을 CSS로 동시에 흉내 내면서 통일된 원근·광원·표면 재질·아이콘 언어가 없다.
+
+### 판단 실패
+
+- 에이전트는 `웹 문법 제거`, `거절 자산 참조 0`, `43/43`, `하드 섀도/두꺼운 외곽`을 시각 품질 향상의 근거로 과대평가했다.
+- `Implemented, not verified`는 라이브 검증 공백을 표현할 뿐, 내부 품질 하한선을 통과하지 못한 화면을 사용자 검수 후보로 전달해도 된다는 뜻이 아니다.
+- 실제 발표 품질 UI 자산 없이 CSS 도형과 규격 선 아이콘만으로 production-looking game UI를 만들 수 있다고 가정한 경로를 종료한다.
+
+### 다음 복구 경로
+
+1. 창 크기부터 고정한다. 현재 거의 전체 화면 패널은 폐기하고 taskbar 장르에 맞는 compact/medium window 실제 픽셀 규격을 비교한다.
+2. 한 문장 콘셉트를 먼저 승인한다. 예: `모모가 운영하는 따뜻한 2D 모바일 레스토랑의 하루를 작은 창에서 관리한다`.
+3. 승인 고양이 원화와 같은 선 굵기·팔레트·광원·채색을 쓰는 실제 UI 스타일 보드와 화면 목업 2~3개를 실제 크기로 만든다.
+4. 아이콘은 얇은 코드 SVG가 아니라 동일 아트 패밀리의 오브젝트 일러스트 또는 승인된 9-slice/배지 세트로 만든다.
+5. 화면 한 장이 사용자 승인을 받기 전에는 네 화면·전체 아이콘·런타임 통합을 확장하지 않는다.
+
+현재 v3 presentation 상태는 **Rejected by user**다. 기능·상태·빌드 코드는 보존하지만 시각 합격 근거로 재사용하지 않는다. 기존 품질 스킬이 이미 같은 금지사항을 포함하므로 이번에는 새 규칙을 추가하지 않고, 규칙 미적용의 반복 실패로 기록한다.
+
+## 36. 2026-07-12 A안 선택 — 비교 목업의 품질과 구현안의 품질을 분리
+
+사용자는 A가 좋아 보인다고 선택하면서도, 내부 추천이었던 B는 목업 품질이 낮아 방향 자체를 판단하기 어렵다고 지적했다. 추천 문구가 낮은 완성도의 증거를 보완하지 못한다는 판정이다.
+
+### 교정한 판단 방식
+
+- B의 `장면 중심` 아이디어를 더 좋은 방향이라는 전제로 끌고 가지 않았다. B는 비교 기준에서 제외했고 사용자 선택 A를 그대로 구현 기준으로 고정했다.
+- 승인된 것은 910×520 구성과 `식당 장면 + 레시피 패널`의 정보 구조이지, 모든 rough crop의 production 승인으로 확장하지 않았다.
+- 기존 CSS 도형·선 SVG를 재포장하지 않고, 하나의 v9 원화 패밀리에서 식당·레시피·재료·자원·하단 행동을 결정론적으로 추출했다. 케이크가 냄비로 잘못 매핑되고 치즈·달걀이 잘린 첫 contact sheet는 거절하고 crop을 교정한 뒤 통합했다.
+- 네 화면과 웹형 전역 내비게이션을 제거하고 한 장면·한 패널·한 주 행동만 구현했다. 숨은 DOM은 기존 저장/경제 로직 호환을 위한 presenter support이며 화면 위계에 노출하지 않는다.
+
+### 검증과 남은 게이트
+
+- Playwright의 실제 1280×720 렌더에서 패널 910×520, 최종 장면/레시피 구도, 버튼 잘림·라벨 덮어쓰기 교정을 확인했다.
+- 케이크 선택, 재료 갱신, 요리 보상·소모, 토글 닫기와 콘솔 0 errors/warnings를 확인했다.
+- Node 43/43, standalone write/check, 19개 v4 자산 check, `git diff --check`를 통과했다. 단일 HTML은 7,175,632 bytes, SHA-256 `95c9ab19fa4848d79107c5b5aaf19656efae8f6fb8d7de9f93d4d5b22913bfde`다.
+- 상태는 **Implemented, not verified**다. 실제 렌더 증거는 내부 검증을 통과했지만, 사용자가 열린 로컬 파일을 새로고침해 최종 시각 품질을 승인하기 전까지 production-quality 또는 완료로 기록하지 않는다.
+
+## 37. 2026-07-12 같은 아트 패밀리의 완성 UI crop도 아이콘이 아님
+
+사용자가 A안 런타임의 상단 자원·하단 행동·레시피 확대 캡처를 제시하며 `저게 지금... 맞아?`라고 판정했다. 답은 아니며, 앞선 menu-v1 거절과 같은 합성 실패를 더 좋은 원화 패밀리로 반복했다.
+
+### 관찰과 원인
+
+- 자원 crop의 흰 사각 matte가 pill 배경과 분리됐다.
+- 하단은 원본에서 이미 완성된 버튼 그림을 새 버튼의 전체 배경으로 쓰고, 그 위에 새 흰 텍스트 판을 추가해 프레임과 라벨이 이중화됐다.
+- 레시피 crop은 음식뿐 아니라 별, 원본 카드 테두리, 상태 장식과 인접 UI 픽셀까지 포함해 새 카드 안에서 placeholder 조각처럼 보였다.
+- 공통 원인은 `같은 v9 원화에서 왔다`를 `수신 컴포넌트에 바로 붙여도 된다`로 잘못 확장한 것이다. 출처 일치가 clean transparency, deliberate framed tile, role-appropriate crop을 대신하지 않는다.
+
+### 구조 교정
+
+- 더 작은 crop이나 새 matte를 다시 만들지 않았다. 기존 crop은 소스/프로비넌스로 보존하되 edge-to-edge UI 배경 역할에서 제거했다.
+- 자원은 원형 medal viewport, 레시피는 원형 dish viewport로 제한해 사각 matte와 주변 원본 UI가 보이지 않게 했다.
+- 하단 행동은 full-button background를 폐기하고 54×54 inset object tile만 사용했다. 텍스트는 같은 버튼의 단일 위계에 배치했고 별도 흰 라벨 plate를 제거했다.
+- 이 방식은 `crop 수정 반복 중단`, `baked rectangular background 불합격`, `role-specific framing`이라는 기존 품질 규칙의 적용이다. 새 보편 규칙은 추가하지 않았다.
+
+### 검증
+
+- 실제 1280×720 렌더와 standalone의 910×520 요소 캡처를 두 번 검사했다. 최종 패널은 `output/playwright/management-v4-1-standalone-panel.png`다.
+- 스튜 기본 상태에서 세 영역의 잔여 UI 픽셀이 제거됐고, 케이크 선택 시 포커스·달걀·우유·치즈 요구량이 정상 전환됐다. 콘솔 errors/warnings 0.
+- Node 43/43, standalone write/check, `git diff --check`를 통과했다. standalone SHA-256은 `5b317c121503042f9f2ec1a79f8301dfb1a59c6fff6f7ab7b7494278cb7d56f0`다.
+- 상태는 **Implemented, not verified**다. 사용자가 같은 로컬 단일 HTML을 새로고침해 교정된 세 영역을 직접 승인해야 한다.
+
+## 38. 2026-07-12 개별 컨트롤 교정 후에도 화면 팔레트와 그룹이 분리됨
+
+사용자는 v4.1을 보고 `전체적으로 너무 누래`, `UI들이 쫌 겉도는 느낌`이라고 판정했다. 이는 raw crop 경계가 사라졌다는 사실이 전체 화면 통합을 보장하지 않는다는 추가 증거다.
+
+### 관찰과 원인
+
+- 크림·황토·금색이 panel base, resource pill, action button, recipe board, recipe card, chip에 반복되어 장면 전체가 노란 필터처럼 보였다.
+- 자원 5개, 행동 3개, 레시피 4개가 각각 밝은 독립 카드여서 상세한 식당 공간 위에 별도 UI 레이어가 부유했다.
+- v4.1은 `사각 crop 경계`라는 국소 결함을 고쳤지만, 색면 총량과 그룹 소속감을 두 번째 전체 화면 게이트에서 충분히 낮추지 못했다.
+
+### v4.2 교정
+
+- 밝은 노랑을 중성 아이보리, 짙은 목재, 세이지, 테라코타로 재배치했다. 원본 식당 장면은 보존하고 8% 저강도 세이지 색온도 레이어만 사용했다.
+- 자원을 개별 pill에서 헤더 내부의 한 HUD tray로 합쳤다.
+- 하단 행동을 하나의 목제 선반 안에 넣고, 레시피 카드를 한 장의 중성 메뉴판에 flush하게 붙였다. drop shadow와 금색 selected ring을 제거하고 세이지 active state로 교체했다.
+- 실제 910×520 standalone을 다시 캡처해 named defect와 unframed full-screen pass를 모두 수행했다. 최종 증거는 `output/playwright/management-v4-2-final-panel-clean.png`다.
+
+### 상태와 학습
+
+- Node 43/43, standalone write/check, console 0 errors/warnings를 통과했다. standalone SHA-256은 `508b0743802949fd0eb2953ba0b509a10a90ffb0a5e05bc40d5b17d0fc97d7c4`다.
+- 상태는 **Implemented, not verified**다. 사용자 visual acceptance가 남아 있다.
+- 새 범용 규칙은 추가하지 않았다. 기존 expanded UI gate가 이미 `full composed screen`, `focal order`, `all-equal card weight`, `game-specific visual language`를 요구한다. 이번 기록은 같은 규칙을 색면 총량과 그룹 구조에 적용하지 못한 프로젝트 실행 실패다.
+
+## 39. 2026-07-12 큰 정지 장면은 분위기만으로 공간을 정당화하지 못함
+
+사용자는 식당 장면이 움직이지 않는다는 답변 뒤 `안 움직이면 저기 화면이 있는 이유가 뭐야?`라고 지적했고, 풀 애니메이션 대신 손님 주문·감정을 말풍선으로 보여 주는 방향을 제시했다.
+
+### 관찰과 방향
+
+- 기존 장면은 식당 정체성을 전달했지만 화면 대부분을 차지하면서도 플레이 상태를 전달하거나 조리에 반응하지 않았다. 고품질 정지 원화 자체가 기능적 장면을 보장하지 않는다.
+- 손님 bitmap을 억지로 변형하거나 새 전신 프레임을 생성하지 않았다. 기존 네 말풍선 위치를 실제 주문/감정 presenter로 전환하는 낮은 위험 경로를 선택했다.
+- 주문 음식, 기다림, 초조, 화남, 서빙 후 기쁨이 같은 고객 슬롯의 상태로 이어지며 조리 버튼과 직접 연결된다.
+
+### 실제 속도 교정
+
+- 첫 캡처에서는 땀이 세 개까지 동시에 나타나고 실루엣이 캡슐처럼 보였다. 땀을 teardrop 형태로 바꾸고 최대 2개로 제한했다.
+- 첫 화남 표식은 X로 읽혔고 다음 표식은 외곽 사각 프레임처럼 보였다. 네 개의 안쪽 꺾임으로 재배치하고 화남은 최대 1개로 제한했다.
+- 최종 상태 머신은 3.2초에 한 슬롯만 갱신하며 부유 3px, 교체 360ms, 서빙 하트 2.6초를 사용한다. 자동 상태는 경제·보상·입력량에 영향을 주지 않는다.
+
+### 검증과 상태
+
+- Chromium 실제 속도에서 order/sweat/angry 전환, 상태 문구, 스튜 조리→happy, 자원·재료 소모, console 0 errors/warnings를 확인했다.
+- Node 44/44와 standalone write/check가 통과했다. 최종 SHA-256은 `00bcb0b498a2dd3167076ddf5c040e1f6df71bf0e61f63e845e7a53910cb9f70`다.
+- 상태는 **Implemented, not verified**다. 사용자 perceived timing과 장면 밀도 판정이 남아 있다.
+- 새 범용 규칙은 추가하지 않았다. 기존 Living Taskbar/semantic/expanded UI gates가 이미 큰 화면 요소가 실제 변화와 게임 결과를 전달해야 한다고 요구한다.
+
+## 40. 2026-07-12 스크린샷 crop은 맛있는 음식 아이콘과 완성된 감정 UI를 대체하지 못함
+
+사용자는 v4.3의 레시피와 말풍선에서 음식 일부만 보이고 네모 matte가 튀어나오며, CSS로 만든 감정표시가 허접하다고 판정했다. 이 판정은 기능 검증과 별개로 presentation runtime 전체를 반려한다.
+
+### 관찰과 원인
+
+- 음식의 핵심은 접시·잔까지 포함한 완전한 실루엣과 먹음직스러운 표면인데, 기존 구현은 이미 UI가 합성된 스크린샷을 46~54px 원형 창 안에서 확대했다.
+- `background-position`으로 피사체 중심을 맞추는 동안 접시 가장자리와 빨대가 잘렸고, baked rectangle은 말풍선의 유기적 외곽 안에서 즉시 드러났다.
+- 감정은 몇 개의 CSS 선과 물방울 도형으로 만들었기 때문에 고해상도 손그림 식당 장면과 선 굵기·명암·재질이 일치하지 않았다.
+- 이전 QA는 상태 전환과 크롭 경계만 확인했고, `음식 전체가 맛있게 보이는가`와 `감정 원화가 배경 원화와 같은 완성도인가`를 승인 조건으로 적용하지 못했다.
+
+### 교정 경로
+
+- 저장소에 깨끗한 full-dish 투명 원화가 없음을 확인한 뒤 crop/matte 조정을 중단했다.
+- 기존 v9 화면을 화풍 참조로만 사용해 음식 4종과 감정 3종을 독립된 투명 원화로 만들었다. 최종 에셋은 모든 모서리가 투명하고 피사체 주위에 18~22px 이상의 안전 여백을 가진다.
+- 레시피 카드·선택 레시피·주문 말풍선은 같은 full-dish master를 역할에 맞는 크기로 `contain`한다. 감정 상태는 authored raster asset으로 통일했다.
+- 이 교정은 기존 `Source Preservation Becomes Runtime Attachment` 규칙의 직접 적용이다. 새 범용 규칙은 추가하지 않는다.
+
+### 검증과 상태
+
+- Node 44/44, standalone write/check, alpha-corner/margin 검증이 통과했다. standalone SHA-256은 `40a0b10137c0815ba6a49a4d71fb36aa58ab5a96b228f0c26860b8cc98ad1a7d`다.
+- Browser URL 정책이 로컬 `file://` 자동 reload를 거부했고 다른 브라우저로 우회하지 않았다. 따라서 이번 턴에는 새 실제 크기 합성 캡처가 없다.
+- 상태는 **Correction implemented, rejected/unverified**다. 사용자가 새로고침한 실제 화면을 승인하기 전에는 완료로 기록하지 않는다.
+
+## 41. 2026-07-12 말풍선 위치는 손님 엔티티 소유권을 대신하지 못함
+
+사용자는 v4.4 화면에서 말풍선이 없는 주변 고양이들의 역할을 물었다. 확인 결과 이 고양이들은 런타임 상태가 아니라 배경 원화에 baked된 장식 손님이었다.
+
+### 원인
+
+- 구현은 원본에 이미 그려진 말풍선 네 곳을 좌표 슬롯으로 복제했을 뿐, 각 말풍선을 특정 손님 엔티티와 연결하지 않았다.
+- 원화에는 앉은 손님이 5마리지만 상태 슬롯은 4개다. 위쪽 두 슬롯은 손님 머리 위가 아니라 주방/요리사 영역에 있고, 나머지 장식 손님은 아무 상태도 갖지 않는다.
+- 결과적으로 그림은 북적이지만 게임은 누가 주문했고 누가 기다리는지 설명하지 못한다. 이는 장면 밀도를 상호작용 깊이로 오인한 구조 실패다.
+
+### 복구 원칙
+
+- 화면에 보이는 손님 캐릭터는 반드시 하나의 customer entity에 속해야 한다. 주문, 대기 시간, 감정, 입장, 퇴장 중 최소 현재 상태를 가져야 한다.
+- 말풍선은 좌표 장식이 아니라 손님의 자식 presenter로 취급하고, 해당 손님 머리 위에 직접 anchor한다.
+- 상태가 없는 장식 손님은 제거한다. 빈 좌석은 새로운 손님이 나타날 수 있는 의도적 공간으로 남길 수 있다.
+- 현재 baked 장면에 더 많은 말풍선을 추가하는 경로는 중단한다. clean scene + chef + 3 customer slots 구조로 다시 설계한다.
+
+### 상태
+
+- 현재 장면은 **Rejected / scene ownership redesign required**다.
+- 이번 응답은 review-only 진단이며 코드·에셋은 변경하지 않았다.
+
+## 42. 2026-07-12 clean scene + owned actor로 손님 상태 소유권 복구
+
+사용자는 빈 위치에 감정 말풍선이 뜨고 상태 없는 장식 고양이가 남은 문제를 다시 지적하면서, 최소한 손님이 나타났다 사라지는 동작을 요구했다.
+
+### 적용한 복구
+
+- baked 손님·말풍선·식탁 음식이 없는 clean restaurant plate를 새로 만들었다. 흰 요리사와 주방 음식은 유지하고 손님용 테이블은 빈 spawn location으로 만들었다.
+- 회색·주황·턱시도 손님을 투명 독립 레이어로 만들고, 각 손님 actor 안에 bubble presenter를 자식으로 배치했다.
+- `empty/arriving/present/leaving` phase와 `order/sweat/angry/happy` mood를 분리했다. bubble은 `present` phase에서만 보이며 actor가 비면 몸과 함께 사라진다.
+- 기존 장면 위에 좌표 bubble을 더 추가하는 실패 경로를 제거했다.
+
+### 증거와 남은 게이트
+
+- 실제 910×520 기반 두 상태 합성에서 빈 말풍선과 상태 없는 고양이가 남지 않음을 확인했다: `output/imagegen/restaurant-v5/customer-lifecycle-actual-size.png`.
+- Node 44/44와 standalone write/check가 통과했다. standalone SHA-256은 `66351b1af8c8aa542bd9f97d8cd6a679d0f4f8005f00d6272cea472694dd7a3c`다.
+- 실제 로컬 브라우저의 연속 arrival/leave 재생은 아직 사용자 검증 전이므로 상태는 **Implemented, not live-verified**다.
+- 새 범용 규칙은 추가하지 않았다. recovery audit 41의 `visible character must own state` 원칙을 실제 구조로 적용한 사례다.

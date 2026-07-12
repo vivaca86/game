@@ -250,3 +250,14 @@ Record only workarounds that were actually verified. Check environment and error
 - Verified workaround: invoke the official Windows command launcher directly: `& 'C:\Program Files\nodejs\npm.cmd' install ...`. Do not alter the system execution policy.
 - Verification evidence: `sharp@0.34.2` and its ten-package dependency set installed under `tmp/menu-svg-qa`, rendered three SVG QA PNGs, and the verified temporary directory was then removed from the project.
 - Reuse conditions: use only when the error signature is specifically the `npm.ps1` execution-policy block and `npm.cmd` exists at the verified Node installation. Do not apply this route to registry, network, package-integrity or filesystem-permission failures.
+
+## 2026-07-11 — Two-command canvas replacement can expose a partially cleared GPU frame
+
+- Environment: Microsoft Edge controlled through Playwright CLI, transparent 128×128 canvas, PNG sprite atlases, Windows GPU compositing.
+- Operation signature: continuously replace a complete transparent sprite frame and capture the 112px taskbar result.
+- Failed route: call `clearRect(0, 0, 128, 128)` and then `drawImage(...)` for each frame.
+- Error signature: one captured work frame retained only the lower part of the cat; earlier in-app captures also intermittently omitted the canvas/WebP layer.
+- Root cause: clearing and drawing were submitted as two distinct canvas commands, allowing GPU-layer capture to observe an intermediate cleared surface even though JavaScript called them synchronously.
+- Verified workaround: keep `globalCompositeOperation="copy"` and issue one full-destination `drawImage` from a complete RGBA atlas frame. `copy` replaces transparent and visible pixels without a separate clear.
+- Verification evidence: after the change, 20 consecutive idle and 19 work/fast/overdrive 112px Edge screenshots had 0 blank/partial frames; bright-character pixel counts ranged from 3,385 upward and bounding boxes remained complete. Console errors/warnings were 0.
+- Reuse conditions: use when a canvas presents complete transparent sprite frames. Do not use `copy` for incremental painting layers that intentionally preserve previous canvas content.

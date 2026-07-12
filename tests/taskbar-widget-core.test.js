@@ -96,7 +96,7 @@ test("typing pulse counts map to normal, fast, and overdrive without key content
 });
 
 test("work, awake idle, typing, doze, wake, and static pose selection are deterministic", () => {
-  assert.equal(core.resolveTaskbarPose(), "ambient-v4");
+  assert.equal(core.resolveTaskbarPose(), "ambient-v6");
   assert.equal(core.resolveTaskbarPose({ ambientState: "alert-idle" }), "idle-alert");
   assert.equal(core.resolveTaskbarPose({ ambientState: "curious-idle" }), "idle-alert");
   assert.equal(core.resolveTaskbarPose({ ambientState: "sleepy-idle" }), "idle-sleepy");
@@ -104,7 +104,7 @@ test("work, awake idle, typing, doze, wake, and static pose selection are determ
   assert.equal(core.resolveTaskbarPose({ ambientState: "doze" }), "doze-loop");
   assert.equal(core.resolveTaskbarPose({ motion: "reduced" }), "neutral");
   assert.equal(core.resolveTaskbarPose({ motion: "off" }), "neutral");
-  assert.equal(core.resolveTaskbarPose({ reaction: "key-left" }), "ambient-v4");
+  assert.equal(core.resolveTaskbarPose({ reaction: "key-left" }), "ambient-v6");
   assert.equal(core.resolveTaskbarPose({ reaction: "typing-fast" }), "typing-fast");
   assert.equal(core.resolveTaskbarPose({ reaction: "typing-overdrive" }), "typing-overdrive");
   assert.equal(core.resolveTaskbarPose({ reaction: "idle-attention" }), "idle-attention");

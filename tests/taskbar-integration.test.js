@@ -12,9 +12,11 @@ const stripCssComments = (value) => value.replace(/\/\*[\s\S]*?\*\//g, "");
 test("index loads only the new taskbar companion runtime", () => {
   const html = readText("index.html");
 
-  assert.match(html, /taskbar-companion\.css\?v=14/);
+  assert.match(html, /game-ui-v4\.css\?v=6/);
+  assert.match(html, /taskbar-companion\.css\?v=17/);
   assert.match(html, /taskbar-widget-core\.js\?v=10/);
-  assert.match(html, /app\.js\?v=44/);
+  assert.match(html, /taskbar-cat-player\.js\?v=6/);
+  assert.match(html, /app\.js\?v=49/);
   assert.match(html, /data-ambient="alert-idle"/);
   assert.match(html, /data-pose="idle-alert"/);
   assert.doesNotMatch(html, /widget-v28\.css/);
@@ -83,7 +85,7 @@ test("pointer drag is captured, clamped, persisted, and cannot consume a keyboar
 test("the visible taskbar cat only toggles the panel and never claims taskbar work", () => {
   const app = readText("app.js");
   const css = stripCssComments(readText("taskbar-companion.css"));
-  const styles = stripCssComments(readText("styles.css"));
+  const styles = stripCssComments(readText("game-ui-v4.css"));
   const html = readText("index.html");
   const clickStart = app.indexOf('$("#tinyWidget").addEventListener("click"');
   const clickEnd = app.indexOf('$("#collapseButton").addEventListener', clickStart);
@@ -114,67 +116,101 @@ test("the visible taskbar cat only toggles the panel and never claims taskbar wo
   assert.doesNotMatch(clickHandler, /claim|reward|완성|수령/i);
 });
 
-test("expanded menu uses the complete menu-v1 asset set without legacy art or emoji placeholders", () => {
+test("direction A runtime is one compact restaurant scene with one recipe board", () => {
   const html = readText("index.html");
   const app = readText("app.js");
-  const styles = readText("styles.css");
-  const manifest = JSON.parse(readText("assets/menu-v1/menu-assets-manifest.json"));
+  const styles = readText("game-ui-v4.css");
   const visibleMenuEmoji = /[🐾🍳🥄🌿🏠⭐🪙💎⚡🐱💾🍴🥼🎒🍲📔🍝🍰🥘🥤🥖🌾🥕🍅🥛🧀🥚🚚🏡🏘️🎁🪑🔒♥]/u;
-  const legacyMenuArt = /assets\/concept\/(?:chef-cat-v9|restaurant-scene-v9|production-strip-v9|recipe-panel-v9|route-map-v9|widget-portrait-v9)/;
+  const combined = `${html}\n${app}\n${styles}`;
 
-  assert.match(html, /styles\.css\?v=31/);
-  assert.match(html, /ui-symbol--paw/);
-  assert.match(html, /menu-icon--spatula/);
-  assert.doesNotMatch(html, visibleMenuEmoji);
-  assert.doesNotMatch(app, visibleMenuEmoji);
-  assert.doesNotMatch(styles, legacyMenuArt);
-  assert.equal(manifest.runtime_assets.length, 32);
-  assert.equal(manifest.project_vector_assets.length, 2);
-  for (const asset of manifest.runtime_assets) {
-    assert.ok(styles.includes(`url("./${asset.path}")`), `CSS must reference ${asset.path}`);
-  }
-  for (const asset of manifest.project_vector_assets) {
-    assert.ok(styles.includes(`url("./${asset.path}")`), `CSS must reference ${asset.path}`);
-  }
+  assert.equal((html.match(/class="restaurant-scene"/g) || []).length, 1);
+  assert.equal((html.match(/class="recipe-board"/g) || []).length, 1);
+  assert.equal((html.match(/class="scene-action /g) || []).length, 3);
+  assert.equal((html.match(/class="primary-action"/g) || []).length, 1);
+  assert.doesNotMatch(combined, /assets\/menu-v1\//);
+  assert.doesNotMatch(combined, /game-ui-v3\.css/);
+  assert.doesNotMatch(html, /<svg\b|class="nav-item|class="management-view/);
+  assert.doesNotMatch(combined, visibleMenuEmoji);
+  assert.match(html, /id="cookButton"/);
+  assert.match(styles, /assets\/management-v4\/restaurant-scene-v3-empty\.png/);
+  assert.doesNotMatch(styles, /url\("\.\/assets\/management-v4\/restaurant-scene\.png"\)/);
+  assert.match(styles, /assets\/management-v4\/recipes-v2\/cake\.png/);
+  assert.match(styles, /assets\/management-v4\/tabs\/kitchen\.png/);
+  assert.match(styles, /\.scene-action::before\s*\{[^}]*border-radius\s*:\s*9px[^}]*background-position\s*:\s*-68px -19px/s);
+  assert.match(styles, /\.recipe-symbol\s*\{[^}]*background-size\s*:\s*contain/s);
+  assert.doesNotMatch(styles, /\.recipe-symbol\s*\{[^}]*border-radius\s*:\s*50%/s);
+  assert.match(styles, /assets\/management-v4\/recipes-v2\/stew\.png/);
+  assert.match(styles, /\.resource i\s*\{[^}]*overflow\s*:\s*hidden[^}]*border-radius\s*:\s*50%/s);
+  assert.doesNotMatch(styles, /\.scene-action--kitchen\s*\{[^}]*background-image/s);
+  assert.match(styles, /\.primary-action:hover/);
+  assert.match(styles, /\.primary-action:active/);
+  assert.match(styles, /\.primary-action:focus-visible/);
+  assert.match(styles, /\.primary-action:disabled/);
 });
 
-test("expanded menu preserves art and reflows instead of clipping narrow browser windows", () => {
-  const styles = stripCssComments(readText("styles.css"));
+test("owned restaurant customers arrive, order, react, and leave with their bubbles", () => {
+  const html = readText("index.html");
+  const app = readText("app.js");
+  const styles = stripCssComments(readText("game-ui-v4.css"));
 
-  assert.match(
-    styles,
-    /\.cat-card\s*\{[^}]*grid-column\s*:\s*1 \/ 4[^}]*background-image\s*:\s*url\("\.\/assets\/menu-v1\/chef-card\.png"\)[^}]*background-size\s*:\s*clamp\(170px, 60%, 220px\) auto/s
-  );
-  assert.match(styles, /\.gear-column\.left\s*\{[^}]*grid-column\s*:\s*1[^}]*grid-row\s*:\s*1/s);
-  assert.match(styles, /\.gear-column\.right\s*\{[^}]*grid-column\s*:\s*3[^}]*grid-row\s*:\s*1/s);
-  assert.match(styles, /\.recipe-card\s*\{[^}]*grid-template-rows\s*:\s*10px minmax\(24px, 1fr\) 5px[^}]*padding\s*:\s*2px 3px/s);
-  assert.match(styles, /\.recipe-card \.progress\s*\{[^}]*width\s*:\s*82%[^}]*height\s*:\s*5px/s);
-  assert.match(
-    styles,
-    /\.room\s*\{[^}]*background-image\s*:\s*url\("\.\/assets\/menu-v1\/restaurant-scene\.png"\)[^}]*background-size\s*:\s*cover/s
-  );
-  assert.doesNotMatch(styles, /@media\s*\(max-width:\s*1200px\)[\s\S]*?\.game-panel\s*\{[^}]*width\s*:\s*1120px/);
-  assert.match(styles, /@media\s*\(max-width:\s*1200px\)/);
-  assert.match(styles, /\.game-panel\s*\{[^}]*width\s*:\s*auto[^}]*overflow-y\s*:\s*auto/s);
-  assert.match(styles, /\.panel-grid\s*\{[^}]*grid-template-columns\s*:\s*minmax\(250px, 0\.82fr\) minmax\(360px, 1\.18fr\)/s);
-  assert.match(styles, /\.recipe-panel\s*\{[^}]*grid-column\s*:\s*1 \/ 3/s);
-  assert.match(styles, /\.production\s*\{[^}]*grid-column\s*:\s*1 \/ 3/s);
-  assert.match(styles, /@media\s*\(max-width:\s*680px\)/);
+  assert.equal((html.match(/data-scene-customer="[0-2]"/g) || []).length, 3);
+  assert.equal((html.match(/class="scene-customer-body"/g) || []).length, 3);
+  assert.equal((html.match(/class="scene-bubble"/g) || []).length, 3);
+  assert.match(html, /data-phase="empty"[^>]*aria-hidden="true"/);
+  assert.match(html, /id="sceneStatusTitle"/);
+  assert.match(html, /id="sceneStatusCopy"/);
+  assert.match(app, /const SCENE_ORDER_IDS = Object\.freeze\(\["stew", "pasta", "cake", "juice"\]\)/);
+  assert.match(app, /function tickSceneLife\(now\)/);
+  assert.match(app, /function serveSceneOrder\(orderId\)/);
+  assert.match(app, /function nextSceneOrderId\(\)/);
+  assert.match(app, /tickSceneLife\(now\)/);
+  assert.match(app, /render\(\);\s+serveSceneOrder\(recipe\.id\);/);
+  assert.match(app, /customer\.phase === "empty"/);
+  assert.match(app, /customer\.phase === "arriving"/);
+  assert.match(app, /customer\.phase === "leaving"/);
+  assert.match(app, /sweatCount < 1/);
+  assert.match(app, /angryCount < 1/);
+  assert.match(styles, /\.scene-customer\[data-phase="present"\] \.scene-bubble/);
+  assert.match(styles, /\.scene-customer\[data-kind="happy"\] \.scene-bubble/);
+  assert.match(styles, /\.scene-customer\[data-kind="sweat"\] \.scene-bubble/);
+  assert.match(styles, /\.scene-customer\[data-kind="angry"\] \.scene-bubble/);
+  assert.match(styles, /assets\/management-v4\/customers-v1\/gray\.png/);
+  assert.match(styles, /assets\/management-v4\/customers-v1\/orange\.png/);
+  assert.match(styles, /assets\/management-v4\/customers-v1\/tuxedo\.png/);
+  assert.match(styles, /assets\/management-v4\/moods\/happy\.png/);
+  assert.match(styles, /assets\/management-v4\/moods\/waiting\.png/);
+  assert.match(styles, /assets\/management-v4\/moods\/angry\.png/);
+  assert.match(styles, /@keyframes sceneBubbleFloat/);
+  assert.match(styles, /@keyframes sceneBubbleSwap/);
+  assert.match(styles, /@media\s*\(prefers-reduced-motion: reduce\)[\s\S]*\.scene-customer[^}]*transition\s*:\s*none/);
 });
 
-test("taskbar CSS is isolated, 12.5 percent smaller, and uses registered motion", () => {
+test("direction A stays compact and preserves responsive control states", () => {
+  const styles = stripCssComments(readText("game-ui-v4.css"));
+  const html = readText("index.html");
+
+  assert.match(styles, /\.game-panel\s*\{[^}]*width\s*:\s*910px[^}]*height\s*:\s*520px/s);
+  assert.match(styles, /\.management-v4-shell\s*\{[^}]*grid-template-columns\s*:\s*minmax\(0, 584px\) minmax\(0, 292px\)/s);
+  assert.match(styles, /\.restaurant-board\s*\{[^}]*grid-template-rows\s*:\s*minmax\(0, 1fr\) 82px/s);
+  assert.match(styles, /\.recipe-board\s*\{[^}]*overflow\s*:\s*hidden/s);
+  assert.match(styles, /@media\s*\(max-width: 760px\)/);
+  assert.match(styles, /\.desktop \.taskbar-companion\[data-panel="open"\][^}]*right\s*:\s*22px/);
+  assert.match(html, /모모의 작은 식당/);
+  assert.match(html, /무엇을 만들까요\?/);
+  assert.match(html, /준비된 재료 받기/);
+  assert.doesNotMatch(html, /class="progress"/);
+});
+
+test("taskbar CSS is isolated, 12.5 percent smaller, and uses registered PNG atlases", () => {
   const css = readText("taskbar-companion.css");
 
-  assert.match(css, /taskbar-cat-cutout-rig-v4\/chef-cat-fast-knead-motion-128\.webp/);
-  assert.match(css, /taskbar-cat-cutout-rig-v4\/chef-cat-transparent-neutral-open-eyes\.png/);
-  assert.match(css, /taskbar-cat-typing-v1\/chef-cat-typing-fast-128\.webp/);
-  assert.match(css, /taskbar-cat-typing-v1\/chef-cat-typing-overdrive-128\.webp/);
-  assert.match(css, /taskbar-cat-idle-v1\/chef-cat-idle-alert-128\.webp/);
-  assert.match(css, /taskbar-cat-idle-v1\/chef-cat-idle-attention-128\.webp/);
-  assert.match(css, /taskbar-cat-idle-v1\/chef-cat-idle-sniff-128\.webp/);
-  assert.match(css, /taskbar-cat-idle-v1\/chef-cat-idle-sleepy-128\.webp/);
-  assert.match(css, /taskbar-cat-rest-v1\/chef-cat-doze-128\.webp/);
-  assert.match(css, /taskbar-cat-rest-v1\/chef-cat-wake-startle-128\.webp/);
+  for (const atlas of [
+    "neutral", "ambient-v6", "typing-fast", "typing-overdrive", "idle-alert",
+    "idle-attention", "idle-sniff", "idle-sleepy", "doze-loop", "wake-startle"
+  ]) {
+    assert.match(css, new RegExp(`taskbar-cat-runtime-v6/${atlas}-atlas\\.png`));
+  }
+  assert.doesNotMatch(css, /\.webp/);
   assert.match(css, /width: 112px/);
   assert.match(css, /height: 112px/);
   assert.match(css, /transform: scale\(0\.875\)/);
@@ -209,6 +245,8 @@ test("awake idle, typing, doze, and wake use registered assets without whole-ima
   const css = stripCssComments(readText("taskbar-companion.css"));
   const app = readText("app.js");
   const core = readText("taskbar-widget-core.js");
+  const player = readText("taskbar-cat-player.js");
+  const html = readText("index.html");
 
   assert.doesNotMatch(css, /steps\s*\(/);
   assert.doesNotMatch(css, /--work-cycle\b/);
@@ -218,26 +256,25 @@ test("awake idle, typing, doze, and wake use registered assets without whole-ima
   const basePoseRule = [...css.matchAll(/\.taskbar-cat-pose\s*\{([^}]*)\}/g)]
     .find((match) => match[1].includes("background-image"));
   assert.ok(basePoseRule, "a base .taskbar-cat-pose rule must exist");
-  assert.match(basePoseRule[1], /var\(--taskbar-cat-neutral-image\)/);
+  assert.match(basePoseRule[1], /var\(--taskbar-cat-neutral-atlas\)/);
   assert.match(basePoseRule[1], /animation\s*:\s*none\b/);
   assert.match(basePoseRule[1], /transition\s*:\s*none\b/);
   assert.match(basePoseRule[1], /transform\s*:\s*none\b/);
-  assert.match(css, /\[data-pose="ambient-v4"\] \.taskbar-cat-pose\s*\{[^}]*var\(--taskbar-cat-motion-image\)/);
-  assert.match(css, /\[data-pose="typing-fast"\] \.taskbar-cat-pose\s*\{[^}]*var\(--taskbar-cat-typing-fast-image\)/);
-  assert.match(css, /\[data-pose="typing-overdrive"\] \.taskbar-cat-pose\s*\{[^}]*var\(--taskbar-cat-typing-overdrive-image\)/);
-  assert.match(css, /\[data-pose="idle-alert"\] \.taskbar-cat-pose\s*\{[^}]*var\(--taskbar-cat-idle-alert-image\)/);
-  assert.match(css, /\[data-pose="idle-attention"\] \.taskbar-cat-pose\s*\{[^}]*var\(--taskbar-cat-idle-attention-image\)/);
-  assert.match(css, /\[data-pose="idle-sniff"\] \.taskbar-cat-pose\s*\{[^}]*var\(--taskbar-cat-idle-sniff-image\)/);
-  assert.match(css, /\[data-pose="idle-sleepy"\] \.taskbar-cat-pose\s*\{[^}]*var\(--taskbar-cat-idle-sleepy-image\)/);
-  assert.match(css, /\[data-pose="doze-loop"\] \.taskbar-cat-pose\s*\{[^}]*var\(--taskbar-cat-doze-image\)/);
-  assert.match(css, /\[data-pose="wake-startle"\] \.taskbar-cat-pose\s*\{[^}]*var\(--taskbar-cat-wake-image\)/);
+  assert.match(html, /<canvas class="taskbar-cat-pose" id="taskbarCatCanvas" width="128" height="128"><\/canvas>/);
+  assert.match(player, /canvas\.getContext\("2d"/);
+  assert.match(player, /context\.drawImage/);
+  assert.match(player, /globalCompositeOperation = "copy"/);
+  assert.doesNotMatch(player, /context\.clearRect/);
+  assert.match(player, /Do not clear the previous complete frame/);
+  assert.match(player, /"ambient-v6"/);
+  assert.doesNotMatch(player, /\.webp/);
   assert.match(css, /taskbarCatDozeZ 1800ms ease-in-out infinite/);
   assert.match(app, /companion\.dataset\.pose = pose/);
   assert.match(app, /if \(companion\.dataset\.pose !== pose\)/);
   assert.match(app, /function recordPointerPulse\(now\)\s*\{[\s\S]*?setWidgetReaction\("wake-startle"/);
   assert.doesNotMatch(app, /maybeRunWidgetWorkBeat|maybeBlinkWidget/);
   assert.deepEqual(require("../taskbar-widget-core.js").TASKBAR_POSE_IDS, [
-    "ambient-v4", "typing-fast", "typing-overdrive", "idle-alert", "idle-attention",
+    "ambient-v6", "typing-fast", "typing-overdrive", "idle-alert", "idle-attention",
     "idle-sniff", "idle-sleepy", "doze-loop", "wake-startle", "neutral"
   ]);
   assert.doesNotMatch(app, /setWidgetReactionSequence|WIDGET_GESTURE_SEQUENCE/);
@@ -260,8 +297,8 @@ test("typing escalates through bounded normal, fast, and overdrive cues without 
   assert.match(app, /WIDGET_KEY_FEEDBACK_MS = 220/);
   assert.match(app, /WIDGET_KEY_COOLDOWN_MS = 70/);
   assert.match(app, /WIDGET_TYPING_WINDOW_MS = 800/);
-  assert.match(app, /WIDGET_TYPING_FAST_HOLD_MS = 620/);
-  assert.match(app, /WIDGET_TYPING_OVERDRIVE_HOLD_MS = 780/);
+  assert.match(app, /WIDGET_TYPING_FAST_HOLD_MS = 1000/);
+  assert.match(app, /WIDGET_TYPING_OVERDRIVE_HOLD_MS = 980/);
   assert.match(app, /WIDGET_WAKE_STARTLE_HOLD_MS = 1000/);
   assert.match(app, /WIDGET_WORK_HOLD_MS = 1200/);
   assert.match(app, /reactionToken \+= 1/);
@@ -305,18 +342,57 @@ test("no-input state stops kneading and schedules bounded curious sniff events",
   assert.equal(core.resolveAmbientState(1_000, 2_200, 0, 2_200), "alert-idle");
 });
 
-test("motion preferences and panel ownership replace animated WebP with static neutral", () => {
+test("motion preferences and panel ownership select the static neutral atlas", () => {
   const css = stripCssComments(readText("taskbar-companion.css"));
+  const app = readText("app.js");
+  const player = readText("taskbar-cat-player.js");
   const mediaIndex = css.indexOf("@media (prefers-reduced-motion: reduce)");
   const mediaRules = css.slice(mediaIndex);
 
   assert.ok(mediaIndex >= 0, "system reduced-motion rules must exist");
   assert.match(mediaRules, /\.taskbar-companion\[data-motion\] \.taskbar-cat-pose/);
   assert.match(mediaRules, /animation\s*:\s*none\b/);
-  assert.match(mediaRules, /var\(--taskbar-cat-neutral-image\)/);
-  assert.match(css, /\.taskbar-companion\[data-motion="reduced"\] \.taskbar-cat-pose\s*\{[^}]*var\(--taskbar-cat-neutral-image\)/);
-  assert.match(css, /\.taskbar-companion\[data-motion="off"\] \.taskbar-cat-pose\s*\{[^}]*var\(--taskbar-cat-neutral-image\)/);
-  assert.match(css, /\.taskbar-companion\[data-panel="open"\] \.taskbar-cat-pose\s*\{[^}]*var\(--taskbar-cat-neutral-image\)/);
+  assert.match(mediaRules, /var\(--taskbar-cat-neutral-atlas\)/);
+  assert.match(css, /\.taskbar-companion\[data-motion="reduced"\] \.taskbar-cat-pose\s*\{[^}]*var\(--taskbar-cat-neutral-atlas\)/);
+  assert.match(css, /\.taskbar-companion\[data-motion="off"\] \.taskbar-cat-pose\s*\{[^}]*var\(--taskbar-cat-neutral-atlas\)/);
+  assert.match(app, /TaskbarCatPlayer\?\.sync\(\{[\s\S]*?panelOpen: state\.panelOpen/);
+  assert.match(app, /reaction: widgetRuntime\.reaction/);
+  assert.match(app, /reactionId: widgetRuntime\.reactionToken/);
+  assert.match(player, /panelOpen \|\| motion !== "full"[\s\S]*?"neutral"/);
+  assert.match(player, /isFreshNormalPulse[\s\S]*?reaction === "key-right" \? 480 : 80/);
+  assert.match(player, /reaction === "key-right" \? 12 : 2/);
+});
+
+test("runtime v6 atlases register complete frames, readable dwell, and deformable dough", () => {
+  const manifest = JSON.parse(readText("assets/taskbar-cat-runtime-v6/runtime-v6-manifest.json"));
+  assert.equal(manifest.animated_webp_runtime, false);
+  assert.match(manifest.renderer, /canvas drawImage/);
+  assert.equal(manifest.display_size_px, 112);
+  assert.equal(manifest.frame_size_px, 128);
+  assert.equal(manifest.input_alignment.normal_left_start_frame, 2);
+  assert.equal(manifest.input_alignment.normal_right_start_frame, 12);
+  assert.ok(manifest.input_alignment.contact_visible_within_ms <= 40);
+  assert.ok(manifest.input_alignment.contact_peak_within_ms <= 80);
+  assert.equal(manifest.input_alignment.fast_overdrive_restart_on_same_pose, false);
+  assert.equal(manifest.clips["ambient-v6"].contacts_per_second, 2.5);
+  assert.equal(manifest.clips["typing-fast"].contacts_per_second, 4);
+  assert.equal(manifest.clips["typing-overdrive"].contacts_per_second, 8.16);
+  assert.ok(manifest.clips["ambient-v6"].contact_peak_dwell_ms >= 100);
+  assert.ok(manifest.clips["typing-fast"].contact_peak_dwell_ms >= 100);
+  assert.ok(manifest.clips["typing-overdrive"].contact_peak_dwell_ms >= 65);
+  for (const pose of ["ambient-v6", "typing-fast", "typing-overdrive"]) {
+    assert.equal(manifest.clips[pose].fixed_dough_root_max_changed_pixels, 0);
+    assert.equal(manifest.clips[pose].first_last_frames_identical, true);
+    assert.equal(manifest.clips[pose].neutral_entry_exit_identical, true);
+  }
+  for (const pose of ["idle-alert", "idle-attention", "idle-sniff", "idle-sleepy", "doze-loop", "wake-startle"]) {
+    assert.equal(manifest.clips[pose].blank_decoded_frames, 0);
+  }
+  assert.ok(manifest.qa.dough_max_vertical_compression_display_px >= 2);
+  assert.ok(manifest.qa.normal_paw_chain_peak_to_peak_display_px >= 3);
+  assert.equal(manifest.qa.paw_contact_penetration_source_px, 21);
+  assert.deepEqual(manifest.qa.cat_mesh_deformation_layers, []);
+  assert.deepEqual(manifest.qa.soft_mesh_deformation_layers, ["dough contact field above fixed root"]);
 });
 
 test("former completion saves become a continuous loop and no ready UI remains", () => {
@@ -524,7 +600,8 @@ test("standalone output contains no external source dependencies", () => {
   assert.doesNotMatch(single, /<link\s+rel="stylesheet"/i);
   assert.doesNotMatch(single, /<script\s+src=/i);
   assert.match(single, /data:image\/png;base64,/);
-  assert.match(single, /data:image\/webp;base64,/);
+  assert.doesNotMatch(single, /data:image\/webp;base64,/);
   assert.match(single, /Inlined from taskbar-widget-core\.js/);
+  assert.match(single, /Inlined from taskbar-cat-player\.js/);
   assert.match(single, /Inlined from app\.js/);
 });

@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Taskbar Cat Visual State Harness</title>
-    <link rel="stylesheet" href="../taskbar-companion.css?v=14" />
+    <link rel="stylesheet" href="../taskbar-companion.css?v=15" />
     <style>
       * { box-sizing: border-box; }
       body {
@@ -66,13 +66,26 @@
         ["Sleepy idle", "3~5분 긴 눈감기와 작은 고개 하강", "sleepy-idle", "none", "idle-sleepy", "full", "none"],
         ["Doze", "5분 후 관절형 꾸벅꾸벅", "doze", "none", "doze-loop", "full", "none"],
         ["Wake", "첫 입력에 1초 화들짝", "return", "wake-startle", "wake-startle", "full", "wake"],
-        ["Normal key", "입력 후 1.2초 반죽 작업", "work", "key-left", "ambient-v4", "full", "input"],
+        ["Normal key", "입력 후 1.2초 반죽 작업", "work", "key-left", "ambient-v6", "full", "input"],
         ["Fast typing", "고대비 대각선·접점 충격", "work", "typing-fast", "typing-fast", "full", "input"],
         ["Typing overdrive", "당황 표정·땀·강한 충격", "work", "typing-overdrive", "typing-overdrive", "full", "input"],
         ["Motion off", "접근성 정지 중립", "alert-idle", "none", "neutral", "off", "none"]
       ];
 
       const grid = document.querySelector("#stateGrid");
+      const atlasSpecs = {
+        neutral: ["--taskbar-cat-neutral-atlas", 1, 1000, 1, false],
+        "ambient-v6": ["--taskbar-cat-work-atlas", 30, 40, 6, true],
+        "typing-fast": ["--taskbar-cat-typing-fast-atlas", 25, 40, 5, true],
+        "typing-overdrive": ["--taskbar-cat-typing-overdrive-atlas", 49, 20, 7, true],
+        "idle-alert": ["--taskbar-cat-idle-alert-atlas", 100, 80, 10, true],
+        "idle-attention": ["--taskbar-cat-idle-attention-atlas", 24, 50, 5, false],
+        "idle-sniff": ["--taskbar-cat-idle-sniff-atlas", 60, 50, 8, false],
+        "idle-sleepy": ["--taskbar-cat-idle-sleepy-atlas", 100, 80, 10, true],
+        "doze-loop": ["--taskbar-cat-doze-atlas", 80, 50, 9, true],
+        "wake-startle": ["--taskbar-cat-wake-atlas", 20, 50, 5, false]
+      };
+      const previews = [];
       states.forEach(([title, description, ambient, reaction, pose, motion, source]) => {
         const card = document.createElement("article");
         card.className = "state-card";
@@ -81,7 +94,7 @@
           <div class="state-stage">
             <div class="taskbar-companion" data-ambient="${ambient}" data-reaction="${reaction}" data-reaction-source="${source}" data-pose="${pose}" data-motion="${motion}">
               <span class="taskbar-cat-visual">
-                <span class="taskbar-cat-reaction-motion"><span class="taskbar-cat-ambient-motion"><span class="taskbar-cat-pose"></span></span></span>
+                <span class="taskbar-cat-reaction-motion"><span class="taskbar-cat-ambient-motion"><canvas class="taskbar-cat-pose" data-preview-pose="${motion === "full" ? pose : "neutral"}" width="128" height="128"></canvas></span></span>
                 <span class="taskbar-cat-fx">
                   <i class="taskbar-cat-key-flash taskbar-cat-key-flash--left"></i>
                   <i class="taskbar-cat-key-flash taskbar-cat-key-flash--right"></i>
@@ -93,6 +106,31 @@
           </div>`;
         grid.appendChild(card);
       });
+
+      document.querySelectorAll("canvas[data-preview-pose]").forEach((canvas) => {
+        const pose = canvas.dataset.previewPose;
+        const spec = atlasSpecs[pose];
+        const companion = canvas.closest(".taskbar-companion");
+        const source = getComputedStyle(companion).getPropertyValue(spec[0]).trim().replace(/^url\(["']?|["']?\)$/g, "");
+        const image = new Image();
+        image.src = source;
+        previews.push({ canvas, context: canvas.getContext("2d"), image, spec, startedAt: performance.now() });
+      });
+
+      function animate(timestamp) {
+        previews.forEach(({ context, image, spec, startedAt }) => {
+          if (!image.complete || !image.naturalWidth) return;
+          const [, frames, frameMs, columns, loop] = spec;
+          const duration = frames * frameMs;
+          const elapsed = loop ? (timestamp - startedAt) % duration : Math.min(timestamp - startedAt, duration - 1);
+          const frame = Math.min(frames - 1, Math.floor(elapsed / frameMs));
+          context.globalCompositeOperation = "copy";
+          context.drawImage(image, (frame % columns) * 128, Math.floor(frame / columns) * 128, 128, 128, 0, 0, 128, 128);
+          context.canvas.dataset.rendererReady = "true";
+        });
+        requestAnimationFrame(animate);
+      }
+      requestAnimationFrame(animate);
     </script>
   </body>
 </html>

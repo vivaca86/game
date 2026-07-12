@@ -1,0 +1,280 @@
+{
+  "version": 1,
+  "status": "prototype-runtime-candidate-user-selected-direction-a",
+  "source_policy": "reference crops only; not production-approved",
+  "scene": "assets/management-v4/restaurant-scene.png",
+  "outputs": [
+    {
+      "path": "assets/management-v4/recipes/stew.png",
+      "source": "assets/concept/recipe-panel-v9.png",
+      "crop": [
+        17,
+        65,
+        98,
+        135
+      ],
+      "kind": "prototype-recipe-art",
+      "width": 96,
+      "height": 82,
+      "sha256": "022d608dfed8bdbf8edd48de7f1fb040261bde8f0a6a06bd4e0816196fa6e40f"
+    },
+    {
+      "path": "assets/management-v4/recipes/pasta.png",
+      "source": "assets/concept/recipe-panel-v9.png",
+      "crop": [
+        123,
+        65,
+        211,
+        135
+      ],
+      "kind": "prototype-recipe-art",
+      "width": 96,
+      "height": 82,
+      "sha256": "e1c5fc8456b6664cdd9502f4cf4306fbf6dafd27d168de6f14bbdfbfcddafd0c"
+    },
+    {
+      "path": "assets/management-v4/recipes/juice.png",
+      "source": "assets/concept/recipe-panel-v9.png",
+      "crop": [
+        344,
+        65,
+        444,
+        135
+      ],
+      "kind": "prototype-recipe-art",
+      "width": 96,
+      "height": 82,
+      "sha256": "2907d98c674744991677917a4210207b888aaa5194ab8f993948e4520bd4a67c"
+    },
+    {
+      "path": "assets/management-v4/recipes/cake.png",
+      "source": "assets/concept/restaurant-room-v9.png",
+      "crop": [
+        402,
+        36,
+        478,
+        112
+      ],
+      "kind": "prototype-recipe-art",
+      "width": 96,
+      "height": 82,
+      "sha256": "4899537c50fc8ff4161f6f004ae42ed3f5d1d57fdc058a541eb1fff7446cf92e"
+    },
+    {
+      "path": "assets/management-v4/ingredients/wheat.png",
+      "source": "assets/concept/recipe-panel-v9.png",
+      "crop": [
+        2,
+        372,
+        58,
+        431
+      ],
+      "kind": "prototype-ingredient-art",
+      "width": 56,
+      "height": 56,
+      "sha256": "9d70871bc704a0acbeca9c984fa3d8019270ef0959c3aae7c9f7833544833e26"
+    },
+    {
+      "path": "assets/management-v4/ingredients/carrot.png",
+      "source": "assets/concept/recipe-panel-v9.png",
+      "crop": [
+        68,
+        372,
+        124,
+        431
+      ],
+      "kind": "prototype-ingredient-art",
+      "width": 56,
+      "height": 56,
+      "sha256": "0ba15b3366715e5989c4af163bff7d1f6c3bebae8d45ce7b7485759ff68f901e"
+    },
+    {
+      "path": "assets/management-v4/ingredients/tomato.png",
+      "source": "assets/concept/recipe-panel-v9.png",
+      "crop": [
+        130,
+        372,
+        186,
+        431
+      ],
+      "kind": "prototype-ingredient-art",
+      "width": 56,
+      "height": 56,
+      "sha256": "9e36095a66d2d481ac399998c7e742c147e72b66f98be729586c993f370fff6c"
+    },
+    {
+      "path": "assets/management-v4/ingredients/milk.png",
+      "source": "assets/concept/recipe-panel-v9.png",
+      "crop": [
+        196,
+        372,
+        252,
+        431
+      ],
+      "kind": "prototype-ingredient-art",
+      "width": 56,
+      "height": 56,
+      "sha256": "e4926cb159580c8e81379f10f7d75c44d49738aa42ec9d47d0121884ad0c09ee"
+    },
+    {
+      "path": "assets/management-v4/ingredients/cheese.png",
+      "source": "assets/concept/recipe-panel-v9.png",
+      "crop": [
+        256,
+        372,
+        312,
+        431
+      ],
+      "kind": "prototype-ingredient-art",
+      "width": 56,
+      "height": 56,
+      "sha256": "9ae81cb675899da685101cf932cfad431eb592a98863bc44d25bf17a87796f45"
+    },
+    {
+      "path": "assets/management-v4/ingredients/egg.png",
+      "source": "assets/concept/recipe-panel-v9.png",
+      "crop": [
+        327,
+        372,
+        383,
+        431
+      ],
+      "kind": "prototype-ingredient-art",
+      "width": 56,
+      "height": 56,
+      "sha256": "92ee394bab35d119949b9192fee928d10600cad593f49575b58851741bec8a3e"
+    },
+    {
+      "path": "assets/management-v4/tabs/kitchen.png",
+      "source": "assets/concept/restaurant-room-v9.png",
+      "crop": [
+        82,
+        420,
+        232,
+        487
+      ],
+      "kind": "prototype-tab-art",
+      "width": 186,
+      "height": 88,
+      "sha256": "9c4f04ca2efb26efcf5baca75eb6406ef61a061b5e070a1908e03d5164c88df7"
+    },
+    {
+      "path": "assets/management-v4/tabs/decorate.png",
+      "source": "assets/concept/restaurant-room-v9.png",
+      "crop": [
+        236,
+        420,
+        390,
+        487
+      ],
+      "kind": "prototype-tab-art",
+      "width": 186,
+      "height": 88,
+      "sha256": "55a41dd4ba343c7801ecc003967ca726aff255f3fed20a763a540d3314eb1413"
+    },
+    {
+      "path": "assets/management-v4/tabs/farm.png",
+      "source": "assets/concept/restaurant-room-v9.png",
+      "crop": [
+        393,
+        420,
+        548,
+        487
+      ],
+      "kind": "prototype-tab-art",
+      "width": 186,
+      "height": 88,
+      "sha256": "36092c8af6582f5b6a1f78ddb3fcb6ec4d1b05a4dd1175807bf195923101b305"
+    },
+    {
+      "path": "assets/management-v4/resources/heart.png",
+      "source": "assets/concept/full-v9.png",
+      "crop": [
+        610,
+        43,
+        654,
+        91
+      ],
+      "kind": "prototype-resource-art",
+      "width": 52,
+      "height": 52,
+      "sha256": "4fcc315f2448b8c04b3765edbfe1d2f4cd8183a0018e420b5a5957b80846d311"
+    },
+    {
+      "path": "assets/management-v4/resources/coin.png",
+      "source": "assets/concept/full-v9.png",
+      "crop": [
+        836,
+        43,
+        882,
+        91
+      ],
+      "kind": "prototype-resource-art",
+      "width": 52,
+      "height": 52,
+      "sha256": "6c169cb6109142ce73ffb4a517683adde21cb97a4074c195bfe0a1bd893addca"
+    },
+    {
+      "path": "assets/management-v4/resources/gem.png",
+      "source": "assets/concept/full-v9.png",
+      "crop": [
+        1012,
+        43,
+        1062,
+        91
+      ],
+      "kind": "prototype-resource-art",
+      "width": 52,
+      "height": 52,
+      "sha256": "91a4c4f2df2211d693dfd34ca7245cd573c30eac0c0ebff960d5bf2b43a4eba2"
+    },
+    {
+      "path": "assets/management-v4/resources/energy.png",
+      "source": "assets/concept/full-v9.png",
+      "crop": [
+        1167,
+        39,
+        1216,
+        93
+      ],
+      "kind": "prototype-resource-art",
+      "width": 52,
+      "height": 52,
+      "sha256": "7271a2e43053f7b0ccbc54a6e40e70ebc34f7f08d9c10bb48848ba21a09861b5"
+    },
+    {
+      "path": "assets/management-v4/resources/cat.png",
+      "source": "assets/concept/full-v9.png",
+      "crop": [
+        1324,
+        42,
+        1370,
+        92
+      ],
+      "kind": "prototype-resource-art",
+      "width": 52,
+      "height": 52,
+      "sha256": "36e6875f5eb92fb8766756049b09930e19e55cc56ef5e251b9fcaf5c481bebc7"
+    },
+    {
+      "path": "assets/management-v4/restaurant-scene.png",
+      "source": "assets/concept/restaurant-scene-v9.png",
+      "crop": [
+        0,
+        0,
+        650,
+        405
+      ],
+      "kind": "prototype-scene-art",
+      "width": 650,
+      "height": 405,
+      "sha256": "7539fee4feded37a261fa36dd3b8b7ff3d63837a20d1297f062274ee61a0c153"
+    }
+  ],
+  "qa": {
+    "path": "assets/management-v4/qa/management-v4-assets-contact-sheet.png",
+    "sha256": "a782c5b2e4a853e8046aa3060eb12f095b7f2596f04c0d73a3070dc6d6a6a697",
+    "width": 1100,
+    "height": 520
+  }
+}
